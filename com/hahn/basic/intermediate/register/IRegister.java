@@ -2,9 +2,9 @@ package com.hahn.basic.intermediate.register;
 
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.types.Type;
-import com.hahn.basic.target.LangObject;
+import com.hahn.basic.target.ILangObject;
 
-public abstract class IRegister extends BasicObject implements LangObject {
+public abstract class IRegister extends BasicObject implements ILangObject {
     
     public IRegister(String name) {
         super(name, Type.UINT);
@@ -25,7 +25,7 @@ public abstract class IRegister extends BasicObject implements LangObject {
     }
     
     @Override
-    public LangObject toTarget() {
+    public ILangObject toTarget() {
         return this;
     }
 }

@@ -66,11 +66,6 @@ public class Register extends IRegister {
         return this;
     }
     
-    @Override
-    public Object[] toBytecode() {
-        return new Object[] { bytecode };
-    }
-    
     public int getAsByte() {
         return bytecode;
     }

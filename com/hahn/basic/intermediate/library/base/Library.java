@@ -1,6 +1,5 @@
 package com.hahn.basic.intermediate.library.base;
 
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -8,9 +7,8 @@ import com.hahn.basic.intermediate.Compiler;
 import com.hahn.basic.intermediate.library.Common;
 import com.hahn.basic.intermediate.library.IO;
 import com.hahn.basic.intermediate.objects.types.Type;
-import com.hahn.basic.intermediate.opcode.PreprocessorDirective;
+import com.hahn.basic.target.ILangCommand;
 import com.hahn.basic.target.LangBuildTarget;
-import com.hahn.basic.target.asm.raw.ASMSpecial;
 import com.hahn.basic.util.Util;
 
 public abstract class Library {
@@ -26,8 +24,8 @@ public abstract class Library {
         this.name = name;
     }
     
-    public final ASMSpecial getCode() {
-        return new ASMSpecial(PreprocessorDirective.IMPORT, '"' + name + '"');
+    public final ILangCommand getCode() {
+        return Compiler.factory.Import(name);
     }
     
     @Override
@@ -45,7 +43,7 @@ public abstract class Library {
     }
     
     public abstract void define();
-    public abstract void defineASM(LangBuildTarget b);
+    public abstract void define(LangBuildTarget b);
     
     public static Library getLib(String name) {
         Library lib = Library.libraries.get(name);
@@ -71,6 +69,6 @@ public abstract class Library {
     }
 
     public static void defineProperty(String string) {
-        Compiler.defineGlobalVar(Compiler.createGlobalVar(string, Type.UINT));
+        Compiler.addGlobalVar(Compiler.factory.VarGlobal(string, Type.UINT));
     }
 }

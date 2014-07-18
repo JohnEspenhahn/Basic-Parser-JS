@@ -2,7 +2,7 @@ package com.hahn.basic.intermediate.objects;
 
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.opcode.OPCode;
-import com.hahn.basic.target.LangObject;
+import com.hahn.basic.target.ILangObject;
 import com.hahn.basic.util.CompileException;
 
 public class LiteralBool extends Literal {
@@ -15,7 +15,7 @@ public class LiteralBool extends Literal {
 	}
 
 	@Override
-	public LangObject toTarget() {
+	public ILangObject toTarget() {
 		return this;
 	}
 

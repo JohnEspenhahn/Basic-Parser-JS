@@ -2,14 +2,12 @@ package com.hahn.basic.intermediate;
 
 import com.hahn.basic.intermediate.objects.AdvancedObject;
 import com.hahn.basic.intermediate.objects.FuncPointer;
-import com.hahn.basic.intermediate.objects.Label;
 import com.hahn.basic.intermediate.objects.Param;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.statements.StoreRegsStatement;
 import com.hahn.basic.parser.Node;
 import com.hahn.basic.target.LangBuildTarget;
-import com.hahn.basic.target.asm.raw.ASMLabel;
 
 public class FuncHead extends Frame {    
     private final String name;
@@ -18,13 +16,13 @@ public class FuncHead extends Frame {
     
     private final Type rtnType;
     
-    private final Label funcId;
+    private final String funcId;
     private final StoreRegsStatement storeRegs;
     
     public FuncHead(String name, Node funcHeadNode, Type rtn, Param... params) {
-        super(null, funcHeadNode);
+        super(Compiler.getGlobalFrame(), funcHeadNode);
         
-        this.funcId = new Label(createFuncId(name, params));
+        this.funcId = createFuncId(name, params);
         this.rtnType = rtn;
         
         this.name = name;
@@ -54,16 +52,12 @@ public class FuncHead extends Frame {
      * Gets the ID of this function
      * @return name_param1_param2_etc
      */
-    public Label getFuncId() {
+    public String getFuncId() {
         return funcId;
     }
     
     public Type getReturnType() {
         return rtnType;
-    }
-    
-    public Label getReturnLabel() {
-        return new Label(funcId + "_rtn");
     }
     
     public int numParams() {
@@ -83,9 +77,8 @@ public class FuncHead extends Frame {
     }
     
     @Override
-    public void addTargetCode() {
-        addCode(new ASMLabel(getFuncId()));
-        addCode(storeRegs);
+    public final void addTargetCode() {
+        Compiler.factory.addPreCode(this);
         
         super.addTargetCode();
         
@@ -152,8 +145,8 @@ public class FuncHead extends Frame {
     }
     
     public static String createFuncId(String name, ITypeable... objs) {
-        String funcID = "@func_" + name;
-        for (ITypeable o: objs) funcID += "@" + o.getType().getName();
+        String funcID = "func_" + name + "_params";
+        for (ITypeable o: objs) funcID += "_" + o.getType().getName();
         
         return funcID;
     }

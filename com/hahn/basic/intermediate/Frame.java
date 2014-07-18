@@ -35,7 +35,6 @@ import com.hahn.basic.intermediate.objects.AdvancedObject;
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.FuncCallPointer;
 import com.hahn.basic.intermediate.objects.FuncPointer;
-import com.hahn.basic.intermediate.objects.Label;
 import com.hahn.basic.intermediate.objects.LiteralBool;
 import com.hahn.basic.intermediate.objects.LiteralNum;
 import com.hahn.basic.intermediate.objects.Param;
@@ -64,6 +63,7 @@ import com.hahn.basic.parser.Node;
 import com.hahn.basic.util.CastException;
 import com.hahn.basic.util.CompileException;
 import com.hahn.basic.util.DepthIterator;
+import com.hahn.basic.util.DuplicateDefinitionException;
 import com.hahn.basic.util.Util;
 
 public class Frame extends Statement {    
@@ -101,17 +101,12 @@ public class Frame extends Statement {
     private List<AdvancedObject> inUseVars;
     
     private EndLoopStatement endLoop;
-    private final Label lblStart, lblEnd;
-    
-    public Frame(Frame parent) {
-        this(parent, null, null, null);
-    }
     
     public Frame(Frame parent, Node head) {
-        this(parent, head, null, null);
+    	this(parent, head, false);
     }
     
-    public Frame(Frame parent, Node head, Label start, Label end) {
+    public Frame(Frame parent, Node head, boolean loop) {
         super(null);
         
         this.parent = parent;
@@ -124,15 +119,7 @@ public class Frame extends Statement {
         this.inUseVars = new ArrayList<AdvancedObject>();
         
         // Special loop handling
-        if (start != null && end != null) {
-            this.endLoop = new EndLoopStatement(this);
-            this.lblStart = start;
-            this.lblEnd = end;
-        } else {
-            this.endLoop = null;
-            this.lblStart = null;
-            this.lblEnd = null;
-        }
+        if (loop) { this.endLoop = new EndLoopStatement(this); }
     }
     
     @Override
@@ -152,16 +139,6 @@ public class Frame extends Statement {
         } else {
             return null;
         }
-    }
-    
-    public Label getStartLabel() {
-        if (lblStart != null) return lblStart;
-        else throw new CompileException("Can not get start label from non-loop");
-    }
-    
-    public Label getEndLabel() {
-        if (lblEnd != null) return lblEnd;
-        else throw new CompileException("Can not get end label from non-loop");
     }
     
     /*
@@ -244,24 +221,28 @@ public class Frame extends Statement {
         }
     }
     
-    public AdvancedObject addVar(AdvancedObject var) {
-        trackVar(var);
-       
-        String name = var.getName();
-        if (getLocalVar(name) == null) {
-            vars.put(name, var);
-        } else {
-            throw new CompileException("The local variable `" + name + "` is already defined");
-        }
+    public boolean safeAddVar(AdvancedObject var) {
+    	trackVar(var);
         
-        return var;
+        String name = var.getName();
+        if (safeGetVar(name) == null) {
+            vars.put(name, var);
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    public AdvancedObject addVar(AdvancedObject var) {
+        if (safeAddVar(var)) return var;
+        else throw new DuplicateDefinitionException("The local var `" + var + "` is already defined");
     }
     
     public VarTemp createTempVar(Type type) {
         return (VarTemp) addVar(new VarTemp(this, type));
     }
     
-    private AdvancedObject getLocalVar(String name) {
+    private AdvancedObject safeGetVar(String name) {
         // Local var
         AdvancedObject obj = vars.get(name);
         if (obj != null) {
@@ -270,7 +251,7 @@ public class Frame extends Statement {
         
         // Var from parent (still local)
         if (parent != null) {
-            obj = parent.getLocalVar(name);
+            obj = parent.safeGetVar(name);
             if (obj != null) {
                 if (endLoop != null) {
                     endLoop.addVar(obj);
@@ -284,19 +265,11 @@ public class Frame extends Statement {
     }
     
     public AdvancedObject getVar(String name) {
-        AdvancedObject obj = getLocalVar(name);
-        if (obj != null) {
-            return obj;
-        }
-        
-        // Global var
-        obj = Compiler.getGlobalVar(name);
-        if (obj != null) { 
-            return obj; 
-        }
+        AdvancedObject obj = safeGetVar(name);
         
         // Not found
-        throw new CompileException("Variable `" + name + "` not defined");
+        if (obj != null) return obj;
+        else throw new CompileException("Variable `" + name + "` is not defined in this scope");
     }
     
     public String getLabel(String name) {
@@ -520,7 +493,7 @@ public class Frame extends Statement {
                 
                 // Create var
                 if (isGlobal) {
-                    obj = Compiler.createGlobalVar(name, type);                    
+                    obj = Compiler.factory.VarGlobal(name, type);                    
                 } else if (varsList != null) {
                     obj = new Param(name, type);                    
                 } else {
@@ -541,11 +514,7 @@ public class Frame extends Statement {
                         List<Node> modify_children = nextHead.getAsChildren();
                         
                         BasicObject o = handleExpression(modify_children.get(1));
-                        if (isGlobal && o.hasLiteral()) {
-                            ((VarGlobal) obj).setDefaultValue(row, o.getLiteral());
-                        } else {
-                            addCode(new DefineVarStatement(this, (AdvancedObject) obj, o));
-                        }
+                        addCode(new DefineVarStatement(this, (AdvancedObject) obj, o));
                         
                         hasInit = true;
                     }
@@ -558,9 +527,9 @@ public class Frame extends Statement {
                 
                 // Make var available
                 if (isGlobal) {
-                    Compiler.defineGlobalVar((VarGlobal) obj);
+                    Compiler.addGlobalVar((VarGlobal) obj);
                 } else if (varsList != null) {
-                    varsList.add((BasicObject) obj);                    
+                    varsList.add(obj);                    
                 } else {
                     addVar((AdvancedObject) obj);
                 }
@@ -882,31 +851,6 @@ public class Frame extends Statement {
     }
     
     /**
-     * Parse an else statement
-     * @param conditionalStatement
-     * @param successTarget Label to move to on completion
-     * @param failTarget Label to move to on fail
-     */
-    public void handleConditional(Conditional conditionalStatement, Label successTarget, Label failTarget) {
-        handleConditional(conditionalStatement, successTarget, failTarget, true);
-    }
-    
-    public void handleConditional(Conditional conditional, Label lblSuccess, Label lblFail, boolean jumpOnSuccess) {
-        Node cndHead = conditional.getConditionHead();
-        if (cndHead != null) {
-            BasicObject c = handleExpression(cndHead);
-            addCode(new Command(this, OPCode.IFE, c, LiteralNum.ZERO));
-            addCode(new Command(this, OPCode.MOV, lblFail));
-        }
-    
-        addCode(new Frame(this, conditional.getBodyHead(), lblSuccess, lblFail));
-        
-        if (jumpOnSuccess) {
-            addCode(new Command(this, OPCode.MOV, lblSuccess));
-        }
-    }
-    
-    /**
      * `For` statement handler
      * @param head EnumExpression.FOR_STMT
      */
@@ -958,7 +902,7 @@ public class Frame extends Statement {
             throw new CompileException("Invalid use of `break`");
         }
         
-        addCode(new Command(this, OPCode.MOV, loop.lblEnd));
+        addCode(Compiler.factory.BreakStatement(this));
     }
     
     /**

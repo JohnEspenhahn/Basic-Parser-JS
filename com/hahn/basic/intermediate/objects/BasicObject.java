@@ -5,9 +5,9 @@ import lombok.NonNull;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.statements.Statement;
-import com.hahn.basic.target.LangObject;
+import com.hahn.basic.target.ILangObject;
 
-public abstract class BasicObject implements ITypeable, IHolderExcludeList {
+public abstract class BasicObject implements ILangObject, ITypeable, IHolderExcludeList {
     private String name;
     private Type type;
     private int uses;
@@ -100,7 +100,7 @@ public abstract class BasicObject implements ITypeable, IHolderExcludeList {
      * Convert to its final form
      * @return A final form object
      */
-    public abstract LangObject toTarget();
+    public abstract ILangObject toTarget();
     
     /**
      * @return The creatable version of this

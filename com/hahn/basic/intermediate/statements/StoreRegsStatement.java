@@ -11,7 +11,7 @@ import com.hahn.basic.intermediate.opcode.OPCode;
 import com.hahn.basic.intermediate.register.Register;
 import com.hahn.basic.intermediate.register.StackRegister;
 import com.hahn.basic.intermediate.register.StackRegisterSnapshot;
-import com.hahn.basic.target.LangObject;
+import com.hahn.basic.target.ILangObject;
 import com.hahn.basic.target.asm.raw.ASMCommand;
 
 public class StoreRegsStatement extends Statement {
@@ -82,7 +82,7 @@ public class StoreRegsStatement extends Statement {
         } else {
             List<Register> regs = Register.values();
             for (int i = 0; i < regsStored; i++) {
-                addCode(new ASMCommand(OPCode.SET, (LangObject) Register.PUSH, (LangObject) regs.get(i)));
+                addCode(new ASMCommand(OPCode.SET, (ILangObject) Register.PUSH, (ILangObject) regs.get(i)));
             }
         }
         

@@ -7,7 +7,7 @@ import com.hahn.basic.intermediate.FuncHead;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.ParameterizedType;
 import com.hahn.basic.intermediate.objects.types.Type;
-import com.hahn.basic.target.LangObject;
+import com.hahn.basic.target.ILangObject;
 import com.hahn.basic.util.CompileException;
 
 public abstract class FuncPointer extends BasicObject {    
@@ -26,7 +26,7 @@ public abstract class FuncPointer extends BasicObject {
     public String getFuncId() {
         checkFunction();
         
-        return func.getFuncId().getName();
+        return func.getFuncId();
     }
     
     @SuppressWarnings("unchecked")
@@ -71,5 +71,5 @@ public abstract class FuncPointer extends BasicObject {
     }
     
     @Override
-    public abstract LangObject toTarget();
+    public abstract ILangObject toTarget();
 }

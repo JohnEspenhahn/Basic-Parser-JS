@@ -26,16 +26,6 @@ public class StackRegister extends IRegister {
     }
     
     @Override
-    public Object[] toBytecode() {
-        int offset = getOffset();
-        if (offset == 0) {
-            return new Object[] { 0x0e };
-        } else {
-            return new Object[] { 0x0d, offset };
-        }
-    }
-    
-    @Override
     public IRegister snapshot() {
         return new StackRegisterSnapshot(getOffset());
     }

@@ -3,10 +3,8 @@ package com.hahn.basic.intermediate.objects;
 import lombok.experimental.Delegate;
 
 import com.hahn.basic.intermediate.objects.types.Type;
-import com.hahn.basic.target.LangObject;
-import com.hahn.basic.target.asm.raw.ASMPointer;
 
-public class VarPointer extends AdvancedObject {
+public abstract class VarPointer extends AdvancedObject {
     
     @Delegate(types=VarPointer.IDelegated.class)
     private AdvancedObject var;
@@ -32,11 +30,6 @@ public class VarPointer extends AdvancedObject {
     @Override
     public boolean canSetLiteral() {
         return false;
-    }
-    
-    @Override
-    public LangObject toTarget() {
-        return new ASMPointer(var.toTarget());
     }
     
     @Override

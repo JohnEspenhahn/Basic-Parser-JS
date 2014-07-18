@@ -5,7 +5,7 @@ import com.hahn.basic.intermediate.objects.types.ParameterizedType;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.statements.Statement;
 import com.hahn.basic.intermediate.statements.function.CallFuncStatement;
-import com.hahn.basic.target.LangObject;
+import com.hahn.basic.target.ILangObject;
 
 public abstract class FuncCallPointer extends FuncPointer {
     private Type returnType;
@@ -66,7 +66,7 @@ public abstract class FuncCallPointer extends FuncPointer {
     }
 
     @Override
-    public abstract LangObject toTarget();
+    public abstract ILangObject toTarget();
 
     @Override
     public String toString() {
