@@ -1,29 +1,30 @@
 package com.hahn.basic.intermediate.statements;
 
 import com.hahn.basic.intermediate.Frame;
-import com.hahn.basic.intermediate.objects.Label;
-import com.hahn.basic.intermediate.statements.IfStatement.Conditional;
-import com.hahn.basic.target.asm.raw.ASMLabel;
+import com.hahn.basic.parser.Node;
 
-public class WhileStatement extends Statement {
-    Conditional conditional;
+public abstract class WhileStatement extends Statement {
+	Frame outerFrame, innerFrame;
+    Node condition;
     
-    public WhileStatement(Statement s, Conditional conditional) {
-        super(s);
+    public WhileStatement(Statement container, Node condition, Node body) {
+        super(container);
         
-        this.conditional = conditional;
+        this.outerFrame = new Frame(getFrame(), null);
+        this.innerFrame = new Frame(outerFrame, body);
+        
+        this.condition = condition;
     }
 
-    @Override
-    public void addTargetCode() {
-        Label lblStart = new Label(getFrame().getLabel("@if_start"));
-        Label lblEnd = new Label(getFrame().getLabel("@if_end"));
-        
-        Frame f = new Frame(getFrame());
-        f.addCode(new ASMLabel(lblStart));
-        f.handleConditional(conditional, lblStart, lblEnd);
-        f.addCode(new ASMLabel(lblEnd));
-        addCode(f);
+    public Frame getOuterFrame() {
+    	return outerFrame;
     }
-
+    
+    public Frame getInnerFrame() {
+    	return innerFrame;
+    }
+    
+    public Node getConditionNode() {
+    	return condition;
+    }
 }

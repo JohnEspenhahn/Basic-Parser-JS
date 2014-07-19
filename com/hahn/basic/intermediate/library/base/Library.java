@@ -3,7 +3,7 @@ package com.hahn.basic.intermediate.library.base;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.hahn.basic.intermediate.Compiler;
+import com.hahn.basic.intermediate.LangCompiler;
 import com.hahn.basic.intermediate.library.Common;
 import com.hahn.basic.intermediate.library.IO;
 import com.hahn.basic.intermediate.objects.types.Type;
@@ -25,7 +25,7 @@ public abstract class Library {
     }
     
     public final ILangCommand getCode() {
-        return Compiler.factory.Import(name);
+        return LangCompiler.factory.Import(name);
     }
     
     @Override
@@ -57,7 +57,7 @@ public abstract class Library {
     
     public static void defineString(String str) {
         // If not already defined will define
-        Compiler.getString(str);
+        LangCompiler.getString(str);
     }
     
     public static void defineFunc(String name, Type rtnType) {
@@ -65,10 +65,10 @@ public abstract class Library {
     }
 
     public static void defineFunc(String name, Type rtnType, Type... types) {        
-        Compiler.defineFunc(name, rtnType, Util.toParams(types));
+        LangCompiler.defineFunc(name, rtnType, Util.toParams(types));
     }
 
     public static void defineProperty(String string) {
-        Compiler.addGlobalVar(Compiler.factory.VarGlobal(string, Type.UINT));
+        LangCompiler.addGlobalVar(LangCompiler.factory.VarGlobal(string, Type.UINT));
     }
 }

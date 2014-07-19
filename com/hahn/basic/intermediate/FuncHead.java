@@ -1,15 +1,13 @@
 package com.hahn.basic.intermediate;
 
-import com.hahn.basic.intermediate.objects.AdvancedObject;
 import com.hahn.basic.intermediate.objects.FuncPointer;
 import com.hahn.basic.intermediate.objects.Param;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.Type;
-import com.hahn.basic.intermediate.statements.StoreRegsStatement;
 import com.hahn.basic.parser.Node;
 import com.hahn.basic.target.LangBuildTarget;
 
-public class FuncHead extends Frame {    
+public abstract class FuncHead extends Frame {    
     private final String name;
     
     private final Param[] params;
@@ -17,10 +15,9 @@ public class FuncHead extends Frame {
     private final Type rtnType;
     
     private final String funcId;
-    private final StoreRegsStatement storeRegs;
     
     public FuncHead(String name, Node funcHeadNode, Type rtn, Param... params) {
-        super(Compiler.getGlobalFrame(), funcHeadNode);
+        super(LangCompiler.getGlobalFrame(), funcHeadNode);
         
         this.funcId = createFuncId(name, params);
         this.rtnType = rtn;
@@ -28,24 +25,13 @@ public class FuncHead extends Frame {
         this.name = name;
         this.params = params;
         
-        this.storeRegs = new StoreRegsStatement(this, params);
-    }
-    
-    public int getRegsStored() {
-        return storeRegs.getRegsStored();
-    }
-    
-    public AdvancedObject[] getCurrentVars() {
-        return storeRegs.getCurrentVars();
-    }
-    
-    @Override
-    protected void trackVar(AdvancedObject var) {
-        if (storeRegs != null) {
-            storeRegs.addVar(var);
+        for (Param p: params) {
+        	addVar(LangCompiler.factory.VarParameter(this, p.getName(), p.getType()));
         }
-        
-        super.trackVar(var);
+    }
+    
+    public String getName() {
+        return name;
     }
     
     /**
@@ -68,21 +54,30 @@ public class FuncHead extends Frame {
         return params;
     }
     
+    @Override
+    public final void addTargetCode() {
+        addPreCode();
+        
+        super.addTargetCode();
+        
+        doReturn(null);
+    }
+    
+    protected abstract void addPreCode();
+    
+    @Override
+    public String toTarget(LangBuildTarget builder) {
+    	super.reverseOptimize();
+    	super.forwardOptimize();
+    	return super.toTarget(builder);
+    }
+    
     public boolean hasSameName(FuncHead func) {
         return this.name.equals(func.name);
     }
     
     public boolean hasSameReturnAs(FuncHead func) {
         return this.rtnType.equals(func.rtnType);
-    }
-    
-    @Override
-    public final void addTargetCode() {
-        Compiler.factory.addPreCode(this);
-        
-        super.addTargetCode();
-        
-        doReturn(null);
     }
     
     @Override
@@ -93,22 +88,6 @@ public class FuncHead extends Frame {
     @Override
     public boolean forwardOptimize() {        
         return false;
-    }
-    
-    @Override
-    public void toTarget(LangBuildTarget builder) {
-        super.reverseOptimize();
-        super.forwardOptimize();
-        
-        storeRegs.doStore();
-        
-        super.toTarget(builder);
-        
-        storeRegs.clearStore();
-    }
-    
-    public String getName() {
-        return name;
     }
     
     @Override

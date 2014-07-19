@@ -5,17 +5,14 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import com.hahn.basic.intermediate.Compiler;
 import com.hahn.basic.intermediate.Frame;
+import com.hahn.basic.intermediate.LangCompiler;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.opcode.OPCode;
 import com.hahn.basic.intermediate.register.IRegister;
-import com.hahn.basic.intermediate.register.Register;
 import com.hahn.basic.intermediate.statements.Statement;
-import com.hahn.basic.target.ILangObject;
 
 public abstract class AdvancedObject extends BasicObject {
-
     private Frame frame;
 
     private IRegister reg;
@@ -49,7 +46,7 @@ public abstract class AdvancedObject extends BasicObject {
     }
 
     public AdvancedObject getPointer() {
-        return Compiler.factory.VarPointer(this);
+        return LangCompiler.factory.VarPointer(this);
     }
 
     public BasicObject getAddress() {
@@ -71,18 +68,18 @@ public abstract class AdvancedObject extends BasicObject {
     }
 
     @Override
-    public ILangObject toTarget() {
+    public String toTarget() {
         if (hasLiteral()) {
             return literal.toTarget();
         } else {
-            return reg;
+            return reg.toTarget();
         }
     }
 
     @Override
     public BasicObject getForCreateVar() {
         if (isRegisterOnStack()) {
-            return Register.PUSH;
+            return LangCompiler.factory.PushObject();
         } else {
             return super.getForCreateVar();
         }

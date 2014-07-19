@@ -38,9 +38,10 @@ public abstract class Compilable implements ILangCommand {
     /**
      * Final conversion to target language. 
      * Should NOT do any advanced optimization
-     * @param code Compile to this code
+     * @param builder The build target
+     * @return String for this build target
      */
-    public abstract void toTarget(LangBuildTarget builder);
+    public abstract String toTarget(LangBuildTarget builder);
 
     @Override
     public abstract String toString();

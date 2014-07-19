@@ -43,7 +43,6 @@ public enum EnumToken implements IEnumToken {
     TRUE        ("true"                      ),
     FALSE       ("false"                     ),
     NEW         ("new"                       ),
-    DELETE      ("delete"                    ),
     GLOBAL      ("global"                    ),
     IMPORT      ("import [_a-zA-Z][_a-zA-Z0-9\\.]*" ),
     IDENTIFIER  ("<<WORD>>"                  );

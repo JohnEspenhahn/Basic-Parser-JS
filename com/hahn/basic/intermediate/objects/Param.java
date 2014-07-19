@@ -1,7 +1,6 @@
 package com.hahn.basic.intermediate.objects;
 
 import com.hahn.basic.intermediate.objects.types.Type;
-import com.hahn.basic.target.ILangObject;
 
 public class Param extends BasicObject {
     
@@ -10,7 +9,7 @@ public class Param extends BasicObject {
     }
     
     @Override
-    public ILangObject toTarget() {
-        throw new RuntimeException("Cannot add 'Param' as ASM");
+    public String toTarget() {
+        throw new RuntimeException("Cannot convert `Param` to target language");
     }
 }

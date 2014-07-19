@@ -16,10 +16,9 @@ public enum EnumExpression implements IEnumExpression {
     BOOL_OP     ("NOTEQUAL|EQUALS|LESS_EQU|GTR_EQU|LESS|GTR"),
     BITWISE     ("AND|MSC_BITWISE"),
     
-    CREATE      ("NEW <TYPE> OPEN_PRNTH ?<CALL_PARAMS> CLOSE_PRNTH", false),    
-    DELETE      ("DELETE <ACCESS>", false),
+    CREATE      ("NEW <TYPE> OPEN_PRNTH ?<CALL_PARAMS> CLOSE_PRNTH", false),
     
-    EVALUABLE   ("<CREATE>|<DELETE>|<CALL_FUNC>"),  
+    EVALUABLE   ("<CREATE>|<CALL_FUNC>"),  
     
     WHILE_STMT  ("WHILE <CONDITIONAL>", false),
     IF_STMT     ("IF <CONDITIONAL> {ELSE IF <CONDITIONAL>} (ELSE <BLOCK>)", false),

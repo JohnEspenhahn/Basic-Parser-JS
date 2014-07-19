@@ -1,22 +1,19 @@
 package com.hahn.basic.intermediate.statements;
 
 import com.hahn.basic.Main;
+import com.hahn.basic.intermediate.LangCompiler;
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.opcode.OPCode;
 import com.hahn.basic.target.LangBuildTarget;
 
-public class DefineVarStatement extends Statement {    
+public abstract class DefineVarStatement extends Statement {    
     private final BasicObject var;
     private final BasicObject val;
     private final boolean ignoreTypeCheck;
     
-    public DefineVarStatement(Statement s, BasicObject var, BasicObject val) {
-        this(s, var, val, false);
-    }
-    
-    public DefineVarStatement(Statement s, BasicObject var, BasicObject val, boolean ignoreTypeCheck) {
-        super(s);
+    public DefineVarStatement(Statement container, BasicObject var, BasicObject val, boolean ignoreTypeCheck) {
+        super(container);
         
         this.val = val;
         this.var = var;
@@ -33,7 +30,7 @@ public class DefineVarStatement extends Statement {
     
     @Override
     public void addTargetCode() {
-        addCode(new Command(this, OPCode.SET, var.getForCreateVar(), val));
+        addCode(LangCompiler.factory.Command(this, OPCode.SET, var.getForCreateVar(), val));
     }
     
     @Override
@@ -64,9 +61,11 @@ public class DefineVarStatement extends Statement {
     }
     
     @Override
-    public void toTarget(LangBuildTarget builder) {
+    public String toTarget(LangBuildTarget builder) {
         if (!var.hasLiteral()) {
-            super.toTarget(builder);
+            return super.toTarget(builder);
         }
+        
+        return "";
     }
 }

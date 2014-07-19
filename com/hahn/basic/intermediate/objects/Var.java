@@ -8,10 +8,9 @@ import com.hahn.basic.intermediate.register.IRegister;
 import com.hahn.basic.intermediate.register.Register;
 import com.hahn.basic.intermediate.register.StackRegister;
 
-
-public class Var extends AdvancedObject {
+public abstract class Var extends AdvancedObject {
     
-    public Var(Frame frame, String name, Type type) {
+    protected Var(Frame frame, String name, Type type) {
         super(frame, name, type);
     }
     

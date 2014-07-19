@@ -5,7 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 
-import com.hahn.basic.intermediate.Compiler;
+import com.hahn.basic.intermediate.LangCompiler;
 import com.hahn.basic.lexer.IEnumToken;
 import com.hahn.basic.lexer.Lexer;
 import com.hahn.basic.lexer.PackedToken;
@@ -97,7 +97,7 @@ public class BASICMain extends Main {
     }
     
     private String compile(Node tree_head) {
-        LangBuildTarget code = Compiler.compile(tree_head, factory);
+        LangBuildTarget code = LangCompiler.compile(tree_head, factory);
         
         if (inputFile != null) {
             writeToFile(code, new File(inputFile.getAbsolutePath() + ".bin")); 

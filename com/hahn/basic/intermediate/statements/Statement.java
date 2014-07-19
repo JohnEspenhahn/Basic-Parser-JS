@@ -16,8 +16,8 @@ import com.hahn.basic.target.LangBuildTarget;
 public abstract class Statement extends Compilable {
     private Deque<Compilable> code;
     
-    public Statement(Statement s) {
-        super(s == null ? null : s.getFrame());
+    public Statement(Statement container) {
+        super(container == null ? null : container.getFrame());
         
         this.code = new ArrayDeque<Compilable>();
     }
@@ -71,10 +71,13 @@ public abstract class Statement extends Compilable {
     }
     
     @Override
-    public void toTarget(LangBuildTarget builder) {
+    public String toTarget(LangBuildTarget builder) {
+    	StringBuilder str = new StringBuilder();
         for (Compilable c: code) {
-            c.toTarget(builder);
+            str.append(c.toTarget(builder));
         }
+        
+        return str.toString();
     }
     
     /**

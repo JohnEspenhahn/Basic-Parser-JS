@@ -3,44 +3,43 @@ package com.hahn.basic.intermediate.statements;
 import com.hahn.basic.Main;
 import com.hahn.basic.intermediate.objects.AdvancedObject;
 import com.hahn.basic.intermediate.objects.BasicObject;
+import com.hahn.basic.intermediate.objects.PopObject;
+import com.hahn.basic.intermediate.objects.PushObject;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.opcode.OPCode;
-import com.hahn.basic.intermediate.register.Register;
 import com.hahn.basic.intermediate.register.StackRegister;
-import com.hahn.basic.target.LangBuildTarget;
-import com.hahn.basic.target.asm.raw.ASMCommand;
 
-public class Command extends Compilable {  
+public abstract class Command extends Compilable {  
     protected OPCode opcode;
     protected BasicObject p1, p2;
     
     protected boolean p1LastUse, p2LastUse;
     
-    public Command(Statement s, OPCode opcode) {
-        this(s, opcode, null, null);
+    public Command(Statement container, OPCode opcode) {
+        this(container, opcode, null, null);
     }
     
     /**
-     * @param s The owning statement
+     * @param container The owning statement
      * @param opcode The command op code
-     * @param p Sets this.p1 = p.getForUse(s)
+     * @param p Sets this.p1 = p.getForUse(container)
      */
-    public Command(Statement s, OPCode opcode, BasicObject p) {
-        this(s, opcode, p, null);
+    public Command(Statement container, OPCode opcode, BasicObject p) {
+        this(container, opcode, p, null);
     }
     
     /**
-     * @param s The owning statement
+     * @param container The owning statement
      * @param opcode The command op code
-     * @param p1 Sets this.p1 = p1.getForUse(s)
-     * @param p2 Sets this.p2 = p2.getForUse(s)
+     * @param p1 Sets this.p1 = p1.getForUse(container)
+     * @param p2 Sets this.p2 = p2.getForUse(container)
      */
-    public Command(Statement s, OPCode opcode, BasicObject p1, BasicObject p2) {
-        super(s.getFrame());
+    public Command(Statement container, OPCode opcode, BasicObject p1, BasicObject p2) {
+        super(container.getFrame());
         
         this.opcode = opcode;
-        this.p1 = (p1 != null ? p1.getForUse(s) : null);
-        this.p2 = (p2 != null ? p2.getForUse(s) : null);
+        this.p1 = (p1 != null ? p1.getForUse(container) : null);
+        this.p2 = (p2 != null ? p2.getForUse(container) : null);
     }
     
     public BasicObject getP1() {
@@ -121,35 +120,20 @@ public class Command extends Compilable {
         
         // Check registers
         if (p2 instanceof AdvancedObject) { ((AdvancedObject) p2).takeRegister(p2LastUse); }
-        else if (p2 == Register.POP) StackRegister.pop();
+        else if (p2 instanceof PopObject) StackRegister.pop();
         
         if (p1 instanceof AdvancedObject) { ((AdvancedObject) p1).takeRegister(p1LastUse); }
-        else if (p1 == Register.PUSH) StackRegister.push();
+        else if (p1 instanceof PushObject) StackRegister.push();
 
         return false;
     }
     
     @Override
-    public void toTarget(LangBuildTarget builder) {        
-        if (p1 != null && p2 != null)
-            builder.append(new ASMCommand(opcode, p1.toTarget(), p2.toTarget()));
-        else if (p1 != null)
-            builder.append(new ASMCommand(opcode, p1.toTarget()));
-        else
-            builder.append(new ASMCommand(opcode));
-            
-    }
-    
-    @Override
     public String toString() {
         if (p2 != null) {
-            String str = String.format("%s %s, %s", opcode, p1, p2);
-            return str +
-                    (Main.DEBUG ? ";\tREM " + opcode + " " + p1.getName() + (p1LastUse?"*":"") + ", " + p2.getName() + (p2LastUse ? "*" : "") : "");
+            return String.format("%s({%s}->%s, {%s}->%s);", opcode, p1.getName() + (p1LastUse?"*":""), p1, p2.getName() + (p2LastUse?"*":""), p2);
         } else if (p1 != null) {
-            String str = String.format("%s %s", opcode, p1);
-            return str +
-                    (Main.DEBUG ? ";\tREM " + opcode + " " + p1.getName() + (p1LastUse?"*":"") : "");
+            return String.format("%s({%s}->%s)", opcode, p1.getName() + (p1LastUse?"*":""), p1);
         } else {
             return opcode.toString();
         }

@@ -149,6 +149,10 @@ public class Util {
     public static String toHexStr(String str) {
         return String.format("%x", new BigInteger(1, str.getBytes()));
     }
+    
+    public static boolean toBool(double d) {
+		return (d != 0 ? true : false);
+	}
 
     public static String createArrow(char main, char pointer, int length) {
         StringBuilder str = new StringBuilder(length);

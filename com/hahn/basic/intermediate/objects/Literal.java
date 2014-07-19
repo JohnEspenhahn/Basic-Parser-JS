@@ -2,9 +2,8 @@ package com.hahn.basic.intermediate.objects;
 
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.opcode.OPCode;
-import com.hahn.basic.target.ILangObject;
 
-public abstract class Literal extends BasicObject implements ILangObject {
+public abstract class Literal extends BasicObject {
 
 	public Literal(Type type) {
 		super("#", type);
@@ -31,8 +30,8 @@ public abstract class Literal extends BasicObject implements ILangObject {
     }
 	
 	@Override
-	public ILangObject toTarget() {
-		return this;
+	public String toTarget() {
+		return toString();
 	}
 	
 	@Override

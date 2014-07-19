@@ -2,12 +2,11 @@ package com.hahn.basic.intermediate.objects;
 
 import lombok.NonNull;
 
-import com.hahn.basic.intermediate.Compiler;
 import com.hahn.basic.intermediate.FuncHead;
+import com.hahn.basic.intermediate.LangCompiler;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.ParameterizedType;
 import com.hahn.basic.intermediate.objects.types.Type;
-import com.hahn.basic.target.ILangObject;
 import com.hahn.basic.util.CompileException;
 
 public abstract class FuncPointer extends BasicObject {    
@@ -61,7 +60,7 @@ public abstract class FuncPointer extends BasicObject {
     
     protected void checkFunction() {
         if (func == null) {
-            setFunction(Compiler.getFunc(getName(), getTypes()));
+            setFunction(LangCompiler.getFunc(getName(), getTypes()));
             
             // Still null then not found
             if (func == null) {
@@ -71,5 +70,5 @@ public abstract class FuncPointer extends BasicObject {
     }
     
     @Override
-    public abstract ILangObject toTarget();
+    public abstract String toTarget();
 }

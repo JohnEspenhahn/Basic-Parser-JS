@@ -16,7 +16,7 @@ import com.hahn.basic.target.LangBuildTarget;
 import com.hahn.basic.target.LangFactory;
 import com.hahn.basic.util.CompileException;
 
-public class Compiler {    
+public class LangCompiler {    
     private static Map<String, Library> libs = new HashMap<String, Library>();
     private static Map<String, Integer> labels = new HashMap<String, Integer>();
     private static Map<String, FuncGroup> funcs = new HashMap<String, FuncGroup>();
@@ -94,7 +94,7 @@ public class Compiler {
     	if (var != null) {
     		return var;
     	} else {
-    		StringConst strConst = Compiler.factory.StringConst(str);
+    		StringConst strConst = LangCompiler.factory.StringConst(str);
     		strings.put(str, strConst);
     		
     		return strConst;
@@ -106,11 +106,11 @@ public class Compiler {
     }
     
     public static FuncHead defineFunc(String name, Type rtnType, Param... params) {
-        return Compiler.defineFunc(null, name, rtnType, params);
+        return LangCompiler.defineFunc(null, name, rtnType, params);
     }
     
     public static FuncHead defineFunc(Node head, String name, Type rtnType, Param... params) {
-        FuncHead func = new FuncHead(name, head, rtnType, params);
+        FuncHead func = LangCompiler.factory.FuncHead(name, head, rtnType, params);
         
         FuncGroup old = funcs.get(name);
         if (old == null) {

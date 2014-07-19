@@ -2,12 +2,12 @@ package com.hahn.basic.intermediate.objects;
 
 import com.hahn.basic.intermediate.objects.types.Type;
 
-public abstract class StringConst extends BasicObject {
+public abstract class NewInstance extends BasicObject {
 
-	public StringConst(String str) {
-		super(str, Type.STRING);
+	public NewInstance(Type type) {
+		super("new " + type.getName(), type);
 	}
-	
+
 	@Override
 	public abstract String toTarget();
 }

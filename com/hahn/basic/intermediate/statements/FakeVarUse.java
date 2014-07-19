@@ -29,7 +29,7 @@ public class FakeVarUse extends Compilable {
     }
     
     @Override
-    public void toTarget(LangBuildTarget builder) { }
+    public String toTarget(LangBuildTarget builder) { return ""; }
 
     @Override
     public String toString() {

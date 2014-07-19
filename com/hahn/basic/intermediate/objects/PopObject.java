@@ -2,10 +2,10 @@ package com.hahn.basic.intermediate.objects;
 
 import com.hahn.basic.intermediate.objects.types.Type;
 
-public abstract class StringConst extends BasicObject {
+public abstract class PopObject extends BasicObject {
 
-	public StringConst(String str) {
-		super(str, Type.STRING);
+	public PopObject() {
+		super("POP", Type.UNDEFINED);
 	}
 	
 	@Override

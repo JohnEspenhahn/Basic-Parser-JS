@@ -30,7 +30,6 @@ import java.util.Map;
 
 import com.hahn.basic.definition.EnumExpression;
 import com.hahn.basic.definition.EnumToken;
-import com.hahn.basic.intermediate.library.Common;
 import com.hahn.basic.intermediate.objects.AdvancedObject;
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.FuncCallPointer;
@@ -47,18 +46,9 @@ import com.hahn.basic.intermediate.objects.types.Struct;
 import com.hahn.basic.intermediate.objects.types.Struct.StructParam;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.opcode.OPCode;
-import com.hahn.basic.intermediate.register.Register;
-import com.hahn.basic.intermediate.statements.Command;
-import com.hahn.basic.intermediate.statements.ContinueStatement;
-import com.hahn.basic.intermediate.statements.DefineVarStatement;
 import com.hahn.basic.intermediate.statements.EndLoopStatement;
-import com.hahn.basic.intermediate.statements.ForStatement;
-import com.hahn.basic.intermediate.statements.IfStatement;
 import com.hahn.basic.intermediate.statements.IfStatement.Conditional;
-import com.hahn.basic.intermediate.statements.ReturnStatement;
 import com.hahn.basic.intermediate.statements.Statement;
-import com.hahn.basic.intermediate.statements.WhileStatement;
-import com.hahn.basic.intermediate.statements.function.DefaultCallFuncStatement;
 import com.hahn.basic.parser.Node;
 import com.hahn.basic.util.CastException;
 import com.hahn.basic.util.CompileException;
@@ -80,7 +70,6 @@ public class Frame extends Statement {
                     { EnumExpression.DEF_FUNC,   "defineFunc"       },
                     { EnumExpression.CALL_FUNC,  "callFunc"         },
                     { EnumExpression.CREATE,     "createInstance"   },
-                    { EnumExpression.DELETE,     "deleteInstance"   },
                     { EnumExpression.RETURN,     "doReturn"         },
                     { EnumToken     .CONTINUE,   "doContinue"       },
                     { EnumToken     .BREAK,      "doBreak"          },
@@ -149,7 +138,7 @@ public class Frame extends Statement {
     
     @Override
     public void addTargetCode() {
-        if (frameHead != null) {
+        if (hasFrameHead()) {
             handleBlock(frameHead);
         }
         
@@ -273,7 +262,7 @@ public class Frame extends Statement {
     }
     
     public String getLabel(String name) {
-        return Compiler.getLabel(name, this);
+        return LangCompiler.getLabel(name, this);
     }
     
     /**
@@ -315,7 +304,7 @@ public class Frame extends Statement {
      */
     public void doImport(Node head) {
         String name = head.getValue().replace("import ", "").trim();
-        Compiler.addLibrary(name);
+        LangCompiler.addLibrary(name);
     }
     
     /**
@@ -350,7 +339,7 @@ public class Frame extends Statement {
         Var temp = createTempVar(Type.UINT);
         
         // Create temp var
-        addCode(new DefineVarStatement(this, temp, obj.getAddress(), true));
+        addCode(LangCompiler.factory.DefineVarStatement(this, temp, obj.getAddress(), true));
         
         Iterator<Node> it = Util.getIterator(head);
         while (it.hasNext()) {  
@@ -364,14 +353,14 @@ public class Frame extends Statement {
                     // If accessing address literal, add 1 here
                     if (offset.hasLiteral()) {
                         pastLng = true;
-                        addCode(new Command(this, OPCode.ADD, temp, new LiteralNum(offset.getLiteral().getValue() + 1))); 
+                        addCode(LangCompiler.factory.Command(this, OPCode.ADD, temp, new LiteralNum(offset.getLiteral().getValue() + 1))); 
                     } else {
-                        addCode(new Command(this, OPCode.ADD, temp, offset));
+                        addCode(LangCompiler.factory.Command(this, OPCode.ADD, temp, offset));
                     }
                 }
                 
                 // Go past .length
-                if (!pastLng) addCode(new Command(this, OPCode.ADD, temp, LiteralNum.ONE));
+                if (!pastLng) addCode(LangCompiler.factory.Command(this, OPCode.ADD, temp, LiteralNum.ONE));
                 
                 // Skip CLOSE_SQR
                 it.next();
@@ -381,7 +370,7 @@ public class Frame extends Statement {
                 Struct struct = t.castToStruct();
                 StructParam sp = struct.getStructParam(name);
                 if (sp.getOffset() > 0) { 
-                    addCode(new Command(this, OPCode.ADD, temp, new LiteralNum(sp.getOffset()))); 
+                    addCode(LangCompiler.factory.Command(this, OPCode.ADD, temp, new LiteralNum(sp.getOffset()))); 
                 }
                 
                 // Load type of object
@@ -392,7 +381,7 @@ public class Frame extends Statement {
             
             // Continue or return?
             if (it.hasNext()) {
-                addCode(new Command(this, OPCode.SET, temp, temp.getAddress()));
+                addCode(LangCompiler.factory.Command(this, OPCode.SET, temp, temp.getAddress()));
             } else {
                 return temp.getPointer();
             }
@@ -451,7 +440,7 @@ public class Frame extends Statement {
      */
     protected void updateVar(BasicObject var, BasicObject obj, OPCode op) {
         Type.merge(var.getType(), obj.getType());
-        addCode(new Command(this, op, var, obj));
+        addCode(LangCompiler.factory.Command(this, op, var, obj));
     }
     
     /**
@@ -493,11 +482,11 @@ public class Frame extends Statement {
                 
                 // Create var
                 if (isGlobal) {
-                    obj = Compiler.factory.VarGlobal(name, type);                    
+                    obj = LangCompiler.factory.VarGlobal(name, type);                    
                 } else if (varsList != null) {
                     obj = new Param(name, type);                    
                 } else {
-                    obj = new Var(this, name, type);
+                    obj = LangCompiler.factory.VarLocal(this, name, type);
                 }
                 
                 // Modify var
@@ -514,7 +503,7 @@ public class Frame extends Statement {
                         List<Node> modify_children = nextHead.getAsChildren();
                         
                         BasicObject o = handleExpression(modify_children.get(1));
-                        addCode(new DefineVarStatement(this, (AdvancedObject) obj, o));
+                        addCode(LangCompiler.factory.DefineVarStatement(this, (AdvancedObject) obj, o, false));
                         
                         hasInit = true;
                     }
@@ -522,12 +511,12 @@ public class Frame extends Statement {
                 
                 // Default value
                 if (!hasInit && canInit && obj instanceof AdvancedObject) {
-                    addCode(new DefineVarStatement(this, (AdvancedObject) obj, LiteralNum.UNDEFINED));
+                    addCode(LangCompiler.factory.DefineVarStatement(this, (AdvancedObject) obj, LiteralNum.UNDEFINED, false));
                 }
                 
                 // Make var available
                 if (isGlobal) {
-                    Compiler.addGlobalVar((VarGlobal) obj);
+                    LangCompiler.addGlobalVar((VarGlobal) obj);
                 } else if (varsList != null) {
                     varsList.add(obj);                    
                 } else {
@@ -554,23 +543,22 @@ public class Frame extends Statement {
         FuncHead func = (FuncHead) f;
         
         // Set result
+        BasicObject result = null;
         if (head != null) {
             List<Node> children = head.getAsChildren();
             if (children.size() > 1) {
-                BasicObject result = this.handleExpression(children.get(1));
+                result = this.handleExpression(children.get(1));
                 
                 try {
                     result.castTo(func.getReturnType());
                 } catch (CastException e) {
                     throw new CastException("Invalid return type - ", e);
                 }
-                
-                addCode(new Command(this, OPCode.SET, Register.EX, result));
             }
         }
         
         // Return
-        addCode(new ReturnStatement(this, (FuncHead) f));
+        addCode(LangCompiler.factory.ReturnStatement(this, (FuncHead) f, result));
     }
     
     /**
@@ -653,13 +641,13 @@ public class Frame extends Statement {
         
         // Define function
         if (!anonymous) {
-            Compiler.defineFunc(next, name, rtnType, aParams);
+            LangCompiler.defineFunc(next, name, rtnType, aParams);
             return null;
         } else {
             name = getLabel("@anon_func");
             
-            Compiler.defineFunc(next, name, rtnType, aParams);
-            return Compiler.factory.FuncPointer(name, new ParameterizedType<ITypeable>(Type.FUNC, (ITypeable[]) aParams));
+            LangCompiler.defineFunc(next, name, rtnType, aParams);
+            return LangCompiler.factory.FuncPointer(name, new ParameterizedType<ITypeable>(Type.FUNC, (ITypeable[]) aParams));
         }
     }
     
@@ -686,8 +674,8 @@ public class Frame extends Statement {
         BasicObject[] aParams = params.toArray(new BasicObject[params.size()]);
         
         // Get FuncCall object
-        FuncCallPointer funcCallPointer = Compiler.factory.FuncCallPointer(name, aParams);        
-        addCode(new DefaultCallFuncStatement(this, funcCallPointer));        
+        FuncCallPointer funcCallPointer = LangCompiler.factory.FuncCallPointer(name, aParams);        
+        addCode(LangCompiler.factory.DefaultCallFuncStatement(this, funcCallPointer));        
         return funcCallPointer;
     }
     
@@ -738,76 +726,23 @@ public class Frame extends Statement {
             types = new ParameterizedType<ITypeable>(Type.FUNC);
         }
         
-        return Compiler.factory.FuncPointer(name, types);
+        return LangCompiler.factory.FuncPointer(name, types);
     }
     
     /**
      * Create a new instance based on node data
      * @param head EnumExpression.CREATE
-     * @return FuncCallPointer alloc
+     * @return Object instance
      */
-    public FuncCallPointer createInstance(Node head) {
-        Compiler.addLibrary("com.hahn.common");
-        
-        List<Node> children = head.getAsChildren();
+    public BasicObject createInstance(Node head) {
+    	List<Node> children = head.getAsChildren();
+    	
         Type type = Type.fromNode(children.get(1));
-        String name = type.toString();
         
-        if (!type.doesExtend(Type.STRUCT)) {
-            throw new CompileException("Can not create a new instance of `" + name + "`");
-        } else {
-            FuncHead alloc = Common.ALLOC;
-            
-            List<BasicObject> callParams = new ArrayList<BasicObject>();
-            getFuncCallParams(children.get(3), callParams);
-            
-            // TODO constructor rather than hard-coded
-            BasicObject[] allocParams = new BasicObject[1];
-            if (type.doesExtend(Type.ARRAY)) {
-                if (callParams.size() != 1) {
-                    throw new CompileException("No constructor for `" + name + "` with the given parameters is defined");
-                }
-                
-                alloc = Common.ARR_ALLOC;
-                allocParams[0] = callParams.get(0);
-            } else {
-                if (callParams.size() > 0) {
-                    throw new CompileException("No constructor for `" + name + "` with the given parameters is defined");
-                }
-                
-                allocParams[0] = new LiteralNum(type.sizeOf());
-            }
-            
-            // Get FuncCall object, must manually set function to 'alloc' because it is hidden
-            FuncCallPointer funcCallPointer = Compiler.factory.FuncCallPointer(alloc.getName(), allocParams);
-            funcCallPointer.setFunction(alloc);
-            funcCallPointer.castTo(type);
-            
-            addCode(new DefaultCallFuncStatement(this, funcCallPointer));
-            
-            return funcCallPointer;
-        }
-    }
-    
-    /**
-     * Delete an instance of an object
-     * @param head EnumExpression.DELETE
-     * @return FuncCallPointer dealloc
-     */
-    public FuncCallPointer deleteInstance(Node head) {
-        Compiler.addLibrary("com.hahn.common");
+        List<BasicObject> params = new ArrayList<BasicObject>();
+        getFuncCallParams(children.get(3), params);
         
-        List<Node> children = head.getAsChildren();
-        BasicObject var = accessVar(children.get(1));
-        
-        if (var instanceof AdvancedObject && var.getType().doesExtend(Type.STRUCT)) {
-            FuncCallPointer funcCallPointer = Compiler.factory.FuncDeallocCallPointer(var);            
-            addCode(new DefaultCallFuncStatement(this, funcCallPointer));
-            
-            return funcCallPointer;
-        } else {
-            throw new CompileException("Can not delete non-instance object `" + var.getName() + "`");
-        }
+        return LangCompiler.factory.NewInstance(type, params);
     }
     
     /**
@@ -817,28 +752,19 @@ public class Frame extends Statement {
     public void ifStatement(Node head) {
         Iterator<Node> it = Util.getIterator(head);
         
-        List<Conditional> elses = new ArrayList<Conditional>();
+        List<Conditional> conditionals = new ArrayList<Conditional>();
         while (it.hasNext()) {
             Node child = it.next();
             Enum<?> token = child.getToken();
             
             if (token == EnumExpression.CONDITIONAL) {
-                elses.add(createConditional(child));
+                conditionals.add(createConditional(child));
             } else if (token == EnumExpression.BLOCK) {
-                elses.add(new Conditional(child));
+                conditionals.add(new Conditional(child));
             }
         }
         
-        addCode(new IfStatement(this, elses));
-    }
-    
-    /**
-     * `While` statement handler
-     * @param head EnumExpression.WHILE_STMT
-     */
-    public void whileStatement(Node head) {
-        List<Node> children = head.getAsChildren();
-        addCode(new WhileStatement(this, createConditional(children.get(1))));
+        addCode(LangCompiler.factory.IfStatement(this, conditionals));
     }
     
     /**
@@ -846,8 +772,19 @@ public class Frame extends Statement {
      * @return Conditional holder
      */
     private Conditional createConditional(Node head) {
-        List<Node> cChildren = head.getAsChildren();
-        return new Conditional(cChildren.get(1), cChildren.get(3));
+        List<Node> children = head.getAsChildren();
+        return new Conditional(children.get(1), children.get(3));
+    }
+    
+    /**
+     * `While` statement handler
+     * @param head EnumExpression.WHILE_STMT
+     */
+    public void whileStatement(Node head) {
+        Node block = head.getAsChildren().get(1);
+        List<Node> blockChildren = block.getAsChildren();
+        
+        addCode(LangCompiler.factory.WhileStatement(this, blockChildren.get(1), blockChildren.get(3)));
     }
     
     /**
@@ -881,7 +818,7 @@ public class Frame extends Statement {
             }
         }
         
-        addCode(new ForStatement(this, define, condition, modification, body));
+        addCode(LangCompiler.factory.ForStatement(this, define, condition, modification, body));
     }
     
     /**
@@ -889,7 +826,7 @@ public class Frame extends Statement {
      * @param head EnumToken.CONTINUE
      */
     public void doContinue(Node head) {        
-        addCode(new ContinueStatement(this));
+        addCode(LangCompiler.factory.ContinueStatement(this));
     }
     
     /**
@@ -902,7 +839,7 @@ public class Frame extends Statement {
             throw new CompileException("Invalid use of `break`");
         }
         
-        addCode(Compiler.factory.BreakStatement(this));
+        addCode(LangCompiler.factory.BreakStatement(this));
     }
     
     /**
@@ -969,7 +906,7 @@ public class Frame extends Statement {
             } else if (token == FALSE) {
                 prev = new LiteralBool(false);
             } else if (token == STRING) {
-                prev = Compiler.getString(val.substring(1, val.length() - 1));
+                prev = LangCompiler.getString(val.substring(1, val.length() - 1));
             } else if (token == ADD_SUB || token == MULT_DIV || token == AND || token == MSC_BITWISE) {
                 OPCode op = OPCode.fromSymbol(val);
                 BasicObject next = handleNextExpressionChild(it, prev, temp);
@@ -977,21 +914,19 @@ public class Frame extends Statement {
                 // Ensure modifiable
                 prev = temp = getTemp(prev, temp);
                 
-                addCode(new Command(this, op, prev, next));
+                addCode(LangCompiler.factory.Command(this, op, prev, next));
             } else if (token == NOTEQUAL || token == EQUALS || token == LESS_EQU || token == GTR_EQU || token == LESS || token == GTR) {
                 OPCode op = OPCode.fromSymbol(val);
                 BasicObject next = handleNextExpressionChild(it, prev, temp);
                 
                 if (temp == null) temp = createTempVar(Type.BOOL);
-                prev = Compiler.factory.ConditionalObject(temp, op, prev, next);
+                prev = LangCompiler.factory.ConditionalObject(temp, op, prev, next);
             }
         } else {
             if (token == EnumExpression.ACCESS) {
                 prev = accessVar(child);
             } else if (token == EnumExpression.CREATE) {
                 prev = createInstance(child);
-            } else if (token == EnumExpression.DELETE) { 
-                prev = deleteInstance(child);
             } else if (token == EnumExpression.CALL_FUNC) {
                 prev = callFunc(child);
             } else if (token == EnumExpression.CAST) {
@@ -1013,10 +948,10 @@ public class Frame extends Statement {
             return prev;
         } else if (temp == null) { 
             temp = createTempVar(prev.getType());
-            addCode(new DefineVarStatement(this, temp, prev));
+            addCode(LangCompiler.factory.DefineVarStatement(this, temp, prev, false));
             return temp;
         } else {
-            addCode(new DefineVarStatement(this, temp, prev));
+            addCode(LangCompiler.factory.DefineVarStatement(this, temp, prev, false));
             return temp;
         }
     }

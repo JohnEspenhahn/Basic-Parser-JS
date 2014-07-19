@@ -1,11 +1,10 @@
 package com.hahn.basic.intermediate.objects;
 
+import com.hahn.basic.intermediate.LangCompiler;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.ParameterizedType;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.statements.Statement;
-import com.hahn.basic.intermediate.statements.function.CallFuncStatement;
-import com.hahn.basic.target.ILangObject;
 
 public abstract class FuncCallPointer extends FuncPointer {
     private Type returnType;
@@ -27,7 +26,7 @@ public abstract class FuncCallPointer extends FuncPointer {
 
     @Override
     public BasicObject getForUse(Statement s) {
-        s.addCode(new CallFuncStatement(s, this));
+        s.addCode(LangCompiler.factory.CallFuncStatement(s, this));
         
         return super.getForUse(s);
     }
@@ -66,7 +65,7 @@ public abstract class FuncCallPointer extends FuncPointer {
     }
 
     @Override
-    public abstract ILangObject toTarget();
+    public abstract String toTarget();
 
     @Override
     public String toString() {

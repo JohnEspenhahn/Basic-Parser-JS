@@ -1,44 +1,29 @@
 package com.hahn.basic.intermediate.statements;
 
 import com.hahn.basic.intermediate.FuncHead;
-import com.hahn.basic.intermediate.objects.AdvancedObject;
-import com.hahn.basic.intermediate.objects.LiteralNum;
-import com.hahn.basic.intermediate.opcode.OPCode;
-import com.hahn.basic.intermediate.register.Register;
-import com.hahn.basic.target.asm.statements.ASMCompilableRecoverRegs;
+import com.hahn.basic.intermediate.objects.BasicObject;
 
-public class ReturnStatement extends Statement {
-    public static final int MIN_REGS_FOR_PUSHA = 4;
+public abstract class ReturnStatement extends Statement {
+	private FuncHead func;
+	private BasicObject result;
     
-    private FuncHead func;
-    private AdvancedObject[] currentVars;
-    
-    public ReturnStatement(Statement s, FuncHead returnFrom) {
-        super(s);
+    public ReturnStatement(Statement container, FuncHead returnFrom, BasicObject result) {
+        super(container);
         
         this.func = returnFrom;
-        this.currentVars = returnFrom.getCurrentVars();
+        this.result = result;
+    }
+    
+    public FuncHead getReturnFromFunc() {
+    	return func;
+    }
+    
+    public BasicObject getResult() {
+    	return result;
     }
     
     @Override
-    public void addTargetCode() {  
-        addCode(new ASMCompilableRecoverRegs(func));
-        
-        // Clear stack registers used at this point
-        int stackRegsHere = 0;
-        for (AdvancedObject var: currentVars) {
-            if (var.isRegisterOnStack()) {
-                stackRegsHere += 1;
-            }
-        }
-        
-        if (stackRegsHere > 0) {
-            addCode(new Command(this, OPCode.SPA, new LiteralNum(stackRegsHere)));
-        }
-        
-        // Return
-        addCode(new Command(this, OPCode.MOV, Register.POP));
-    }
+    public abstract void addTargetCode();
     
     @Override
     public boolean equals(Object o) {

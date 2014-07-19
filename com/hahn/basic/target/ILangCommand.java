@@ -1,5 +1,5 @@
 package com.hahn.basic.target;
 
 public interface ILangCommand {
-    public void toTarget(LangBuildTarget builder);
+    public String toTarget(LangBuildTarget builder);
 }

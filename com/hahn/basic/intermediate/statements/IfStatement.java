@@ -2,36 +2,19 @@ package com.hahn.basic.intermediate.statements;
 
 import java.util.List;
 
-import com.hahn.basic.intermediate.Frame;
-import com.hahn.basic.intermediate.objects.Label;
 import com.hahn.basic.parser.Node;
-import com.hahn.basic.target.asm.raw.ASMLabel;
 
-public class IfStatement extends Statement {
+public abstract class IfStatement extends Statement {
+    private List<Conditional> conditionals;
     
-    private List<Conditional> elseStatements;
-    private Label lblFinalEnd;
-    
-    public IfStatement(Statement s, List<Conditional> elseStatements) {
-        super(s);
+    public IfStatement(Statement container, List<Conditional> elseStatements) {
+        super(container);
         
-        this.elseStatements = elseStatements;
-        this.lblFinalEnd = new Label(getFrame().getLabel("@if_end"));
+        this.conditionals = elseStatements;
     }
 
-    @Override
-    public void addTargetCode() {
-        for (int i = 0; i < elseStatements.size(); i++) {
-            Conditional cnd = elseStatements.get(i);
-            Label lblSkip = new Label(getFrame().getLabel("@if_skip"));
-            
-            Frame f = new Frame(getFrame());
-            f.handleConditional(cnd, lblFinalEnd, lblSkip);
-            addCode(f);
-            
-            addCode(new ASMLabel(lblSkip));
-        }
-        addCode(new ASMLabel(lblFinalEnd));
+    public List<Conditional> getConditionals() {
+    	return conditionals;
     }
     
     public static class Conditional {

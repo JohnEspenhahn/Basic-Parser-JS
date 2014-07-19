@@ -1,8 +1,9 @@
 package com.hahn.basic.intermediate.objects;
 
+import static com.hahn.basic.util.Util.toBool;
+
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.opcode.OPCode;
-import com.hahn.basic.target.ILangObject;
 import com.hahn.basic.util.CompileException;
 
 public class LiteralBool extends Literal {
@@ -12,16 +13,6 @@ public class LiteralBool extends Literal {
 		super(Type.BOOL);
 		
 		this.value = value;
-	}
-
-	@Override
-	public ILangObject toTarget() {
-		return this;
-	}
-
-	@Override
-	public String toString() {
-		return String.valueOf(value);
 	}
 
 	@Override
@@ -71,7 +62,13 @@ public class LiteralBool extends Literal {
 		}
 	}
 	
-	public static boolean toBool(double d) {
-		return (d != 0 ? true : false);
+	@Override
+	public String toTarget() {
+		return toString();
+	}
+
+	@Override
+	public String toString() {
+		return String.valueOf(value);
 	}
 }
