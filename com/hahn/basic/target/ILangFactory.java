@@ -35,6 +35,8 @@ public interface ILangFactory {
 	public Var VarLocal(Frame frame, String name, Type type);
 	public VarGlobal VarGlobal(String name, Type type);
 	
+	public AdvancedObject VarAccess(AdvancedObject var, BasicObject idx, Type type);
+	
 	public BasicObject NewInstance(Type type, List<BasicObject> params);
 	
 	public ConditionalObject ConditionalObject(BasicObject temp, OPCode op, BasicObject p1, BasicObject p2);

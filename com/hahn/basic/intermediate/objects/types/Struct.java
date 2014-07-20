@@ -85,7 +85,7 @@ public class Struct extends Type {
     }
     
     public Type getType(String name) {
-        return getStructParam(name).param.getType();
+        return getStructParam(name).getType();
     }
     
     @Override
@@ -93,21 +93,22 @@ public class Struct extends Type {
         return baseSize + params.size();
     }
     
-    public class StructParam {
-        public final BasicObject param;
+    public class StructParam extends BasicObject {
         public final int idx;
         
         public StructParam(int i, BasicObject p) {
-            this.param = p;
+            super(p.getName(), p.getType());
+            
             this.idx = i;
-        }
-        
-        public Type getType() {
-            return param.getType();
         }
         
         public int getOffset() {
             return idx;
+        }
+
+        @Override
+        public String toTarget() {
+            throw new RuntimeException("Cannot convert `StructParam` to target!");
         }
     }
 }

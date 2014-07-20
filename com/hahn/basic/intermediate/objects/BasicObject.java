@@ -69,10 +69,10 @@ public abstract class BasicObject implements ITypeable, IBasicHolderExcludeList 
     /**
      * Called while still compiling, do any finalizations
      * needed in order for this object to be used
-     * @param c The calling statement
+     * @param by The calling statement
      * @return This
      */
-    public BasicObject getForUse(Statement s) {
+    public BasicObject getForUse(Statement by) {
         return this;
     }
     

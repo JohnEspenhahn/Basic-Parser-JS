@@ -37,12 +37,10 @@ import com.hahn.basic.intermediate.objects.FuncPointer;
 import com.hahn.basic.intermediate.objects.LiteralBool;
 import com.hahn.basic.intermediate.objects.LiteralNum;
 import com.hahn.basic.intermediate.objects.Param;
-import com.hahn.basic.intermediate.objects.Var;
 import com.hahn.basic.intermediate.objects.VarGlobal;
 import com.hahn.basic.intermediate.objects.VarTemp;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.ParameterizedType;
-import com.hahn.basic.intermediate.objects.types.Struct;
 import com.hahn.basic.intermediate.objects.types.Struct.StructParam;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.opcode.OPCode;
@@ -205,7 +203,7 @@ public class Frame extends Statement {
     }
     
     /**
-     * All variables used within this frame, including subframes,
+     * All variables used within this frame, including child frames,
      * are called to this function to be tracked
      * @param var The variable to be tracked
      */
@@ -339,60 +337,31 @@ public class Frame extends Statement {
      * @param head EnumExpression.IN_ACCESS
      * @return The object the with retrieved value
      */
-    private BasicObject inAccessVar(AdvancedObject obj, Node head) {
+    private AdvancedObject inAccessVar(AdvancedObject obj, Node head) {
         Type t = obj.getType();
-        Var temp = createTempVar(Type.UINT);
         
-        // Create temp var
-        addCode(LangCompiler.factory.DefineVarStatement(this, temp, obj.getAddress(), true));
-        
+        AdvancedObject access = obj;
         Iterator<Node> it = Util.getIterator(head);
         while (it.hasNext()) {  
             Enum<?> accessMarker = it.next().getToken();
             if (accessMarker == OPEN_SQR && t.doesExtend(Type.ARRAY)) {
-                // Is past .length
-                boolean pastLng = false;
-                
                 BasicObject offset = handleExpression(it.next());
-                if (offset != LiteralNum.ZERO) { 
-                    // If accessing address literal, add 1 here
-                    if (offset.hasLiteral()) {
-                        pastLng = true;
-                        addCode(LangCompiler.factory.Command(this, OPCode.ADD, temp, new LiteralNum(offset.getLiteral().getValue() + 1))); 
-                    } else {
-                        addCode(LangCompiler.factory.Command(this, OPCode.ADD, temp, offset));
-                    }
-                }
                 
-                // Go past .length
-                if (!pastLng) addCode(LangCompiler.factory.Command(this, OPCode.ADD, temp, LiteralNum.ONE));
+                access = LangCompiler.factory.VarAccess(access, offset, Type.UINT);
                 
-                // Skip CLOSE_SQR
-                it.next();
+                
+                it.next(); // Skip CLOSE_SQR
             } else if (accessMarker == DOT && t.doesExtend(Type.STRUCT)) {               
                 String name = it.next().getValue();
+                StructParam sp = t.castToStruct().getStructParam(name);
                 
-                Struct struct = t.castToStruct();
-                StructParam sp = struct.getStructParam(name);
-                if (sp.getOffset() > 0) { 
-                    addCode(LangCompiler.factory.Command(this, OPCode.ADD, temp, new LiteralNum(sp.getOffset()))); 
-                }
-                
-                // Load type of object
-                temp.setType(sp.getType());
+                access = LangCompiler.factory.VarAccess(access, sp, sp.getType());
             } else {
                 throw new CompileException("Invalid access of `" + obj.getName() + "` of type `" + t + "`");
             }
-            
-            // Continue or return?
-            if (it.hasNext()) {
-                addCode(LangCompiler.factory.Command(this, OPCode.SET, temp, temp.getAddress()));
-            } else {
-                return temp.getPointer();
-            }
         }
         
-        throw new RuntimeException("Failed to load pointer var");
+        return access;
     }
     
     /**

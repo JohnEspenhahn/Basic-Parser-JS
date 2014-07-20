@@ -75,6 +75,12 @@ public class JSLangFactory implements ILangFactory {
     }
     
     @Override
+    public AdvancedObject VarAccess(AdvancedObject var, BasicObject idx, Type type) {
+        // TODO
+        return null;
+    }
+    
+    @Override
     public BasicObject NewInstance(Type type, List<BasicObject> params) {
         // TODO Auto-generated method stub
         return null;
