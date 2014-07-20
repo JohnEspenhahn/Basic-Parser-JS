@@ -45,6 +45,7 @@ import com.hahn.basic.intermediate.objects.types.Struct.StructParam;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.opcode.OPCode;
 import com.hahn.basic.intermediate.statements.Command;
+import com.hahn.basic.intermediate.statements.Compilable;
 import com.hahn.basic.intermediate.statements.EndLoopStatement;
 import com.hahn.basic.intermediate.statements.IfStatement.Conditional;
 import com.hahn.basic.intermediate.statements.Statement;
@@ -150,6 +151,12 @@ public class Frame extends Statement {
             addCode(endLoop);
             endLoop = null;
         }
+    }
+    
+    @Deprecated
+    @Override
+    public void addCode(Compilable c) {
+        super.addCode(c);
     }
     
     public void addInUseVar(AdvancedObject o) {
@@ -423,21 +430,24 @@ public class Frame extends Statement {
     /**
      * `Define` var handler
      * @param head EnumExpression.DEFINE
+     * @return List of the statements to define the vars
      */
-    public void defineVar(Node head) {
-        defineVar(head, null, true, false);
+    public List<Compilable> defineVar(Node head) {
+        return defineVar(head, null, true, false);
     }
     
-    protected void defineVar(Node head, boolean isGlobal) {
-        defineVar(head, null, true, isGlobal);
+    protected List<Compilable> defineVar(Node head, boolean isGlobal) {
+        return defineVar(head, null, true, isGlobal);
     }
     
-    protected void defineVar(Node head, List<BasicObject> varsList) {
-        defineVar(head, varsList, false, false);
+    protected List<Compilable> defineVar(Node head, List<BasicObject> varsList) {
+        return defineVar(head, varsList, false, false);
     }
     
-    private void defineVar(Node head, List<BasicObject> varsList, boolean canInit, boolean isGlobal) {
+    private List<Compilable> defineVar(Node head, List<BasicObject> varsList, boolean canInit, boolean isGlobal) {
         Iterator<Node> it = Util.getIterator(head);
+        
+        List<Compilable> list = new ArrayList<Compilable>();
         
         // Init var
         Type type = Type.fromNode(it.next());
@@ -471,7 +481,7 @@ public class Frame extends Statement {
                         List<Node> modify_children = nextHead.getAsChildren();
                         
                         BasicObject o = handleExpression(modify_children.get(1));
-                        addCode(LangCompiler.factory.DefineVarStatement(this, (AdvancedObject) obj, o, false));
+                        list.add(LangCompiler.factory.DefineVarStatement(this, (AdvancedObject) obj, o, false));
                         
                         hasInit = true;
                     }
@@ -479,7 +489,7 @@ public class Frame extends Statement {
                 
                 // Default value
                 if (!hasInit && canInit && obj instanceof AdvancedObject) {
-                    addCode(LangCompiler.factory.DefineVarStatement(this, (AdvancedObject) obj, LiteralNum.UNDEFINED, false));
+                    list.add(LangCompiler.factory.DefineVarStatement(this, (AdvancedObject) obj, LiteralNum.UNDEFINED, false));
                 }
                 
                 // Make var available
@@ -492,6 +502,8 @@ public class Frame extends Statement {
                 }
             }
         }
+        
+        return list;
     }
     
     /**
