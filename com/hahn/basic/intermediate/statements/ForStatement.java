@@ -49,4 +49,9 @@ public abstract class ForStatement extends Statement {
     public List<Node> getModifyNodes() {
     	return modification;
     }
+    
+    @Override
+    public String toString() {
+        return "for(" + define + "; " + condition + "; " + modification + ") { " + innerFrame + "}"; 
+    }
 }

@@ -5,15 +5,13 @@ import com.hahn.basic.intermediate.objects.AdvancedObject;
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.PopObject;
 import com.hahn.basic.intermediate.objects.PushObject;
+import com.hahn.basic.intermediate.objects.register.StackRegister;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.opcode.OPCode;
-import com.hahn.basic.intermediate.register.StackRegister;
 
 public abstract class Command extends Compilable {  
     protected OPCode opcode;
     protected BasicObject p1, p2;
-    
-    protected boolean p1LastUse, p2LastUse;
     
     public Command(Statement container, OPCode opcode) {
         this(container, opcode, null, null);
@@ -55,11 +53,11 @@ public abstract class Command extends Compilable {
     }
     
     public boolean isP1LastUse() {
-        return p1LastUse;
+        return p1.isLastUse(this);
     }
     
     public boolean isP2LastUse() {
-        return p2LastUse;
+        return p2.isLastUse(this);
     }
     
     /**
@@ -86,12 +84,12 @@ public abstract class Command extends Compilable {
         Main.setLine(row);
         if (p1 != null) { 
             Type.merge(opcode.type1, p1.getType());
-            p1LastUse = p1.setInUse();
+            p1.setInUse(this);
         }
         
         if (p2 != null) { 
             Type.merge(opcode.type2, p2.getType()); 
-            p2LastUse = p2.setInUse();
+            p2.setInUse(this);
         }
         
         return false;
@@ -119,10 +117,10 @@ public abstract class Command extends Compilable {
         }
         
         // Check registers
-        if (p2 instanceof AdvancedObject) { ((AdvancedObject) p2).takeRegister(p2LastUse); }
+        if (p2 instanceof AdvancedObject) { ((AdvancedObject) p2).takeRegister(this); }
         else if (p2 instanceof PopObject) StackRegister.pop();
         
-        if (p1 instanceof AdvancedObject) { ((AdvancedObject) p1).takeRegister(p1LastUse); }
+        if (p1 instanceof AdvancedObject) { ((AdvancedObject) p1).takeRegister(this); }
         else if (p1 instanceof PushObject) StackRegister.push();
 
         return false;
@@ -131,9 +129,9 @@ public abstract class Command extends Compilable {
     @Override
     public String toString() {
         if (p2 != null) {
-            return String.format("%s({%s}->%s, {%s}->%s);", opcode, p1.getName() + (p1LastUse?"*":""), p1, p2.getName() + (p2LastUse?"*":""), p2);
+            return String.format("%s({%s}->%s, {%s}->%s);", opcode, p1.getName() + (isP1LastUse()?"*":""), p1, p2.getName() + (isP2LastUse()?"*":""), p2);
         } else if (p1 != null) {
-            return String.format("%s({%s}->%s)", opcode, p1.getName() + (p1LastUse?"*":""), p1);
+            return String.format("%s({%s}->%s)", opcode, p1.getName() + (isP1LastUse()?"*":""), p1);
         } else {
             return opcode.toString();
         }

@@ -137,6 +137,11 @@ public class Frame extends Statement {
      */
     
     @Override
+    public boolean useAddTargetCode() {
+        return true;
+    }
+    
+    @Override
     public void addTargetCode() {
         if (hasFrameHead()) {
             handleBlock(frameHead);
@@ -954,5 +959,10 @@ public class Frame extends Statement {
             addCode(LangCompiler.factory.DefineVarStatement(this, temp, prev, false));
             return temp;
         }
+    }
+
+    @Override
+    public String toString() {
+        return getTargetCodeString();
     }
 }

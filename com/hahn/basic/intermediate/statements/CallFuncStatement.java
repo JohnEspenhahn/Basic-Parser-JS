@@ -8,8 +8,8 @@ import com.hahn.basic.util.Util;
 public abstract class CallFuncStatement extends Statement {    
     private FuncCallPointer funcCallPointer;
     
-    public CallFuncStatement(Statement s, FuncCallPointer fcp) {
-        super(s);
+    public CallFuncStatement(Statement container, FuncCallPointer fcp) {
+        super(container);
         
         this.funcCallPointer = fcp;
     }
@@ -25,7 +25,11 @@ public abstract class CallFuncStatement extends Statement {
     @Override
     public boolean reverseOptimize() {
     	if (shouldCallFunction()) {
-		    funcCallPointer.setInUse();
+    	    for (BasicObject o : getParams()) {
+                o.setInUse(this);
+            }
+    	    
+		    funcCallPointer.setInUse(this);
 		    return super.reverseOptimize();
     	} else {
     		return true;
@@ -33,9 +37,6 @@ public abstract class CallFuncStatement extends Statement {
     }
     
     protected abstract boolean shouldCallFunction();
-    
-    @Override
-    public abstract void addTargetCode();
     
     @Override
     public String toString() {

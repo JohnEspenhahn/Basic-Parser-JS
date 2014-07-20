@@ -8,7 +8,7 @@ import com.hahn.basic.intermediate.statements.Statement;
 
 public class BasicObjectHolder extends BasicObject {
 
-    @Delegate(types = BasicObject.class, excludes = IHolderExcludeList.class)
+    @Delegate(types = BasicObject.class, excludes = IBasicHolderExcludeList.class)
     private BasicObject heldObj;
     private Type type;
 

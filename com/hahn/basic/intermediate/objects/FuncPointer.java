@@ -7,6 +7,7 @@ import com.hahn.basic.intermediate.LangCompiler;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.ParameterizedType;
 import com.hahn.basic.intermediate.objects.types.Type;
+import com.hahn.basic.intermediate.statements.Compilable;
 import com.hahn.basic.util.CompileException;
 
 public abstract class FuncPointer extends BasicObject {    
@@ -46,10 +47,10 @@ public abstract class FuncPointer extends BasicObject {
     }
     
     @Override
-    public boolean setInUse() {
+    public boolean setInUse(Compilable by) {
         checkFunction();
         
-        return super.setInUse();
+        return super.setInUse(by);
     }
     
     public void setFunction(FuncHead func) {

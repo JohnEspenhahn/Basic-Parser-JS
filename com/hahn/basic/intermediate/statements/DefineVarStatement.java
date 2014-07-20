@@ -29,7 +29,12 @@ public abstract class DefineVarStatement extends Statement {
     }
     
     @Override
-    public void addTargetCode() {
+    public final boolean useAddTargetCode() {
+        return true;
+    }
+    
+    @Override
+    public final void addTargetCode() {
         addCode(LangCompiler.factory.Command(this, OPCode.SET, var.getForCreateVar(), val));
     }
     
@@ -67,5 +72,10 @@ public abstract class DefineVarStatement extends Statement {
         }
         
         return "";
+    }
+    
+    @Override
+    public String toString() {
+        return "let " + var + " = " + val;
     }
 }

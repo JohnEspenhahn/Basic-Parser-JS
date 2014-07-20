@@ -7,7 +7,7 @@ import com.hahn.basic.intermediate.statements.Statement;
 
 public class AdvancedObjectHolder extends AdvancedObject {
 
-    @Delegate(types=AdvancedObject.class, excludes=IHolderExcludeList.class)
+    @Delegate(types=AdvancedObject.class, excludes=IAdvancedHolderExcludeList.class)
     private AdvancedObject heldObj;
     
     public AdvancedObjectHolder(AdvancedObject obj, Type type) {

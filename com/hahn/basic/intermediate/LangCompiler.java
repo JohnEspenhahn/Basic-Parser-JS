@@ -8,12 +8,12 @@ import com.hahn.basic.intermediate.objects.Param;
 import com.hahn.basic.intermediate.objects.StringConst;
 import com.hahn.basic.intermediate.objects.VarGlobal;
 import com.hahn.basic.intermediate.objects.VarTemp;
+import com.hahn.basic.intermediate.objects.register.Register;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.Type;
-import com.hahn.basic.intermediate.register.Register;
 import com.hahn.basic.parser.Node;
 import com.hahn.basic.target.LangBuildTarget;
-import com.hahn.basic.target.LangFactory;
+import com.hahn.basic.target.ILangFactory;
 import com.hahn.basic.util.CompileException;
 
 public class LangCompiler {    
@@ -22,10 +22,10 @@ public class LangCompiler {
     private static Map<String, FuncGroup> funcs = new HashMap<String, FuncGroup>();
     private static Map<String, StringConst> strings = new HashMap<String, StringConst>();
     
-    public static LangFactory factory;
+    public static ILangFactory factory;
     private static Frame globalFrame, frame;
 
-    public static LangBuildTarget compile(Node h, LangFactory f) {
+    public static LangBuildTarget compile(Node h, ILangFactory f) {
         globalFrame = frame = new Frame(null, h);
         factory = f;
         

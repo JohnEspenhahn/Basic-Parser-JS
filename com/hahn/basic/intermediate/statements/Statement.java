@@ -14,41 +14,52 @@ import com.hahn.basic.intermediate.opcode.OPCode;
 import com.hahn.basic.target.LangBuildTarget;
 
 public abstract class Statement extends Compilable {
-    private Deque<Compilable> code;
+    private Deque<Compilable> targetCode;
     
     public Statement(Statement container) {
         super(container == null ? null : container.getFrame());
         
-        this.code = new ArrayDeque<Compilable>();
+        if (useAddTargetCode()) {
+            this.targetCode = new ArrayDeque<Compilable>();
+        } else {
+            this.targetCode = null;
+        }
     }
     
+    /**
+     * @return True to allow use of addTargetCode
+     */
+    public abstract boolean useAddTargetCode();
+    
     public void addCode(Compilable c) {
-        code.addLast(c);
+        targetCode.addLast(c);
     }
     
     public void prependCode(Compilable c) {
-        code.addFirst(c);
+        targetCode.addFirst(c);
     }
     
     /**
      * Called from reverseOptimize. Add target code to be handled. 
      * Should NOT do any optimization 
      */
-    public abstract void addTargetCode();
+    protected void addTargetCode() { }
     
     @Override
     public boolean reverseOptimize() {
-        addTargetCode();
-        
-        Iterator<Compilable> it = code.descendingIterator();
-        Compilable a = null, b = null;
-        while (it.hasNext()) {
-            b = a;
-            a = it.next();
+        if (useAddTargetCode()) {
+            addTargetCode();
             
-            if (optimize(a, b) || a.reverseOptimize()) {
-                a = b;
-                it.remove();
+            Iterator<Compilable> it = targetCode.descendingIterator();
+            Compilable a = null, b = null;
+            while (it.hasNext()) {
+                b = a;
+                a = it.next();
+                
+                if (optimize(a, b) || a.reverseOptimize()) {
+                    a = b;
+                    it.remove();
+                }
             }
         }
         
@@ -57,13 +68,15 @@ public abstract class Statement extends Compilable {
     
     @Override
     public boolean forwardOptimize() {
-        Iterator<Compilable> it = code.iterator();
-        while (it.hasNext()) {
-            Compilable compilable = it.next();            
-            boolean remove = compilable.forwardOptimize();
-            
-            if (remove) {
-                it.remove();
+        if (useAddTargetCode()) {
+            Iterator<Compilable> it = targetCode.iterator();
+            while (it.hasNext()) {
+                Compilable compilable = it.next();            
+                boolean remove = compilable.forwardOptimize();
+                
+                if (remove) {
+                    it.remove();
+                }
             }
         }
         
@@ -73,12 +86,22 @@ public abstract class Statement extends Compilable {
     @Override
     public String toTarget(LangBuildTarget builder) {
     	StringBuilder str = new StringBuilder();
-        for (Compilable c: code) {
-            str.append(c.toTarget(builder));
-        }
+    	str.append(toTargetPre());
+    	
+    	if (useAddTargetCode()) {
+            for (Compilable c: targetCode) {
+                str.append(c.toTarget(builder));
+            }
+    	}
+        
+        str.append(toTargetPost());
         
         return str.toString();
     }
+    
+    protected String toTargetPre() { return ""; }
+    
+    protected String toTargetPost() { return ""; }
     
     /**
      * Called from reverse optimize. Optimize a compilable pair
@@ -123,8 +146,7 @@ public abstract class Statement extends Compilable {
         return false;
     }
     
-    @Override
-    public String toString() {
-        return code.toString();
+    public String getTargetCodeString() {
+        return targetCode.toString();
     }
 }

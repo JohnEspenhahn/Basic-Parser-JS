@@ -3,10 +3,10 @@ package com.hahn.basic.intermediate.objects;
 import java.util.List;
 
 import com.hahn.basic.intermediate.Frame;
+import com.hahn.basic.intermediate.objects.register.IRegister;
+import com.hahn.basic.intermediate.objects.register.Register;
+import com.hahn.basic.intermediate.objects.register.StackRegister;
 import com.hahn.basic.intermediate.objects.types.Type;
-import com.hahn.basic.intermediate.register.IRegister;
-import com.hahn.basic.intermediate.register.Register;
-import com.hahn.basic.intermediate.register.StackRegister;
 
 public abstract class Var extends AdvancedObject {
     
@@ -15,7 +15,7 @@ public abstract class Var extends AdvancedObject {
     }
     
     @Override
-    public void takeRegister(boolean lastUse) {
+    public void doTakeRegister(boolean lastUse) {
         if (!hasRegister()) {
             List<AdvancedObject> parallelObjs = getParallelObjs();
             if (parallelObjs.size() < Register.getNumFree() || getUses() >= parallelObjs.get(0).getUses()) {

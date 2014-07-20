@@ -4,6 +4,7 @@ import com.hahn.basic.intermediate.LangCompiler;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.ParameterizedType;
 import com.hahn.basic.intermediate.objects.types.Type;
+import com.hahn.basic.intermediate.statements.Compilable;
 import com.hahn.basic.intermediate.statements.Statement;
 
 public abstract class FuncCallPointer extends FuncPointer {
@@ -30,10 +31,6 @@ public abstract class FuncCallPointer extends FuncPointer {
         
         return super.getForUse(s);
     }
-    
-    public void doAddPreCall(Statement s) { }
-    
-    public void doAddPostCall(Statement s) { }
 
     /**
      * Cast to given type
@@ -48,15 +45,11 @@ public abstract class FuncCallPointer extends FuncPointer {
     }
 
     @Override
-    public boolean setInUse() {
-        for (BasicObject o : getParams()) {
-            o.setInUse();
-        }
-
+    public boolean setInUse(Compilable by) {
         checkFunction();
         returnType = func.getReturnType().castTo(returnType);
         
-        return super.setInUse();
+        return super.setInUse(by);
     }
 
     @SuppressWarnings("unchecked")

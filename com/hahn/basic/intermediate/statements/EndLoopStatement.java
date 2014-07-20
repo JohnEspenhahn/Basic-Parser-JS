@@ -1,6 +1,5 @@
 package com.hahn.basic.intermediate.statements;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +26,11 @@ public class EndLoopStatement extends Statement {
         if (!objs.contains(o)) {
             objs.add(o);
         }
+    }
+    
+    @Override
+    public boolean useAddTargetCode() {
+        return true;
     }
     
     @Override

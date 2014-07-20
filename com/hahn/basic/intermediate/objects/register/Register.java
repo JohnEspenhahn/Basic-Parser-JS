@@ -1,4 +1,4 @@
-package com.hahn.basic.intermediate.register;
+package com.hahn.basic.intermediate.objects.register;
 
 import java.util.ArrayList;
 import java.util.List;

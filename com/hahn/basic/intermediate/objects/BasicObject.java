@@ -4,12 +4,15 @@ import lombok.NonNull;
 
 import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.Type;
+import com.hahn.basic.intermediate.statements.Compilable;
 import com.hahn.basic.intermediate.statements.Statement;
 
-public abstract class BasicObject implements ITypeable, IHolderExcludeList {
+public abstract class BasicObject implements ITypeable, IBasicHolderExcludeList {
     private String name;
     private Type type;
+    
     private int uses;
+    private Compilable statementOfLastUse;
     
     public BasicObject(String name, Type type) {
         this.name = name;
@@ -76,13 +79,26 @@ public abstract class BasicObject implements ITypeable, IHolderExcludeList {
     /**
      * Should be called from reverseRegisterOptimize
      * Keep track of the number of uses
+     * @param by The object causing this to be set in use
      * @return True if first call (last use)
      */
-    public boolean setInUse() {        
-        boolean firstCall = (uses == 0);
+    public boolean setInUse(Compilable by) {
         uses += 1;
         
-        return firstCall;
+        if (uses == 1) {
+            statementOfLastUse = by;
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    /**
+     * @param by The object to check if is last use by
+     * @return True if last use is by this
+     */
+    public boolean isLastUse(Compilable by) {
+        return by == statementOfLastUse;
     }
     
     public void removeInUse() { }

@@ -7,9 +7,10 @@ import java.util.List;
 
 import com.hahn.basic.intermediate.Frame;
 import com.hahn.basic.intermediate.LangCompiler;
+import com.hahn.basic.intermediate.objects.register.IRegister;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.opcode.OPCode;
-import com.hahn.basic.intermediate.register.IRegister;
+import com.hahn.basic.intermediate.statements.Compilable;
 import com.hahn.basic.intermediate.statements.Statement;
 
 public abstract class AdvancedObject extends BasicObject {
@@ -88,6 +89,23 @@ public abstract class AdvancedObject extends BasicObject {
     /*
      * ------------------------------- Register Management -------------------------------
      */
+    @Override
+    public boolean setInUse(Compilable by) {
+        boolean firstCall = super.setInUse(by);
+
+        if (firstCall && getFrame() != null) {
+            frame.addInUseVar(this);
+        }
+
+        return firstCall;
+    }
+    
+    public final void takeRegister(Compilable by) {
+        doTakeRegister(isLastUse(by));
+    }
+    
+    public abstract void doTakeRegister(boolean isLastUse);
+    
     public boolean hasRegister() {
         return reg != null;
     }
@@ -95,8 +113,6 @@ public abstract class AdvancedObject extends BasicObject {
     public boolean isRegisterOnStack() {
         return hasRegister() && reg.isOnStack();
     }
-    
-    public abstract void takeRegister(boolean lastUse);
 
     public void releaseRegister() {
         if (hasRegister()) {
@@ -110,17 +126,6 @@ public abstract class AdvancedObject extends BasicObject {
 
     public IRegister getRegister() {
         return reg;
-    }
-    
-    @Override
-    public boolean setInUse() {
-        boolean firstCall = super.setInUse();
-
-        if (firstCall && getFrame() != null) {
-            frame.addInUseVar(this);
-        }
-
-        return firstCall;
     }
 
     public void addParallelObj(AdvancedObject obj) {

@@ -13,7 +13,7 @@ import com.hahn.basic.parser.IEnumExpression;
 import com.hahn.basic.parser.Node;
 import com.hahn.basic.parser.Parser;
 import com.hahn.basic.target.LangBuildTarget;
-import com.hahn.basic.target.LangFactory;
+import com.hahn.basic.target.ILangFactory;
 import com.hahn.basic.util.CompileException;
 
 public class BASICMain extends Main {
@@ -21,11 +21,11 @@ public class BASICMain extends Main {
     
     private final Lexer lexer;
     private final Parser parser;
-    private final LangFactory factory;
+    private final ILangFactory factory;
     
     private List<PackedToken> stream;
 
-    public BASICMain(LangFactory factory, Class<? extends IEnumToken> tokens, Class<? extends IEnumExpression> expressions) {
+    public BASICMain(ILangFactory factory, Class<? extends IEnumToken> tokens, Class<? extends IEnumExpression> expressions) {
         System.out.println("BASIC Parser v" + VERSION);
         
         this.factory = factory;

@@ -1,4 +1,4 @@
-package com.hahn.basic.intermediate.register;
+package com.hahn.basic.intermediate.objects.register;
 
 
 public class StackRegister extends IRegister {

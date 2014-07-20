@@ -3,6 +3,7 @@ package com.hahn.basic.intermediate.objects;
 import lombok.experimental.Delegate;
 
 import com.hahn.basic.intermediate.objects.types.Type;
+import com.hahn.basic.intermediate.statements.Compilable;
 
 public abstract class VarPointer extends AdvancedObject {
     
@@ -18,8 +19,8 @@ public abstract class VarPointer extends AdvancedObject {
     interface IDelegated {
         public Type getType();
         public String getName();
-        public boolean setInUse();
-        public void takeRegister(boolean lastUse);
+        public boolean setInUse(Compilable by);
+        public void doTakeRegister(boolean lastUse);
         public int getUses();
     }
     

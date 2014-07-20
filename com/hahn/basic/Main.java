@@ -156,7 +156,7 @@ public abstract class Main {
         List<String> argsList = Arrays.asList(args);
         
         try {
-            Main main = new BASICMain(new LangFactory(), EnumToken.class, EnumExpression.class);
+            Main main = new BASICMain(new ILangFactory(), EnumToken.class, EnumExpression.class);
             
             if (argsList.contains("--debug") || argsList.contains("-d")) {
                 toggleDebug();

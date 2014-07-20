@@ -4,7 +4,7 @@ import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.statements.Statement;
 
 
-interface IHolderExcludeList {
+interface IBasicHolderExcludeList {
     public Type getType();
     
     public BasicObject getForUse(Statement s);
