@@ -54,6 +54,10 @@ public abstract class BasicObject implements ITypeable, IBasicHolderExcludeList 
         return false;
     }
     
+    public void doTakeRegister(boolean lastUse) {
+        // Basic objects don't have registers
+    }
+    
     /**
      * @param t The type to cast to
      * @return A new, altered version of this
@@ -67,6 +71,10 @@ public abstract class BasicObject implements ITypeable, IBasicHolderExcludeList 
      */
     
     /**
+     * TODO: Should only be called one; but always called
+     * prior to the object being used for the first time,
+     * and before any other statements are added.
+     * 
      * Called while still compiling, do any finalizations
      * needed in order for this object to be used
      * @param by The calling statement
@@ -77,8 +85,8 @@ public abstract class BasicObject implements ITypeable, IBasicHolderExcludeList 
     }
     
     /**
-     * Should be called from reverseRegisterOptimize
-     * Keep track of the number of uses
+     * Should be called from reverseOptimize to
+     * keep track of the number of uses
      * @param by The object causing this to be set in use
      * @return True if first call (last use)
      */

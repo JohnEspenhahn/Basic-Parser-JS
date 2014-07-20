@@ -1,16 +1,18 @@
 package com.hahn.basic.intermediate.statements;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.hahn.basic.intermediate.Frame;
+import com.hahn.basic.intermediate.objects.ExpressionObject;
 import com.hahn.basic.parser.Node;
 
 public abstract class ForStatement extends Statement {
 	private Frame outerFrame, innerFrame;
 	
-    private Node define;
-    private Node condition;
-    private List<Node> modification;
+    private List<Compilable> define;
+    private ExpressionObject condition;
+    private List<Compilable> modification;
     
     /**
      * @param continer Owning statement
@@ -25,9 +27,13 @@ public abstract class ForStatement extends Statement {
         this.outerFrame = new Frame(getFrame(), null);
         this.innerFrame = new Frame(outerFrame, body);
         
-        this.define = define;
-        this.condition = condition;
-        this.modification = modification;
+        this.define = outerFrame.defineVar(define);
+        this.condition = outerFrame.handleExpression(condition);
+        
+        this.modification = new ArrayList<Compilable>();
+        for (Node modify: modification) {
+            this.modification.add(outerFrame.modifyVar(modify));
+        }
     }
 
     public Frame getOuterFrame() {
@@ -38,15 +44,15 @@ public abstract class ForStatement extends Statement {
     	return innerFrame;
     }
     
-    public Node getDefineNode() {
+    public List<Compilable> getDefineStatements() {
     	return define;
     }
     
-    public Node getConditionNode() {
+    public ExpressionObject getConditionObject() {
     	return condition;
     }
     
-    public List<Node> getModifyNodes() {
+    public List<Compilable> getModifyStatements() {
     	return modification;
     }
     

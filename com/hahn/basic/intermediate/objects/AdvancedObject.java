@@ -46,10 +46,6 @@ public abstract class AdvancedObject extends BasicObject {
         return parallelObjs;
     }
 
-    public AdvancedObject getPointer() {
-        return LangCompiler.factory.VarPointer(this);
-    }
-
     public BasicObject getAddress() {
         return this;
     }

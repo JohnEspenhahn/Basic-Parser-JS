@@ -6,10 +6,8 @@ import java.util.Iterator;
 
 import lombok.NonNull;
 
-import com.hahn.basic.intermediate.objects.AdvancedObject;
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.LiteralNum;
-import com.hahn.basic.intermediate.objects.VarPointer;
 import com.hahn.basic.intermediate.opcode.OPCode;
 import com.hahn.basic.target.LangBuildTarget;
 
@@ -120,9 +118,6 @@ public abstract class Statement extends Compilable {
                 return true;
             } else if (create.getVar() == bCmd.getP2() && bCmd.isP2LastUse()) {
                 bCmd.forceP2(create.getVal());
-                return true;
-            } else if (bCmd.isP1LastUse() && bCmd.getP1() instanceof VarPointer && create.getVal() instanceof AdvancedObject && bCmd.getP1().equals(create.getVar())) {
-                ((VarPointer) bCmd.getP1()).setObj((AdvancedObject) create.getVal());
                 return true;
             } else if (create.getVal() == bCmd.getP2()) {
                 bCmd.forceP2(create.getVar());

@@ -32,6 +32,7 @@ import com.hahn.basic.definition.EnumExpression;
 import com.hahn.basic.definition.EnumToken;
 import com.hahn.basic.intermediate.objects.AdvancedObject;
 import com.hahn.basic.intermediate.objects.BasicObject;
+import com.hahn.basic.intermediate.objects.ExpressionObject;
 import com.hahn.basic.intermediate.objects.FuncCallPointer;
 import com.hahn.basic.intermediate.objects.FuncPointer;
 import com.hahn.basic.intermediate.objects.LiteralBool;
@@ -44,6 +45,7 @@ import com.hahn.basic.intermediate.objects.types.ParameterizedType;
 import com.hahn.basic.intermediate.objects.types.Struct.StructParam;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.opcode.OPCode;
+import com.hahn.basic.intermediate.statements.CallFuncStatement;
 import com.hahn.basic.intermediate.statements.Command;
 import com.hahn.basic.intermediate.statements.Compilable;
 import com.hahn.basic.intermediate.statements.EndLoopStatement;
@@ -509,8 +511,9 @@ public class Frame extends Statement {
     /**
      * `Return` statement handler
      * @param head EnumExpression.RETURN or null
+     * @return The statement to do the return
      */
-    public void doReturn(Node head) {
+    public Compilable doReturn(Node head) {
         Frame f = this;
         while (f.parent != null) {
             f = f.parent;
@@ -538,7 +541,7 @@ public class Frame extends Statement {
         }
         
         // Return
-        addCode(LangCompiler.factory.ReturnStatement(this, (FuncHead) f, result));
+        return LangCompiler.factory.ReturnStatement(this, (FuncHead) f, result);
     }
     
     /**
@@ -634,8 +637,10 @@ public class Frame extends Statement {
     /**
      * Call a function
      * @param head EnumExpression.CALL_FUNC
+     * @return The statement that should be added to the frame
+     * and can extract the FuncCallPointer from
      */    
-    public FuncCallPointer callFunc(Node head) {
+    public CallFuncStatement callFunc(Node head) {
         Iterator<Node> it = Util.getIterator(head);
         
         // Determine function
@@ -654,9 +659,8 @@ public class Frame extends Statement {
         BasicObject[] aParams = params.toArray(new BasicObject[params.size()]);
         
         // Get FuncCall object
-        FuncCallPointer funcCallPointer = LangCompiler.factory.FuncCallPointer(name, aParams);        
-        addCode(LangCompiler.factory.DefaultCallFuncStatement(this, funcCallPointer));        
-        return funcCallPointer;
+        FuncCallPointer funcCallPointer = LangCompiler.factory.FuncCallPointer(name, aParams);
+        return LangCompiler.factory.DefaultCallFuncStatement(this, funcCallPointer);
     }
     
     /**
@@ -728,8 +732,9 @@ public class Frame extends Statement {
     /**
      * `If` statement handler
      * @param head EnumExpression.IF_STMT
+     * @return The IfStatement
      */
-    public void ifStatement(Node head) {
+    public Compilable ifStatement(Node head) {
         Iterator<Node> it = Util.getIterator(head);
         
         List<Conditional> conditionals = new ArrayList<Conditional>();
@@ -744,7 +749,7 @@ public class Frame extends Statement {
             }
         }
         
-        addCode(LangCompiler.factory.IfStatement(this, conditionals));
+        return LangCompiler.factory.IfStatement(this, conditionals);
     }
     
     /**
@@ -759,19 +764,21 @@ public class Frame extends Statement {
     /**
      * `While` statement handler
      * @param head EnumExpression.WHILE_STMT
+     * @return The WhileStatement
      */
-    public void whileStatement(Node head) {
+    public Compilable whileStatement(Node head) {
         Node block = head.getAsChildren().get(1);
         List<Node> blockChildren = block.getAsChildren();
         
-        addCode(LangCompiler.factory.WhileStatement(this, blockChildren.get(1), blockChildren.get(3)));
+        return LangCompiler.factory.WhileStatement(this, blockChildren.get(1), blockChildren.get(3));
     }
     
     /**
      * `For` statement handler
      * @param head EnumExpression.FOR_STMT
+     * @return The ForStatement
      */
-    public void forStatement(Node head) {
+    public Compilable forStatement(Node head) {
         Iterator<Node> it = Util.getIterator(head);
         
         Node define = null, condition = null;
@@ -798,39 +805,40 @@ public class Frame extends Statement {
             }
         }
         
-        addCode(LangCompiler.factory.ForStatement(this, define, condition, modification, body));
+        return LangCompiler.factory.ForStatement(this, define, condition, modification, body);
     }
     
     /**
      * `Continue` handler
      * @param head EnumToken.CONTINUE
+     * @return ContinueStatement
      */
-    public void doContinue(Node head) {        
-        addCode(LangCompiler.factory.ContinueStatement(this));
+    public Compilable doContinue(Node head) {        
+        return LangCompiler.factory.ContinueStatement(this);
     }
     
     /**
      * `Break` handler
      * @param head EnumToken.BREAK
+     * @return BreakStatement
      */
-    public void doBreak(Node head) {
+    public Compilable doBreak(Node head) {
         Frame loop = getLoop();
         if (loop == null) {
             throw new CompileException("Invalid use of `break`");
         }
         
-        addCode(LangCompiler.factory.BreakStatement(this));
+        return LangCompiler.factory.BreakStatement(this);
     }
     
     /**
-     * Cast the next experession object
+     * Cast the next expression object
      * @param head EnumExpression.CAST
      * @param it Parent expression parsing iterator
-     * @param prev
      * @param temp
      * @return ObjectHolder
      */
-    private BasicObject doCast(Node head, DepthIterator<Node> it, BasicObject prev, BasicObject temp) {
+    private BasicObject doCast(Node head, DepthIterator<Node> it, BasicObject temp) {
         Iterator<Node> childIt = Util.getIterator(head);
         while (childIt.hasNext()) {
             Node child = childIt.next();
@@ -839,7 +847,10 @@ public class Frame extends Statement {
                 Type type = Type.fromNode(child);
                 
                 if (it.hasNext()) {
-                    return handleNextExpressionChild(it, prev, temp).castTo(type);
+                    ExpressionObject nextExp = LangCompiler.factory.ExpressionObject(this, null);
+                    handleNextExpressionChild(it, nextExp, temp);
+                    
+                    return nextExp.castTo(type);
                 } else {
                     throw new CompileException("Nothing provided to cast to `" + type + "`");
                 }
@@ -854,85 +865,73 @@ public class Frame extends Statement {
      * @param head EnumExpression.EXPRESSION or one of it's children
      * @return An object with the result of the expression
      */    
-    public BasicObject handleExpression(Node head) {
+    public ExpressionObject handleExpression(Node head) {
         return doHandleExpression(new DepthIterator<Node>(Util.getIterator(head)));
     }
     
-    private BasicObject doHandleExpression(DepthIterator<Node> it) {
-        BasicObject prev = null;
+    private ExpressionObject doHandleExpression(DepthIterator<Node> it) {
+        ExpressionObject exp = LangCompiler.factory.ExpressionObject(this, null);
         
         // Add tokens
         while (it.hasNext()) {            
-            prev = handleNextExpressionChild(it, prev, null);
+            handleNextExpressionChild(it, exp, null);
         }
  
-        if (prev == null) {
+        if (exp.getObj() == null) {
             throw new CompileException("Incomplete command"); 
         } else {
-            return prev;
+            return exp;
         }
     }
     
-    private BasicObject handleNextExpressionChild(DepthIterator<Node> it, BasicObject prev, BasicObject temp) {
+    private void handleNextExpressionChild(DepthIterator<Node> it, ExpressionObject exp, BasicObject temp) {
         Node child = it.next();
         Enum<?> token = child.getToken();
 
         if (child.isTerminal()) {
             String val = child.getValue();
             if (token == NUMBER || token == HEX_NUMBER || token == CHAR) {
-                prev = Util.parseInt(child);
+                exp.setObj(Util.parseInt(child));
             } else if (token == TRUE) {
-                prev = new LiteralBool(true);
+                exp.setObj(new LiteralBool(true));
             } else if (token == FALSE) {
-                prev = new LiteralBool(false);
+                exp.setObj(new LiteralBool(false));
             } else if (token == STRING) {
-                prev = LangCompiler.getString(val.substring(1, val.length() - 1));
+                exp.setObj(LangCompiler.getString(val.substring(1, val.length() - 1)));
             } else if (token == ADD_SUB || token == MULT_DIV || token == AND || token == MSC_BITWISE) {
                 OPCode op = OPCode.fromSymbol(val);
-                BasicObject next = handleNextExpressionChild(it, prev, temp);
                 
-                // Ensure modifiable
-                prev = temp = getTemp(prev, temp);
+                ExpressionObject nextExp = LangCompiler.factory.ExpressionObject(this, null);
+                handleNextExpressionChild(it, nextExp, temp);
                 
-                addCode(LangCompiler.factory.Command(this, op, prev, next));
+                exp.addCode(LangCompiler.factory.Command(this, op, exp, nextExp));
             } else if (token == NOTEQUAL || token == EQUALS || token == LESS_EQU || token == GTR_EQU || token == LESS || token == GTR) {
                 OPCode op = OPCode.fromSymbol(val);
-                BasicObject next = handleNextExpressionChild(it, prev, temp);
+                
+                ExpressionObject nextExp = LangCompiler.factory.ExpressionObject(this, null);
+                handleNextExpressionChild(it, nextExp, temp);
                 
                 if (temp == null) temp = createTempVar(Type.BOOL);
-                prev = LangCompiler.factory.ConditionalObject(temp, op, prev, next);
+                exp.setObj(LangCompiler.factory.ConditionalObject(temp, op, exp.getObj(), nextExp.getObj()));
             }
         } else {
             if (token == EnumExpression.ACCESS) {
-                prev = accessVar(child);
+                exp.setObj(accessVar(child));
             } else if (token == EnumExpression.CREATE) {
-                prev = createInstance(child);
+                exp.setObj(createInstance(child));
             } else if (token == EnumExpression.CALL_FUNC) {
-                prev = callFunc(child);
+                CallFuncStatement fc = callFunc(child);
+                exp.setObj(fc.getFuncCallPointer());
+                exp.addCode(fc);
             } else if (token == EnumExpression.CAST) {
-                prev = doCast(child, it, prev, temp);
+                exp.setObj(doCast(child, it, temp));
             } else if (token == EnumExpression.FUNC_POINTER) {
-                prev = getFuncPointer(child);
+                exp.setObj(getFuncPointer(child));
             } else if (token == EnumExpression.ANON_FUNC) {
-                prev = defineAnonFunc(child);
+                exp.setObj(defineAnonFunc(child));
             } else {
-                prev = doHandleExpression(it.enter(child.getAsChildren()));
+                exp.setObj(doHandleExpression(it.enter(child.getAsChildren())));
             }
-        }
-        
-        return prev;
-    }
-    
-    private BasicObject getTemp(BasicObject prev, BasicObject temp) {
-        if (prev.isTemp()) {
-            return prev;
-        } else if (temp == null) { 
-            temp = createTempVar(prev.getType());
-            addCode(LangCompiler.factory.DefineVarStatement(this, temp, prev, false));
-            return temp;
-        } else {
-            addCode(LangCompiler.factory.DefineVarStatement(this, temp, prev, false));
-            return temp;
         }
     }
 

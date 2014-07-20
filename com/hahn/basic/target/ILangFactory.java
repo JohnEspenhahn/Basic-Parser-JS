@@ -7,6 +7,7 @@ import com.hahn.basic.intermediate.FuncHead;
 import com.hahn.basic.intermediate.objects.AdvancedObject;
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.ConditionalObject;
+import com.hahn.basic.intermediate.objects.ExpressionObject;
 import com.hahn.basic.intermediate.objects.FuncCallPointer;
 import com.hahn.basic.intermediate.objects.FuncPointer;
 import com.hahn.basic.intermediate.objects.Param;
@@ -17,6 +18,7 @@ import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.ParameterizedType;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.opcode.OPCode;
+import com.hahn.basic.intermediate.statements.CallFuncStatement;
 import com.hahn.basic.intermediate.statements.Command;
 import com.hahn.basic.intermediate.statements.Compilable;
 import com.hahn.basic.intermediate.statements.IfStatement.Conditional;
@@ -30,12 +32,12 @@ public interface ILangFactory {
 	public BasicObject PushObject();
 	public StringConst StringConst(String str);
 	
-	public Var VarPointer(AdvancedObject obj);
 	public Var VarParameter(Frame frame, String name, Type type);
 	public Var VarLocal(Frame frame, String name, Type type);
 	public VarGlobal VarGlobal(String name, Type type);
 	
 	public AdvancedObject VarAccess(AdvancedObject var, BasicObject idx, Type type);
+	public ExpressionObject ExpressionObject(Frame frame, BasicObject obj);
 	
 	public BasicObject NewInstance(Type type, List<BasicObject> params);
 	
@@ -59,8 +61,8 @@ public interface ILangFactory {
     public Compilable WhileStatement(Statement container, Node conditional, Node body);
     public Compilable ForStatement(Statement container, Node define, Node condition, List<Node> modification, Node body);
     
-    public Compilable CallFuncStatement(Statement container, FuncCallPointer funcCallPointer);
-    public Compilable DefaultCallFuncStatement(Statement container, FuncCallPointer funcCallPointer);
-    
 	public Compilable DefineVarStatement(Statement container, BasicObject var, BasicObject value, boolean ignoreTypeCheck);
+	
+	public CallFuncStatement CallFuncStatement(Statement container, FuncCallPointer funcCallPointer);
+    public CallFuncStatement DefaultCallFuncStatement(Statement container, FuncCallPointer funcCallPointer);
 }

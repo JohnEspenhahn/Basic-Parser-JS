@@ -7,6 +7,7 @@ import com.hahn.basic.intermediate.FuncHead;
 import com.hahn.basic.intermediate.objects.AdvancedObject;
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.ConditionalObject;
+import com.hahn.basic.intermediate.objects.ExpressionObject;
 import com.hahn.basic.intermediate.objects.FuncCallPointer;
 import com.hahn.basic.intermediate.objects.FuncPointer;
 import com.hahn.basic.intermediate.objects.Param;
@@ -17,9 +18,9 @@ import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.ParameterizedType;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.opcode.OPCode;
+import com.hahn.basic.intermediate.statements.CallFuncStatement;
 import com.hahn.basic.intermediate.statements.Command;
 import com.hahn.basic.intermediate.statements.Compilable;
-import com.hahn.basic.intermediate.statements.ForStatement;
 import com.hahn.basic.intermediate.statements.IfStatement.Conditional;
 import com.hahn.basic.intermediate.statements.Statement;
 import com.hahn.basic.parser.Node;
@@ -51,12 +52,6 @@ public class JSLangFactory implements ILangFactory {
     }
     
     @Override
-    public Var VarPointer(AdvancedObject obj) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-    
-    @Override
     public Var VarParameter(Frame frame, String name, Type type) {
         // TODO Auto-generated method stub
         return null;
@@ -83,6 +78,12 @@ public class JSLangFactory implements ILangFactory {
     @Override
     public BasicObject NewInstance(Type type, List<BasicObject> params) {
         // TODO Auto-generated method stub
+        return null;
+    }
+    
+    @Override
+    public ExpressionObject ExpressionObject(Frame frame, BasicObject obj) {
+        // TODO
         return null;
     }
     
@@ -158,12 +159,12 @@ public class JSLangFactory implements ILangFactory {
     }
     
     @Override
-    public Compilable CallFuncStatement(Statement container, FuncCallPointer funcCallPointer) {
+    public CallFuncStatement CallFuncStatement(Statement container, FuncCallPointer funcCallPointer) {
         return new JSCallFuncStatement(container, funcCallPointer);
     }
     
     @Override
-    public Compilable DefaultCallFuncStatement(Statement container, FuncCallPointer funcCallPointer) {
+    public CallFuncStatement DefaultCallFuncStatement(Statement container, FuncCallPointer funcCallPointer) {
         return new JSDefaultCallFuncStatement(container, funcCallPointer);
     }
     
