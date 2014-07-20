@@ -44,6 +44,7 @@ import com.hahn.basic.intermediate.objects.types.ParameterizedType;
 import com.hahn.basic.intermediate.objects.types.Struct.StructParam;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.opcode.OPCode;
+import com.hahn.basic.intermediate.statements.Command;
 import com.hahn.basic.intermediate.statements.EndLoopStatement;
 import com.hahn.basic.intermediate.statements.IfStatement.Conditional;
 import com.hahn.basic.intermediate.statements.Statement;
@@ -367,40 +368,32 @@ public class Frame extends Statement {
     /**
      * `Modify` var handler
      * @param head EnumExpression.MODIFY
+     * @return The command to do the modification
      */
-    public void modifyVar(Node head) {
+    public Command modifyVar(Node head) {
         List<Node> children = head.getAsChildren();
         
-        BasicObject v = accessVar(children.get(0));
-        BasicObject o = handleExpression(children.get(2));        
+        BasicObject var = accessVar(children.get(0));
+        BasicObject obj = handleExpression(children.get(2));        
         switch (children.get(1).getValue()) {
             case "=": 
-                updateVar(v, o, OPCode.SET);
-                break;
+                return updateVar(var, obj, OPCode.SET);
             case "+=":
-                updateVar(v, o, OPCode.ADD);
-                break;
+                return updateVar(var, obj, OPCode.ADD);
             case "-=":
-                updateVar(v, o, OPCode.SUB);
-                break;
+                return updateVar(var, obj, OPCode.SUB);
             case "*=":
-                updateVar(v, o, OPCode.MUL);
-                break;
+                return updateVar(var, obj, OPCode.MUL);
             case "/=":
-                updateVar(v, o, OPCode.DIV);
-                break;
+                return updateVar(var, obj, OPCode.DIV);
             case "%=":
-                updateVar(v, o, OPCode.MOD);
-                break;
+                return updateVar(var, obj, OPCode.MOD);
             case "&=":
-                updateVar(v, o, OPCode.AND);
-                break;
+                return updateVar(var, obj, OPCode.AND);
             case "|=":
-                updateVar(v, o, OPCode.BOR);
-                break;
+                return updateVar(var, obj, OPCode.BOR);
             case "^=":
-                updateVar(v, o, OPCode.XOR);
-                break;
+                return updateVar(var, obj, OPCode.XOR);
            default:
                throw new RuntimeException("Unhandled modify var '" + children.get(1).getValue() + "'");
         }
@@ -411,10 +404,11 @@ public class Frame extends Statement {
      * @param var The variable to modify
      * @param obj The object doing the modification
      * @param op The operation to perform on the variable
+     * @return The command to update the var
      */
-    protected void updateVar(BasicObject var, BasicObject obj, OPCode op) {
+    protected Command updateVar(BasicObject var, BasicObject obj, OPCode op) {
         Type.merge(var.getType(), obj.getType());
-        addCode(LangCompiler.factory.Command(this, op, var, obj));
+        return LangCompiler.factory.Command(this, op, var, obj);
     }
     
     /**
