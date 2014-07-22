@@ -2,6 +2,7 @@ package com.hahn.basic.intermediate.objects;
 
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.opcode.OPCode;
+import com.hahn.basic.target.LangBuildTarget;
 
 public abstract class Literal extends BasicObject {
 
@@ -30,7 +31,7 @@ public abstract class Literal extends BasicObject {
     }
 	
 	@Override
-	public String toTarget() {
+	public String toTarget(LangBuildTarget builder) {
 		return toString();
 	}
 	

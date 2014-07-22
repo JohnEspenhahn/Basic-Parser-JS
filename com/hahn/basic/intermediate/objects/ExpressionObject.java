@@ -30,9 +30,6 @@ public abstract class ExpressionObject extends ObjectPointer {
     }
     
     @Override
-    public abstract String toTarget();
-    
-    @Override
     public String toString() {
         return "{...}" + getObj();
     }

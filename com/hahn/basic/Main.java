@@ -10,6 +10,7 @@ import javax.swing.JFileChooser;
 
 import com.hahn.basic.definition.EnumExpression;
 import com.hahn.basic.definition.EnumToken;
+import com.hahn.basic.target.js.JSLangFactory;
 import com.hahn.basic.util.CompileException;
 
 public abstract class Main {
@@ -156,7 +157,7 @@ public abstract class Main {
         List<String> argsList = Arrays.asList(args);
         
         try {
-            Main main = new BASICMain(new ILangFactory(), EnumToken.class, EnumExpression.class);
+            Main main = new BASICMain(new JSLangFactory(), EnumToken.class, EnumExpression.class);
             
             if (argsList.contains("--debug") || argsList.contains("-d")) {
                 toggleDebug();

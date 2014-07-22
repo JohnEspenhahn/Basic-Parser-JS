@@ -4,6 +4,7 @@ import static com.hahn.basic.util.Util.toBool;
 
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.opcode.OPCode;
+import com.hahn.basic.target.LangBuildTarget;
 import com.hahn.basic.util.CompileException;
 
 public class LiteralBool extends Literal {
@@ -63,7 +64,7 @@ public class LiteralBool extends Literal {
 	}
 	
 	@Override
-	public String toTarget() {
+	public String toTarget(LangBuildTarget builder) {
 		return toString();
 	}
 

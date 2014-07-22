@@ -21,8 +21,12 @@ import com.hahn.basic.intermediate.opcode.OPCode;
 import com.hahn.basic.intermediate.statements.CallFuncStatement;
 import com.hahn.basic.intermediate.statements.Command;
 import com.hahn.basic.intermediate.statements.Compilable;
+import com.hahn.basic.intermediate.statements.DefineVarStatement;
+import com.hahn.basic.intermediate.statements.ForStatement;
+import com.hahn.basic.intermediate.statements.IfStatement;
 import com.hahn.basic.intermediate.statements.IfStatement.Conditional;
 import com.hahn.basic.intermediate.statements.Statement;
+import com.hahn.basic.intermediate.statements.WhileStatement;
 import com.hahn.basic.parser.Node;
 
 public interface ILangFactory {
@@ -57,11 +61,11 @@ public interface ILangFactory {
     public Compilable ContinueStatement(Frame frame);
     public Compilable ReturnStatement(Statement container, Frame returnFrom, BasicObject result);
     
-    public Compilable IfStatement(Statement container, List<Conditional> conditionals);
-    public Compilable WhileStatement(Statement container, Node conditional, Node body);
-    public Compilable ForStatement(Statement container, Node define, Node condition, List<Node> modification, Node body);
+    public IfStatement IfStatement(Statement container, List<Conditional> conditionals);
+    public WhileStatement WhileStatement(Statement container, Node conditional, Node body);
+    public ForStatement ForStatement(Statement container, Node define, Node condition, List<Node> modification, Node body);
     
-	public Compilable DefineVarStatement(Statement container, BasicObject var, BasicObject value, boolean ignoreTypeCheck);
+	public DefineVarStatement DefineVarStatement(Statement container, boolean ignoreTypeCheck);
 	
 	public CallFuncStatement CallFuncStatement(Statement container, FuncCallPointer funcCallPointer);
     public CallFuncStatement DefaultCallFuncStatement(Statement container, FuncCallPointer funcCallPointer);

@@ -105,7 +105,7 @@ public abstract class Command extends Compilable {
                     return true;
                 }
             } else if (p2 != null) {
-                ao1.setLiteral(null);
+                p1.setLiteral(null);
             }
         }
         

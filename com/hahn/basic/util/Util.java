@@ -7,11 +7,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.hahn.basic.intermediate.IIntermediate;
 import com.hahn.basic.intermediate.objects.LiteralNum;
 import com.hahn.basic.intermediate.objects.Param;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.parser.Node;
+import com.hahn.basic.target.LangBuildTarget;
 
 
 public class Util {
@@ -46,6 +48,19 @@ public class Util {
         StringBuffer result = new StringBuffer();
         for (int i = 0; i < arr.length; i++) {
            result.append(arr[i].toString());
+           
+           if (i + 1 < arr.length) {
+               result.append(seperator);
+           }
+        }
+        
+        return result.toString();
+    }
+    
+    public static String toTarget(IIntermediate[] arr, String seperator, LangBuildTarget builder) {
+        StringBuffer result = new StringBuffer();
+        for (int i = 0; i < arr.length; i++) {
+           result.append(arr[i].toTarget(builder));
            
            if (i + 1 < arr.length) {
                result.append(seperator);

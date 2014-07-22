@@ -23,7 +23,9 @@ public abstract class Var extends AdvancedObject {
             } else {
                 setRegister(getStackRegister());
             }
-        } else if (lastUse) {
+        } 
+        
+        if (lastUse) {
             releaseRegister();
         }
     }

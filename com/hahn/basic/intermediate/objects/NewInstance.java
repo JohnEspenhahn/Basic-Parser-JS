@@ -17,6 +17,4 @@ public abstract class NewInstance extends BasicObject {
 		return params;
 	}
 
-	@Override
-	public abstract String toTarget();
 }

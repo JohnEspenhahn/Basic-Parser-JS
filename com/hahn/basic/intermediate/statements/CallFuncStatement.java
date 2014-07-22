@@ -23,18 +23,27 @@ public abstract class CallFuncStatement extends Statement {
     }
     
     @Override
-    public boolean reverseOptimize() {
+    public final boolean reverseOptimize() {
     	if (shouldCallFunction()) {
     	    for (BasicObject o : getParams()) {
                 o.setInUse(this);
             }
     	    
 		    funcCallPointer.setInUse(this);
-		    return super.reverseOptimize();
+		    return doReverseOptimize();
     	} else {
     		return true;
     	}
     }
+    
+    public abstract boolean doReverseOptimize();
+    
+    @Override
+    public final boolean forwardOptimize() {
+        return doForwardOptimize();
+    }
+    
+    public abstract boolean doForwardOptimize();
     
     protected abstract boolean shouldCallFunction();
     

@@ -6,7 +6,4 @@ public abstract class PushObject extends BasicObject {
 	public PushObject() {
 		super("PUSH", Type.UNDEFINED);
 	}
-
-	@Override
-	public abstract String toTarget();
 }

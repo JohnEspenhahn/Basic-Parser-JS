@@ -2,12 +2,14 @@ package com.hahn.basic.intermediate.objects;
 
 import lombok.NonNull;
 
+import com.hahn.basic.intermediate.IIntermediate;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.statements.Compilable;
 import com.hahn.basic.intermediate.statements.Statement;
+import com.hahn.basic.target.LangBuildTarget;
 
-public abstract class BasicObject implements ITypeable, IBasicHolderExcludeList {
+public abstract class BasicObject implements IIntermediate, ITypeable, IBasicHolderExcludeList {
     private String name;
     private Type type;
     
@@ -121,9 +123,10 @@ public abstract class BasicObject implements ITypeable, IBasicHolderExcludeList 
     
     /**
      * Convert to its final form
+     * @param builder
      * @return A final form object
      */
-    public abstract String toTarget();
+    public abstract String toTarget(LangBuildTarget builder);
     
     /**
      * @return The creatable version of this

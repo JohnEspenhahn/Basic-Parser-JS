@@ -29,6 +29,12 @@ public abstract class Statement extends Compilable {
      */
     public abstract boolean useAddTargetCode();
     
+    @Override
+    public abstract boolean reverseOptimize();
+    
+    @Override
+    public abstract boolean forwardOptimize();
+    
     public void addCode(Compilable c) {
         targetCode.addLast(c);
     }
@@ -43,8 +49,12 @@ public abstract class Statement extends Compilable {
      */
     protected void addTargetCode() { }
     
-    @Override
-    public boolean reverseOptimize() {
+    /**
+     * Do reverse optimization of the target code
+     * if use of target code is enabled (through
+     * useAddTargetCode)
+     */
+    public void reverseOptimizeTargetCode() {
         if (useAddTargetCode()) {
             addTargetCode();
             
@@ -60,12 +70,14 @@ public abstract class Statement extends Compilable {
                 }
             }
         }
-        
-        return false;
     }
     
-    @Override
-    public boolean forwardOptimize() {
+    /**
+     * Do forward optimization of the target code
+     * if use of target code is enabled (through
+     * useAddTargetCode)
+     */
+    public void forwardOptimizeTargetCode() {
         if (useAddTargetCode()) {
             Iterator<Compilable> it = targetCode.iterator();
             while (it.hasNext()) {
@@ -77,29 +89,18 @@ public abstract class Statement extends Compilable {
                 }
             }
         }
-        
-        return false;
     }
     
-    @Override
-    public String toTarget(LangBuildTarget builder) {
-    	StringBuilder str = new StringBuilder();
-    	str.append(toTargetPre());
-    	
+    public String joinTargetCode(LangBuildTarget builder) {
+    	StringBuilder str = new StringBuilder();    	
     	if (useAddTargetCode()) {
             for (Compilable c: targetCode) {
                 str.append(c.toTarget(builder));
             }
     	}
         
-        str.append(toTargetPost());
-        
         return str.toString();
     }
-    
-    protected String toTargetPre() { return ""; }
-    
-    protected String toTargetPost() { return ""; }
     
     /**
      * Called from reverse optimize. Optimize a compilable pair
@@ -113,14 +114,14 @@ public abstract class Statement extends Compilable {
         } else if (a instanceof DefineVarStatement && b instanceof Command) {
             DefineVarStatement create = (DefineVarStatement) a;
             Command bCmd = (Command) b;
-            if (create.getVar() == bCmd.getP1() && bCmd.isP1LastUse()) {
-                bCmd.forceP1(create.getVal());
+            if (create.hasVar(bCmd.getP1()) && bCmd.isP1LastUse()) {
+                bCmd.forceP1(create.getValFor(bCmd.getP1()));
                 return true;
-            } else if (create.getVar() == bCmd.getP2() && bCmd.isP2LastUse()) {
-                bCmd.forceP2(create.getVal());
+            } else if (create.hasVar(bCmd.getP2()) && bCmd.isP2LastUse()) {
+                bCmd.forceP2(create.getValFor(bCmd.getP1()));
                 return true;
-            } else if (create.getVal() == bCmd.getP2()) {
-                bCmd.forceP2(create.getVar());
+            } else if (create.hasVar(bCmd.getP2())) {
+                bCmd.forceP2(create.getValFor(bCmd.getP1()));
             }
         } else if (a instanceof Command) {
             Command aCmd = (Command) a;

@@ -22,9 +22,6 @@ public abstract class ConditionalObject extends BasicObject {
     @Override
     public abstract BasicObject getForUse(Statement s);
     
-    @Override
-	public abstract String toTarget();
-    
     public OPCode getOP() {
         return op;
     }

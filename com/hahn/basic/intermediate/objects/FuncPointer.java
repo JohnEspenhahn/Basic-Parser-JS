@@ -69,7 +69,4 @@ public abstract class FuncPointer extends BasicObject {
             }
         }
     }
-    
-    @Override
-    public abstract String toTarget();
 }

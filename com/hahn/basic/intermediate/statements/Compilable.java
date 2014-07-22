@@ -2,10 +2,11 @@ package com.hahn.basic.intermediate.statements;
 
 import com.hahn.basic.Main;
 import com.hahn.basic.intermediate.Frame;
+import com.hahn.basic.intermediate.IIntermediate;
 import com.hahn.basic.target.ILangCommand;
 import com.hahn.basic.target.LangBuildTarget;
 
-public abstract class Compilable implements ILangCommand {
+public abstract class Compilable implements IIntermediate, ILangCommand {
     protected final int row;
     private final Frame frame;
 

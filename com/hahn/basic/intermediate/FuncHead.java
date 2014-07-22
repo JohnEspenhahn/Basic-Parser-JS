@@ -69,6 +69,7 @@ public abstract class FuncHead extends Frame {
     public String toTarget(LangBuildTarget builder) {
     	super.reverseOptimize();
     	super.forwardOptimize();
+    	
     	return super.toTarget(builder);
     }
     

@@ -58,9 +58,6 @@ public abstract class FuncCallPointer extends FuncPointer {
     }
 
     @Override
-    public abstract String toTarget();
-
-    @Override
     public String toString() {
         return super.toString() + "(...)";
     }

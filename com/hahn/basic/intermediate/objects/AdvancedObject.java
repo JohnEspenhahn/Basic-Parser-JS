@@ -12,6 +12,7 @@ import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.opcode.OPCode;
 import com.hahn.basic.intermediate.statements.Compilable;
 import com.hahn.basic.intermediate.statements.Statement;
+import com.hahn.basic.target.LangBuildTarget;
 
 public abstract class AdvancedObject extends BasicObject {
     private Frame frame;
@@ -65,11 +66,11 @@ public abstract class AdvancedObject extends BasicObject {
     }
 
     @Override
-    public String toTarget() {
+    public String toTarget(LangBuildTarget builder) {
         if (hasLiteral()) {
-            return literal.toTarget();
+            return literal.toTarget(builder);
         } else {
-            return reg.toTarget();
+            return reg.toTarget(builder);
         }
     }
 

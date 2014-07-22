@@ -7,7 +7,4 @@ public abstract class PopObject extends BasicObject {
 	public PopObject() {
 		super("POP", Type.UNDEFINED);
 	}
-	
-	@Override
-	public abstract String toTarget();
 }

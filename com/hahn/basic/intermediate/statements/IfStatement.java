@@ -2,6 +2,8 @@ package com.hahn.basic.intermediate.statements;
 
 import java.util.List;
 
+import com.hahn.basic.intermediate.Frame;
+import com.hahn.basic.intermediate.objects.ExpressionObject;
 import com.hahn.basic.parser.Node;
 
 public abstract class IfStatement extends Statement {
@@ -17,32 +19,63 @@ public abstract class IfStatement extends Statement {
     	return conditionals;
     }
     
+    @Override
+    public String toString() {
+        StringBuilder str = new StringBuilder();
+        
+        boolean first = true;
+        for (Conditional cnd: conditionals) {
+            if (!first) str.append("else ");
+            else first = false;
+            
+            if (cnd.hasCondition()) {
+                str.append(String.format("if (%s) { %s }\n", cnd.getConditionObject(), cnd.getInnerFrame()));
+            } else {
+                str.append(String.format("{ %s }\n", cnd.getInnerFrame()));
+            }            
+        }
+        
+        return str.toString();
+    }
+    
     public static class Conditional {
-        private final Node bodyHead;
-        private final Node conditionHead;
+        private Frame outerFrame, innerFrame;
+        private ExpressionObject condition;
         
         /**
-         * @param conditionHead EnumExpression.EXPRESSION
-         * @param bodyHead EnumExpression.BLOCK
+         * @param condition EnumExpression.EXPRESSION
+         * @param body EnumExpression.BLOCK
          */
-        public Conditional(Node conditionHead, Node bodyHead) {
-            this.conditionHead = conditionHead;
-            this.bodyHead = bodyHead;
+        public Conditional(Frame parent, Node condition, Node body) {
+            this.outerFrame = new Frame(parent, null);
+            this.innerFrame = new Frame(outerFrame, body);
+            
+            if (condition != null) {
+                this.condition = outerFrame.handleExpression(condition);
+            }
         }
         
         /**
          * @param bodyHead EnumExpression.BLOCK
          */
-        public Conditional(Node bodyHead) {
-            this(null, bodyHead);
+        public Conditional(Frame parent, Node bodyHead) {
+            this(parent, null, bodyHead);
         }
         
-        public Node getConditionHead() {
-            return conditionHead;
+        public boolean hasCondition() {
+            return condition != null;
         }
         
-        public Node getBodyHead() {
-            return bodyHead;
+        public ExpressionObject getConditionObject() {
+            return condition;
+        }
+        
+        public Frame getInnerFrame() {
+            return innerFrame;
+        }
+        
+        public Frame getOuterFrame() {
+            return outerFrame;
         }
     }
 }

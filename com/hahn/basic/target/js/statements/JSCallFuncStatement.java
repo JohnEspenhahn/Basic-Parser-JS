@@ -13,19 +13,29 @@ public class JSCallFuncStatement extends CallFuncStatement {
     }
     
     @Override
-    protected boolean shouldCallFunction() {
-        return true;
-    }
-    
-    @Override
     public boolean useAddTargetCode() {
         return false;
     }
     
     @Override
+    public boolean doReverseOptimize() {
+        return false;
+    }
+    
+    @Override
+    public boolean doForwardOptimize() {
+        return false;
+    }
+    
+    @Override
+    protected boolean shouldCallFunction() {
+        return true;
+    }
+    
+    @Override
     public String toTarget(LangBuildTarget builder) {
         FuncCallPointer funccall = getFuncCallPointer();
-        return funccall.getFuncId() + "(" + Util.toString(funccall.getParams(), ",") + ")";
+        return funccall.getFuncId() + "(" + Util.toTarget(funccall.getParams(), ",", builder) + ")";
     }
     
 }

@@ -48,10 +48,12 @@ import com.hahn.basic.intermediate.opcode.OPCode;
 import com.hahn.basic.intermediate.statements.CallFuncStatement;
 import com.hahn.basic.intermediate.statements.Command;
 import com.hahn.basic.intermediate.statements.Compilable;
+import com.hahn.basic.intermediate.statements.DefineVarStatement;
 import com.hahn.basic.intermediate.statements.EndLoopStatement;
 import com.hahn.basic.intermediate.statements.IfStatement.Conditional;
 import com.hahn.basic.intermediate.statements.Statement;
 import com.hahn.basic.parser.Node;
+import com.hahn.basic.target.LangBuildTarget;
 import com.hahn.basic.util.CastException;
 import com.hahn.basic.util.CompileException;
 import com.hahn.basic.util.DepthIterator;
@@ -132,6 +134,11 @@ public class Frame extends Statement {
         }
     }
     
+    @Override
+    public String toTarget(LangBuildTarget builder) {
+        return super.joinTargetCode(builder);
+    }
+    
     /*
      * =====================================================
      * START OPTIMIZE CODE
@@ -200,8 +207,15 @@ public class Frame extends Statement {
      */
     
     @Override
+    public boolean reverseOptimize() {
+        super.reverseOptimizeTargetCode();
+        
+        return false;
+    }
+    
+    @Override
     public boolean forwardOptimize() {
-        super.forwardOptimize();
+        super.forwardOptimizeTargetCode();
         
         // Release the frame's variables
         inUseVars.clear();
@@ -432,24 +446,24 @@ public class Frame extends Statement {
     /**
      * `Define` var handler
      * @param head EnumExpression.DEFINE
-     * @return List of the statements to define the vars
+     * @return Statement to define the vars
      */
-    public List<Compilable> defineVar(Node head) {
+    public DefineVarStatement defineVar(Node head) {
         return defineVar(head, null, true, false);
     }
     
-    protected List<Compilable> defineVar(Node head, boolean isGlobal) {
+    protected DefineVarStatement defineVar(Node head, boolean isGlobal) {
         return defineVar(head, null, true, isGlobal);
     }
     
-    protected List<Compilable> defineVar(Node head, List<BasicObject> varsList) {
+    protected DefineVarStatement defineVar(Node head, List<BasicObject> varsList) {
         return defineVar(head, varsList, false, false);
     }
     
-    private List<Compilable> defineVar(Node head, List<BasicObject> varsList, boolean canInit, boolean isGlobal) {
+    private DefineVarStatement defineVar(Node head, List<BasicObject> varsList, boolean canInit, boolean isGlobal) {
         Iterator<Node> it = Util.getIterator(head);
         
-        List<Compilable> list = new ArrayList<Compilable>();
+        DefineVarStatement define = LangCompiler.factory.DefineVarStatement(this, false);
         
         // Init var
         Type type = Type.fromNode(it.next());
@@ -483,7 +497,7 @@ public class Frame extends Statement {
                         List<Node> modify_children = nextHead.getAsChildren();
                         
                         BasicObject o = handleExpression(modify_children.get(1));
-                        list.add(LangCompiler.factory.DefineVarStatement(this, (AdvancedObject) obj, o, false));
+                        define.addVar((AdvancedObject) obj, o);
                         
                         hasInit = true;
                     }
@@ -491,7 +505,7 @@ public class Frame extends Statement {
                 
                 // Default value
                 if (!hasInit && canInit && obj instanceof AdvancedObject) {
-                    list.add(LangCompiler.factory.DefineVarStatement(this, (AdvancedObject) obj, LiteralNum.UNDEFINED, false));
+                    define.addVar((AdvancedObject) obj, LiteralNum.UNDEFINED);
                 }
                 
                 // Make var available
@@ -505,7 +519,7 @@ public class Frame extends Statement {
             }
         }
         
-        return list;
+        return define;
     }
     
     /**
@@ -745,7 +759,7 @@ public class Frame extends Statement {
             if (token == EnumExpression.CONDITIONAL) {
                 conditionals.add(createConditional(child));
             } else if (token == EnumExpression.BLOCK) {
-                conditionals.add(new Conditional(child));
+                conditionals.add(new Conditional(this, child));
             }
         }
         
@@ -758,7 +772,7 @@ public class Frame extends Statement {
      */
     private Conditional createConditional(Node head) {
         List<Node> children = head.getAsChildren();
-        return new Conditional(children.get(1), children.get(3));
+        return new Conditional(this, children.get(1), children.get(3));
     }
     
     /**

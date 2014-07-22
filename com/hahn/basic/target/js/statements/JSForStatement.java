@@ -6,6 +6,7 @@ import com.hahn.basic.intermediate.statements.Compilable;
 import com.hahn.basic.intermediate.statements.ForStatement;
 import com.hahn.basic.intermediate.statements.Statement;
 import com.hahn.basic.parser.Node;
+import com.hahn.basic.target.LangBuildTarget;
 
 public class JSForStatement extends ForStatement {
     
@@ -20,18 +21,21 @@ public class JSForStatement extends ForStatement {
     
     @Override
     public boolean reverseOptimize() {
-        List<Compilable> modify = getModifyStatements();
-        for (int i = modify.size() - 1; i >= 0; i--) {
-            modify.get(i).reverseOptimize();
+        if (getModifyStatements() != null) {
+            List<Compilable> modify = getModifyStatements();
+            for (int i = modify.size() - 1; i >= 0; i--) {
+                modify.get(i).reverseOptimize();
+            }
         }
         
         getInnerFrame().reverseOptimize();
         
-        getConditionObject().setInUse(this);
+        if (getConditionObject() != null) {
+            getConditionObject().setInUse(this);
+        }
         
-        List<Compilable> define = getDefineStatements();
-        for (int i = define.size() - 1; i >= 0; i--) {
-            define.get(i).reverseOptimize();
+        if (getDefineStatement() != null) {
+            getDefineStatement().reverseOptimize();
         }
         
         return false;
@@ -39,20 +43,33 @@ public class JSForStatement extends ForStatement {
     
     @Override
     public boolean forwardOptimize() {
-        List<Compilable> define = getDefineStatements();
-        for (int i = 0; i < define.size(); i++) {
-            define.get(i).forwardOptimize();
+        if (getDefineStatement() != null) {
+            getDefineStatement().forwardOptimize();
         }
-        
-        getConditionObject().takeRegister(this);
         
         getInnerFrame().forwardOptimize();
         
-        List<Compilable> modify = getModifyStatements();
-        for (int i = 0; i < modify.size(); i++) {
-            modify.get(i).forwardOptimize();
+        if (getModifyStatements() != null) {
+            List<Compilable> modify = getModifyStatements();
+            for (int i = 0; i < modify.size(); i++) {
+                modify.get(i).forwardOptimize();
+            }
+        }
+        
+        if (getConditionObject() != null) {
+            // Make sure don't free register before handling frame
+            getConditionObject().takeRegister(this);
         }
         
         return false;
+    }
+    
+    @Override
+    public String toTarget(LangBuildTarget builder) {
+        return String.format("for(%s;%s;%s){%s}", 
+                getDefineStatement().toTarget(builder),
+                getConditionObject().toTarget(builder),
+                getModifyStatements().toTarget(builder),
+                getInnerFrame().toTarget(builder));
     }
 }

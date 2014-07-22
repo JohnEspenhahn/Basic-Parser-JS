@@ -21,8 +21,12 @@ import com.hahn.basic.intermediate.opcode.OPCode;
 import com.hahn.basic.intermediate.statements.CallFuncStatement;
 import com.hahn.basic.intermediate.statements.Command;
 import com.hahn.basic.intermediate.statements.Compilable;
+import com.hahn.basic.intermediate.statements.DefineVarStatement;
+import com.hahn.basic.intermediate.statements.ForStatement;
+import com.hahn.basic.intermediate.statements.IfStatement;
 import com.hahn.basic.intermediate.statements.IfStatement.Conditional;
 import com.hahn.basic.intermediate.statements.Statement;
+import com.hahn.basic.intermediate.statements.WhileStatement;
 import com.hahn.basic.parser.Node;
 import com.hahn.basic.target.ILangCommand;
 import com.hahn.basic.target.ILangFactory;
@@ -30,13 +34,15 @@ import com.hahn.basic.target.LangBuildTarget;
 import com.hahn.basic.target.js.statements.JSCallFuncStatement;
 import com.hahn.basic.target.js.statements.JSDefaultCallFuncStatement;
 import com.hahn.basic.target.js.statements.JSDefineVarStatement;
+import com.hahn.basic.target.js.statements.JSForStatement;
+import com.hahn.basic.target.js.statements.JSIfStatement;
+import com.hahn.basic.target.js.statements.JSWhileStatement;
 
 public class JSLangFactory implements ILangFactory {
     
     @Override
     public LangBuildTarget LangBuildTarget() {
-        // TODO Auto-generated method stub
-        return null;
+        return new JSBuildTarget();
     }
     
     @Override
@@ -142,19 +148,17 @@ public class JSLangFactory implements ILangFactory {
     }
     
     @Override
-    public Compilable IfStatement(Statement container, List<Conditional> conditionals) {
-        // TODO Auto-generated method stub
-        return null;
+    public IfStatement IfStatement(Statement container, List<Conditional> conditionals) {
+        return new JSIfStatement(container, conditionals);
     }
     
     @Override
-    public Compilable WhileStatement(Statement container, Node conditional, Node body) {
-        // TODO Auto-generated method stub
-        return null;
+    public WhileStatement WhileStatement(Statement container, Node conditional, Node body) {
+        return new JSWhileStatement(container, conditional, body);
     }
     
     @Override
-    public Compilable ForStatement(Statement container, Node define, Node condition, List<Node> modification, Node body) {
+    public ForStatement ForStatement(Statement container, Node define, Node condition, List<Node> modification, Node body) {
         return new JSForStatement(container, define, condition, modification, body);
     }
     
@@ -169,8 +173,8 @@ public class JSLangFactory implements ILangFactory {
     }
     
     @Override
-    public Compilable DefineVarStatement(Statement container, BasicObject var, BasicObject val, boolean ignoreTypeCheck) {
-        return new JSDefineVarStatement(container, var, val, ignoreTypeCheck);
+    public DefineVarStatement DefineVarStatement(Statement container, boolean ignoreTypeCheck) {
+        return new JSDefineVarStatement(container, ignoreTypeCheck);
     }
     
 }

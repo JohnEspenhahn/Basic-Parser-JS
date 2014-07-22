@@ -2,8 +2,10 @@ package com.hahn.basic.intermediate.statements;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 
 import com.hahn.basic.intermediate.objects.AdvancedObject;
+import com.hahn.basic.target.LangBuildTarget;
 
 public class EndLoopStatement extends Statement {
     /**
@@ -19,7 +21,8 @@ public class EndLoopStatement extends Statement {
     }
     
     /**
-     * Add a var used in a loop but not created within it
+     * Called while still compiling. Add a var
+     * used in a loop but not created within it
      * @param v The var to add
      */
     public void addVar(AdvancedObject o) {
@@ -30,18 +33,36 @@ public class EndLoopStatement extends Statement {
     
     @Override
     public boolean useAddTargetCode() {
-        return true;
+        return false;
     }
     
     @Override
-    public void addTargetCode() {
-        for (AdvancedObject o: objs) {
-            addCode(new FakeVarUse(this, o));
+    public boolean reverseOptimize() {
+        ListIterator<AdvancedObject> it = objs.listIterator(objs.size());
+        while (it.hasPrevious()) {
+            AdvancedObject obj = it.previous();
+            obj.setInUse(this);
         }
+        
+        return false;
+    }
+    
+    @Override
+    public boolean forwardOptimize() {
+        for (AdvancedObject obj: objs) {
+            obj.takeRegister(this);
+        }
+        
+        return false;
+    }
+    
+    @Override
+    public String toTarget(LangBuildTarget builder) { 
+        return "";
     }
 
     @Override
     public String toString() {
-        return "endloop";
-    }
+        return "use " + objs;
+    }    
 }

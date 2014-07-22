@@ -1,81 +1,153 @@
 package com.hahn.basic.intermediate.statements;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ListIterator;
+
 import com.hahn.basic.Main;
-import com.hahn.basic.intermediate.LangCompiler;
+import com.hahn.basic.intermediate.objects.AdvancedObject;
 import com.hahn.basic.intermediate.objects.BasicObject;
+import com.hahn.basic.intermediate.objects.PopObject;
+import com.hahn.basic.intermediate.objects.PushObject;
+import com.hahn.basic.intermediate.objects.register.StackRegister;
 import com.hahn.basic.intermediate.objects.types.Type;
-import com.hahn.basic.intermediate.opcode.OPCode;
-import com.hahn.basic.target.LangBuildTarget;
+import com.hahn.basic.util.Util;
 
 public abstract class DefineVarStatement extends Statement {    
-    private final BasicObject var;
-    private final BasicObject val;
-    private final boolean ignoreTypeCheck;
+    private List<DefinePair> definepairs;
+    private boolean ignoreTypeCheck;
     
-    public DefineVarStatement(Statement container, BasicObject var, BasicObject val, boolean ignoreTypeCheck) {
+    private int lastMatchIdx;
+    private BasicObject lastMatchObj;
+    
+    public DefineVarStatement(Statement container, boolean ignoreTypeCheck) {
         super(container);
         
-        this.val = val;
-        this.var = var;
+        this.definepairs = new ArrayList<DefinePair>();
         this.ignoreTypeCheck = ignoreTypeCheck;
     }
     
-    public BasicObject getVar() {
-        return var;
+    public void addVar(BasicObject var, BasicObject val) {
+        definepairs.add(new DefinePair(var.getForUse(this), val.getForUse(this)));
     }
     
-    public BasicObject getVal() {
-        return val;
+    public List<DefinePair> getDefinePairs() {
+        return definepairs;
+    }
+    
+    /**
+     * Checks if one of the vars defined by this statement
+     * is the given var. If it is will cache it for a
+     * preceding load of the var's value with getValFor(var)
+     * @param var The var to check for
+     * @return True if this statement defines that var
+     */
+    public boolean hasVar(BasicObject var) {
+        for (int i = 0; i < definepairs.size(); i++) {
+            DefinePair pair = definepairs.get(i);
+            if (pair.var == var) {
+                lastMatchIdx = i;
+                lastMatchObj = var;
+                
+                return true;
+            }
+        }
+        
+        lastMatchIdx = 0;
+        lastMatchObj = null;
+        
+        return false;
+    }
+    
+    public BasicObject getValFor(BasicObject var) {
+        if (lastMatchObj != null && lastMatchObj == var) {
+            return definepairs.get(lastMatchIdx).val;
+        } else {
+            for (DefinePair pair: definepairs) {
+                if (pair.var == var) {
+                    return pair.val;
+                }
+            }
+        }
+        
+        return null;
     }
     
     @Override
-    public final boolean useAddTargetCode() {
-        return true;
-    }
-    
-    @Override
-    public final void addTargetCode() {
-        addCode(LangCompiler.factory.Command(this, OPCode.SET, var.getForCreateVar(), val));
+    public boolean useAddTargetCode() {
+        return false;
     }
     
     @Override
     public boolean reverseOptimize() {        
-        // Type check
-        if (!ignoreTypeCheck) {
-            Main.setLine(row);
-            Type.merge(var.getType(), val.getType());
+        ListIterator<DefinePair> it = definepairs.listIterator(definepairs.size());
+        while (it.hasPrevious()) {
+            DefinePair pair = it.previous();
+            
+            // Type check
+            if (!ignoreTypeCheck) {
+                Main.setLine(row);
+                Type.merge(pair.var.getType(), pair.val.getType());
+            }
+            
+            pair.val.setInUse(this);
+            
+            pair.var.removeInUse();            
+            if (pair.var.getUses() == 0) {
+                it.remove();
+            }
         }
         
-        super.reverseOptimize();
-        
-        var.removeInUse();
-        if (var.getUses() == 1) {
-            return true;
-        } else {
-            return false;
-        }
+        return (definepairs.size() == 0);
     }
     
     @Override
     public boolean forwardOptimize() {
-        if (var.canSetLiteral() && val.hasLiteral()) {
-            var.setLiteral(val.getLiteral());
+        for (DefinePair pair: definepairs) {
+            BasicObject var = pair.var;
+            BasicObject val = pair.val;
+            
+            // Check literals
+            if (var.canSetLiteral() && val.hasLiteral()) {
+                var.setLiteral(val.getLiteral());
+            } else {
+                var.setLiteral(null);
+            }
+            
+            if (val instanceof AdvancedObject && val.hasLiteral()) {
+                AdvancedObject aval = (AdvancedObject) val;
+                if (!aval.isOwnerFrame(getFrame())) {
+                    aval.setLiteral(null);
+                } 
+            }
+            
+            // Check registers
+            if (val instanceof AdvancedObject) { ((AdvancedObject) val).takeRegister(this); }
+            else if (val instanceof PopObject) StackRegister.pop();
+            
+            if (var instanceof AdvancedObject) { ((AdvancedObject) var).takeRegister(this); }
+            else if (var instanceof PushObject) StackRegister.push();
         }
         
-        return super.forwardOptimize();
-    }
-    
-    @Override
-    public String toTarget(LangBuildTarget builder) {
-        if (!var.hasLiteral()) {
-            return super.toTarget(builder);
-        }
-        
-        return "";
+        return false;
     }
     
     @Override
     public String toString() {
-        return "let " + var + " = " + val;
+        return "let " + Util.toString(definepairs.toArray(), ", ");
+    }
+    
+    public class DefinePair {
+        public final BasicObject var, val;
+        
+        public DefinePair(BasicObject var, BasicObject val) {
+            this.var = var;
+            this.val = val;
+        }
+        
+        @Override
+        public String toString() {
+            return var + " = " + val;
+        }
     }
 }

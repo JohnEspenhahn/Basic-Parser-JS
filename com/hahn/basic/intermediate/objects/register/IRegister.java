@@ -2,6 +2,7 @@ package com.hahn.basic.intermediate.objects.register;
 
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.types.Type;
+import com.hahn.basic.target.LangBuildTarget;
 
 public abstract class IRegister extends BasicObject {
     
@@ -24,7 +25,7 @@ public abstract class IRegister extends BasicObject {
     }
     
     @Override
-    public String toTarget() {
+    public String toTarget(LangBuildTarget builder) {
         return toString();
     }
 }

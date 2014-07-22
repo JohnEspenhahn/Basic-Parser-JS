@@ -43,7 +43,4 @@ public abstract class VarAccess extends BasicObject {
      * @param by The calling statement
      */
     public abstract void doGetForUse(Statement by);
-    
-    @Override
-    public abstract String toTarget();
 }
