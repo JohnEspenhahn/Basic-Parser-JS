@@ -51,7 +51,7 @@ public abstract class Library {
         if (lib != null) {
             return lib;
         } else {
-            throw new com.hahn.basic.util.CompileException("Unknown library to import " + name);
+            throw new com.hahn.basic.util.exceptions.CompileException("Unknown library to import " + name);
         }
     }
     

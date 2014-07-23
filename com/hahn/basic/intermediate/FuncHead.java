@@ -56,14 +56,14 @@ public abstract class FuncHead extends Frame {
     
     @Override
     public final void addTargetCode() {
-        addPreCode();
+        addPreTargetCode();
         
         super.addTargetCode();
         
         doReturn(null);
     }
     
-    protected abstract void addPreCode();
+    protected abstract void addPreTargetCode();
     
     @Override
     public String toTarget(LangBuildTarget builder) {

@@ -6,7 +6,7 @@ import java.util.Map;
 
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.target.LangBuildTarget;
-import com.hahn.basic.util.CompileException;
+import com.hahn.basic.util.exceptions.CompileException;
 
 public class Struct extends Type {
     protected static final Struct STRUCT = new Struct("struct", null);

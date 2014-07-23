@@ -1,6 +1,7 @@
-package com.hahn.basic.util;
+package com.hahn.basic.util.exceptions;
 
 import com.hahn.basic.Main;
+import com.hahn.basic.util.Util;
 
 public class CompileException extends RuntimeException {
     private static final long serialVersionUID = 4974149633641094015L;

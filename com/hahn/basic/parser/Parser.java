@@ -4,7 +4,7 @@ import com.hahn.basic.Main;
 import com.hahn.basic.definition.EnumExpression;
 import com.hahn.basic.lexer.IEnumToken;
 import com.hahn.basic.lexer.PackedToken;
-import com.hahn.basic.util.CompileException;
+import com.hahn.basic.util.exceptions.CompileException;
 
 public class Parser extends IParser {   
     private final BNFParser bnfParser;

@@ -7,7 +7,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import com.hahn.basic.util.CompileException;
+import com.hahn.basic.util.exceptions.CompileException;
 
 public class Lexer {    
     private final Pattern LexRegex;

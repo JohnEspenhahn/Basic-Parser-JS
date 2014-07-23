@@ -8,9 +8,9 @@ import com.hahn.basic.definition.EnumExpression;
 import com.hahn.basic.definition.EnumToken;
 import com.hahn.basic.intermediate.objects.Param;
 import com.hahn.basic.parser.Node;
-import com.hahn.basic.util.CastException;
-import com.hahn.basic.util.CompileException;
 import com.hahn.basic.util.Util;
+import com.hahn.basic.util.exceptions.CastException;
+import com.hahn.basic.util.exceptions.CompileException;
 
 public class Type implements ITypeable {
     public static final int NO_MATCH = -0xffff;

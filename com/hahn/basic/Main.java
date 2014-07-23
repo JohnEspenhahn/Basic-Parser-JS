@@ -11,7 +11,7 @@ import javax.swing.JFileChooser;
 import com.hahn.basic.definition.EnumExpression;
 import com.hahn.basic.definition.EnumToken;
 import com.hahn.basic.target.js.JSLangFactory;
-import com.hahn.basic.util.CompileException;
+import com.hahn.basic.util.exceptions.CompileException;
 
 public abstract class Main {
     private static int ROW, COLUMN;    

@@ -14,7 +14,7 @@ import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.parser.Node;
 import com.hahn.basic.target.LangBuildTarget;
 import com.hahn.basic.target.ILangFactory;
-import com.hahn.basic.util.CompileException;
+import com.hahn.basic.util.exceptions.CompileException;
 
 public class LangCompiler {    
     private static Map<String, Library> libs = new HashMap<String, Library>();

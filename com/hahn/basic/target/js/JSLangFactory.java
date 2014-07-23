@@ -31,12 +31,20 @@ import com.hahn.basic.parser.Node;
 import com.hahn.basic.target.ILangCommand;
 import com.hahn.basic.target.ILangFactory;
 import com.hahn.basic.target.LangBuildTarget;
+import com.hahn.basic.target.js.objects.JSFuncCallPointer;
+import com.hahn.basic.target.js.objects.JSFuncHead;
+import com.hahn.basic.target.js.objects.JSFuncPointer;
+import com.hahn.basic.target.js.statements.JSBreakStatement;
 import com.hahn.basic.target.js.statements.JSCallFuncStatement;
+import com.hahn.basic.target.js.statements.JSCommand;
+import com.hahn.basic.target.js.statements.JSContinueStatement;
 import com.hahn.basic.target.js.statements.JSDefaultCallFuncStatement;
 import com.hahn.basic.target.js.statements.JSDefineVarStatement;
 import com.hahn.basic.target.js.statements.JSForStatement;
 import com.hahn.basic.target.js.statements.JSIfStatement;
+import com.hahn.basic.target.js.statements.JSReturnStatement;
 import com.hahn.basic.target.js.statements.JSWhileStatement;
+import com.hahn.basic.util.exceptions.UnimplementedException;
 
 public class JSLangFactory implements ILangFactory {
     
@@ -101,50 +109,42 @@ public class JSLangFactory implements ILangFactory {
     
     @Override
     public FuncHead FuncHead(String name, Node head, Type rtnType, Param[] params) {
-        // TODO Auto-generated method stub
-        return null;
+        return new JSFuncHead(name, head, rtnType, params);
     }
     
     @Override
     public FuncPointer FuncPointer(String name, ParameterizedType<ITypeable> funcType) {
-        // TODO Auto-generated method stub
-        return null;
+        return new JSFuncPointer(name, funcType);
     }
     
     @Override
     public FuncCallPointer FuncCallPointer(String name, BasicObject[] params) {
-        // TODO Auto-generated method stub
-        return null;
+        return new JSFuncCallPointer(name, params);
     }
     
     @Override
     public Command Command(Statement container, OPCode op, BasicObject p1, BasicObject p2) {
-        // TODO Auto-generated method stub
-        return null;
+        return new JSCommand(container, op, p1, p2);
     }
     
     @Override
     public ILangCommand Import(String name) {
-        // TODO Auto-generated method stub
-        return null;
+        throw new UnimplementedException();
     }
     
     @Override
     public Compilable BreakStatement(Frame frame) {
-        // TODO Auto-generated method stub
-        return null;
+        return new JSBreakStatement(frame);
     }
     
     @Override
     public Compilable ContinueStatement(Frame frame) {
-        // TODO Auto-generated method stub
-        return null;
+        return new JSContinueStatement(frame);
     }
     
     @Override
-    public Compilable ReturnStatement(Statement container, Frame returnFrom, BasicObject result) {
-        // TODO Auto-generated method stub
-        return null;
+    public Compilable ReturnStatement(Statement container, FuncHead returnFrom, BasicObject result) {
+        return new JSReturnStatement(container, returnFrom, result);
     }
     
     @Override

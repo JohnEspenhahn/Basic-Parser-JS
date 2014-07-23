@@ -1,4 +1,4 @@
-package com.hahn.basic.util;
+package com.hahn.basic.util.exceptions;
 
 public class DuplicateDefinitionException extends CompileException {
 	private static final long serialVersionUID = -2931528828963017742L;

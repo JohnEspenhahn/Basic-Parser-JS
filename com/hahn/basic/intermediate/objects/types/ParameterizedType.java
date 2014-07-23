@@ -8,8 +8,8 @@ import lombok.NonNull;
 
 import com.hahn.basic.definition.EnumExpression;
 import com.hahn.basic.parser.Node;
-import com.hahn.basic.util.CompileException;
 import com.hahn.basic.util.Util;
+import com.hahn.basic.util.exceptions.CompileException;
 
 public class ParameterizedType<T extends ITypeable> extends Type {
     public static final ParameterizedType<Type> UINT_ARRAY = new ParameterizedType<Type>(Type.ARRAY, new Type[] { Type.UINT });

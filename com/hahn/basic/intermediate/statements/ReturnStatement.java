@@ -23,9 +23,6 @@ public abstract class ReturnStatement extends Statement {
     }
     
     @Override
-    public abstract void addTargetCode();
-    
-    @Override
     public boolean equals(Object o) {
         if (o instanceof ReturnStatement) {
             ReturnStatement r = (ReturnStatement) o;

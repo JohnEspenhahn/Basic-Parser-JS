@@ -14,7 +14,7 @@ abstract class ObjectPointer extends AdvancedObject {
     public ObjectPointer(Frame frame, BasicObject temp) {
         super(frame, null, null);
         
-        this.obj = temp;
+        this.obj = temp.getForUse(frame);
     }
     
     interface IDelegated {

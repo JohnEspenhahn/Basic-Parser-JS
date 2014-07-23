@@ -59,7 +59,7 @@ public interface ILangFactory {
     
     public Compilable BreakStatement(Frame frame);
     public Compilable ContinueStatement(Frame frame);
-    public Compilable ReturnStatement(Statement container, Frame returnFrom, BasicObject result);
+    public Compilable ReturnStatement(Statement container, FuncHead returnFrom, BasicObject result);
     
     public IfStatement IfStatement(Statement container, List<Conditional> conditionals);
     public WhileStatement WhileStatement(Statement container, Node conditional, Node body);

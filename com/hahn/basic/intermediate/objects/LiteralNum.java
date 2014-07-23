@@ -2,7 +2,7 @@ package com.hahn.basic.intermediate.objects;
 
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.opcode.OPCode;
-import com.hahn.basic.util.CompileException;
+import com.hahn.basic.util.exceptions.CompileException;
 
 public class LiteralNum extends Literal {
     public static final LiteralNum ZERO = new LiteralNum(0);

@@ -8,7 +8,7 @@ import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.ParameterizedType;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.statements.Compilable;
-import com.hahn.basic.util.CompileException;
+import com.hahn.basic.util.exceptions.CompileException;
 
 public abstract class FuncPointer extends BasicObject {    
     protected FuncHead func;
@@ -20,7 +20,7 @@ public abstract class FuncPointer extends BasicObject {
     @Override
     @Deprecated
     public void setType(Type t) {
-        throw new RuntimeException("Can not change the type of a FuncPointer!");
+        throw new RuntimeException("Can not change the type of a function pointer!");
     }
     
     public String getFuncId() {

@@ -5,7 +5,7 @@ import static com.hahn.basic.util.Util.toBool;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.opcode.OPCode;
 import com.hahn.basic.target.LangBuildTarget;
-import com.hahn.basic.util.CompileException;
+import com.hahn.basic.util.exceptions.CompileException;
 
 public class LiteralBool extends Literal {
 	private boolean value;

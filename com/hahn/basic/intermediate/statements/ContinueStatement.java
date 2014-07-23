@@ -1,7 +1,7 @@
 package com.hahn.basic.intermediate.statements;
 
 import com.hahn.basic.intermediate.Frame;
-import com.hahn.basic.util.CompileException;
+import com.hahn.basic.util.exceptions.CompileException;
 
 public abstract class ContinueStatement extends Statement {
     private Frame loop;

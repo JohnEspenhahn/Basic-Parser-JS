@@ -111,7 +111,7 @@ public enum OPCode {
         else if (code == IFG)
             return IFM;
         else
-            throw new RuntimeException("Unhandled opposite of '" + code + "'");
+            throw new RuntimeException("Unhandled opposite of opcode `" + code + "`");
     }
     
     public static boolean isConditional(OPCode op) {

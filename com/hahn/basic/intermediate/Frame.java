@@ -54,11 +54,11 @@ import com.hahn.basic.intermediate.statements.IfStatement.Conditional;
 import com.hahn.basic.intermediate.statements.Statement;
 import com.hahn.basic.parser.Node;
 import com.hahn.basic.target.LangBuildTarget;
-import com.hahn.basic.util.CastException;
-import com.hahn.basic.util.CompileException;
 import com.hahn.basic.util.DepthIterator;
-import com.hahn.basic.util.DuplicateDefinitionException;
 import com.hahn.basic.util.Util;
+import com.hahn.basic.util.exceptions.CastException;
+import com.hahn.basic.util.exceptions.CompileException;
+import com.hahn.basic.util.exceptions.DuplicateDefinitionException;
 
 public class Frame extends Statement {    
     @SuppressWarnings("unchecked")
