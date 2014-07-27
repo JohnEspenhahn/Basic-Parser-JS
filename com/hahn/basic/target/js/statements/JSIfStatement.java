@@ -26,8 +26,8 @@ public class JSIfStatement extends IfStatement {
             
             cnd.getInnerFrame().reverseOptimize();
             
-            if (cnd.getConditionObject() != null) {
-                cnd.getConditionObject().setInUse(this);
+            if (cnd.getConditionStatement() != null) {
+                cnd.getConditionStatement().reverseOptimize();
             }
         }
         
@@ -39,9 +39,9 @@ public class JSIfStatement extends IfStatement {
         for (Conditional cnd: getConditionals()) {
             cnd.getInnerFrame().forwardOptimize();
             
-            if (cnd.getConditionObject() != null) {
+            if (cnd.getConditionStatement() != null) {
                 // Make sure don't free register before handling frame
-                cnd.getConditionObject().takeRegister(this);
+                cnd.getConditionStatement().forwardOptimize();
             }
         }
         
@@ -59,7 +59,7 @@ public class JSIfStatement extends IfStatement {
             
             if (cnd.hasCondition()) {
                 str.append(String.format("if(%s){%s}", 
-                        cnd.getConditionObject().toTarget(builder), 
+                        cnd.getConditionStatement().toTarget(builder), 
                         cnd.getInnerFrame().toTarget(builder)));
             } else {
                 str.append(String.format("{%s}", 

@@ -3,11 +3,11 @@ package com.hahn.basic.intermediate.objects;
 import lombok.NonNull;
 
 import com.hahn.basic.intermediate.FuncHead;
+import com.hahn.basic.intermediate.IIntermediate;
 import com.hahn.basic.intermediate.LangCompiler;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.ParameterizedType;
 import com.hahn.basic.intermediate.objects.types.Type;
-import com.hahn.basic.intermediate.statements.Compilable;
 import com.hahn.basic.util.exceptions.CompileException;
 
 public abstract class FuncPointer extends BasicObject {    
@@ -47,7 +47,7 @@ public abstract class FuncPointer extends BasicObject {
     }
     
     @Override
-    public boolean setInUse(Compilable by) {
+    public boolean setInUse(IIntermediate by) {
         checkFunction();
         
         return super.setInUse(by);

@@ -3,7 +3,6 @@ package com.hahn.basic.intermediate.statements;
 import java.util.List;
 
 import com.hahn.basic.intermediate.Frame;
-import com.hahn.basic.intermediate.objects.ExpressionObject;
 import com.hahn.basic.parser.Node;
 import com.hahn.basic.util.IntermediateList;
 
@@ -11,7 +10,7 @@ public abstract class ForStatement extends Statement {
 	private Frame outerFrame, innerFrame;
 	
     private DefineVarStatement define;
-    private ExpressionObject condition;
+    private ExpressionStatement condition;
     private IntermediateList<Compilable> modification;
     
     /**
@@ -48,7 +47,7 @@ public abstract class ForStatement extends Statement {
     	return define;
     }
     
-    public ExpressionObject getConditionObject() {
+    public ExpressionStatement getConditionStatement() {
     	return condition;
     }
     

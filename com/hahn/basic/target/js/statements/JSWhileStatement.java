@@ -20,7 +20,9 @@ public class JSWhileStatement extends WhileStatement {
     public boolean reverseOptimize() {
         getInnerFrame().reverseOptimize();
         
-        getConditionObject().setInUse(this);
+        if (getConditionStatement() != null) {
+            getConditionStatement().reverseOptimize();
+        }
         
         return false;
     }
@@ -29,9 +31,9 @@ public class JSWhileStatement extends WhileStatement {
     public boolean forwardOptimize() {
         getInnerFrame().forwardOptimize();
         
-        if (getConditionObject() != null) {
+        if (getConditionStatement() != null) {
             // Make sure don't free register before handling frame
-            getConditionObject().takeRegister(this);
+            getConditionStatement().forwardOptimize();
         }
             
         return false;
@@ -40,7 +42,7 @@ public class JSWhileStatement extends WhileStatement {
     @Override
     public String toTarget(LangBuildTarget builder) {
         return String.format("while(%s){%s}", 
-                getConditionObject().toTarget(builder), 
+                getConditionStatement().toTarget(builder), 
                 getInnerFrame().toTarget(builder));
     }
 }

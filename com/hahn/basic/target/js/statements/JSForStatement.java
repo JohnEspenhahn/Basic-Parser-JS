@@ -30,8 +30,8 @@ public class JSForStatement extends ForStatement {
         
         getInnerFrame().reverseOptimize();
         
-        if (getConditionObject() != null) {
-            getConditionObject().setInUse(this);
+        if (getConditionStatement() != null) {
+            getConditionStatement().reverseOptimize();
         }
         
         if (getDefineStatement() != null) {
@@ -56,9 +56,9 @@ public class JSForStatement extends ForStatement {
             }
         }
         
-        if (getConditionObject() != null) {
+        if (getConditionStatement() != null) {
             // Make sure don't free register before handling frame
-            getConditionObject().takeRegister(this);
+            getConditionStatement().forwardOptimize();
         }
         
         return false;
@@ -68,7 +68,7 @@ public class JSForStatement extends ForStatement {
     public String toTarget(LangBuildTarget builder) {
         return String.format("for(%s;%s;%s){%s}", 
                 getDefineStatement().toTarget(builder),
-                getConditionObject().toTarget(builder),
+                getConditionStatement().toTarget(builder),
                 getModifyStatements().toTarget(builder),
                 getInnerFrame().toTarget(builder));
     }

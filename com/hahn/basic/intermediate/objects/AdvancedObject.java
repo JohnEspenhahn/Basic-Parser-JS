@@ -6,11 +6,11 @@ import java.util.Comparator;
 import java.util.List;
 
 import com.hahn.basic.intermediate.Frame;
+import com.hahn.basic.intermediate.IIntermediate;
 import com.hahn.basic.intermediate.LangCompiler;
 import com.hahn.basic.intermediate.objects.register.IRegister;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.opcode.OPCode;
-import com.hahn.basic.intermediate.statements.Compilable;
 import com.hahn.basic.intermediate.statements.Statement;
 import com.hahn.basic.target.LangBuildTarget;
 
@@ -87,7 +87,7 @@ public abstract class AdvancedObject extends BasicObject {
      * ------------------------------- Register Management -------------------------------
      */
     @Override
-    public boolean setInUse(Compilable by) {
+    public boolean setInUse(IIntermediate by) {
         boolean firstCall = super.setInUse(by);
 
         if (firstCall && getFrame() != null) {
@@ -97,7 +97,7 @@ public abstract class AdvancedObject extends BasicObject {
         return firstCall;
     }
     
-    public final void takeRegister(Compilable by) {
+    public final void takeRegister(IIntermediate by) {
         doTakeRegister(isLastUse(by));
     }
     

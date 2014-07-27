@@ -1,11 +1,9 @@
 package com.hahn.basic.intermediate.objects;
 
-import com.hahn.basic.intermediate.LangCompiler;
+import com.hahn.basic.intermediate.IIntermediate;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.ParameterizedType;
 import com.hahn.basic.intermediate.objects.types.Type;
-import com.hahn.basic.intermediate.statements.Compilable;
-import com.hahn.basic.intermediate.statements.Statement;
 
 public abstract class FuncCallPointer extends FuncPointer {
     private Type returnType;
@@ -25,13 +23,6 @@ public abstract class FuncCallPointer extends FuncPointer {
         return returnType;
     }
 
-    @Override
-    public BasicObject getForUse(Statement s) {
-        s.addCode(LangCompiler.factory.CallFuncStatement(s, this));
-        
-        return super.getForUse(s);
-    }
-
     /**
      * Cast to given type
      * @param t The type to cast to
@@ -45,7 +36,7 @@ public abstract class FuncCallPointer extends FuncPointer {
     }
 
     @Override
-    public boolean setInUse(Compilable by) {
+    public boolean setInUse(IIntermediate by) {
         checkFunction();
         returnType = func.getReturnType().castTo(returnType);
         

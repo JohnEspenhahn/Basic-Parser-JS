@@ -9,14 +9,14 @@ public abstract class ConditionalObject extends BasicObject {
     private BasicObject p1, p2;
     private BasicObject temp;
     
-    public ConditionalObject(BasicObject temp, OPCode op, BasicObject p1, BasicObject p2) {
+    public ConditionalObject(Statement container, OPCode op, BasicObject p1, BasicObject p2, BasicObject temp) {
         super(VarTemp.getNextTempName(), Type.BOOL);
         
         this.temp = temp;
         
         this.op = op;
-        this.p1 = p1;
-        this.p2 = p2;
+        this.p1 = p1.getForUse(container);
+        this.p2 = p2.getForUse(container);
     }
 
     @Override

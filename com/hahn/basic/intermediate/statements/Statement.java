@@ -35,11 +35,11 @@ public abstract class Statement extends Compilable {
     @Override
     public abstract boolean forwardOptimize();
     
-    public void addCode(Compilable c) {
+    protected final void addCode(Compilable c) {
         targetCode.addLast(c);
     }
     
-    public void prependCode(Compilable c) {
+    protected final void prependCode(Compilable c) {
         targetCode.addFirst(c);
     }
     

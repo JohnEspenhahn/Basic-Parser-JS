@@ -1,7 +1,7 @@
 package com.hahn.basic.intermediate.objects;
 
-import com.hahn.basic.intermediate.statements.Compilable;
+import com.hahn.basic.intermediate.IIntermediate;
 
 public interface IAdvancedHolderExcludeList extends IBasicHolderExcludeList {
-    public void takeRegister(Compilable by);
+    public void takeRegister(IIntermediate by);
 }

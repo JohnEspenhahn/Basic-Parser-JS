@@ -5,7 +5,6 @@ import lombok.NonNull;
 import com.hahn.basic.intermediate.IIntermediate;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.Type;
-import com.hahn.basic.intermediate.statements.Compilable;
 import com.hahn.basic.intermediate.statements.Statement;
 import com.hahn.basic.target.LangBuildTarget;
 
@@ -14,7 +13,7 @@ public abstract class BasicObject implements IIntermediate, ITypeable, IBasicHol
     private Type type;
     
     private int uses;
-    private Compilable statementOfLastUse;
+    private IIntermediate statementOfLastUse;
     
     public BasicObject(String name, Type type) {
         this.name = name;
@@ -92,7 +91,7 @@ public abstract class BasicObject implements IIntermediate, ITypeable, IBasicHol
      * @param by The object causing this to be set in use
      * @return True if first call (last use)
      */
-    public boolean setInUse(Compilable by) {
+    public boolean setInUse(IIntermediate by) {
         uses += 1;
         
         if (uses == 1) {
@@ -107,7 +106,7 @@ public abstract class BasicObject implements IIntermediate, ITypeable, IBasicHol
      * @param by The object to check if is last use by
      * @return True if last use is by this
      */
-    public boolean isLastUse(Compilable by) {
+    public boolean isLastUse(IIntermediate by) {
         return by == statementOfLastUse;
     }
     

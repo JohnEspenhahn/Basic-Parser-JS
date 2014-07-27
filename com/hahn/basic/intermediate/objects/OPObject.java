@@ -1,43 +1,30 @@
-package com.hahn.basic.intermediate.statements;
+package com.hahn.basic.intermediate.objects;
 
-import com.hahn.basic.Main;
-import com.hahn.basic.intermediate.objects.AdvancedObject;
-import com.hahn.basic.intermediate.objects.BasicObject;
-import com.hahn.basic.intermediate.objects.PopObject;
-import com.hahn.basic.intermediate.objects.PushObject;
+import com.hahn.basic.intermediate.IIntermediate;
 import com.hahn.basic.intermediate.objects.register.StackRegister;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.opcode.OPCode;
+import com.hahn.basic.intermediate.statements.Statement;
+import com.hahn.basic.target.LangBuildTarget;
 
-public abstract class Command extends Compilable {  
-    protected OPCode opcode;
-    protected BasicObject p1, p2;
+public abstract class OPObject extends AdvancedObject {
+    private OPCode opcode;
+    private BasicObject p1, p2;
     
-    public Command(Statement container, OPCode opcode) {
-        this(container, opcode, null, null);
-    }
+    private boolean isValid;
     
-    /**
-     * @param container The owning statement
-     * @param opcode The command op code
-     * @param p Sets this.p1 = p.getForUse(container)
-     */
-    public Command(Statement container, OPCode opcode, BasicObject p) {
-        this(container, opcode, p, null);
-    }
-    
-    /**
-     * @param container The owning statement
-     * @param opcode The command op code
-     * @param p1 Sets this.p1 = p1.getForUse(container)
-     * @param p2 Sets this.p2 = p2.getForUse(container)
-     */
-    public Command(Statement container, OPCode opcode, BasicObject p1, BasicObject p2) {
-        super(container.getFrame());
+    public OPObject(Statement container, OPCode opcode, BasicObject p1, BasicObject p2) {
+        super(container.getFrame(), "@ " + opcode.toString() + " @", p1.getType());
+        
+        this.isValid = true;
         
         this.opcode = opcode;
         this.p1 = (p1 != null ? p1.getForUse(container) : null);
         this.p2 = (p2 != null ? p2.getForUse(container) : null);
+    }
+    
+    public boolean isValid() {
+        return isValid;
     }
     
     public BasicObject getP1() {
@@ -79,11 +66,12 @@ public abstract class Command extends Compilable {
     }
     
     @Override
-    public boolean reverseOptimize() {        
+    public boolean setInUse(IIntermediate by) {
         // Type check
-        Main.setLine(row);
         if (p1 != null) { 
-            Type.merge(opcode.type1, p1.getType());
+            Type mergedType = Type.merge(opcode.type1, p1.getType());
+            this.setType(mergedType);
+            
             p1.setInUse(this);
         }
         
@@ -96,13 +84,15 @@ public abstract class Command extends Compilable {
     }
     
     @Override
-    public boolean forwardOptimize() {
+    public void doTakeRegister(boolean isLastUse) {
         // Check literals
         if (p1 instanceof AdvancedObject && p1.hasLiteral()) {
             AdvancedObject ao1 = (AdvancedObject) p1;
             if (p2.hasLiteral() && ao1.isOwnerFrame(getFrame())) {
                 if (ao1.updateLiteral(opcode, p2.getLiteral())) {
-                    return true;
+                    // This expression is no longer needed
+                    this.isValid = false;
+                    return;
                 }
             } else if (p2 != null) {
                 p1.setLiteral(null);
@@ -122,8 +112,17 @@ public abstract class Command extends Compilable {
         
         if (p1 instanceof AdvancedObject) { ((AdvancedObject) p1).takeRegister(this); }
         else if (p1 instanceof PushObject) StackRegister.push();
-
-        return false;
+    }
+    
+    public abstract String doToTarget(LangBuildTarget builder);
+    
+    @Override
+    public final String toTarget(LangBuildTarget builder) {
+        if (isValid()) {
+            return doToTarget(builder);
+        } else {
+            return "";
+        }
     }
     
     @Override
