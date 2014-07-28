@@ -35,6 +35,15 @@ public abstract class Compilable implements IIntermediate, ILangCommand {
     public boolean forwardOptimize() {
         return false;
     }
+    
+    /**
+     * Return true if ends with a block. For example,
+     * in a javascript an if statement.
+     * @return
+     */
+    public boolean endsWithBlock() {
+        return false;
+    }
 
     /**
      * Final conversion to target language. 

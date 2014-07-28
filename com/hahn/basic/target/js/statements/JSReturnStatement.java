@@ -36,7 +36,7 @@ public class JSReturnStatement extends ReturnStatement {
     
     @Override
     public String toTarget(LangBuildTarget builder) {
-        return String.format("return %s;", getResult());
+        return "return " + getResult();
     }
     
 }

@@ -30,7 +30,7 @@ public class JSDefineVarStatement extends DefineVarStatement {
             str.append(String.format("%s=%s", pair.var.toTarget(builder), pair.val.toTarget(builder)));
         }
         
-        return "var " + str + ";";
+        return "var " + str;
     }
     
 }

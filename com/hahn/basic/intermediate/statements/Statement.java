@@ -88,6 +88,10 @@ public abstract class Statement extends Compilable {
         }
     }
     
+    public Deque<Compilable> getTargetCode() {
+        return targetCode;
+    }
+    
     public String joinTargetCode(LangBuildTarget builder) {
     	StringBuilder str = new StringBuilder();    	
     	if (useAddTargetCode()) {

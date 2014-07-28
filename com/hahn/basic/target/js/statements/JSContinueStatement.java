@@ -27,7 +27,7 @@ public class JSContinueStatement extends ContinueStatement {
     
     @Override
     public String toTarget(LangBuildTarget builder) {
-        return "continue;";
+        return "continue";
     }
     
 }

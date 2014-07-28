@@ -110,7 +110,16 @@ public class Frame extends Statement {
     
     @Override
     public String toTarget(LangBuildTarget builder) {
-        return super.joinTargetCode(builder);
+        StringBuilder str = new StringBuilder();
+        for (Compilable c: getTargetCode()) {
+            str.append(c.toTarget(builder));
+            
+            if (!c.endsWithBlock()) {
+                str.append(";");
+            }
+        }
+        
+        return str.toString();
     }
     
     /*

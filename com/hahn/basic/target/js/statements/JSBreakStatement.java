@@ -27,7 +27,7 @@ public class JSBreakStatement extends BreakStatement {
     
     @Override
     public String toTarget(LangBuildTarget builder) {
-        return "break;";
+        return "break";
     }
     
 }
