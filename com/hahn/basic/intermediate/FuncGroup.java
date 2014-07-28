@@ -49,11 +49,14 @@ public class FuncGroup {
         return null;
     }
     
-    public void toTarget(LangBuildTarget builder) {
+    public String toTarget(LangBuildTarget builder) {
+        StringBuilder str = new StringBuilder();
         for (FuncHead func: funcs) {
             if (func.hasFrameHead()) {
-                func.toTarget(builder);
+                str.append(func.toTarget(builder));
             }
         }
+        
+        return str.toString();
     }
 }

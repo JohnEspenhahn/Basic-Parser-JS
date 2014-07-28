@@ -3,8 +3,10 @@ package com.hahn.basic.intermediate.objects;
 import lombok.NonNull;
 
 import com.hahn.basic.intermediate.IIntermediate;
+import com.hahn.basic.intermediate.LangCompiler;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.Type;
+import com.hahn.basic.intermediate.statements.ExpressionStatement;
 import com.hahn.basic.intermediate.statements.Statement;
 import com.hahn.basic.target.LangBuildTarget;
 
@@ -72,7 +74,7 @@ public abstract class BasicObject implements IIntermediate, ITypeable, IBasicHol
      */
     
     /**
-     * TODO: Should only be called one; but always called
+     * TODO: Should only be called once; but always called
      * prior to the object being used for the first time,
      * and before any other statements are added.
      * 
@@ -132,6 +134,15 @@ public abstract class BasicObject implements IIntermediate, ITypeable, IBasicHol
      */
     public BasicObject getForCreateVar() {
         return this;
+    }
+    
+    /**
+     * Get as an expression
+     * @param container The container of the expression
+     * @return ExpressionStatement
+     */
+    public ExpressionStatement getAsExp(Statement container) {
+        return LangCompiler.factory.ExpressionStatement(container, this);
     }
     
     @Override

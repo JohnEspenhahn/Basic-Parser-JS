@@ -69,6 +69,6 @@ public abstract class Library {
     }
 
     public static void defineProperty(String string) {
-        LangCompiler.addGlobalVar(LangCompiler.factory.VarGlobal(string, Type.UINT));
+        LangCompiler.addGlobalVar(LangCompiler.factory.VarGlobal(string, Type.INT));
     }
 }

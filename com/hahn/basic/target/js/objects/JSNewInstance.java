@@ -16,7 +16,11 @@ public class JSNewInstance extends NewInstance {
     
     @Override
     public String toTarget(LangBuildTarget builder) {
-        return String.format("new %s(%s)", getType().getName(), Util.toTarget(getParams(), ",", builder));
+        if (getType().doesExtend(Type.STRUCT)) {
+            return "{}";
+        } else {
+            return String.format("new %s(%s)", getType().getName(), Util.toTarget(getParams(), ",", builder));
+        }
     }
     
 }

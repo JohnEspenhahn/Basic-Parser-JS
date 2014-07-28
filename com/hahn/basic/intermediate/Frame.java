@@ -20,13 +20,10 @@ import static com.hahn.basic.definition.EnumToken.OPEN_SQR;
 import static com.hahn.basic.definition.EnumToken.STRING;
 import static com.hahn.basic.definition.EnumToken.TRUE;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import com.hahn.basic.definition.EnumExpression;
 import com.hahn.basic.definition.EnumToken;
@@ -61,29 +58,6 @@ import com.hahn.basic.util.exceptions.CompileException;
 import com.hahn.basic.util.exceptions.DuplicateDefinitionException;
 
 public class Frame extends Statement {    
-    @SuppressWarnings("unchecked")
-    public static Map<Enum<?>, String> EXPRESSION_HANDLERS = (Map<Enum<?>, String>) Util.arr2map(
-                Enum.class, String.class,
-                new Object[][] {
-                    { EnumExpression.BLOCK,      "handleBlock"      },
-                    { EnumExpression.BLOCK_CNTNT,"handleBlock"      },
-                    { EnumExpression.DEFINE,     "defineVar"        },
-                    { EnumExpression.DEFINE_G,   "defineGlobalVar"  },
-                    { EnumExpression.MODIFY,     "modifyVar"        },
-                    { EnumExpression.STRUCT,     "defineStruct"     },
-                    { EnumExpression.DEF_FUNC,   "defineFunc"       },
-                    { EnumExpression.CALL_FUNC,  "callFunc"         },
-                    { EnumExpression.CREATE,     "createInstance"   },
-                    { EnumExpression.RETURN,     "doReturn"         },
-                    { EnumToken     .CONTINUE,   "doContinue"       },
-                    { EnumToken     .BREAK,      "doBreak"          },
-                    { EnumToken     .IMPORT,     "doImport"         },
-                    { EnumExpression.IF_STMT,    "ifStatement"      },
-                    { EnumExpression.WHILE_STMT, "whileStatement"   },
-                    { EnumExpression.FOR_STMT,   "forStatement"     },
-                }
-            );
-    
     private final Frame parent;
     private final Node frameHead;
     
@@ -296,25 +270,40 @@ public class Frame extends Statement {
             Node child = it.next();
             Enum<?> token = child.getToken();
             
-            if (token != EnumToken.EOL && token != EnumToken.OPEN_BRACE && token != EnumToken.CLOSE_BRACE) {                
-                String handlerName = EXPRESSION_HANDLERS.get(token);
-                if (handlerName == null) {
-                    throw new RuntimeException("No handler defined for token `" + token + "`");
-                }
-                
-                Method handler;
-                try {
-                    handler = Frame.class.getMethod(handlerName, Node.class);
-                    handler.invoke(this, child);
-                } catch (InvocationTargetException e) {
-                    if (e.getTargetException() instanceof RuntimeException) {
-                        throw (RuntimeException) e.getTargetException();
-                    } else {
-                        throw new CompileException(e.getTargetException().getMessage());
-                    }
-                } catch (Exception e) {
-                    throw new RuntimeException(e.getMessage());
-                }
+            if (token == EnumExpression.BLOCK || token == EnumExpression.BLOCK_CNTNT) {
+                handleBlock(child);
+            } else if (token == EnumExpression.DEFINE) {
+                addCode(defineVar(child));
+            } else if (token == EnumExpression.DEFINE_G) {
+                defineGlobalVar(child);
+            } else if (token == EnumExpression.MODIFY) {
+                addCode(modifyVar(child).getAsExp(this));
+            } else if (token == EnumExpression.STRUCT) {
+                defineStruct(child);
+            } else if (token == EnumExpression.DEF_FUNC) {
+                defineFunc(child);
+            } else if (token == EnumExpression.CALL_FUNC) {
+                addCode(callFunc(child));
+            } else if (token == EnumExpression.CREATE) {
+                addCode(createInstance(child).getAsExp(this));
+            } else if (token == EnumExpression.RETURN) {
+                addCode(doReturn(child));
+            } else if (token == EnumToken.CONTINUE) {
+                addCode(doContinue(child));
+            } else if (token == EnumToken.BREAK) {
+                addCode(doBreak(child));
+            } else if (token == EnumToken.IMPORT) {
+                doImport(child);
+            } else if (token == EnumExpression.IF_STMT) {
+                addCode(ifStatement(child));
+            } else if (token == EnumExpression.WHILE_STMT) {
+                addCode(whileStatement(child));
+            } else if (token == EnumExpression.FOR_STMT) {
+                addCode(forStatement(child));
+            } else if (token == EnumToken.EOL || token == EnumToken.OPEN_BRACE || token == EnumToken.CLOSE_BRACE) {
+                continue;
+            } else {
+                throw new RuntimeException("No handler defined for token `" + token + "`");
             }
         }
     }
@@ -365,7 +354,7 @@ public class Frame extends Statement {
             if (accessMarker == OPEN_SQR && t.doesExtend(Type.ARRAY)) {
                 BasicObject offset = handleExpression(it.next()).getAsExpObj();
                 
-                access = LangCompiler.factory.VarAccess(access, offset, Type.UINT);
+                access = LangCompiler.factory.VarAccess(access, offset, Type.INT);
                 
                 
                 it.next(); // Skip CLOSE_SQR
@@ -464,7 +453,7 @@ public class Frame extends Statement {
         Type type = Type.fromNode(it.next());
         while (it.hasNext()) {
             Node node = it.next();
-         
+            
             if (node.getToken() != EnumToken.COMMA) {
                 String name = node.getValue();
                 final BasicObject obj;

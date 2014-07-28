@@ -159,8 +159,14 @@ public abstract class Main {
         try {
             Main main = new BASICMain(new JSLangFactory(), EnumToken.class, EnumExpression.class);
             
-            if (argsList.contains("--debug") || argsList.contains("-d")) {
-                toggleDebug();
+            for (String s: argsList) {
+                if (s.equals("--debug") || s.equals("-d")) {
+                    toggleDebug();
+                } else if (s.equals("--term") || s.equals("-t")) {
+                    continue;
+                } else {
+                    System.out.println("Unhandled command line parameter '" + s + "'");
+                }
             }
             
             // Choose execution mode

@@ -12,7 +12,7 @@ import com.hahn.basic.util.Util;
 import com.hahn.basic.util.exceptions.CompileException;
 
 public class ParameterizedType<T extends ITypeable> extends Type {
-    public static final ParameterizedType<Type> UINT_ARRAY = new ParameterizedType<Type>(Type.ARRAY, new Type[] { Type.UINT });
+    public static final ParameterizedType<Type> UINT_ARRAY = new ParameterizedType<Type>(Type.ARRAY, new Type[] { Type.INT });
     public static final ParameterizedType<Type> CHAR_ARRAY = new ParameterizedType<Type>(Type.ARRAY, new Type[] { Type.CHAR });
     
     private final Struct base;

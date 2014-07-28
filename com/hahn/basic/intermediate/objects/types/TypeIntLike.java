@@ -1,13 +1,13 @@
 package com.hahn.basic.intermediate.objects.types;
 
-public class TypeUIntLike extends Type {
+public class TypeIntLike extends Type {
 
-    public TypeUIntLike(String name) {
+    public TypeIntLike(String name) {
         super(name);
     }
     
     @Override
     public boolean doesExtend(Type t) {
-        return t == Type.UINT || t == Type.CHAR;
+        return t == Type.INT || t == Type.CHAR;
     }
 }

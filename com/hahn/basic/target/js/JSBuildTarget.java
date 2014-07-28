@@ -7,10 +7,15 @@ import com.hahn.basic.target.ILangCommand;
 import com.hahn.basic.target.LangBuildTarget;
 
 public class JSBuildTarget extends LangBuildTarget {
-	StringBuilder builder; 
+	StringBuilder builder;
 
 	public JSBuildTarget() {
 		builder = new StringBuilder();
+	}
+	
+	@Override
+	public void appendString(String str) {
+	    builder.append(str);
 	}
 
 	@Override
@@ -24,4 +29,8 @@ public class JSBuildTarget extends LangBuildTarget {
 		os.write('\n');
 	}
 
+	@Override
+	public String toString() {
+	    return builder.toString();
+	}
 }

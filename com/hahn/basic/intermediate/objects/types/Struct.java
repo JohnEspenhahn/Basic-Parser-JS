@@ -1,5 +1,6 @@
 package com.hahn.basic.intermediate.objects.types;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,7 +12,6 @@ import com.hahn.basic.util.exceptions.CompileException;
 public class Struct extends Type {
     protected static final Struct STRUCT = new Struct("struct", null);
     
-    private final int baseSize;
     private final Struct parent;
     private final Map<String, StructParam> params;
 
@@ -20,11 +20,13 @@ public class Struct extends Type {
     private Struct(String name, Struct parent) {
         super(name, true);
         
-        this.params = new HashMap<String, StructParam>();
         this.parent = parent;
+        this.params = new HashMap<String, StructParam>();
         
-        if (parent == null) this.baseSize = 0;
-        else this.baseSize = parent.sizeOf();
+        // Copy all parent parameters
+        for (StructParam p: parent.getAllParams()) {
+            add(p);
+        }
     }
     
     public Struct extendAs(String name, List<BasicObject> ps) {
@@ -66,7 +68,7 @@ public class Struct extends Type {
     }
     
     public Struct add(BasicObject p) {
-        params.put(p.getName(), new StructParam(baseSize + params.size(), p));
+        params.put(p.getName(), new StructParam(params.size(), p));
         return this;
     }
     
@@ -74,8 +76,6 @@ public class Struct extends Type {
         StructParam sVar = params.get(name);
         if (sVar != null) {
             return sVar;
-        } else if (parent != null) {
-            return parent.getStructParam(name);
         } else {
             throw new CompileException("Unknown variable '" + name + "' in " + this);
         }
@@ -89,9 +89,13 @@ public class Struct extends Type {
         return getStructParam(name).getType();
     }
     
+    public Collection<StructParam> getAllParams() {
+        return params.values();
+    }
+    
     @Override
     public int sizeOf() {
-        return baseSize + params.size();
+        return params.size();
     }
     
     public class StructParam extends BasicObject {

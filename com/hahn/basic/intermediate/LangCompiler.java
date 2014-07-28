@@ -38,14 +38,18 @@ public class LangCompiler {
         frame.forwardOptimize();
         
         // Convert to target
+        StringBuilder str = new StringBuilder();
         LangBuildTarget builder = factory.LangBuildTarget();        
-        frame.toTarget(builder);
-        builder.endCodeArea();
+        
+        str.append(frame.toTarget(builder));
+        str.append(builder.endCodeArea());
         
         // Compile function area
         for (FuncGroup func: funcs.values()) {
-            func.toTarget(builder);
+            str.append(func.toTarget(builder));
         }
+        
+        builder.appendString(str.toString());
         
         // Put library import strings
         for (Library lib: libs.values()) {

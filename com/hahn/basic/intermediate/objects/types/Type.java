@@ -18,15 +18,15 @@ public class Type implements ITypeable {
     
     public static final Type VOID = new Type("void"),
                              BOOL = new Type("bool"),
-                             CHAR = new TypeUIntLike("char"),
-                             UINT = new TypeUIntLike("uint"),
+                             CHAR = new TypeIntLike("char"),
+                             INT = new TypeIntLike("int"),
                              DBL = new Type("dbl"),
                              /** UNDEFINED -> anything */
                              UNDEFINED = new Type("undefined", false, true);
     
     public static final Struct STRUCT = Struct.STRUCT,
                                FUNC = STRUCT.extendAs("func").setTypeParams(-1),
-                               ARRAY = STRUCT.extendAs("array").add(new Param("length", Type.UINT)).setTypeParams(1),
+                               ARRAY = STRUCT.extendAs("array").add(new Param("length", Type.INT)).setTypeParams(1),
                                STRING = ARRAY.extendAs("string").setTypeParams(0);
     
     public static final int COUNT_PRIMATIVES = TYPES.size();
@@ -87,10 +87,10 @@ public class Type implements ITypeable {
             return this;
         } else if (this.equals(t)) {
             return t;
-        } else if (this == UINT) {
+        } else if (this == INT) {
             if (t == BOOL) return BOOL;
         } else if (this == BOOL) {
-            if (t == UINT) return UINT;
+            if (t == INT) return INT;
         } else if (this == UNDEFINED) {
             return t;
         } else if (this == STRING && t.equals(ParameterizedType.UINT_ARRAY)) {
@@ -144,7 +144,7 @@ public class Type implements ITypeable {
         else if (original.doesExtend(newType)) return newType;
         else if (original == UNDEFINED) return newType;
         else if (newType == UNDEFINED) return original; 
-        else if (original == UINT && newType == BOOL) return BOOL;
+        else if (original == INT && newType == BOOL) return BOOL;
         
         throw new CompileException("Incompatible types `" + original.toString() + "` and `" + newType.toString() + "`");
     }

@@ -7,7 +7,7 @@ import com.hahn.basic.target.LangBuildTarget;
 public abstract class IRegister extends BasicObject {
     
     public IRegister(String name) {
-        super(name, Type.UINT);
+        super(name, Type.INT);
     }
 
     public abstract boolean isOnStack();

@@ -13,7 +13,7 @@ public class LiteralNum extends Literal {
     private double value;
     
     public LiteralNum(int value) {
-        this(value, Type.UINT);
+        this(value, Type.INT);
     }
     
     public LiteralNum(char value) {
@@ -56,13 +56,13 @@ public class LiteralNum extends Literal {
     }
     
     private void isnum(OPCode op, Literal lit) {
-    	if (!lit.getType().doesExtend(Type.UINT) && !lit.getType().doesExtend(Type.DBL)) {
+    	if (!lit.getType().doesExtend(Type.INT) && !lit.getType().doesExtend(Type.DBL)) {
     		throw new CompileException("Can not preform " + op + " on " + this.getType() + " with " + lit.getType());
     	}
     }
     
     private void isint(OPCode op, Literal lit) {
-    	if (!getType().doesExtend(Type.UINT) || !lit.getType().doesExtend(Type.UINT)) {
+    	if (!getType().doesExtend(Type.INT) || !lit.getType().doesExtend(Type.INT)) {
     		throw new CompileException("Can not preform " + op + " on " + this.getType() + " with " + lit.getType());
     	}
     }
@@ -74,7 +74,7 @@ public class LiteralNum extends Literal {
     
     @Override
     public boolean equals(Object o) {
-        if (getType() == Type.UINT && o instanceof Integer) {
+        if (getType() == Type.INT && o instanceof Integer) {
             return value == (int) o;
         } else if (o instanceof LiteralNum) {
             return ((LiteralNum) o).value == value;
@@ -85,7 +85,7 @@ public class LiteralNum extends Literal {
     
     @Override
     public String toString() {
-        if (getType().doesExtend(Type.UINT) || getType() == Type.BOOL) {
+        if (getType().doesExtend(Type.INT) || getType() == Type.BOOL) {
         	return String.valueOf((int) value);
         } else {
         	return String.valueOf(value);
