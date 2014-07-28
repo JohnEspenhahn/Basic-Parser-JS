@@ -13,7 +13,9 @@ import com.hahn.basic.intermediate.objects.OPObject;
 import com.hahn.basic.intermediate.objects.Param;
 import com.hahn.basic.intermediate.objects.StringConst;
 import com.hahn.basic.intermediate.objects.Var;
+import com.hahn.basic.intermediate.objects.VarAccess;
 import com.hahn.basic.intermediate.objects.VarGlobal;
+import com.hahn.basic.intermediate.objects.register.IRegister;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.ParameterizedType;
 import com.hahn.basic.intermediate.objects.types.Type;
@@ -31,14 +33,25 @@ import com.hahn.basic.parser.Node;
 import com.hahn.basic.target.ILangCommand;
 import com.hahn.basic.target.ILangFactory;
 import com.hahn.basic.target.LangBuildTarget;
+import com.hahn.basic.target.js.objects.JSConditionalObject;
+import com.hahn.basic.target.js.objects.JSExpressionStatementObject;
 import com.hahn.basic.target.js.objects.JSFuncCallPointer;
 import com.hahn.basic.target.js.objects.JSFuncHead;
 import com.hahn.basic.target.js.objects.JSFuncPointer;
+import com.hahn.basic.target.js.objects.JSNewInstance;
+import com.hahn.basic.target.js.objects.JSOPObject;
+import com.hahn.basic.target.js.objects.JSStringConst;
+import com.hahn.basic.target.js.objects.JSVarAccess;
+import com.hahn.basic.target.js.objects.JSVarGlobal;
+import com.hahn.basic.target.js.objects.JSVarLocal;
+import com.hahn.basic.target.js.objects.JSVarParameter;
+import com.hahn.basic.target.js.objects.register.JSRegister;
 import com.hahn.basic.target.js.statements.JSBreakStatement;
 import com.hahn.basic.target.js.statements.JSCallFuncStatement;
 import com.hahn.basic.target.js.statements.JSContinueStatement;
 import com.hahn.basic.target.js.statements.JSDefaultCallFuncStatement;
 import com.hahn.basic.target.js.statements.JSDefineVarStatement;
+import com.hahn.basic.target.js.statements.JSExpressionStatement;
 import com.hahn.basic.target.js.statements.JSForStatement;
 import com.hahn.basic.target.js.statements.JSIfStatement;
 import com.hahn.basic.target.js.statements.JSReturnStatement;
@@ -48,68 +61,73 @@ import com.hahn.basic.util.exceptions.UnimplementedException;
 public class JSLangFactory implements ILangFactory {
     
     @Override
+    public void reset() {
+        // TODO reset JS factory
+    }
+    
+    @Override
     public LangBuildTarget LangBuildTarget() {
         return new JSBuildTarget();
     }
     
     @Override
+    public IRegister getNextRegister(AdvancedObject objFor) {
+        return JSRegister.getForObject(objFor);
+    }
+    
+    @Override
+    public int getAvailableRegisters() {
+        return Integer.MAX_VALUE;
+    }
+    
+    @Override
     public BasicObject PushObject() {
-        // TODO Auto-generated method stub
-        return null;
+        throw new UnimplementedException();
     }
     
     @Override
     public StringConst StringConst(String str) {
-        // TODO Auto-generated method stub
-        return null;
+        return new JSStringConst(str);
     }
     
     @Override
     public OPObject OPObject(Statement container, OPCode op, BasicObject p1, BasicObject p2) {
-        // TODO
-        return null;
+        return new JSOPObject(container, op, p1, p2);
     }
     
     @Override
     public BasicObject ExpressionStatementObject(ExpressionStatement exp) {
-        // TODO
-        return null;
+        return new JSExpressionStatementObject(exp);
     }
     
     @Override
     public Var VarParameter(Frame frame, String name, Type type) {
-        // TODO Auto-generated method stub
-        return null;
+        return new JSVarParameter(frame, name, type);
     }
     
     @Override
     public Var VarLocal(Frame frame, String name, Type type) {
-        // TODO Auto-generated method stub
-        return null;
+        return new JSVarLocal(frame, name, type);
     }
     
     @Override
     public VarGlobal VarGlobal(String name, Type type) {
-        // TODO Auto-generated method stub
-        return null;
+        return new JSVarGlobal(name, type);
     }
     
     @Override
-    public AdvancedObject VarAccess(AdvancedObject var, BasicObject idx, Type type) {
-        // TODO
-        return null;
+    public VarAccess VarAccess(BasicObject var, BasicObject idx, Type type) {
+        return new JSVarAccess(var, idx, type);
     }
     
     @Override
     public BasicObject NewInstance(Type type, List<BasicObject> params) {
-        // TODO Auto-generated method stub
-        return null;
+        return new JSNewInstance(type, params);
     }
     
     @Override
-    public ConditionalObject ConditionalObject(Statement continer, OPCode op, BasicObject p1, BasicObject p2, BasicObject temp) {
-        // TODO Auto-generated method stub
-        return null;
+    public ConditionalObject ConditionalObject(Statement container, OPCode op, BasicObject p1, BasicObject p2, BasicObject temp) {
+        return new JSConditionalObject(container, op, p1, p2, temp);
     }
     
     @Override
@@ -134,8 +152,7 @@ public class JSLangFactory implements ILangFactory {
     
     @Override
     public ExpressionStatement ExpressionStatement(Statement container, BasicObject obj) {
-        // TODO
-        return null;
+        return new JSExpressionStatement(container, obj);
     }
     
     @Override

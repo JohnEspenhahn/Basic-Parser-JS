@@ -1,5 +1,6 @@
 package com.hahn.basic.intermediate.objects;
 
+import com.hahn.basic.intermediate.Frame;
 import com.hahn.basic.intermediate.IIntermediate;
 import com.hahn.basic.intermediate.objects.register.StackRegister;
 import com.hahn.basic.intermediate.objects.types.Type;
@@ -7,16 +8,19 @@ import com.hahn.basic.intermediate.opcode.OPCode;
 import com.hahn.basic.intermediate.statements.Statement;
 import com.hahn.basic.target.LangBuildTarget;
 
-public abstract class OPObject extends AdvancedObject {
+public abstract class OPObject extends BasicObject {
+    private Frame frame;
     private OPCode opcode;
     private BasicObject p1, p2;
     
     private boolean isValid;
     
     public OPObject(Statement container, OPCode opcode, BasicObject p1, BasicObject p2) {
-        super(container.getFrame(), "@ " + opcode.toString() + " @", p1.getType());
+        super("@ " + opcode.toString() + " @", p1.getType());
         
         this.isValid = true;
+        
+        this.frame = container.getFrame();
         
         this.opcode = opcode;
         this.p1 = (p1 != null ? p1.getForUse(container) : null);
@@ -25,6 +29,10 @@ public abstract class OPObject extends AdvancedObject {
     
     public boolean isValid() {
         return isValid;
+    }
+    
+    public Frame getFrame() {
+        return frame;
     }
     
     public BasicObject getP1() {
@@ -66,6 +74,9 @@ public abstract class OPObject extends AdvancedObject {
     }
     
     @Override
+    public abstract BasicObject getForUse(Statement s);
+    
+    @Override
     public boolean setInUse(IIntermediate by) {
         // Type check
         if (p1 != null) { 
@@ -84,7 +95,7 @@ public abstract class OPObject extends AdvancedObject {
     }
     
     @Override
-    public void doTakeRegister(boolean isLastUse) {
+    public void takeRegister(IIntermediate by) {
         // Check literals
         if (p1 instanceof AdvancedObject && p1.hasLiteral()) {
             AdvancedObject ao1 = (AdvancedObject) p1;
@@ -114,6 +125,11 @@ public abstract class OPObject extends AdvancedObject {
         else if (p1 instanceof PushObject) StackRegister.push();
     }
     
+    /**
+     * Called by toTarget is the object is still valid
+     * @param builder
+     * @return A final form of the object
+     */
     public abstract String doToTarget(LangBuildTarget builder);
     
     @Override

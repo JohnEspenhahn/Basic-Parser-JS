@@ -12,6 +12,10 @@ public abstract class ExpressionStatementObject extends BasicObject {
         this.statement = s;
     }
     
+    public ExpressionStatement getStatement() {
+        return statement;
+    }
+    
     @Override
     public Type getType() {
         return statement.getObj().getType();

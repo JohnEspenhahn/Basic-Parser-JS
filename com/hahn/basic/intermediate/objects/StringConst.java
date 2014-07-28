@@ -7,4 +7,8 @@ public abstract class StringConst extends BasicObject {
 	public StringConst(String str) {
 		super(str, Type.STRING);
 	}
+	
+	public String getString() {
+	    return getName();
+	}
 }

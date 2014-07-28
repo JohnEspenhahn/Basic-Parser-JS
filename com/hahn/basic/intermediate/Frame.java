@@ -355,10 +355,10 @@ public class Frame extends Statement {
      * @param head EnumExpression.IN_ACCESS
      * @return The object the with retrieved value
      */
-    private AdvancedObject inAccessVar(AdvancedObject obj, Node head) {
+    private BasicObject inAccessVar(AdvancedObject obj, Node head) {
         Type t = obj.getType();
         
-        AdvancedObject access = obj;
+        BasicObject access = obj;
         Iterator<Node> it = Util.getIterator(head);
         while (it.hasNext()) {  
             Enum<?> accessMarker = it.next().getToken();

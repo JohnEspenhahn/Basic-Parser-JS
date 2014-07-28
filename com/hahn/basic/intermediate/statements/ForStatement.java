@@ -3,6 +3,7 @@ package com.hahn.basic.intermediate.statements;
 import java.util.List;
 
 import com.hahn.basic.intermediate.Frame;
+import com.hahn.basic.intermediate.objects.OPObject;
 import com.hahn.basic.parser.Node;
 import com.hahn.basic.util.IntermediateList;
 
@@ -11,7 +12,7 @@ public abstract class ForStatement extends Statement {
 	
     private DefineVarStatement define;
     private ExpressionStatement condition;
-    private IntermediateList<Compilable> modification;
+    private IntermediateList<OPObject> modification;
     
     /**
      * @param continer Owning statement
@@ -29,7 +30,7 @@ public abstract class ForStatement extends Statement {
         this.define = outerFrame.defineVar(define);
         this.condition = outerFrame.handleExpression(condition);
         
-        this.modification = new IntermediateList<Compilable>();
+        this.modification = new IntermediateList<OPObject>();
         for (Node modify: modification) {
             this.modification.add(outerFrame.modifyVar(modify));
         }
@@ -51,7 +52,7 @@ public abstract class ForStatement extends Statement {
     	return condition;
     }
     
-    public IntermediateList<Compilable> getModifyStatements() {
+    public IntermediateList<OPObject> getModifyStatements() {
     	return modification;
     }
     

@@ -25,6 +25,20 @@ public abstract class ExpressionStatement extends Statement {
         return obj;
     }
     
+    @Override
+    public boolean reverseOptimize() {
+        getObj().setInUse(this);
+        
+        return false;
+    }
+    
+    @Override
+    public boolean forwardOptimize() {
+        getObj().takeRegister(this);
+        
+        return false;
+    }
+    
     public void castTo(Type type) {
         obj = obj.castTo(type);
     }

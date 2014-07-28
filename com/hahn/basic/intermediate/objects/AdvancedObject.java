@@ -97,6 +97,7 @@ public abstract class AdvancedObject extends BasicObject {
         return firstCall;
     }
     
+    @Override
     public final void takeRegister(IIntermediate by) {
         doTakeRegister(isLastUse(by));
     }

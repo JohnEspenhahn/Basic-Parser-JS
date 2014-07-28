@@ -4,7 +4,7 @@ import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.statements.Statement;
 
 public abstract class VarAccess extends BasicObject {
-    private AdvancedObject var;
+    private BasicObject var;
     private BasicObject index;
     
     /**
@@ -13,7 +13,7 @@ public abstract class VarAccess extends BasicObject {
      * @param index The index of a property to access. Can be either a literal, another variable, or a struct param
      * @param type The type of the property at the given index
      */
-    public VarAccess(AdvancedObject var, BasicObject index, Type type) {
+    public VarAccess(BasicObject var, BasicObject index, Type type) {
         super(var.getName() + "[" + index.getName() + "]", type);
         
         this.var = var;
@@ -24,7 +24,7 @@ public abstract class VarAccess extends BasicObject {
         return index;
     }
     
-    public AdvancedObject getVar() {
+    public BasicObject getVar() {
         return var;
     }
     
@@ -42,5 +42,5 @@ public abstract class VarAccess extends BasicObject {
      * finalizations needed in order for this object to be used
      * @param by The calling statement
      */
-    public abstract void doGetForUse(Statement by);
+    public void doGetForUse(Statement by) { }
 }

@@ -2,7 +2,7 @@ package com.hahn.basic.target.js.statements;
 
 import java.util.List;
 
-import com.hahn.basic.intermediate.statements.Compilable;
+import com.hahn.basic.intermediate.objects.OPObject;
 import com.hahn.basic.intermediate.statements.ForStatement;
 import com.hahn.basic.intermediate.statements.Statement;
 import com.hahn.basic.parser.Node;
@@ -22,9 +22,9 @@ public class JSForStatement extends ForStatement {
     @Override
     public boolean reverseOptimize() {
         if (getModifyStatements() != null) {
-            List<Compilable> modify = getModifyStatements();
+            List<OPObject> modify = getModifyStatements();
             for (int i = modify.size() - 1; i >= 0; i--) {
-                modify.get(i).reverseOptimize();
+                modify.get(i).getForUse(this);
             }
         }
         
@@ -50,9 +50,9 @@ public class JSForStatement extends ForStatement {
         getInnerFrame().forwardOptimize();
         
         if (getModifyStatements() != null) {
-            List<Compilable> modify = getModifyStatements();
+            List<OPObject> modify = getModifyStatements();
             for (int i = 0; i < modify.size(); i++) {
-                modify.get(i).forwardOptimize();
+                modify.get(i).takeRegister(this);
             }
         }
         

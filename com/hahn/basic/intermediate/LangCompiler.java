@@ -8,12 +8,11 @@ import com.hahn.basic.intermediate.objects.Param;
 import com.hahn.basic.intermediate.objects.StringConst;
 import com.hahn.basic.intermediate.objects.VarGlobal;
 import com.hahn.basic.intermediate.objects.VarTemp;
-import com.hahn.basic.intermediate.objects.register.Register;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.parser.Node;
-import com.hahn.basic.target.LangBuildTarget;
 import com.hahn.basic.target.ILangFactory;
+import com.hahn.basic.target.LangBuildTarget;
 import com.hahn.basic.util.exceptions.CompileException;
 
 public class LangCompiler {    
@@ -30,7 +29,7 @@ public class LangCompiler {
         factory = f;
         
         // Reset
-        Register.freeAll();
+        factory.reset();
         // Type.reset();
         reset();
         
@@ -89,6 +88,11 @@ public class LangCompiler {
         }
     }
     
+    /**
+     * Convert a string to a string constant
+     * @param str The string to get (does not need inner parenthesis)
+     * @return StringConst
+     */
     public static StringConst getString(String str) {
     	StringConst var = strings.get(str);
     	if (var != null) {
