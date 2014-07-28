@@ -386,21 +386,21 @@ public class Frame extends Statement {
             case "=": 
                 return updateVar(var, obj, OPCode.SET);
             case "+=":
-                return updateVar(var, obj, OPCode.ADD);
+                return updateVar(var, obj, OPCode.ADDE);
             case "-=":
-                return updateVar(var, obj, OPCode.SUB);
+                return updateVar(var, obj, OPCode.SUBE);
             case "*=":
-                return updateVar(var, obj, OPCode.MUL);
+                return updateVar(var, obj, OPCode.MULE);
             case "/=":
-                return updateVar(var, obj, OPCode.DIV);
+                return updateVar(var, obj, OPCode.DIVE);
             case "%=":
-                return updateVar(var, obj, OPCode.MOD);
+                return updateVar(var, obj, OPCode.MODE);
             case "&=":
-                return updateVar(var, obj, OPCode.AND);
+                return updateVar(var, obj, OPCode.ANDE);
             case "|=":
-                return updateVar(var, obj, OPCode.BOR);
+                return updateVar(var, obj, OPCode.BORE);
             case "^=":
-                return updateVar(var, obj, OPCode.XOR);
+                return updateVar(var, obj, OPCode.XORE);
            default:
                throw new RuntimeException("Unhandled modify var '" + children.get(1).getValue() + "'");
         }

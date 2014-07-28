@@ -1,5 +1,6 @@
 package com.hahn.basic.intermediate.objects;
 
+import com.hahn.basic.intermediate.IIntermediate;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.statements.ExpressionStatement;
 
@@ -31,5 +32,17 @@ public abstract class ExpressionStatementObject extends BasicObject {
         statement.castTo(type);
         
         return this;
+    }
+    
+    @Override
+    public boolean setInUse(IIntermediate by) {
+        statement.reverseOptimize();
+        
+        return super.setInUse(by);
+    }
+    
+    @Override
+    public void takeRegister(IIntermediate by) {
+        statement.forwardOptimize();
     }
 }

@@ -24,8 +24,10 @@ public class Struct extends Type {
         this.params = new HashMap<String, StructParam>();
         
         // Copy all parent parameters
-        for (StructParam p: parent.getAllParams()) {
-            add(p);
+        if (parent != null) {
+            for (StructParam p: parent.getAllParams()) {
+                add(p);
+            }
         }
     }
     

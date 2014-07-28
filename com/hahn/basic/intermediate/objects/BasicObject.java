@@ -57,6 +57,10 @@ public abstract class BasicObject implements IIntermediate, ITypeable, IBasicHol
         return false;
     }
     
+    /**
+     * Called from forward optimize
+     * @param by
+     */
     public void takeRegister(IIntermediate by) {
         // Basic objects don't have registers
     }
