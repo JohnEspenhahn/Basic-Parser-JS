@@ -4,7 +4,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Stack;
-import java.util.function.Consumer;
 
 public class DepthIterator<E> implements Iterator<E> {
     private final Stack<Iterator<E>> itStack;
@@ -12,11 +11,6 @@ public class DepthIterator<E> implements Iterator<E> {
     public DepthIterator(Iterator<E> it) {
         itStack = new Stack<Iterator<E>>();
         itStack.push(it);
-    }
-
-    @Override
-    public void forEachRemaining(Consumer<? super E> consumer) {
-        itStack.peek().forEachRemaining(consumer);
     }
 
     @Override

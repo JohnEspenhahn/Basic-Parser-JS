@@ -31,11 +31,15 @@ public abstract class Main {
     public abstract void handleFileReadComplete();
     
     public void termInput() {
+        System.out.println("Basic shell started");
+        System.out.println("Type `exit` to quit");
+        System.out.println();
+        
         // Create input scanner
         Scanner scanner = new Scanner(System.in);
          
         String input;
-        do {
+        while (true) {
             System.out.print("> ");
             
             try {
@@ -48,6 +52,8 @@ public abstract class Main {
                 Main.toggleDebug();
             } else if (input.equalsIgnoreCase("optimize")) {
                 Main.toggleOptimize();
+            } else if (input.equalsIgnoreCase("exit")) {
+                break;
             } else {
                 try {               
                     // Reset
@@ -62,7 +68,7 @@ public abstract class Main {
                     e.printStackTrace();
                 }
             }
-        } while (!input.equalsIgnoreCase("exit"));
+        }
         
         scanner.close();
     }
@@ -162,7 +168,7 @@ public abstract class Main {
             for (String s: argsList) {
                 if (s.equals("--debug") || s.equals("-d")) {
                     toggleDebug();
-                } else if (s.equals("--term") || s.equals("-t")) {
+                } else if (s.equals("--file") || s.equals("-f")) {
                     continue;
                 } else {
                     System.out.println("Unhandled command line parameter '" + s + "'");
@@ -170,10 +176,10 @@ public abstract class Main {
             }
             
             // Choose execution mode
-            if (argsList.contains("--term") || argsList.contains("-t")) {
-                main.termInput();
-            } else {
+            if (argsList.contains("--file") || argsList.contains("-f")) {
                 main.fileInput();
+            } else {
+                main.termInput();
             }
         } catch (Exception e) {
             e.printStackTrace();

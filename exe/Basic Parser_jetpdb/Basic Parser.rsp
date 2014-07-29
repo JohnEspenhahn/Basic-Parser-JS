@@ -1,0 +1,36 @@
+
+-x64
+-PIC
+-jetcomponent=10.00
+-jetedition=Evaluation
+-vcode=5
+-sys=C
+-nosmart
+-zimer=0
+-stack=900000
+-LargeAddressAware
+-config=VMProperty:-Djet.gc.heaplimit:0 -Djet.stack.trace
+-config=ClassPath:Basic.jar
+-config=JETProfile:5
+-config=JETProfileName:1.7.0_55
+-config=RuntimeKind:DESKTOP
+-EmbeddedFileSys=C:/Users/jesp/Documents/Workspace/Basic-Parser-JS/exe/Basic Parser_jetpdb/Basic Parser.efs
+-config=MainClass:com/hahn/basic/Main
+-config=VersionInfo:jet-1000-release (eval, en)
+-config=CompatibilityString:Java SE version: 1.7.0_55; JET update level: 0; CPU architecture: amd64
+-name=..\..\..\..\Desktop\Basic Parser.exe
+C:\Users\jesp\Documents\Workspace\Basic-Parser-JS\exe\Basic Parser_jetpdb\version.res
+
+-entry=ExeEntryPoint
+
+-LinkFileAsRData=LINK_SplashPicture:C:\Program Files\JET10.0\lib\x86\dummysplash.lib
+C:\Program Files\JET10.0\lib\x86\startup-exe-normal.zip
+-GenExceptionInfo=JR_SystemExceptionHandler
+-config=PackagingOptions:component_microversions=BC-0
+C:\Users\jesp\Documents\Workspace\Basic-Parser-JS\exe\Basic Parser_jetpdb\obj.zip
+-Config=RTComponent:XKRN10005.dll
+C:\Program Files\JET10.0\lib\x86\startup-rtlink.zip
+C:\Program Files\JET10.0\lib\x86\import32.lib
+C:\Program Files\JET10.0\lib\x86\app.res
+-StrictLinkToDLL
+

@@ -46,6 +46,7 @@ public class BASICMain extends Main {
         lexLineToStream(input, 1);
         handleStream();
         
+        System.out.println();
         System.out.println("Done in " + (System.currentTimeMillis() - start) + "ms");
     }
     
