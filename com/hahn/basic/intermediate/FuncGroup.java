@@ -1,12 +1,10 @@
 package com.hahn.basic.intermediate;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
 import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.Type;
-import com.hahn.basic.target.LangBuildTarget;
 
 public class FuncGroup {
     private List<FuncHead> funcs;
@@ -49,14 +47,7 @@ public class FuncGroup {
         return null;
     }
     
-    public String toTarget(LangBuildTarget builder) {
-        StringBuilder str = new StringBuilder();
-        for (FuncHead func: funcs) {
-            if (func.hasFrameHead()) {
-                str.append(func.toTarget(builder));
-            }
-        }
-        
-        return str.toString();
+    public List<FuncHead> getFuncs() {
+        return funcs;
     }
 }

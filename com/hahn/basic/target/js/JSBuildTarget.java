@@ -3,14 +3,24 @@ package com.hahn.basic.target.js;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import com.hahn.basic.intermediate.LangCompiler;
+import com.hahn.basic.intermediate.library.base.Library;
 import com.hahn.basic.target.ILangCommand;
 import com.hahn.basic.target.LangBuildTarget;
+import com.hahn.basic.target.js.library.LibraryBuiltinJS;
 
 public class JSBuildTarget extends LangBuildTarget {
+    public static final Library BuiltinJS = new LibraryBuiltinJS();
+    
 	StringBuilder builder;
 
 	public JSBuildTarget() {
 		builder = new StringBuilder();
+	}
+	
+	@Override
+	public void init() {
+	    LangCompiler.addLibrary("BuiltinJS");
 	}
 	
 	@Override

@@ -1,7 +1,6 @@
 package com.hahn.basic.target.js.statements;
 
 import com.hahn.basic.intermediate.FuncHead;
-import com.hahn.basic.intermediate.objects.AdvancedObject;
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.statements.ReturnStatement;
 import com.hahn.basic.intermediate.statements.Statement;
@@ -27,16 +26,14 @@ public class JSReturnStatement extends ReturnStatement {
     
     @Override
     public boolean forwardOptimize() {
-        if (getResult() instanceof AdvancedObject) {
-            ((AdvancedObject) getResult()).takeRegister(this);
-        }
+        getResult().takeRegister(this);
         
         return false;
     }
     
     @Override
     public String toTarget(LangBuildTarget builder) {
-        return "return " + getResult();
+        return "return " + getResult().toTarget(builder);
     }
     
 }

@@ -522,7 +522,7 @@ public class Frame extends Statement {
      */
     public Compilable doReturn(Node head) {
         Frame f = this;
-        while (f.parent != null) {
+        while (f.parent != LangCompiler.getGlobalFrame()) {
             f = f.parent;
         }
         
@@ -631,12 +631,12 @@ public class Frame extends Statement {
         
         // Define function
         if (!anonymous) {
-            LangCompiler.defineFunc(next, name, rtnType, aParams);
+            LangCompiler.defineFunc(next, name, false, rtnType, aParams);
             return null;
         } else {
             name = getLabel("@anon_func");
             
-            LangCompiler.defineFunc(next, name, rtnType, aParams);
+            LangCompiler.defineFunc(next, name, false, rtnType, aParams);
             return LangCompiler.factory.FuncPointer(name, new ParameterizedType<ITypeable>(Type.FUNC, (ITypeable[]) aParams));
         }
     }

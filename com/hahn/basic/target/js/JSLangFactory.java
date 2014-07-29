@@ -131,8 +131,8 @@ public class JSLangFactory implements ILangFactory {
     }
     
     @Override
-    public FuncHead FuncHead(String name, Node head, Type rtnType, Param[] params) {
-        return new JSFuncHead(name, head, rtnType, params);
+    public FuncHead FuncHead(String name, boolean rawName, Node head, Type rtnType, Param[] params) {
+        return new JSFuncHead(name, rawName, head, rtnType, params);
     }
     
     @Override

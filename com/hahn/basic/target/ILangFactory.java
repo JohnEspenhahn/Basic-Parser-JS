@@ -58,7 +58,7 @@ public interface ILangFactory {
 	
 	public ConditionalObject ConditionalObject(Statement container, OPCode op, BasicObject p1, BasicObject p2, BasicObject temp);
 	
-	public FuncHead FuncHead(String name, Node head, Type rtnType, Param[] params);
+	public FuncHead FuncHead(String name, boolean rawName, Node head, Type rtnType, Param[] params);
     public FuncPointer FuncPointer(String name, ParameterizedType<ITypeable> funcType);
 
     public FuncCallPointer FuncCallPointer(String name, BasicObject[] params);

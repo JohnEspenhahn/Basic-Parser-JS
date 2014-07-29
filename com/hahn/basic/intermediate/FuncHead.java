@@ -5,7 +5,6 @@ import com.hahn.basic.intermediate.objects.Param;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.parser.Node;
-import com.hahn.basic.target.LangBuildTarget;
 
 public abstract class FuncHead extends Frame {    
     private final String name;
@@ -16,10 +15,15 @@ public abstract class FuncHead extends Frame {
     
     private final String funcId;
     
-    public FuncHead(String name, Node funcHeadNode, Type rtn, Param... params) {
+    public FuncHead(String name, boolean rawName, Node funcHeadNode, Type rtn, Param... params) {
         super(LangCompiler.getGlobalFrame(), funcHeadNode);
         
-        this.funcId = createFuncId(name, params);
+        if (rawName) {
+            this.funcId = name;
+        } else {
+            this.funcId = createFuncId(name, params);
+        }
+        
         this.rtnType = rtn;
         
         this.name = name;
@@ -54,25 +58,6 @@ public abstract class FuncHead extends Frame {
         return params;
     }
     
-    @Override
-    public final void addTargetCode() {
-        addPreTargetCode();
-        
-        super.addTargetCode();
-        
-        doReturn(null);
-    }
-    
-    protected abstract void addPreTargetCode();
-    
-    @Override
-    public String toTarget(LangBuildTarget builder) {
-    	super.reverseOptimize();
-    	super.forwardOptimize();
-    	
-    	return super.toTarget(builder);
-    }
-    
     public boolean hasSameName(FuncHead func) {
         return this.name.equals(func.name);
     }
@@ -82,13 +67,8 @@ public abstract class FuncHead extends Frame {
     }
     
     @Override
-    public boolean reverseOptimize() {
-        return false;
-    }
-    
-    @Override
-    public boolean forwardOptimize() {        
-        return false;
+    public boolean endsWithBlock() {
+        return true;
     }
     
     @Override
@@ -125,7 +105,7 @@ public abstract class FuncHead extends Frame {
     }
     
     public static String createFuncId(String name, ITypeable... objs) {
-        String funcID = "func_" + name + "_params";
+        String funcID = "func_" + name + "__";
         for (ITypeable o: objs) funcID += "_" + o.getType().getName();
         
         return funcID;

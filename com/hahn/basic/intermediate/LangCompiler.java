@@ -33,27 +33,37 @@ public class LangCompiler {
         // Type.reset();
         reset();
         
+        // Init
+        StringBuilder str = new StringBuilder();
+        LangBuildTarget builder = factory.LangBuildTarget(); 
+        builder.init();
+        
+        
         // Optimize
         frame.reverseOptimize();
         frame.forwardOptimize();
         
-        // Convert to target
-        StringBuilder str = new StringBuilder();
-        LangBuildTarget builder = factory.LangBuildTarget();        
-        
+        // Convert to target      
         str.append(frame.toTarget(builder));
         str.append(builder.endCodeArea());
         
         // Compile function area
-        for (FuncGroup func: funcs.values()) {
-            str.append(func.toTarget(builder));
+        for (FuncGroup fg: funcs.values()) {
+            for (FuncHead func: fg.getFuncs()) {
+                if (func.hasFrameHead()) {
+                    func.reverseOptimize();
+                    func.forwardOptimize();
+                    
+                    str.append(func.toTarget(builder));
+                }
+            }
         }
         
         builder.appendString(str.toString());
         
         // Put library import strings
         for (Library lib: libs.values()) {
-            builder.append(lib.getCode());
+            builder.appendString(lib.toTarget(builder));
         }
         
         return builder;
@@ -113,12 +123,12 @@ public class LangCompiler {
         return (VarGlobal) globalFrame.addVar(var);
     }
     
-    public static FuncHead defineFunc(String name, Type rtnType, Param... params) {
-        return LangCompiler.defineFunc(null, name, rtnType, params);
+    public static FuncHead defineFunc(String name, boolean rawName, Type rtnType, Param... params) {
+        return LangCompiler.defineFunc(null, name, rawName, rtnType, params);
     }
     
-    public static FuncHead defineFunc(Node head, String name, Type rtnType, Param... params) {
-        FuncHead func = LangCompiler.factory.FuncHead(name, head, rtnType, params);
+    public static FuncHead defineFunc(Node head, String name, boolean rawName, Type rtnType, Param... params) {
+        FuncHead func = LangCompiler.factory.FuncHead(name, rawName, head, rtnType, params);
         
         FuncGroup old = funcs.get(name);
         if (old == null) {

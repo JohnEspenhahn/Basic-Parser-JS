@@ -23,9 +23,12 @@ public abstract class FuncPointer extends BasicObject {
         throw new RuntimeException("Can not change the type of a function pointer!");
     }
     
-    public String getFuncId() {
-        checkFunction();
-        
+    /**
+     * Get the ID of the function. Should only be called
+     * after being register optimized
+     * @return The function id
+     */
+    public String getFuncId() {        
         return func.getFuncId();
     }
     
