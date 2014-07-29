@@ -914,7 +914,7 @@ public class Frame extends Statement {
             
             if (temp == null) temp = createTempVar(Type.BOOL);
             exp.setObj(LangCompiler.factory.ConditionalObject(exp, op, exp.getObj(), nextExp.getObj(), temp));
-        } else {
+        } else if (!child.isTerminal()) {
             exp.setObj(doHandleExpression(it.enter(child.getAsChildren())));
         }
     }
