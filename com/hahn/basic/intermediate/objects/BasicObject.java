@@ -12,7 +12,7 @@ import com.hahn.basic.intermediate.statements.ExpressionStatement;
 import com.hahn.basic.intermediate.statements.Statement;
 import com.hahn.basic.target.LangBuildTarget;
 
-public abstract class BasicObject implements IIntermediate, ITypeable, IBasicHolderExcludeList {
+public abstract class BasicObject implements IIntermediate, ITypeable, IHolderExcludeList {
     private String name;
     private Type type;
     

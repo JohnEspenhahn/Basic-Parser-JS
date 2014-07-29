@@ -98,7 +98,7 @@ public abstract class AdvancedObject extends BasicObject {
     }
     
     @Override
-    public final void takeRegister(IIntermediate by) {
+    public void takeRegister(IIntermediate by) {
         doTakeRegister(isLastUse(by));
     }
     
