@@ -90,6 +90,7 @@ public abstract class DefineVarStatement extends Statement {
                 Type.merge(pair.var.getType(), pair.val.getType());
             }
             
+            pair.var.setInUse(this);
             pair.val.setInUse(this);
             
             pair.var.removeInUse();            
@@ -122,11 +123,11 @@ public abstract class DefineVarStatement extends Statement {
             }
             
             // Check registers
-            if (val instanceof AdvancedObject) { ((AdvancedObject) val).takeRegister(this); }
-            else if (val instanceof PopObject) StackRegister.pop();
+            val.takeRegister(this);
+            if (val instanceof PopObject) StackRegister.pop();
             
-            if (var instanceof AdvancedObject) { ((AdvancedObject) var).takeRegister(this); }
-            else if (var instanceof PushObject) StackRegister.push();
+            var.takeRegister(this);
+            if (var instanceof PushObject) StackRegister.push();
         }
         
         return false;

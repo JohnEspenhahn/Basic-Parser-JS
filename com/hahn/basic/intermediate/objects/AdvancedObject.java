@@ -165,18 +165,23 @@ public abstract class AdvancedObject extends BasicObject {
      */
 
     @Override
+    public Literal getLiteral() {
+        return literal;
+    }
+    
+    @Override
     public boolean canSetLiteral() {
         return literal != null;
     }
 
     @Override
-    public Literal getLiteral() {
-        return literal;
-    }
-
-    @Override
     public boolean hasLiteral() {
         return canSetLiteral() && literal != LiteralNum.UNDEFINED;
+    }
+    
+    @Override
+    public boolean canUpdateLiteral(Frame frame) {
+        return hasLiteral() && isOwnerFrame(frame);
     }
 
     @Override
@@ -186,16 +191,9 @@ public abstract class AdvancedObject extends BasicObject {
         }
     }
 
-    /**
-     * If is a literal, modify it
-     * @return True if should remove the containing op command
-     */
-    public boolean updateLiteral(OPCode op, BasicObject val) {
-        if (hasLiteral() && val.hasLiteral()) {
-            return literal.updateLiteral(op, val.getLiteral());
-        } else {
-            return false;
-        }
+    @Override
+    public boolean updateLiteral(OPCode op, Literal lit) {
+        return literal.updateLiteral(op, lit);
     }
 
     @Override

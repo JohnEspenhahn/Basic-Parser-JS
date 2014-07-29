@@ -13,12 +13,8 @@ public abstract class OPObject extends BasicObject {
     private OPCode opcode;
     private BasicObject p1, p2;
     
-    private boolean isValid;
-    
     public OPObject(Statement container, OPCode opcode, BasicObject p1, BasicObject p2) {
         super("@ " + opcode.toString() + " @", p1.getType());
-        
-        this.isValid = true;
         
         this.frame = container.getFrame();
         
@@ -27,8 +23,19 @@ public abstract class OPObject extends BasicObject {
         this.p2 = (p2 != null ? p2.getForUse(container) : null);
     }
     
-    public boolean isValid() {
-        return isValid;
+    @Override
+    public boolean hasLiteral() {
+        return p1.hasLiteral();
+    }
+    
+    @Override
+    public boolean canUpdateLiteral(Frame frame) {
+        return p1.canUpdateLiteral(frame) && p1.hasLiteral();
+    }
+    
+    @Override
+    public boolean updateLiteral(OPCode op, Literal lit) {
+        return p1.updateLiteral(op, lit);
     }
     
     public Frame getFrame() {
@@ -96,33 +103,28 @@ public abstract class OPObject extends BasicObject {
     
     @Override
     public void takeRegister(IIntermediate by) {
+        // Check registers
+        p2.takeRegister(this);
+        if (p2 instanceof PopObject) StackRegister.pop();
+        
+        p1.takeRegister(this);
+        if (p1 instanceof PushObject) StackRegister.push();
+        
         // Check literals
-        if (p1 instanceof AdvancedObject && p1.hasLiteral()) {
-            AdvancedObject ao1 = (AdvancedObject) p1;
-            if (p2.hasLiteral() && ao1.isOwnerFrame(getFrame())) {
-                if (ao1.updateLiteral(opcode, p2.getLiteral())) {
-                    // This expression is no longer needed
-                    this.isValid = false;
-                    return;
-                }
-            } else if (p2 != null) {
+        if (p1.hasLiteral() && p2 != null) {
+            if (p1.canUpdateLiteral(getFrame()) && p2.hasLiteral()) {
+                p1.updateLiteral(opcode, p2.getLiteral());
+            } else {
                 p1.setLiteral(null);
             }
         }
         
         if (p2 instanceof AdvancedObject && p2.hasLiteral()) {
-            AdvancedObject ao2 = (AdvancedObject) p2;
-            if (!ao2.isOwnerFrame(getFrame())) {
-                ao2.setLiteral(null);
+            AdvancedObject advancedP2 = (AdvancedObject) p2;
+            if (!advancedP2.isOwnerFrame(getFrame())) {
+                advancedP2.setLiteral(null);
             } 
         }
-        
-        // Check registers
-        if (p2 instanceof AdvancedObject) { ((AdvancedObject) p2).takeRegister(this); }
-        else if (p2 instanceof PopObject) StackRegister.pop();
-        
-        if (p1 instanceof AdvancedObject) { ((AdvancedObject) p1).takeRegister(this); }
-        else if (p1 instanceof PushObject) StackRegister.push();
     }
     
     /**
@@ -134,16 +136,18 @@ public abstract class OPObject extends BasicObject {
     
     @Override
     public final String toTarget(LangBuildTarget builder) {
-        if (isValid()) {
-            return doToTarget(builder);
+        if (hasLiteral()) {
+            return p1.toTarget(builder);
         } else {
-            return "";
+            return doToTarget(builder);
         }
     }
     
     @Override
     public String toString() {
-        if (p2 != null) {
+        if (hasLiteral()) {
+            return p1.toString();
+        } else if (p2 != null) {
             return String.format("%s({%s}->%s, {%s}->%s);", opcode, p1.getName() + (isP1LastUse()?"*":""), p1, p2.getName() + (isP2LastUse()?"*":""), p2);
         } else if (p1 != null) {
             return String.format("%s({%s}->%s)", opcode, p1.getName() + (isP1LastUse()?"*":""), p1);

@@ -1,5 +1,6 @@
 package com.hahn.basic.intermediate.objects;
 
+import com.hahn.basic.intermediate.Frame;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.opcode.OPCode;
 import com.hahn.basic.target.LangBuildTarget;
@@ -12,12 +13,12 @@ public abstract class Literal extends BasicObject {
 	
 	public abstract double getValue();
 	
-	/**
-     * Update the literal value of this variable
-     * @param op The op update type
-     * @param lit The value to use in update
-     * @return True if did modify
-     */
+	@Override
+	public boolean canUpdateLiteral(Frame f) {
+	    return true;
+	}
+	
+	@Override
     public abstract boolean updateLiteral(OPCode op, Literal lit);
 
 	@Override

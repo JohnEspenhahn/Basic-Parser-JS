@@ -2,10 +2,12 @@ package com.hahn.basic.intermediate.objects;
 
 import lombok.NonNull;
 
+import com.hahn.basic.intermediate.Frame;
 import com.hahn.basic.intermediate.IIntermediate;
 import com.hahn.basic.intermediate.LangCompiler;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.Type;
+import com.hahn.basic.intermediate.opcode.OPCode;
 import com.hahn.basic.intermediate.statements.ExpressionStatement;
 import com.hahn.basic.intermediate.statements.Statement;
 import com.hahn.basic.target.LangBuildTarget;
@@ -47,13 +49,29 @@ public abstract class BasicObject implements IIntermediate, ITypeable, IBasicHol
         return null;
     }
     
+    public void setLiteral(Literal literal) {
+        
+    }
+    
     public boolean canSetLiteral() {
         return false;
     }
     
-    public void setLiteral(Literal literal) { }
+    public boolean canUpdateLiteral(Frame frame) {
+        return canSetLiteral();
+    }
     
     public boolean hasLiteral() {
+        return false;
+    }
+    
+    /**
+     * If is a literal, modify it
+     * @param op The operation to preform on the literal
+     * @param lit The value to use in update
+     * @return True if should remove the containing op command
+     */
+    public boolean updateLiteral(OPCode op, Literal lit) {
         return false;
     }
     
