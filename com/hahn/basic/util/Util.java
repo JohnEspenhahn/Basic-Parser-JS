@@ -122,7 +122,7 @@ public class Util {
         
         for (Object[] pair: arr) {
             if (pair.length != 2) {
-                throw new RuntimeException("Invalid pair '" + pair + "'");
+                throw new RuntimeException("Invalid pair '" + Arrays.toString(pair) + "'");
             }
             
             map.put(key.cast(pair[0]), value.cast(pair[1]));

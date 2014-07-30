@@ -73,17 +73,6 @@ public class LiteralNum extends Literal {
     }
     
     @Override
-    public boolean equals(Object o) {
-        if (getType() == Type.INT && o instanceof Integer) {
-            return value == (int) o;
-        } else if (o instanceof LiteralNum) {
-            return ((LiteralNum) o).value == value;
-        } else {
-            return false;
-        }
-    }
-    
-    @Override
     public String toString() {
         if (getType().doesExtend(Type.INT) || getType() == Type.BOOL) {
         	return String.valueOf((int) value);

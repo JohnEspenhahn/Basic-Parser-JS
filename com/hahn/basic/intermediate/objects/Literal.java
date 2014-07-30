@@ -37,7 +37,6 @@ public abstract class Literal extends BasicObject {
 	}
 	
 	@Override
-	public abstract boolean equals(Object o);
 	
 	@Override
 	public int hashCode() {

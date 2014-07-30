@@ -1,5 +1,7 @@
 package com.hahn.basic.intermediate.objects;
 
+import lombok.NonNull;
+
 import com.hahn.basic.intermediate.Frame;
 import com.hahn.basic.intermediate.IIntermediate;
 import com.hahn.basic.intermediate.objects.register.StackRegister;
@@ -13,14 +15,14 @@ public abstract class OPObject extends BasicObject {
     private OPCode opcode;
     private BasicObject p1, p2;
     
-    public OPObject(Statement container, OPCode opcode, BasicObject p1, BasicObject p2) {
+    public OPObject(Statement container, OPCode opcode, BasicObject p1, @NonNull BasicObject p2) {
         super("@ " + opcode.toString() + " @", p1.getType());
         
         this.frame = container.getFrame();
         
         this.opcode = opcode;
-        this.p1 = (p1 != null ? p1.getForUse(container) : null);
-        this.p2 = (p2 != null ? p2.getForUse(container) : null);
+        this.p1 = p1.getForUse(container);
+        this.p2 = p2.getForUse(container);
     }
     
     @Override

@@ -9,15 +9,13 @@ import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.target.LangBuildTarget;
 import com.hahn.basic.util.exceptions.CompileException;
 
-public class Struct extends Type {
-    protected static final Struct STRUCT = new Struct("struct", null);
-    
+public class Struct extends Type {    
     private final Struct parent;
     private final Map<String, StructParam> params;
 
     private int typeParams;
     
-    private Struct(String name, Struct parent) {
+    protected Struct(String name, Struct parent) {
         super(name, true);
         
         this.parent = parent;

@@ -172,16 +172,6 @@ public abstract class BasicObject implements IIntermediate, ITypeable, IHolderEx
     }
     
     @Override
-    public boolean equals(Object o) {
-        if (o instanceof BasicObject) {
-            BasicObject bo = (BasicObject) o;
-            return bo.getType().equals(getType()) && bo.getName().equals(getName());
-        } else {
-            return super.equals(o);
-        }
-    }
-    
-    @Override
     public int hashCode() {
         return getName().hashCode();
     }

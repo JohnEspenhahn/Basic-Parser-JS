@@ -81,7 +81,7 @@ public abstract class Main {
             inputFile = chooser.getSelectedFile();
             
             // Reset
-            Main.ROW = 1;
+            Main.setLine(1);
             Main.LINES.clear();
             
             Scanner scanner = null;

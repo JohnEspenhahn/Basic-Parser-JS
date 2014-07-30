@@ -19,14 +19,14 @@ public class Type implements ITypeable {
     public static final Type VOID = new Type("void"),
                              BOOL = new Type("bool"),
                              CHAR = new TypeIntLike("char"),
-                             INT = new TypeIntLike("int"),
-                             DBL = new Type("dbl"),
+                             INT  = new TypeIntLike("int"),
+                             DBL  = new Type("dbl"),
                              /** UNDEFINED -> anything */
                              UNDEFINED = new Type("undefined", false, true);
     
-    public static final Struct STRUCT = Struct.STRUCT,
-                               FUNC = STRUCT.extendAs("func").setTypeParams(-1),
-                               ARRAY = STRUCT.extendAs("array").add(new Param("length", Type.INT)).setTypeParams(1),
+    public static final Struct STRUCT = new Struct("struct", null),
+                               FUNC   = STRUCT.extendAs("func").setTypeParams(-1),
+                               ARRAY  = STRUCT.extendAs("array").add(new Param("length", Type.INT)).setTypeParams(1),
                                STRING = ARRAY.extendAs("string").setTypeParams(0);
     
     public static final int COUNT_PRIMATIVES = TYPES.size();
@@ -108,8 +108,6 @@ public class Type implements ITypeable {
     public boolean equals(Object obj) {
         if (obj == null) {
             return true;
-        } else if (obj instanceof String) {
-            return ((String) obj).equals(getName());
         } else if (obj instanceof Type) {
             return ((Type) obj).getName().equals(getName());
         } else {

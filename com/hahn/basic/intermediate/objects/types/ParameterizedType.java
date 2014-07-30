@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import lombok.NonNull;
-
 import com.hahn.basic.definition.EnumExpression;
 import com.hahn.basic.parser.Node;
 import com.hahn.basic.util.Util;
@@ -29,29 +27,19 @@ public class ParameterizedType<T extends ITypeable> extends Type {
         this(base, types, Type.UNDEFINED);
     }
     
-    public ParameterizedType(Struct base, @NonNull T[] types, @NonNull ITypeable returnType) {
-        super(base.toString(), false, true);
+    public ParameterizedType(Struct base, T[] types, ITypeable returnType) {
+        super(createName(base, types, returnType), false, true);
         
         this.base = base;
         this.types = types;
         this.returnType = returnType;
     }
     
-    @Override
-    public String getName() {
+    private static String createName(Struct base, ITypeable[] types, ITypeable returnType) {
         return base.getName() 
                 + "<"
                 + (types.length > 0 ? Util.toString(types, "@") : "") 
                 + (returnType != Type.UNDEFINED || base.doesExtend(Type.FUNC) ? "@@"+returnType.getType() : "")
-                + ">";
-    }
-    
-    @Override
-    public String toString() {
-        return base.getName() 
-                + "<"
-                + (types.length > 0 ? Util.toString(types, ",") : "") 
-                + (returnType != Type.UNDEFINED || base.doesExtend(Type.FUNC) ? ";"+returnType.getType() : "")
                 + ">";
     }
     
@@ -99,27 +87,6 @@ public class ParameterizedType<T extends ITypeable> extends Type {
         } else {
             return base.doesExtend(t);
         }
-    }
-    
-    @Override
-    public boolean equals(Object o) {
-        if (o instanceof ParameterizedType) {
-            ParameterizedType<?> p = (ParameterizedType<?>) o;
-            
-            if (base.equals(p.base) && types.length == p.types.length
-                    && getReturn().doesExtend(p.getReturn()) ) {
-                
-                for (int i = 0; i < types.length; i++) {
-                    if (!getTypable(i).getType().equals(p.getTypable(i).getType())) {
-                        return false;
-                    }
-                }
-                
-                return true;
-            }
-        }
-        
-        return false;
     }
     
     /**

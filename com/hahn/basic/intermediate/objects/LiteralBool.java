@@ -51,17 +51,6 @@ public class LiteralBool extends Literal {
 			throw new CompileException("Can not preform operation " + op + " on bool with " + lit.getType());
 		}
 	}
-
-	@Override
-	public boolean equals(Object o) {
-		if (o instanceof Boolean) {
-			return value == (boolean) o;
-		} else if (o instanceof LiteralBool) {
-			return value == ((LiteralBool) o).getBoolValue();
-		} else {
-			return false;
-		}
-	}
 	
 	@Override
 	public String toTarget(LangBuildTarget builder) {
