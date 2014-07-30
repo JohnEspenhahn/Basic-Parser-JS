@@ -101,7 +101,7 @@ public class BASICMain extends Main {
         LangBuildTarget code = LangCompiler.compile(tree_head, factory);
         
         if (inputFile != null) {
-            writeToFile(code, new File(inputFile.getAbsolutePath() + ".bin")); 
+            writeToFile(code, new File(inputFile.getAbsolutePath() + factory.getLangBuildTarget().getExtension())); 
         }
         
         return code.toString();

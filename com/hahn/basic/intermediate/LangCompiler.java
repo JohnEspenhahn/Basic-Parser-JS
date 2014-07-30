@@ -35,7 +35,7 @@ public class LangCompiler {
         
         // Init
         StringBuilder str = new StringBuilder();
-        LangBuildTarget builder = factory.LangBuildTarget(); 
+        LangBuildTarget builder = factory.getLangBuildTarget(); 
         builder.init();
         
         

@@ -6,6 +6,8 @@ import java.io.IOException;
 public abstract class LangBuildTarget {
     public abstract void init();
     
+    public abstract String getExtension();
+    
     public abstract void append(ILangCommand cmd);
     public abstract void appendString(String str);
     public abstract void writeRunnableTo(FileOutputStream os) throws IOException;

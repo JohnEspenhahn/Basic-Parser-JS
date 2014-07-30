@@ -165,18 +165,19 @@ public abstract class Main {
         try {
             Main main = new BASICMain(new JSLangFactory(), EnumToken.class, EnumExpression.class);
             
+            boolean fileInput = false;
             for (String s: argsList) {
                 if (s.equals("--debug") || s.equals("-d")) {
                     toggleDebug();
                 } else if (s.equals("--file") || s.equals("-f")) {
-                    continue;
+                    fileInput = true;
                 } else {
                     System.out.println("Unhandled command line parameter '" + s + "'");
                 }
             }
             
             // Choose execution mode
-            if (argsList.contains("--file") || argsList.contains("-f")) {
+            if (fileInput) {
                 main.fileInput();
             } else {
                 main.termInput();

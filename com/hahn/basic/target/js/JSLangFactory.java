@@ -59,6 +59,7 @@ import com.hahn.basic.target.js.statements.JSWhileStatement;
 import com.hahn.basic.util.exceptions.UnimplementedException;
 
 public class JSLangFactory implements ILangFactory {
+    private static final LangBuildTarget build = new JSBuildTarget();    
     
     @Override
     public void reset() {
@@ -66,8 +67,8 @@ public class JSLangFactory implements ILangFactory {
     }
     
     @Override
-    public LangBuildTarget LangBuildTarget() {
-        return new JSBuildTarget();
+    public LangBuildTarget getLangBuildTarget() {
+        return build;
     }
     
     @Override
