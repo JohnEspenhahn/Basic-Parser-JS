@@ -58,8 +58,4 @@ public abstract class Library {
     public static void defineFunc(String name, boolean rawName, Type rtnType, Type... types) {        
         LangCompiler.defineFunc(name, rawName, rtnType, Util.toParams(types));
     }
-
-    public static void defineProperty(String string) {
-        LangCompiler.addGlobalVar(LangCompiler.factory.VarGlobal(string, Type.INT));
-    }
 }

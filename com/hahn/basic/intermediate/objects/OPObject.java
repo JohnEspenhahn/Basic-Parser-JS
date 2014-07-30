@@ -25,12 +25,12 @@ public abstract class OPObject extends BasicObject {
     
     @Override
     public boolean hasLiteral() {
-        return p1.hasLiteral();
+        return p1.hasLiteral() && OPCode.doesModify(getOP());
     }
     
     @Override
     public boolean canUpdateLiteral(Frame frame) {
-        return p1.canUpdateLiteral(frame) && p1.hasLiteral();
+        return p1.canUpdateLiteral(frame) && hasLiteral();
     }
     
     @Override
@@ -111,7 +111,7 @@ public abstract class OPObject extends BasicObject {
         if (p1 instanceof PushObject) StackRegister.push();
         
         // Check literals
-        if (p1.hasLiteral() && p2 != null) {
+        if (p1.hasLiteral() && p2 != null && OPCode.doesModify(getOP())) {
             if (p1.canUpdateLiteral(getFrame()) && p2.hasLiteral()) {
                 p1.updateLiteral(opcode, p2.getLiteral());
             } else {

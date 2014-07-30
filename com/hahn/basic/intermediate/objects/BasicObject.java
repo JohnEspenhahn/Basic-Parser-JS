@@ -45,12 +45,16 @@ public abstract class BasicObject implements IIntermediate, ITypeable, IHolderEx
         this.type = t;
     }
     
+    public boolean hasFlag(String name) {
+        return false;
+    }
+    
     public Literal getLiteral() {
         return null;
     }
     
     public void setLiteral(Literal literal) {
-        
+        // Basic objects don't handle literals
     }
     
     public boolean canSetLiteral() {

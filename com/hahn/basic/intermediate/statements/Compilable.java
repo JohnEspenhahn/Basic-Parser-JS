@@ -7,7 +7,7 @@ import com.hahn.basic.target.ILangCommand;
 import com.hahn.basic.target.LangBuildTarget;
 
 public abstract class Compilable implements IIntermediate, ILangCommand {
-    protected final int row;
+    public final int row;
     private final Frame frame;
 
     public Compilable(Frame f) {

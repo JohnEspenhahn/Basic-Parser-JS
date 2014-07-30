@@ -14,7 +14,6 @@ import com.hahn.basic.intermediate.objects.Param;
 import com.hahn.basic.intermediate.objects.StringConst;
 import com.hahn.basic.intermediate.objects.Var;
 import com.hahn.basic.intermediate.objects.VarAccess;
-import com.hahn.basic.intermediate.objects.VarGlobal;
 import com.hahn.basic.intermediate.objects.register.IRegister;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.ParameterizedType;
@@ -43,11 +42,10 @@ public interface ILangFactory {
 	public StringConst StringConst(String str);
 	
 	public OPObject OPObject(Statement container, OPCode op, BasicObject p1, BasicObject p2);
-	public BasicObject ExpressionStatementObject(ExpressionStatement exp);
+	public BasicObject ExpressionObject(ExpressionStatement exp);
 	
-	public Var VarParameter(Frame frame, String name, Type type);
-	public Var VarLocal(Frame frame, String name, Type type);
-	public VarGlobal VarGlobal(String name, Type type);
+	public Var VarParameter(Frame frame, String name, Type type, List<String> flags);
+	public Var VarLocal(Frame frame, String name, Type type, List<String> flags);
 	
 	public VarAccess VarAccess(BasicObject var, BasicObject idx, Type type);
 	public ExpressionStatement ExpressionStatement(Statement continer, BasicObject obj);

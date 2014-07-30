@@ -7,6 +7,7 @@ public abstract class LangBuildTarget {
     public abstract void init();
     
     public abstract String getExtension();
+    public abstract String getEOL();
     
     public abstract void append(ILangCommand cmd);
     public abstract void appendString(String str);

@@ -5,7 +5,7 @@ import lombok.experimental.Delegate;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.statements.Statement;
 
-public class AdvancedObjectHolder extends AdvancedObject {
+public class AdvancedObjectHolder extends AdvancedObject implements IHolderExcludeList {
 
     @Delegate(types=AdvancedObject.class, excludes=IHolderExcludeList.class)
     private AdvancedObject heldObj;
@@ -16,6 +16,10 @@ public class AdvancedObjectHolder extends AdvancedObject {
         this.heldObj = obj;
     }
 
+    protected BasicObject getHeldObject() {
+        return heldObj;
+    }
+    
     @Override
     public AdvancedObject getForUse(Statement s) {
         heldObj.getForUse(s);

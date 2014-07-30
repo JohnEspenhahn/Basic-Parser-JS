@@ -60,14 +60,6 @@ Creator: John Espenhahn
     * For both arrays and string, this expression
       will have 'a' and 'b' reference the same memory
         EX] string a = "test", b = a;
-        
-        
-  GLOBAL:
-    global <standard_var_definition>
-      * Must be defined in outer body (not within a function or struct)
-      * Can be accessed from any block
-      * Accessing is slower
-        EX] global uint i = 5;
 
     
 

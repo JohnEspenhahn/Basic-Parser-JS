@@ -30,7 +30,7 @@ public abstract class FuncHead extends Frame {
         this.params = params;
         
         for (Param p: params) {
-        	addVar(LangCompiler.factory.VarParameter(this, p.getName(), p.getType()));
+        	addVar(LangCompiler.factory.VarParameter(this, p.getName(), p.getType(), p.getFlags()));
         }
     }
     

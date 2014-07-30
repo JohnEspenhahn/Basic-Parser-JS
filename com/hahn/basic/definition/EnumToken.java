@@ -31,6 +31,7 @@ public enum EnumToken implements IEnumToken {
     CLOSE_SQR   ("\\]"                       ),
     DBL_COLON   ("\\:\\:"                    ),
     COLON       ("\\:"                       ),
+    FLAGS       ("const"                     ),
     IF          ("if"                        ),
     ELSE        ("else"                      ),
     FOR         ("for"                       ),
@@ -43,7 +44,6 @@ public enum EnumToken implements IEnumToken {
     TRUE        ("true"                      ),
     FALSE       ("false"                     ),
     NEW         ("new"                       ),
-    GLOBAL      ("global"                    ),
     IMPORT      ("import [_a-zA-Z][_a-zA-Z0-9\\.]*" ),
     IDENTIFIER  ("<<WORD>>"                  );
 

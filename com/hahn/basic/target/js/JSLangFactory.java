@@ -14,7 +14,6 @@ import com.hahn.basic.intermediate.objects.Param;
 import com.hahn.basic.intermediate.objects.StringConst;
 import com.hahn.basic.intermediate.objects.Var;
 import com.hahn.basic.intermediate.objects.VarAccess;
-import com.hahn.basic.intermediate.objects.VarGlobal;
 import com.hahn.basic.intermediate.objects.register.IRegister;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.ParameterizedType;
@@ -34,7 +33,7 @@ import com.hahn.basic.target.ILangCommand;
 import com.hahn.basic.target.ILangFactory;
 import com.hahn.basic.target.LangBuildTarget;
 import com.hahn.basic.target.js.objects.JSConditionalObject;
-import com.hahn.basic.target.js.objects.JSExpressionStatementObject;
+import com.hahn.basic.target.js.objects.JSExpressionObject;
 import com.hahn.basic.target.js.objects.JSFuncCallPointer;
 import com.hahn.basic.target.js.objects.JSFuncHead;
 import com.hahn.basic.target.js.objects.JSFuncPointer;
@@ -42,7 +41,6 @@ import com.hahn.basic.target.js.objects.JSNewInstance;
 import com.hahn.basic.target.js.objects.JSOPObject;
 import com.hahn.basic.target.js.objects.JSStringConst;
 import com.hahn.basic.target.js.objects.JSVarAccess;
-import com.hahn.basic.target.js.objects.JSVarGlobal;
 import com.hahn.basic.target.js.objects.JSVarLocal;
 import com.hahn.basic.target.js.objects.JSVarParameter;
 import com.hahn.basic.target.js.objects.register.JSRegister;
@@ -92,23 +90,18 @@ public class JSLangFactory implements ILangFactory {
     }
     
     @Override
-    public BasicObject ExpressionStatementObject(ExpressionStatement exp) {
-        return new JSExpressionStatementObject(exp);
+    public BasicObject ExpressionObject(ExpressionStatement exp) {
+        return new JSExpressionObject(exp);
     }
     
     @Override
-    public Var VarParameter(Frame frame, String name, Type type) {
-        return new JSVarParameter(frame, name, type);
+    public Var VarParameter(Frame frame, String name, Type type, List<String> flags) {
+        return new JSVarParameter(frame, name, type, flags);
     }
     
     @Override
-    public Var VarLocal(Frame frame, String name, Type type) {
-        return new JSVarLocal(frame, name, type);
-    }
-    
-    @Override
-    public VarGlobal VarGlobal(String name, Type type) {
-        return new JSVarGlobal(name, type);
+    public Var VarLocal(Frame frame, String name, Type type, List<String> flags) {
+        return new JSVarLocal(frame, name, type, flags);
     }
     
     @Override

@@ -20,6 +20,7 @@ import static com.hahn.basic.definition.EnumToken.STRING;
 import static com.hahn.basic.definition.EnumToken.TRUE;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -34,7 +35,6 @@ import com.hahn.basic.intermediate.objects.LiteralBool;
 import com.hahn.basic.intermediate.objects.LiteralNum;
 import com.hahn.basic.intermediate.objects.OPObject;
 import com.hahn.basic.intermediate.objects.Param;
-import com.hahn.basic.intermediate.objects.VarGlobal;
 import com.hahn.basic.intermediate.objects.VarTemp;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.ParameterizedType;
@@ -97,6 +97,10 @@ public class Frame extends Statement {
         return frameHead != null;
     }
     
+    public Collection<AdvancedObject> getVars() {
+        return vars.values();
+    }
+    
     public Frame getLoop() {
         if (endLoop != null) {
             return this;
@@ -111,10 +115,13 @@ public class Frame extends Statement {
     public String toTarget(LangBuildTarget builder) {
         StringBuilder str = new StringBuilder();
         for (Compilable c: getTargetCode()) {
-            str.append(c.toTarget(builder));
-            
-            if (!c.endsWithBlock()) {
-                str.append(";");
+            String cs = c.toTarget(builder);
+            if (cs != null && cs.length() > 0) {
+                str.append(cs);
+                
+                if (!c.endsWithBlock()) {
+                    str.append(builder.getEOL());
+                }
             }
         }
         
@@ -282,8 +289,6 @@ public class Frame extends Statement {
                 handleBlock(child);
             } else if (token == EnumExpression.DEFINE) {
                 addCode(defineVar(child));
-            } else if (token == EnumExpression.DEFINE_G) {
-                defineGlobalVar(child);
             } else if (token == EnumExpression.MODIFY) {
                 addCode(modifyVar(child).getAsExp(this));
             } else if (token == EnumExpression.STRUCT) {
@@ -426,52 +431,44 @@ public class Frame extends Statement {
     }
     
     /**
-     * `Define global` var handler
-     * @param head EnumExpression.DEFINE_G
-     */
-    public void defineGlobalVar(Node head) {
-        List<Node> children = head.getAsChildren();
-        defineVar(children.get(1), true);
-    }
-    
-    /**
      * `Define` var handler
      * @param head EnumExpression.DEFINE
      * @return Statement to define the vars
      */
     public DefineVarStatement defineVar(Node head) {
-        return defineVar(head, null, true, false);
-    }
-    
-    protected DefineVarStatement defineVar(Node head, boolean isGlobal) {
-        return defineVar(head, null, true, isGlobal);
+        return defineVar(head, null, true);
     }
     
     protected DefineVarStatement defineVar(Node head, List<BasicObject> varsList) {
-        return defineVar(head, varsList, false, false);
+        return defineVar(head, varsList, false);
     }
     
-    private DefineVarStatement defineVar(Node head, List<BasicObject> varsList, boolean canInit, boolean isGlobal) {
+    private DefineVarStatement defineVar(Node head, List<BasicObject> varsList, boolean canInit) {
         Iterator<Node> it = Util.getIterator(head);
         
         DefineVarStatement define = LangCompiler.factory.DefineVarStatement(this, false);
         
         // Init var
-        Type type = Type.fromNode(it.next());
+        Type type = Type.UNDEFINED;
+        ArrayList<String> flags = new ArrayList<String>();
+        
         while (it.hasNext()) {
             Node node = it.next();
+            Enum<?> token = node.getToken();
             
-            if (node.getToken() != EnumToken.COMMA) {
+            if (token == EnumToken.FLAGS) {
+                flags.add(node.getValue());
+            } else if (token == EnumExpression.TYPE) {
+                type = Type.fromNode(node);
+            } else if (token == EnumToken.IDENTIFIER) {
                 String name = node.getValue();
-                final BasicObject obj;
                 
                 // Create var
-                if (isGlobal) {
-                    obj = LangCompiler.factory.VarGlobal(name, type);                    
-                } else if (varsList != null) {
-                    obj = new Param(name, type);                    
+                final BasicObject obj;
+                if (varsList != null) {
+                    obj = new Param(name, type, flags);                    
                 } else {
-                    obj = LangCompiler.factory.VarLocal(this, name, type);
+                    obj = LangCompiler.factory.VarLocal(this, name, type, flags);
                 }
                 
                 // Modify var
@@ -500,15 +497,15 @@ public class Frame extends Statement {
                 }
                 
                 // Make var available
-                if (isGlobal) {
-                    LangCompiler.addGlobalVar((VarGlobal) obj);
-                } else if (varsList != null) {
-                    varsList.add(obj);                    
+                if (varsList != null) {
+                    varsList.add(obj);
                 } else {
                     addVar((AdvancedObject) obj);
                 }
             }
         }
+        
+        define.setFlags(flags);
         
         return define;
     }

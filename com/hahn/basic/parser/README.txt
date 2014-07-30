@@ -24,7 +24,7 @@ as string not in triangular braces references a token.
 
 +--------------------+-------+
 | Expression loop    | $     |
-| Next is optional   | ?     |
+| NEXT is optional   | ?     |
 | Match 0 or 1 times | (...) |
 | Match 0+ times     | {...} |
 | Match 1+ times     | [...] |

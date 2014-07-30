@@ -6,7 +6,6 @@ import java.util.Map;
 import com.hahn.basic.intermediate.library.base.Library;
 import com.hahn.basic.intermediate.objects.Param;
 import com.hahn.basic.intermediate.objects.StringConst;
-import com.hahn.basic.intermediate.objects.VarGlobal;
 import com.hahn.basic.intermediate.objects.VarTemp;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.Type;
@@ -42,7 +41,7 @@ public class LangCompiler {
         frame.reverseOptimize();
         frame.forwardOptimize();
         
-        // Convert to target      
+        // Convert to target
         str.append(frame.toTarget(builder));
         str.append(builder.endCodeArea());
         
@@ -116,10 +115,6 @@ public class LangCompiler {
     		
     		return strConst;
     	}
-    }
-    
-    public static VarGlobal addGlobalVar(VarGlobal var) {
-        return (VarGlobal) globalFrame.addVar(var);
     }
     
     public static FuncHead defineFunc(String name, boolean rawName, Type rtnType, Param... params) {

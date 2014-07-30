@@ -1,5 +1,6 @@
 package com.hahn.basic.intermediate.statements;
 
+import com.hahn.basic.Main;
 import com.hahn.basic.intermediate.FuncHead;
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.FuncCallPointer;
@@ -24,6 +25,8 @@ public abstract class CallFuncStatement extends Statement {
     
     @Override
     public final boolean reverseOptimize() {
+        Main.setLine(row);
+        
     	if (shouldCallFunction()) {
     	    for (BasicObject o : getParams()) {
                 o.setInUse(this);

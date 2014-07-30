@@ -117,37 +117,51 @@ class BNFParser {
         
         switch (flag.name()) {
         case "END":
-            if (isMarked(Flag.LOOP_START) && !isMarked(Flag.LOOP_END)) error("missing ending ']'");
-            else if (isMarked(Flag.LOOP_OPTIONAL_START) && !isMarked(Flag.LOOP_OPTIONAL_END)) error("missing ending '}'");
+            if (isMarked(Flag.LOOP_START)) error("missing ending ']'");
+            if (isMarked(Flag.LOOP_OPTIONAL_START)) error("missing ending '}'");
+            if (isMarked(Flag.OPTIONAL_BLOCK_START)) error("missing ending ')'");
+            
             break;
         case "FULL_LOOP":
         case "REQUIRES_NEXT":
             if (isMarked(Flag.REQUIRES_NEXT)) error("invalid preceding token");
+            flags.mark(flag);
+            
             break;
         case "OPTIONAL_BLOCK_START":
             if (isMarked(Flag.OPTIONAL_BLOCK_START)) error("can't nest optional block");
+            else flags.mark(flag);
+            
             break;
         case "OPTIONAL_BLOCK_END":
             if (!isMarked(Flag.OPTIONAL_BLOCK_START)) error("required starting '('");
+            else clearFlag(Flag.OPTIONAL_BLOCK_START);
+            
             break;
         case "LOOP_OPTIONAL_START":
             if (isMarked(Flag.LOOP_OPTIONAL_START)) error("can't nest two of the same loop");
+            else flags.mark(flag);
+            
             break;
         case "LOOP_OPTIONAL_END":
             if (!isMarked(Flag.LOOP_OPTIONAL_START)) error("required starting '{'");
+            else clearFlag(Flag.LOOP_OPTIONAL_START);
+            
             break;
         case "LOOP_START":
             if (isMarked(Flag.LOOP_START)) error("can't nest two of the same loop");
+            else flags.mark(flag);
+            
             break;
         case "LOOP_END":
             if (!isMarked(Flag.LOOP_START)) error("required starting '['");
+            else clearFlag(Flag.LOOP_START);
+            
             break;
         case "NEXT":
             clearFlag(Flag.REQUIRES_NEXT);
             break;
         }
-
-        flags.mark(flag);
     }
 
     private void clearFlag(Flag flag) {

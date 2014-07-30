@@ -7,7 +7,7 @@ public class VarTemp extends Var {
     public static int NEXT_TEMP_VAR = 0;
 
     public VarTemp(Frame frame, Type type) {
-        super(frame, getNextTempName(), type);
+        super(frame, getNextTempName(), type, null);
     }
 
     public boolean isTemp() {

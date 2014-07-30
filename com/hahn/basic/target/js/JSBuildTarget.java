@@ -31,6 +31,11 @@ public class JSBuildTarget extends LangBuildTarget {
 	}
 	
 	@Override
+	public String getEOL() {
+	    return ";";
+	}
+	
+	@Override
 	public void appendString(String str) {
 	    builder.append(str);
 	}

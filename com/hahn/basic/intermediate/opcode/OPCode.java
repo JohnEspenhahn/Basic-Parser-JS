@@ -126,6 +126,11 @@ public enum OPCode {
         return (op == IFE || op == IFN || op == IFP || op == IFL || op == IFM || op == IFG);
     }
     
+    public static boolean doesModify(OPCode op) {
+        return op == SET  || op == ADDE || op == SUBE || op == MULE || op == DIVE
+                || op == MODE || op == ANDE || op == BORE || op == XORE;
+    }
+    
     public static boolean isBitwise(OPCode op) {
         return (op == AND || op == BOR || op == XOR);
     }

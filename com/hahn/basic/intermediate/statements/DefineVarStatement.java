@@ -12,8 +12,12 @@ import com.hahn.basic.intermediate.objects.PushObject;
 import com.hahn.basic.intermediate.objects.register.StackRegister;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.util.Util;
+import com.sun.istack.internal.Nullable;
 
-public abstract class DefineVarStatement extends Statement {    
+public abstract class DefineVarStatement extends Statement {   
+    @Nullable
+    private List<String> flags;
+    
     private List<DefinePair> definepairs;
     private boolean ignoreTypeCheck;
     
@@ -25,6 +29,22 @@ public abstract class DefineVarStatement extends Statement {
         
         this.definepairs = new ArrayList<DefinePair>();
         this.ignoreTypeCheck = ignoreTypeCheck;
+    }
+    
+    public boolean hasFlags() {
+        return flags != null;
+    }
+    
+    public List<String> getFlags() {
+        return flags;
+    }
+    
+    public void setFlags(List<String> flags) {
+        this.flags = flags;
+    }
+    
+    public boolean hasFlag(String name) {
+        return hasFlags() && getFlags().contains(name);
     }
     
     public void addVar(BasicObject var, BasicObject val) {
@@ -79,7 +99,9 @@ public abstract class DefineVarStatement extends Statement {
     }
     
     @Override
-    public boolean reverseOptimize() {        
+    public boolean reverseOptimize() {
+        Main.setLine(row);
+        
         ListIterator<DefinePair> it = definepairs.listIterator(definepairs.size());
         while (it.hasPrevious()) {
             DefinePair pair = it.previous();
@@ -89,7 +111,6 @@ public abstract class DefineVarStatement extends Statement {
             
             // Type check
             if (!ignoreTypeCheck) {
-                Main.setLine(row);
                 Type.merge(pair.var.getType(), pair.val.getType());
             }
             
@@ -104,6 +125,8 @@ public abstract class DefineVarStatement extends Statement {
     
     @Override
     public boolean forwardOptimize() {
+        Main.setLine(row);
+        
         for (DefinePair pair: definepairs) {
             BasicObject var = pair.var;
             BasicObject val = pair.val;
