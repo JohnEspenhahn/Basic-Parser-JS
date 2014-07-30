@@ -2,7 +2,6 @@ package com.hahn.basic.intermediate;
 
 import static com.hahn.basic.definition.EnumToken.ADD_SUB;
 import static com.hahn.basic.definition.EnumToken.AND;
-import static com.hahn.basic.definition.EnumToken.ARROW;
 import static com.hahn.basic.definition.EnumToken.CHAR;
 import static com.hahn.basic.definition.EnumToken.DOT;
 import static com.hahn.basic.definition.EnumToken.EQUALS;
@@ -423,7 +422,6 @@ public class Frame extends Statement {
      * @return Object to update the var
      */
     protected OPObject updateVar(BasicObject var, BasicObject obj, OPCode op) {
-        Type.merge(var.getType(), obj.getType());
         return LangCompiler.factory.OPObject(this, op, var, obj);
     }
     
@@ -592,15 +590,19 @@ public class Frame extends Statement {
     public FuncPointer doDefineFunc(Node head, boolean anonymous) {
         Iterator<Node> it = Util.getIterator(head);
         
-        String name = it.next().getValue();
+        Type rtnType = Type.VOID;
+        String name = null;
+        Node body = null;
         
         List<Param> params = new ArrayList<Param>();
         while (it.hasNext()) {
             Node parent = it.next();
             Enum<?> token = parent.getToken();
             
-            if (token == ARROW) {
-                break;
+            if (token == EnumExpression.TYPE) {
+                rtnType = Type.fromNode(parent);
+            } else if (token == EnumToken.IDENTIFIER) {
+                name = parent.getValue();
             } else if (token == EnumExpression.DEF_PARAMS) {      
                 Iterator<Node> pIt = Util.getIterator(parent);
                 
@@ -615,28 +617,22 @@ public class Frame extends Statement {
                         params.add(new Param(pName.getValue(), Type.fromNode(pType)));
                     }
                 }
+            } else if (token == EnumExpression.BLOCK) {
+                body = parent;
             }
         }
         
         // Convert params list to array
         Param[] aParams = params.toArray(new Param[params.size()]);
-        
-        // Get return type
-        Node next = it.next();
-        Type rtnType = Type.VOID;
-        if (next.getToken() != EnumExpression.BLOCK) {
-            rtnType = Type.fromNode(next);
-            next = it.next();
-        }
-        
+           
         // Define function
         if (!anonymous) {
-            LangCompiler.defineFunc(next, name, false, rtnType, aParams);
+            LangCompiler.defineFunc(body, name, false, rtnType, aParams);
             return null;
         } else {
-            name = getLabel("@anon_func");
+            name = getLabel("afunc");
             
-            LangCompiler.defineFunc(next, name, false, rtnType, aParams);
+            LangCompiler.defineFunc(body, name, false, rtnType, aParams);
             return LangCompiler.factory.FuncPointer(name, new ParameterizedType<ITypeable>(Type.FUNC, (ITypeable[]) aParams));
         }
     }

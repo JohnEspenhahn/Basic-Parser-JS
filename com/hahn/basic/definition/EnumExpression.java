@@ -27,7 +27,7 @@ public enum EnumExpression implements IEnumExpression {
     FOR_STMT    ("FOR OPEN_PRNTH ?<FOR_DEF> EOL ?<EXPRESSION> EOL (<MODIFY> {COMMA <MODIFY>}) CLOSE_PRNTH <BLOCK>", false),
     FOR_DEF     ("<DEFINE>|<MODIFY>"),
     
-    TYPE        ("IDENTIFIER ?<PARAM_TYPES>", false), 
+    TYPE        ("FUNCTION <PARAM_TYPES>|IDENTIFIER ?<PARAM_TYPES>", false), 
     PARAM_TYPES ("LESS ?<TYPE_LIST> (EOL <TYPE>) GTR", false),
     TYPE_LIST   ("<TYPE> {COMMA <TYPE>}", false),
     
@@ -36,9 +36,9 @@ public enum EnumExpression implements IEnumExpression {
     
     FUNC_POINTER("AND IDENTIFIER OPEN_PRNTH ?<TYPE_LIST> CLOSE_PRNTH", false),
     
-    ANON_FUNC   ("FUNCTION ?<DEF_PARAMS> ARROW ?<TYPE> <BLOCK>", false),
+    ANON_FUNC   ("FUNCTION ?<TYPE> OPEN_PRNTH?<DEF_PARAMS> CLOSE_PRNTH <BLOCK>", false),
     
-    DEF_FUNC    ("IDENTIFIER ?<DEF_PARAMS> ARROW ?<TYPE> <BLOCK>", false),
+    DEF_FUNC    ("FUNCTION ?<TYPE> IDENTIFIER OPEN_PRNTH ?<DEF_PARAMS> CLOSE_PRNTH <BLOCK>", false),
     DEF_PARAMS  ("<TYPE> IDENTIFIER {COMMA <TYPE> IDENTIFIER}", false),
     
     STRUCT      ("STRUCT IDENTIFIER OPEN_BRACE [<DEFINE> EOL] CLOSE_BRACE", false),

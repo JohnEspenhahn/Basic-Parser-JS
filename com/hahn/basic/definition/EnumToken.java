@@ -38,7 +38,7 @@ public enum EnumToken implements IEnumToken {
     CONTINUE    ("continue"                  ),
     BREAK       ("break"                     ),
     RETURN      ("return"                    ),
-    FUNCTION    ("function"                  ),
+    FUNCTION    ("func"                      ),
     STRUCT      ("struct"                    ),
     TRUE        ("true"                      ),
     FALSE       ("false"                     ),
