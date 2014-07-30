@@ -85,24 +85,24 @@ public abstract class OPObject extends BasicObject {
     
     @Override
     public boolean setInUse(IIntermediate by) {
+        if (p1 != null) p1.setInUse(this);        
+        if (p2 != null) p2.setInUse(this);
+        
         // Type check
         if (p1 != null) { 
             Type mergedType = Type.merge(opcode.type1, p1.getType());
             this.setType(mergedType);
-            
-            p1.setInUse(this);
         }
         
         if (p2 != null) { 
-            Type.merge(opcode.type2, p2.getType()); 
-            p2.setInUse(this);
+            Type.merge(opcode.type2, p2.getType());
         }
         
         return false;
     }
     
     @Override
-    public void takeRegister(IIntermediate by) {
+    public void takeRegister(IIntermediate by) {        
         // Check registers
         p2.takeRegister(this);
         if (p2 instanceof PopObject) StackRegister.pop();

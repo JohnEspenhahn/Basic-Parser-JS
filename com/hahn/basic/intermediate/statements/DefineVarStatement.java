@@ -84,14 +84,14 @@ public abstract class DefineVarStatement extends Statement {
         while (it.hasPrevious()) {
             DefinePair pair = it.previous();
             
+            pair.var.setInUse(this);
+            pair.val.setInUse(this);
+            
             // Type check
             if (!ignoreTypeCheck) {
                 Main.setLine(row);
                 Type.merge(pair.var.getType(), pair.val.getType());
             }
-            
-            pair.var.setInUse(this);
-            pair.val.setInUse(this);
             
             pair.var.removeInUse();            
             if (pair.var.getUses() == 0) {
