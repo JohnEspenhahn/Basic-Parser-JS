@@ -32,8 +32,6 @@ import com.hahn.basic.intermediate.statements.WhileStatement;
 import com.hahn.basic.parser.Node;
 
 public interface ILangFactory {
-    public void reset();
-    
 	public LangBuildTarget getLangBuildTarget();
 	
 	// Registers

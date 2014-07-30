@@ -20,6 +20,8 @@ public class JSBuildTarget extends LangBuildTarget {
 	
 	@Override
 	public void init() {
+	    builder.setLength(0);
+	    
 	    LangCompiler.addLibrary("BuiltinJS");
 	}
 	

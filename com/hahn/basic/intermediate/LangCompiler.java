@@ -29,7 +29,6 @@ public class LangCompiler {
         factory = f;
         
         // Reset
-        factory.reset();
         // Type.reset();
         reset();
         

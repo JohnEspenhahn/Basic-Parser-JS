@@ -94,7 +94,7 @@ public abstract class DefineVarStatement extends Statement {
             }
             
             pair.var.removeInUse();            
-            if (pair.var.getUses() == 0) {
+            if (pair.var.getUses() == 1) {
                 it.remove();
             }
         }
