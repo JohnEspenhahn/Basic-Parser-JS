@@ -37,8 +37,6 @@ public abstract class Literal extends BasicObject {
 	}
 	
 	@Override
-	
-	@Override
 	public int hashCode() {
 		return (int) getValue();
 	}

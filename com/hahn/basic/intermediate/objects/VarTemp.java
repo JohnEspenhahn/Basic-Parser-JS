@@ -10,7 +10,13 @@ public class VarTemp extends Var {
         super(frame, getNextTempName(), type, null);
     }
 
+    @Override
     public boolean isTemp() {
+        return true;
+    }
+    
+    @Override
+    public boolean isLocal() {
         return true;
     }
     

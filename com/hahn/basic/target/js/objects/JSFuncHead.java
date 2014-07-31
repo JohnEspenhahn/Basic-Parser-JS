@@ -17,7 +17,7 @@ public class JSFuncHead extends FuncHead {
     public String toTarget(LangBuildTarget builder) {
         return String.format("function %s(%s){%s}", 
                     getFuncId(), 
-                    Util.toString(getParams(), ","),
+                    Util.toTarget(getParams(), ",", builder),
                     super.toTarget(builder)
                 );        
     }

@@ -11,4 +11,8 @@ public class VarLocal extends Var {
 		super(frame, name, type, flags);
 	}
 
+	@Override
+	public boolean isLocal() {
+        return true;
+    }
 }

@@ -31,7 +31,7 @@ public abstract class AdvancedObject extends BasicObject {
         this.parallelObjs = new ArrayList<AdvancedObject>();
     }
 
-    public boolean isPointer() {
+    public boolean isLocal() {
         return false;
     }
 

@@ -2,15 +2,14 @@ package com.hahn.basic.intermediate;
 
 import com.hahn.basic.intermediate.objects.FuncPointer;
 import com.hahn.basic.intermediate.objects.Param;
+import com.hahn.basic.intermediate.objects.Var;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.parser.Node;
 
 public abstract class FuncHead extends Frame {    
     private final String name;
-    
-    private final Param[] params;
-    
+    private final Var[] params;
     private final Type rtnType;
     
     private final String funcId;
@@ -24,13 +23,16 @@ public abstract class FuncHead extends Frame {
             this.funcId = createFuncId(name, params);
         }
         
+        this.name = name;
         this.rtnType = rtn;
         
-        this.name = name;
-        this.params = params;
-        
-        for (Param p: params) {
-        	addVar(LangCompiler.factory.VarParameter(this, p.getName(), p.getType(), p.getFlags()));
+        this.params = new Var[params.length];
+        for (int i = 0; i < params.length; i++) {
+            Param p = params[i];
+            
+            Var var = LangCompiler.factory.VarParameter(this, p.getName(), p.getType(), p.getFlags());
+            this.params[i] = var;
+        	this.addVar(var);
         }
     }
     
@@ -54,7 +56,7 @@ public abstract class FuncHead extends Frame {
         return params.length;
     }
     
-    public Param[] getParams() {
+    public Var[] getParams() {
         return params;
     }
     
@@ -76,7 +78,7 @@ public abstract class FuncHead extends Frame {
         if (obj instanceof FuncHead) {
             FuncHead func = (FuncHead) obj;
             if (hasSameReturnAs(func) && numParams() == func.numParams()) {
-                Param[] funcParams = func.getParams();
+                Var[] funcParams = func.getParams();
                 for (int i = 0; i < params.length; i++) {
                     if (!params[i].getType().equals(funcParams[i].getType())) {
                         return false;
@@ -105,7 +107,7 @@ public abstract class FuncHead extends Frame {
     }
     
     public static String createFuncId(String name, ITypeable... objs) {
-        String funcID = "func_" + name + "__";
+        String funcID = "__" + name + "__";
         for (ITypeable o: objs) funcID += "_" + o.getType().getName();
         
         return funcID;

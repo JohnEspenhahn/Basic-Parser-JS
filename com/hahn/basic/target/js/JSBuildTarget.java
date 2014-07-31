@@ -8,6 +8,7 @@ import com.hahn.basic.intermediate.library.base.Library;
 import com.hahn.basic.target.ILangCommand;
 import com.hahn.basic.target.LangBuildTarget;
 import com.hahn.basic.target.js.library.LibraryBuiltinJS;
+import com.hahn.basic.target.js.objects.register.JSRegister;
 
 public class JSBuildTarget extends LangBuildTarget {
     public static final Library BuiltinJS = new LibraryBuiltinJS();
@@ -22,6 +23,7 @@ public class JSBuildTarget extends LangBuildTarget {
 	public void init() {
 	    builder.setLength(0);
 	    
+	    JSRegister.init();
 	    LangCompiler.addLibrary("BuiltinJS");
 	}
 	

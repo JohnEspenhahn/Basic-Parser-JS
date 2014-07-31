@@ -57,7 +57,7 @@ public abstract class Main {
             } else {
                 try {               
                     // Reset
-                    Main.ROW = 1;
+                    Main.setLine(1);
                     Main.LINES.clear();
                     Main.LINES.add(input.trim());
                     

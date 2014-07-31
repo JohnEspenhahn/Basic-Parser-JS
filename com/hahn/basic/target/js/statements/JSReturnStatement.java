@@ -19,7 +19,7 @@ public class JSReturnStatement extends ReturnStatement {
     }
     
     @Override
-    public boolean reverseOptimize() {
+    public boolean doReverseOptimize() {
         Main.setLine(row);
         
         getResult().setInUse(this);
@@ -28,7 +28,7 @@ public class JSReturnStatement extends ReturnStatement {
     }
     
     @Override
-    public boolean forwardOptimize() {
+    public boolean doForwardOptimize() {
         Main.setLine(row);
         
         getResult().takeRegister(this);

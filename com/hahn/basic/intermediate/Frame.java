@@ -241,7 +241,7 @@ public class Frame extends Statement {
         return (VarTemp) addVar(new VarTemp(this, type));
     }
     
-    private AdvancedObject safeGetVar(String name) {
+    public AdvancedObject safeGetVar(String name) {
         // Local var
         AdvancedObject obj = vars.get(name);
         if (obj != null) {

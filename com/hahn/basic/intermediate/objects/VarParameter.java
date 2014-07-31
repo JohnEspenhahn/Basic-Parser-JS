@@ -11,4 +11,8 @@ public abstract class VarParameter extends Var {
         super(frame, name, type, flags);
     }
     
+    @Override
+    public boolean isLocal() {
+        return true;
+    }
 }

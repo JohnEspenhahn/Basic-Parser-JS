@@ -38,7 +38,7 @@ public enum EnumExpression implements IEnumExpression {
     
     ANON_FUNC   ("FUNCTION ?<TYPE> OPEN_PRNTH?<DEF_PARAMS> CLOSE_PRNTH <BLOCK>", false),
     
-    DEF_FUNC    ("FUNCTION ?<TYPE> IDENTIFIER OPEN_PRNTH ?<DEF_PARAMS> CLOSE_PRNTH <BLOCK>", false),
+    DEF_FUNC    ("FUNCTION <TYPE> IDENTIFIER OPEN_PRNTH ?<DEF_PARAMS> CLOSE_PRNTH <BLOCK>", false),
     DEF_PARAMS  ("<TYPE> IDENTIFIER {COMMA <TYPE> IDENTIFIER}", false),
     
     STRUCT      ("STRUCT IDENTIFIER OPEN_BRACE [<DEFINE> EOL] CLOSE_BRACE", false),
@@ -57,7 +57,7 @@ public enum EnumExpression implements IEnumExpression {
     
     BLOCK       ("OPEN_BRACE {<BLOCK_CNTNT>} CLOSE_BRACE|<BLOCK_CNTNT>", false),
     BLOCK_CNTNT ("<DEFINE>EOL|<MODIFY>EOL|<COMMAND>EOL|<EVALUABLE>EOL|<RETURN>|<IF_STMT>|<WHILE_STMT>|<FOR_STMT>|EOL", false),
-    START       ("<DEFINE_G>$|<BLOCK_CNTNT>$|<DEF_FUNC>$|<STRUCT>$", false);
+    START       ("<BLOCK_CNTNT>$|<DEF_FUNC>$|<STRUCT>$", false);
 
 
     private final String bnf;
