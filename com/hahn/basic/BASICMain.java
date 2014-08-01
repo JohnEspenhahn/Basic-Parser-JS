@@ -17,7 +17,7 @@ import com.hahn.basic.target.ILangFactory;
 import com.hahn.basic.util.exceptions.CompileException;
 
 public class BASICMain extends Main {
-    public static final String VERSION = "1.2.0";
+    public static final String VERSION = "1.3.0";
     
     private final Lexer lexer;
     private final Parser parser;
@@ -33,6 +33,11 @@ public class BASICMain extends Main {
         // Create handlers
         this.lexer = new Lexer(tokens);
         this.parser = new Parser(tokens, expressions);
+    }
+    
+    @Override
+    public LangBuildTarget getLangBuildTarget() {
+        return this.factory.getLangBuildTarget();
     }
 
     @Override
@@ -79,8 +84,9 @@ public class BASICMain extends Main {
                     System.out.println();
                 }
                 
-                String result = compile(tree_head);
-                System.out.println(result);
+                compile(tree_head);
+            } else {
+                System.err.println("Empty input source");
             }
         } catch (CompileException e) {
             printCompileException(e);
@@ -97,14 +103,14 @@ public class BASICMain extends Main {
         return parser.parse(stream.toArray(new PackedToken[0]));
     }
     
-    private String compile(Node tree_head) {
+    private void compile(Node tree_head) {
         LangBuildTarget code = LangCompiler.compile(tree_head, factory);
         
         if (inputFile != null) {
-            writeToFile(code, new File(inputFile.getAbsolutePath() + factory.getLangBuildTarget().getExtension())); 
+            writeToFile(code, getTargetFile()); 
+        } else {
+            System.out.println(code.toString());
         }
-        
-        return code.toString();
     }
     
     private void writeToFile(LangBuildTarget code, File targ) {

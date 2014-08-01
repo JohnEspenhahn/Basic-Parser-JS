@@ -1,36 +1,84 @@
 package com.hahn.basic;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 import javax.swing.JFileChooser;
 
 import com.hahn.basic.definition.EnumExpression;
 import com.hahn.basic.definition.EnumToken;
+import com.hahn.basic.target.LangBuildTarget;
 import com.hahn.basic.target.js.JSLangFactory;
+import com.hahn.basic.util.EnumInputType;
 import com.hahn.basic.util.exceptions.CompileException;
 
 public abstract class Main {
     private static int ROW, COLUMN;    
     private static List<String> LINES = new ArrayList<String>();
     
-    public static boolean DEBUG = false, 
-                          OPTIMIZE = false;    
+    public static boolean DEBUG = false; 
+    public static boolean OPTIMIZE = false;
     
+    private static final String FILE_KEY = "file";
+    private static final String DIR_KEY = "dir";
+    private Map<String, String> values;
+    
+    private EnumInputType inputType;
     protected File inputFile;
     
     public Main() {
-        inputFile = null;
+        this.inputType = null;
+        this.inputFile = null;
+        
+        this.values = new HashMap<String, String>();
     }
+    
+    public abstract LangBuildTarget getLangBuildTarget();
     
     public abstract void handleTermInput(String input);
     public abstract void handleFileLine(String str, int line);
     public abstract void handleFileReadComplete();
     
-    public void termInput() {
+    public void setInputType(EnumInputType type) {
+        if (this.inputType == null) this.inputType = type;
+        else throw new IllegalArgumentException("Only one input type parameter is allowed");
+    }
+    
+    public void setValue(String name, String value) {
+        if (!values.containsKey(name)) values.put(name, value);
+        else throw new IllegalArgumentException("Duplicate parameter `" + name + "`");
+    }
+    
+    public String getValue(String name) {
+        return values.get(name);
+    }
+    
+    public String getInputExtension() {
+        return getLangBuildTarget().getInputExtension();
+    }
+    
+    public File getTargetFile() {
+        return new File(inputFile.getAbsolutePath() + "." + getLangBuildTarget().getExtension());
+    }
+    
+    public void run() {
+        if (inputType == EnumInputType.SHELL) {
+            shellInput();
+        } else if (inputType == EnumInputType.GUI_FILE) {
+            guiFileInput();
+        } else if (inputType == EnumInputType.FILE) {
+            fileInput(new File(getValue(FILE_KEY)));
+        } else {
+            dirInput(getValue(DIR_KEY));
+        }
+    }
+    
+    public void shellInput() {
         System.out.println("Basic shell started");
         System.out.println("Type `exit` to quit");
         System.out.println();
@@ -48,11 +96,11 @@ public abstract class Main {
                 input = "";
             }
             
-            if (input.equalsIgnoreCase("debug")) {
+            if (input.equalsIgnoreCase(":debug")) {
                 Main.toggleDebug();
-            } else if (input.equalsIgnoreCase("optimize")) {
+            } else if (input.equalsIgnoreCase(":optimize")) {
                 Main.toggleOptimize();
-            } else if (input.equalsIgnoreCase("exit")) {
+            } else if (input.equalsIgnoreCase(":exit")) {
                 break;
             } else {
                 try {               
@@ -73,38 +121,105 @@ public abstract class Main {
         scanner.close();
     }
     
-    public void fileInput() {        
+    public void guiFileInput() {        
         JFileChooser chooser = new JFileChooser();
         int result = chooser.showOpenDialog(null);
         
         if (result == JFileChooser.APPROVE_OPTION) {
-            inputFile = chooser.getSelectedFile();
+            fileInput(chooser.getSelectedFile());
+        } else {
+            System.out.println("ERROR: Canceled by user");
+        }
+    }
+    
+    public void fileInput(File file) {
+        this.inputFile = file;
+        
+        // Reset
+        Main.setLine(1);
+        Main.LINES.clear();
+        
+        Scanner scanner = null;
+        try {
+            long start = System.currentTimeMillis();
             
-            // Reset
-            Main.setLine(1);
-            Main.LINES.clear();
+            scanner = new Scanner(this.inputFile);
+            while(scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                
+                Main.LINES.add(line.trim());
+                handleFileLine(line, Main.ROW);
+                
+                Main.ROW += 1;
+            }
             
+            handleFileReadComplete();
+            
+            if (DEBUG) {
+                System.out.println();
+                System.out.println("Done in " + (System.currentTimeMillis() - start) + "ms");
+            }
+        } catch (CompileException e) {
+            printCompileException(e);
+        } catch (FileNotFoundException e) {
+            System.err.println("Could not find the file `" + getValue(FILE_KEY) + "`");
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (scanner != null) {
+                scanner.close();
+            }
+            
+            inputFile = null;
+        }
+    }
+    
+    public void dirInput(String dir) {
+        if (dir == null) dir = System.getProperty("user.dir");
+        File dirFile = new File(dir);
+        
+        if (dirFile.isDirectory()) {            
             Scanner scanner = null;
             try {
-                long start = System.currentTimeMillis();
+                // Reset
+                Main.setLine(1);
+                Main.LINES.clear();
                 
-                scanner = new Scanner(inputFile);
-                while(scanner.hasNextLine()) {
-                    String line = scanner.nextLine();
-                    
-                    Main.LINES.add(line.trim());
-                    handleFileLine(line, Main.ROW);
-                    
-                    Main.ROW += 1;
+                int found = 0;
+                long start = System.currentTimeMillis();                
+                this.inputFile = new File(dirFile, "main");
+                
+                for (File f: dirFile.listFiles()) {
+                    String extension = f.getName().replaceFirst("^.+\\.", "");
+                    if (f.isFile() && extension.equals(getInputExtension())) {
+                        found += 1;
+                        
+                        scanner = new Scanner(f);
+                        while(scanner.hasNextLine()) {
+                            String line = scanner.nextLine();
+                            
+                            Main.LINES.add(line.trim());
+                            handleFileLine(line, Main.ROW);
+                            
+                            Main.ROW += 1;
+                        }
+                        scanner.close();
+                        scanner = null;
+                    }
                 }
                 
                 handleFileReadComplete();
                 
-                if (DEBUG) {
-                    System.out.println("Done in " + (System.currentTimeMillis() - start) + "ms");
+                System.out.println();
+                if (found == 0) {
+                    System.err.println("No files found in the directory `" + dir + "` with the file extension `." + getLangBuildTarget().getInputExtension() + "`");
                 }
+                
+                System.out.println("Done in " + (System.currentTimeMillis() - start) + "ms");
             } catch (CompileException e) {
                 printCompileException(e);
+            } catch (FileNotFoundException e) {
+                System.err.println("Could not find the directory `" + dir + "`");
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
@@ -115,7 +230,7 @@ public abstract class Main {
                 inputFile = null;
             }
         } else {
-            System.out.println("ERROR: Canceled by user");
+            throw new IllegalArgumentException("The given directory path is not a directory");
         }
     }
     
@@ -160,30 +275,41 @@ public abstract class Main {
     }
     
     public static void main(String[] args) {
-        List<String> argsList = Arrays.asList(args);
-        
         try {
             Main main = new BASICMain(new JSLangFactory(), EnumToken.class, EnumExpression.class);
             
-            boolean fileInput = false;
-            for (String s: argsList) {
+            String s;
+            for (int i = 0; i < args.length; i++) {
+                s = args[i];
                 if (s.equals("--debug") || s.equals("-d")) {
                     toggleDebug();
+                } else if (s.equals("--gui") || s.equals("-g")) {
+                    main.setInputType(EnumInputType.GUI_FILE);
+                } else if (s.equals("--shell") || s.equals("-s")) {
+                    main.setInputType(EnumInputType.SHELL);
                 } else if (s.equals("--file") || s.equals("-f")) {
-                    fileInput = true;
+                    main.setInputType(EnumInputType.FILE);
+                    if (i+1 < args.length && !args[i+1].startsWith("-")) {
+                        main.setValue(FILE_KEY, args[++i]);
+                    } else {
+                        throw new IllegalArgumentException("No file name provided after `" + s + "`");
+                    }
+                } else if (s.equals("--dir") || s.equals("-d")) {
+                    main.setInputType(EnumInputType.DIR);
+                    if (i+1 < args.length && !args[i+1].startsWith("-")) {
+                        main.setValue(DIR_KEY, args[++i]);
+                    }
                 } else {
-                    System.out.println("Unhandled command line parameter '" + s + "'");
+                    throw new IllegalArgumentException("Illegal command line parameter `" + s + "`");
                 }
             }
             
             // Choose execution mode
-            if (fileInput) {
-                main.fileInput();
-            } else {
-                main.termInput();
-            }
+            main.run();
+        } catch (IllegalArgumentException e) {
+            System.err.println(e);
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
+    }  
 }

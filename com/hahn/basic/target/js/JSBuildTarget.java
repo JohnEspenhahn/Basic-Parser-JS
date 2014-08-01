@@ -28,8 +28,13 @@ public class JSBuildTarget extends LangBuildTarget {
 	}
 	
 	@Override
+	public String getInputExtension() {
+	    return "b";
+	}
+	
+	@Override
 	public String getExtension() {
-	    return ".js";
+	    return "js";
 	}
 	
 	@Override

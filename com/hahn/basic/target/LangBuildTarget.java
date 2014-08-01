@@ -6,7 +6,20 @@ import java.io.IOException;
 public abstract class LangBuildTarget {
     public abstract void init();
     
+    /**
+     * The extension compiled output files standardly will
+     * have. Should not be the safe as getInputExpression
+     * @return The extension (without '.')
+     */
     public abstract String getExtension();
+    
+    /**
+     * The extension source input files standardly will have.
+     * Should not be the same as getExension
+     * @return The extension (without '.')
+     */
+    public abstract String getInputExtension();
+    
     public abstract String getEOL();
     
     public abstract void append(ILangCommand cmd);
