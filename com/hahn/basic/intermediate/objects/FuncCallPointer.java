@@ -1,5 +1,8 @@
 package com.hahn.basic.intermediate.objects;
 
+import java.util.Arrays;
+import java.util.ListIterator;
+
 import com.hahn.basic.intermediate.IIntermediate;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.ParameterizedType;
@@ -40,12 +43,32 @@ public abstract class FuncCallPointer extends FuncPointer {
         checkFunction();
         returnType = func.getReturnType().castTo(returnType);
         
+        ListIterator<BasicObject> it = Arrays.asList(getParams()).listIterator(countParams());
+        while (it.hasPrevious()) {
+            BasicObject param = it.previous();
+            
+            param.setInUse(this);
+        }
+        
         return super.setInUse(by);
+    }
+    
+    @Override
+    public void takeRegister(IIntermediate by) {
+        for (BasicObject param: getParams()) {
+            param.takeRegister(by);
+        }
+        
+        super.takeRegister(by);
     }
 
     @SuppressWarnings("unchecked")
     public BasicObject[] getParams() {
         return ((ParameterizedType<BasicObject>) super.getType()).getTypes();
+    }
+    
+    public int countParams() {
+        return getParams().length;
     }
 
     @Override

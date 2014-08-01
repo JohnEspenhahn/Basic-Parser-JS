@@ -43,11 +43,6 @@ public abstract class AdvancedObject extends BasicObject {
     }
 
     @Override
-    public AdvancedObject castTo(Type t) {
-        return new AdvancedObjectHolder(this, t);
-    }
-
-    @Override
     public BasicObject getForCreateVar() {
         if (isRegisterOnStack()) {
             return LangCompiler.factory.PushObject();

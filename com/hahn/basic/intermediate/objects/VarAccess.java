@@ -6,7 +6,7 @@ import com.hahn.basic.intermediate.statements.Statement;
 import com.hahn.basic.target.LangBuildTarget;
 import com.hahn.basic.util.exceptions.CompileException;
 
-public abstract class VarAccess extends BasicObjectHolder {
+public abstract class VarAccess extends ObjectHolder {
     private BasicObject index;
     
     /**

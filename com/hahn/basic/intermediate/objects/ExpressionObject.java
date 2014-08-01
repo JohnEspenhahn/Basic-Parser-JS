@@ -4,7 +4,7 @@ import com.hahn.basic.intermediate.IIntermediate;
 import com.hahn.basic.intermediate.statements.ExpressionStatement;
 import com.hahn.basic.target.LangBuildTarget;
 
-public abstract class ExpressionObject extends BasicObjectHolder {
+public abstract class ExpressionObject extends ObjectHolder {
     private ExpressionStatement statement;
     private boolean forcedGroup;
     
@@ -36,14 +36,12 @@ public abstract class ExpressionObject extends BasicObjectHolder {
     public boolean setInUse(IIntermediate by) {
         statement.reverseOptimize();
         
-        return super.setInUse(by);
+        return super.isLastUse(this);
     }
     
     @Override
     public void takeRegister(IIntermediate by) {
         statement.forwardOptimize();
-        
-        super.takeRegister(by);
     }
     
     @Override
