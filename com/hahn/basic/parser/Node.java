@@ -132,7 +132,7 @@ public class Node {
     @Override
     public String toString() {
         if (this.isTerminal()) {
-            return token + " (" + value + ")";
+            return value;
         } else {
             return children.toString();
         }

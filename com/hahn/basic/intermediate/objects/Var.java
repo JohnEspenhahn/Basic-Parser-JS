@@ -20,6 +20,11 @@ public abstract class Var extends AdvancedObject {
         this.flags = flags;
     }
     
+    @Override
+    public boolean isVar() {
+        return true;
+    }
+    
     public boolean hasFlags() {
         return flags != null;
     }

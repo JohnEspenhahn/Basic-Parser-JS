@@ -1,26 +1,6 @@
 package com.hahn.basic.intermediate;
 
-import static com.hahn.basic.definition.EnumToken.ADD_SUB;
-import static com.hahn.basic.definition.EnumToken.AND;
-import static com.hahn.basic.definition.EnumToken.CHAR;
-import static com.hahn.basic.definition.EnumToken.DOT;
-import static com.hahn.basic.definition.EnumToken.EQUALS;
-import static com.hahn.basic.definition.EnumToken.FALSE;
-import static com.hahn.basic.definition.EnumToken.GTR;
-import static com.hahn.basic.definition.EnumToken.GTR_EQU;
-import static com.hahn.basic.definition.EnumToken.HEX_NUMBER;
-import static com.hahn.basic.definition.EnumToken.LESS;
-import static com.hahn.basic.definition.EnumToken.LESS_EQU;
-import static com.hahn.basic.definition.EnumToken.MSC_BITWISE;
-import static com.hahn.basic.definition.EnumToken.MULT_DIV;
-import static com.hahn.basic.definition.EnumToken.NOT;
-import static com.hahn.basic.definition.EnumToken.NOTEQUAL;
-import static com.hahn.basic.definition.EnumToken.NUMBER;
-import static com.hahn.basic.definition.EnumToken.OPEN_PRNTH;
-import static com.hahn.basic.definition.EnumToken.OPEN_SQR;
-import static com.hahn.basic.definition.EnumToken.SC_BITWISE;
-import static com.hahn.basic.definition.EnumToken.STRING;
-import static com.hahn.basic.definition.EnumToken.TRUE;
+import static com.hahn.basic.definition.EnumToken.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -362,28 +342,27 @@ public class Frame extends Statement {
     private BasicObject inAccessVar(AdvancedObject obj, Node head) {
         Type t = obj.getType();
         
-        BasicObject access = obj;
+        ExpressionStatement exp = LangCompiler.factory.ExpressionStatement(this, obj);
         Iterator<Node> it = Util.getIterator(head);
         while (it.hasNext()) {  
             Enum<?> accessMarker = it.next().getToken();
             if (accessMarker == OPEN_SQR && t.doesExtend(Type.ARRAY)) {
                 BasicObject offset = handleExpression(it.next()).getAsExpObj();
                 
-                access = LangCompiler.factory.VarAccess(access, offset, Type.INT);
-                
+                exp.setObj(LangCompiler.factory.VarAccess(exp, exp.getObj(), offset, Type.INT));                
                 
                 it.next(); // Skip CLOSE_SQR
             } else if (accessMarker == DOT && t.doesExtend(Type.STRUCT)) {               
                 String name = it.next().getValue();
                 StructParam sp = t.castToStruct().getStructParam(name);
                 
-                access = LangCompiler.factory.VarAccess(access, sp, sp.getType());
+                exp.setObj(LangCompiler.factory.VarAccess(exp, exp.getObj(), sp, sp.getType()));
             } else {
                 throw new CompileException("Invalid access of `" + obj.getName() + "` of type `" + t + "`");
             }
         }
         
-        return access;
+        return exp.getAsExpObj();
     }
     
     /**
@@ -480,22 +459,22 @@ public class Frame extends Statement {
                     Enum<?> nextToken = nextHead.getToken();
                     
                     if (nextToken == EnumExpression.DEF_MODIFY) {
-                        if (!canInit || !(obj instanceof AdvancedObject)) {
+                        if (!canInit) {
                             throw new CompileException("Can not initialize `" + obj.getName() + "` here");
                         }
                         
                         List<Node> modify_children = nextHead.getAsChildren();
                         
                         BasicObject o = handleExpression(modify_children.get(1)).getAsExpObj();
-                        define.addVar((AdvancedObject) obj, o);
+                        define.addVar(obj, o);
                         
                         hasInit = true;
                     }
                 }
                 
                 // Default value
-                if (!hasInit && canInit && obj instanceof AdvancedObject) {
-                    define.addVar((AdvancedObject) obj, LiteralNum.UNDEFINED);
+                if (!hasInit && canInit) {
+                    define.addVar(obj, LiteralNum.UNDEFINED);
                 }
                 
                 // Make var available

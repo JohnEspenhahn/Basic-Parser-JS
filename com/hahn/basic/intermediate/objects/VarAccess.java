@@ -1,10 +1,12 @@
 package com.hahn.basic.intermediate.objects;
 
+import com.hahn.basic.intermediate.IIntermediate;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.statements.Statement;
+import com.hahn.basic.target.LangBuildTarget;
+import com.hahn.basic.util.exceptions.CompileException;
 
-public abstract class VarAccess extends BasicObject {
-    private BasicObject var;
+public abstract class VarAccess extends BasicObjectHolder {
     private BasicObject index;
     
     /**
@@ -13,34 +15,34 @@ public abstract class VarAccess extends BasicObject {
      * @param index The index of a property to access. Can be either a literal, another variable, or a struct param
      * @param type The type of the property at the given index
      */
-    public VarAccess(BasicObject var, BasicObject index, Type type) {
-        super(var.getName() + "[" + index.getName() + "]", type);
+    public VarAccess(Statement container, BasicObject var, BasicObject index, Type type) {
+        super(var, type);
         
-        this.var = var;
-        this.index = index;
+        if (!var.isVar()) {
+            throw new CompileException("Illegal attempt to access object `" + var + "` at index `" + index + "`");
+        }
+        
+        this.index = index.getForUse(container);
     }
     
     public BasicObject getIndex() {
         return index;
     }
     
-    public BasicObject getVar() {
-        return var;
+    @Override
+    public boolean setInUse(IIntermediate by) {
+        getIndex().setInUse(by);
+        
+        return super.setInUse(by);
     }
     
     @Override
-    public final BasicObject getForUse(Statement by) {
-        getIndex().getForUse(by);
+    public void takeRegister(IIntermediate by) {
+        getIndex().takeRegister(by);
         
-        doGetForUse(by);
-        
-        return super.getForUse(by);
+        super.takeRegister(by);
     }
     
-    /**
-     * Called while still compiling by getForUse, do any
-     * finalizations needed in order for this object to be used
-     * @param by The calling statement
-     */
-    public void doGetForUse(Statement by) { }
+    @Override
+    public abstract String toTarget(LangBuildTarget builder);
 }

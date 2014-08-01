@@ -61,6 +61,10 @@ public abstract class BasicObject implements IIntermediate, ITypeable, IHolderEx
         return false;
     }
     
+    public boolean canLiteralSurvive(Frame frame) {
+        return true;
+    }
+    
     public boolean canUpdateLiteral(Frame frame, OPCode op) {
         return canSetLiteral();
     }
@@ -77,14 +81,6 @@ public abstract class BasicObject implements IIntermediate, ITypeable, IHolderEx
      */
     public boolean updateLiteral(OPCode op, Literal lit) {
         return false;
-    }
-    
-    /**
-     * Called from forward optimize
-     * @param by
-     */
-    public void takeRegister(IIntermediate by) {
-        // Basic objects don't have registers
     }
     
     /**
@@ -144,6 +140,14 @@ public abstract class BasicObject implements IIntermediate, ITypeable, IHolderEx
         return uses;
     }
     
+    /**
+     * Called from forward optimize
+     * @param by
+     */
+    public void takeRegister(IIntermediate by) {
+        // Basic objects don't have registers
+    }
+    
     /*
      * ------------------------------- To Target Tools -------------------------------
      */
@@ -159,6 +163,14 @@ public abstract class BasicObject implements IIntermediate, ITypeable, IHolderEx
      * @return True if this object should be grouped together
      */
     public boolean isGrouped() {
+        return false;
+    }
+    
+    /**
+     * @return True if is an assignable variable. Anything added
+     * to a Frame's `vars` should have this set to true
+     */
+    public boolean isVar() {
         return false;
     }
     
@@ -181,7 +193,7 @@ public abstract class BasicObject implements IIntermediate, ITypeable, IHolderEx
      * @param container The container of the expression
      * @return ExpressionStatement
      */
-    public ExpressionStatement getAsExp(Statement container) {
+    public final ExpressionStatement getAsExp(Statement container) {
         return LangCompiler.factory.ExpressionStatement(container, this);
     }
     

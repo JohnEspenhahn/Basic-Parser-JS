@@ -12,7 +12,7 @@ public class BasicObjectHolder extends BasicObject implements IHolderExcludeList
     private BasicObject heldObj;
 
     public BasicObjectHolder(BasicObject obj, @NonNull Type type) {
-        super(obj.getName(), type);
+        super(obj.getName(), obj.getType().castTo(type));
 
         this.heldObj = obj;
     }

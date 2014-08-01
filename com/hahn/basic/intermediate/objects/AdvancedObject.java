@@ -39,7 +39,8 @@ public abstract class AdvancedObject extends BasicObject {
         return frame;
     }
 
-    public boolean isOwnerFrame(Frame f) {
+    @Override
+    public boolean canLiteralSurvive(Frame f) {
         return (f == getFrame());
     }
 
@@ -181,7 +182,7 @@ public abstract class AdvancedObject extends BasicObject {
     
     @Override
     public boolean canUpdateLiteral(Frame frame, OPCode op) {
-        return hasLiteral() && isOwnerFrame(frame) && OPCode.doesModify(op);
+        return hasLiteral() && canLiteralSurvive(frame) && OPCode.doesModify(op);
     }
 
     @Override

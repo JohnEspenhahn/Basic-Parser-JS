@@ -47,8 +47,7 @@ public interface ILangFactory {
 	public Var VarParameter(Frame frame, String name, Type type, List<String> flags);
 	public Var VarLocal(Frame frame, String name, Type type, List<String> flags);
 	
-	public VarAccess VarAccess(BasicObject var, BasicObject idx, Type type);
-	public ExpressionStatement ExpressionStatement(Statement continer, BasicObject obj);
+	public VarAccess VarAccess(Statement container, BasicObject var, BasicObject idx, Type type);
 	
 	public BasicObject NewInstance(Type type, List<BasicObject> params);
 	
@@ -65,6 +64,8 @@ public interface ILangFactory {
     public Compilable BreakStatement(Frame frame);
     public Compilable ContinueStatement(Frame frame);
     public Compilable ReturnStatement(Statement container, FuncHead returnFrom, BasicObject result);
+    
+    public ExpressionStatement ExpressionStatement(Statement continer, BasicObject obj);
     
     public IfStatement IfStatement(Statement container, List<Conditional> conditionals);
     public WhileStatement WhileStatement(Statement container, Node conditional, Node body);

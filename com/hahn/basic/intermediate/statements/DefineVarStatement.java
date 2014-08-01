@@ -5,11 +5,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 import com.hahn.basic.Main;
-import com.hahn.basic.intermediate.objects.AdvancedObject;
 import com.hahn.basic.intermediate.objects.BasicObject;
-import com.hahn.basic.intermediate.objects.PopObject;
-import com.hahn.basic.intermediate.objects.PushObject;
-import com.hahn.basic.intermediate.objects.register.StackRegister;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.util.Util;
 import com.sun.istack.internal.Nullable;
@@ -132,11 +128,8 @@ public abstract class DefineVarStatement extends Statement {
             BasicObject val = pair.val;
             
             // Check registers
-            val.takeRegister(this);
-            if (val instanceof PopObject) StackRegister.pop();
-            
+            val.takeRegister(this);            
             var.takeRegister(this);
-            if (var instanceof PushObject) StackRegister.push();
             
             // Check literals
             if (var.canSetLiteral() && val.hasLiteral()) {
@@ -145,11 +138,8 @@ public abstract class DefineVarStatement extends Statement {
                 var.setLiteral(null);
             }
             
-            if (val instanceof AdvancedObject && val.hasLiteral()) {
-                AdvancedObject aval = (AdvancedObject) val;
-                if (!aval.isOwnerFrame(getFrame())) {
-                    aval.setLiteral(null);
-                } 
+            if (val.hasLiteral() && !val.canLiteralSurvive(getFrame())) {
+                val.setLiteral(null);
             }
         }
         

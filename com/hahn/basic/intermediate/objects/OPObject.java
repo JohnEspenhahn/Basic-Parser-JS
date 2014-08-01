@@ -4,7 +4,6 @@ import lombok.NonNull;
 
 import com.hahn.basic.intermediate.Frame;
 import com.hahn.basic.intermediate.IIntermediate;
-import com.hahn.basic.intermediate.objects.register.StackRegister;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.opcode.OPCode;
 import com.hahn.basic.intermediate.statements.Statement;
@@ -131,13 +130,10 @@ public abstract class OPObject extends BasicObject {
     }
     
     @Override
-    public void takeRegister(IIntermediate by) {        
+    public void takeRegister(IIntermediate by) {      
         // Check registers
         if (p2 != null) p2.takeRegister(this);
-        if (p2 instanceof PopObject) StackRegister.pop();
-        
         p1.takeRegister(this);
-        if (p1 instanceof PushObject) StackRegister.push();
         
         // Check literals
         if (p1.hasLiteral() && p2 != null && OPCode.canChangeLiteral(getOP())) {
@@ -149,11 +145,8 @@ public abstract class OPObject extends BasicObject {
             }
         }
         
-        if (p2 instanceof AdvancedObject && p2.hasLiteral()) {
-            AdvancedObject advancedP2 = (AdvancedObject) p2;
-            if (!advancedP2.isOwnerFrame(getFrame())) {
-                advancedP2.setLiteral(null);
-            } 
+        if (p2.hasLiteral() && !p2.canLiteralSurvive(getFrame())) {
+            p2.setLiteral(null);
         }
     }
     

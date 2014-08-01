@@ -68,9 +68,8 @@ public abstract class ExpressionStatement extends Statement {
     }
     
     /**
-     * Get an object version of this statement. Should
-     * only be called once the statement is fully 
-     * evaluated
+     * Get an object version of this statement. Should only
+     * be called after the statement has been fully evaluated
      * @return ExpressionStatementObject
      */
     public BasicObject getAsExpObj() {
