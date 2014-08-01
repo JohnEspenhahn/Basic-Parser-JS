@@ -22,7 +22,6 @@ public abstract class Main {
     private static List<String> LINES = new ArrayList<String>();
     
     public static boolean DEBUG = false; 
-    public static boolean OPTIMIZE = false;
     
     private static final String FILE_KEY = "file";
     private static final String DIR_KEY = "dir";
@@ -39,6 +38,8 @@ public abstract class Main {
     }
     
     public abstract LangBuildTarget getLangBuildTarget();
+    
+    public abstract void printShellTitle();
     
     public abstract void handleTermInput(String input);
     public abstract void handleFileLine(String str, int line);
@@ -58,10 +59,6 @@ public abstract class Main {
         return values.get(name);
     }
     
-    public String getInputExtension() {
-        return getLangBuildTarget().getInputExtension();
-    }
-    
     public File getTargetFile() {
         return new File(inputFile.getAbsolutePath() + "." + getLangBuildTarget().getExtension());
     }
@@ -73,15 +70,37 @@ public abstract class Main {
             guiFileInput();
         } else if (inputType == EnumInputType.FILE) {
             fileInput(new File(getValue(FILE_KEY)));
-        } else {
+        } else if (inputType == EnumInputType.DIR) {
             dirInput(getValue(DIR_KEY));
+        } else {
+            printHelp();
         }
     }
     
-    public void shellInput() {
-        System.out.println("Basic shell started");
-        System.out.println("Type `exit` to quit");
+    public void printHelp() {
+        System.out.println("Usage: cmp [-options] input");
         System.out.println();
+        System.out.println("Options:");
+        System.out.println(" --debug                       Run in debug mode");
+        System.out.println();
+        System.out.println("Input Modes:");
+        System.out.println(" -d [<path>], --dir [<path>]   Attempt to compile a project");
+        System.out.println("                               in the given directory <path>");
+        System.out.println(" -f <path>, --file <path>      Compile file at the given");
+        System.out.println("                               file <path>");
+        System.out.println(" -g, --gui                     Select file to be compiled");
+        System.out.println("                               with the gui file selector");
+        System.out.println(" -s, --shell                   Start an input shell");
+    }
+    
+    public void printShellHelp() {
+        System.out.println(":debug   Toggle debug mode");
+        System.out.println(":help    Print this");
+        System.out.println(":exit    Quit the shell");
+    }
+    
+    public void shellInput() {
+        printShellTitle();
         
         // Create input scanner
         Scanner scanner = new Scanner(System.in);
@@ -98,8 +117,8 @@ public abstract class Main {
             
             if (input.equalsIgnoreCase(":debug")) {
                 Main.toggleDebug();
-            } else if (input.equalsIgnoreCase(":optimize")) {
-                Main.toggleOptimize();
+            } else if (input.equalsIgnoreCase(":help")) {
+                printShellHelp();
             } else if (input.equalsIgnoreCase(":exit")) {
                 break;
             } else {
@@ -178,6 +197,8 @@ public abstract class Main {
         if (dir == null) dir = System.getProperty("user.dir");
         File dirFile = new File(dir);
         
+        System.out.println("Compiling files in directory `" + dir + "` with extension `" + getLangBuildTarget().getInputExtension() + "`");
+        
         if (dirFile.isDirectory()) {            
             Scanner scanner = null;
             try {
@@ -191,7 +212,7 @@ public abstract class Main {
                 
                 for (File f: dirFile.listFiles()) {
                     String extension = f.getName().replaceFirst("^.+\\.", "");
-                    if (f.isFile() && extension.equals(getInputExtension())) {
+                    if (f.isFile() && extension.equals(getLangBuildTarget().getInputExtension())) {
                         found += 1;
                         
                         scanner = new Scanner(f);
@@ -239,11 +260,6 @@ public abstract class Main {
         System.out.println("Debug = " + DEBUG);
     }
     
-    private static void toggleOptimize() {
-        OPTIMIZE = !OPTIMIZE;
-        System.out.println("Optimize = " + OPTIMIZE);
-    }
-    
     public static void printCompileException(CompileException e) {
         if (DEBUG) e.printStackTrace();
         else System.out.println("ERROR: " + e.getMessage());
@@ -281,7 +297,7 @@ public abstract class Main {
             String s;
             for (int i = 0; i < args.length; i++) {
                 s = args[i];
-                if (s.equals("--debug") || s.equals("-d")) {
+                if (s.equals("--debug")) {
                     toggleDebug();
                 } else if (s.equals("--gui") || s.equals("-g")) {
                     main.setInputType(EnumInputType.GUI_FILE);

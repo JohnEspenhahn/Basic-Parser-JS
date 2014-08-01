@@ -39,6 +39,13 @@ public class BASICMain extends Main {
     public LangBuildTarget getLangBuildTarget() {
         return this.factory.getLangBuildTarget();
     }
+    
+    @Override
+    public void printShellTitle() {
+        System.out.println("Basic shell started");
+        System.out.println("Type `:help` for help");
+        System.out.println();
+    }
 
     @Override
     public void handleTermInput(String input) {
