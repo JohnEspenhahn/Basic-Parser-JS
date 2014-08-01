@@ -14,7 +14,7 @@ public abstract class Literal extends BasicObject {
 	public abstract double getValue();
 	
 	@Override
-	public boolean canUpdateLiteral(Frame f) {
+	public boolean canUpdateLiteral(Frame f, OPCode op) {
 	    return true;
 	}
 	

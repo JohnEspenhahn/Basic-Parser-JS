@@ -7,6 +7,7 @@ import com.hahn.basic.intermediate.objects.types.Type;
 
 public abstract class ExpressionStatement extends Statement {
     private BasicObject obj;
+    private boolean forcedGroup;
     
     private boolean gotAsObject;
     
@@ -14,7 +15,16 @@ public abstract class ExpressionStatement extends Statement {
         super(continer);
         
         this.obj = obj;
+        this.forcedGroup = false;
         this.gotAsObject = false;
+    }
+    
+    public void setForcedGroup(boolean b) {
+        this.forcedGroup = b;
+    }
+    
+    public boolean isForcedGroup() {
+        return forcedGroup;
     }
     
     public BasicObject getObj() {
@@ -30,7 +40,7 @@ public abstract class ExpressionStatement extends Statement {
     public void setObj(ExpressionStatement otherExp) {
         enforce();
         
-        this.obj = otherExp.obj;
+        this.obj = otherExp.getAsExpObj();
     }
     
     public void castTo(Type type) {

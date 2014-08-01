@@ -131,6 +131,13 @@ public abstract class DefineVarStatement extends Statement {
             BasicObject var = pair.var;
             BasicObject val = pair.val;
             
+            // Check registers
+            val.takeRegister(this);
+            if (val instanceof PopObject) StackRegister.pop();
+            
+            var.takeRegister(this);
+            if (var instanceof PushObject) StackRegister.push();
+            
             // Check literals
             if (var.canSetLiteral() && val.hasLiteral()) {
                 var.setLiteral(val.getLiteral());
@@ -144,13 +151,6 @@ public abstract class DefineVarStatement extends Statement {
                     aval.setLiteral(null);
                 } 
             }
-            
-            // Check registers
-            val.takeRegister(this);
-            if (val instanceof PopObject) StackRegister.pop();
-            
-            var.takeRegister(this);
-            if (var instanceof PushObject) StackRegister.push();
         }
         
         return false;

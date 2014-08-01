@@ -16,6 +16,7 @@ import static com.hahn.basic.definition.EnumToken.MULT_DIV;
 import static com.hahn.basic.definition.EnumToken.NOT;
 import static com.hahn.basic.definition.EnumToken.NOTEQUAL;
 import static com.hahn.basic.definition.EnumToken.NUMBER;
+import static com.hahn.basic.definition.EnumToken.OPEN_PRNTH;
 import static com.hahn.basic.definition.EnumToken.OPEN_SQR;
 import static com.hahn.basic.definition.EnumToken.SC_BITWISE;
 import static com.hahn.basic.definition.EnumToken.STRING;
@@ -893,6 +894,15 @@ public class Frame extends Statement {
         BasicObject obj = handleNextExpressionChildObject(child, it, temp);
         if (obj != null) {
             exp.setObj(obj);
+        } else if (token == OPEN_PRNTH) {
+            ExpressionStatement nextExp = LangCompiler.factory.ExpressionStatement(this, null);
+            handleNextExpressionChild(Util.getIterator(it.next()), nextExp, temp);
+            nextExp.setForcedGroup(true);
+            
+            exp.setObj(nextExp);
+            
+            // Skip ending parenthesis
+            it.next();
         } else if (token == NOT) {
             OPCode op = OPCode.fromSymbol(val);
             

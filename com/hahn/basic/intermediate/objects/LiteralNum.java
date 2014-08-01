@@ -1,5 +1,7 @@
 package com.hahn.basic.intermediate.objects;
 
+import static com.hahn.basic.intermediate.opcode.OPCode.*;
+
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.opcode.OPCode;
 import com.hahn.basic.util.exceptions.CompileException;
@@ -31,20 +33,21 @@ public class LiteralNum extends Literal {
     }
     
     @Override
-    public boolean updateLiteral(OPCode op, Literal lit) {
-    	mergeTypes(lit);
-    	
+    public boolean updateLiteral(OPCode op, Literal lit) {    	
     	// Do operation
-        if (op == OPCode.ADD)      { isnum(op, lit); this.value += lit.getValue(); }
-        else if (op == OPCode.SUB) { isnum(op, lit); this.value -= lit.getValue(); }
-        else if (op == OPCode.MUL) { isnum(op, lit); this.value *= lit.getValue(); }
-        else if (op == OPCode.DIV) { isnum(op, lit); this.value /= lit.getValue(); }
-        else if (op == OPCode.BOR) { isint(op, lit); this.value = (int) this.value | (int) lit.getValue(); }
-        else if (op == OPCode.AND) { isint(op, lit); this.value = (int) this.value & (int) lit.getValue(); }
-        else if (op == OPCode.XOR) { isint(op, lit); this.value = (int) this.value ^ (int) lit.getValue(); }
-        else if (op == OPCode.SHL) { isint(op, lit); this.value = (int) this.value << (int) lit.getValue(); }
-        else if (op == OPCode.SHR) { isint(op, lit); this.value = (int) this.value >> (int) lit.getValue(); }
+        if (op == ADD || op == ADDE)      { isnum(op, lit); this.value += lit.getValue(); }
+        else if (op == SUB || op == SUBE) { isnum(op, lit); this.value -= lit.getValue(); }
+        else if (op == MUL || op == MULE) { isnum(op, lit); this.value *= lit.getValue(); }
+        else if (op == DIV || op == DIVE) { isnum(op, lit); this.value /= lit.getValue(); }
+        else if (op == MOD || op == MODE) { isnum(op, lit); this.value %= lit.getValue(); }
+        else if (op == BOR || op == BORE) { isint(op, lit); this.value = (int) this.value | (int) lit.getValue(); }
+        else if (op == AND || op == ANDE) { isint(op, lit); this.value = (int) this.value & (int) lit.getValue(); }
+        else if (op == XOR || op == XORE) { isint(op, lit); this.value = (int) this.value ^ (int) lit.getValue(); }
+        else if (op == SHL)               { isint(op, lit); this.value = (int) this.value << (int) lit.getValue(); }
+        else if (op == SHR)               { isint(op, lit); this.value = (int) this.value >> (int) lit.getValue(); }
         else return false; // Not a modifiable op code
+        
+        mergeTypes(lit);
         
         return true; // Did modify
     }
@@ -52,6 +55,8 @@ public class LiteralNum extends Literal {
     private void mergeTypes(Literal lit) {
     	if (lit.getType().doesExtend(Type.DBL)) {
     		this.setType(lit.getType());
+    	} else if (this.getType().doesExtend(Type.INT)) {
+    	    this.value = (int) this.value;
     	}
     }
     

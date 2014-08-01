@@ -140,6 +140,14 @@ public enum OPCode {
         return (op == AND || op == BOR || op == XOR);
     }
     
+    public static boolean isSimpleArithmetic(OPCode op) {
+        return (op == ADD || op == SUB || op == MUL || op == DIV || op == MOD);
+    }
+    
+    public static boolean canChangeLiteral(OPCode op) {
+        return isBitwise(op) || isSimpleArithmetic(op) || doesModify(op);
+    }
+    
     public static boolean isNonModify(OPCode op) {
         return isConditional(op);
     }

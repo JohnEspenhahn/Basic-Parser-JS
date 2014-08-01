@@ -17,6 +17,7 @@ public abstract class OPObject extends BasicObject {
     
     @NonNull
     private BasicObject p1;
+    private boolean isLiteral;
     
     @Nullable
     private BasicObject p2;
@@ -24,6 +25,7 @@ public abstract class OPObject extends BasicObject {
     public OPObject(Statement container, OPCode opcode, BasicObject p1, @Nullable BasicObject p2) {
         super("@ " + opcode.toString() + " @", p1.getType());
         
+        this.isLiteral = false;
         this.frame = container.getFrame();
         
         this.opcode = opcode;
@@ -33,17 +35,26 @@ public abstract class OPObject extends BasicObject {
     
     @Override
     public boolean hasLiteral() {
-        return p1.hasLiteral() && OPCode.doesModify(getOP());
+        return isLiteral;
     }
     
     @Override
-    public boolean canUpdateLiteral(Frame frame) {
-        return p1.canUpdateLiteral(frame) && hasLiteral();
+    public boolean canUpdateLiteral(Frame frame, OPCode op) {
+        return getP1().canUpdateLiteral(frame, op) && hasLiteral();
     }
     
     @Override
     public boolean updateLiteral(OPCode op, Literal lit) {
-        return p1.updateLiteral(op, lit);
+        return getP1().updateLiteral(op, lit);
+    }
+    
+    @Override
+    public Literal getLiteral() {
+        if (hasLiteral()) {
+            return getP1().getLiteral();
+        } else {
+            return null;
+        }
     }
     
     @Override
@@ -129,9 +140,10 @@ public abstract class OPObject extends BasicObject {
         if (p1 instanceof PushObject) StackRegister.push();
         
         // Check literals
-        if (p1.hasLiteral() && p2 != null && OPCode.doesModify(getOP())) {
-            if (p1.canUpdateLiteral(getFrame()) && p2.hasLiteral()) {
-                p1.updateLiteral(opcode, p2.getLiteral());
+        if (p1.hasLiteral() && p2 != null && OPCode.canChangeLiteral(getOP())) {
+            if (p1.canUpdateLiteral(getFrame(), getOP()) && p2.hasLiteral()
+                    && p1.updateLiteral(opcode, p2.getLiteral())) {
+                this.isLiteral = true;
             } else {
                 p1.setLiteral(null);
             }
@@ -156,7 +168,8 @@ public abstract class OPObject extends BasicObject {
     @Override
     public final String toTarget(LangBuildTarget builder) {
         if (hasLiteral()) {
-            return p1.toTarget(builder);
+            if (OPCode.doesModify(getOP())) return "";
+            else return p1.toTarget(builder);
         } else {
             return doToTarget(builder);
         }
@@ -165,7 +178,8 @@ public abstract class OPObject extends BasicObject {
     @Override
     public String toString() {
         if (hasLiteral()) {
-            return p1.toString();
+            if (OPCode.doesModify(getOP())) return "";
+            else return p1.toString();
         } else if (p2 != null) {
             return String.format("%s({%s}->%s, {%s}->%s);", opcode, p1.getName() + (isP1LastUse()?"*":""), p1, p2.getName() + (isP2LastUse()?"*":""), p2);
         } else if (p1 != null) {

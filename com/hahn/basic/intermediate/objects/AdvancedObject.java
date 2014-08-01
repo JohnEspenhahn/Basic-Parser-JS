@@ -180,8 +180,8 @@ public abstract class AdvancedObject extends BasicObject {
     }
     
     @Override
-    public boolean canUpdateLiteral(Frame frame) {
-        return hasLiteral() && isOwnerFrame(frame);
+    public boolean canUpdateLiteral(Frame frame, OPCode op) {
+        return hasLiteral() && isOwnerFrame(frame) && OPCode.doesModify(op);
     }
 
     @Override

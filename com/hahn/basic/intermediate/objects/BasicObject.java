@@ -61,7 +61,7 @@ public abstract class BasicObject implements IIntermediate, ITypeable, IHolderEx
         return false;
     }
     
-    public boolean canUpdateLiteral(Frame frame) {
+    public boolean canUpdateLiteral(Frame frame, OPCode op) {
         return canSetLiteral();
     }
     
