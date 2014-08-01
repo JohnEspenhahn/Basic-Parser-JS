@@ -44,7 +44,7 @@ public abstract class DefineVarStatement extends Statement {
     }
     
     public void addVar(BasicObject var, BasicObject val) {
-        definepairs.add(new DefinePair(var.getForUse(this), val.getForUse(this)));
+        definepairs.add(new DefinePair(var.getForCreateVar(), val));
     }
     
     public List<DefinePair> getDefinePairs() {

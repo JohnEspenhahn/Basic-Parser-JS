@@ -29,7 +29,7 @@ public class JSForStatement extends ForStatement {
         if (getModifyStatements() != null) {
             List<OPObject> modify = getModifyStatements();
             for (int i = modify.size() - 1; i >= 0; i--) {
-                modify.get(i).getForUse(this);
+                modify.get(i).setInUse(this);
             }
         }
         

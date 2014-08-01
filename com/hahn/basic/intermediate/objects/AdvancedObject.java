@@ -11,7 +11,6 @@ import com.hahn.basic.intermediate.LangCompiler;
 import com.hahn.basic.intermediate.objects.register.IRegister;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.opcode.OPCode;
-import com.hahn.basic.intermediate.statements.Statement;
 import com.hahn.basic.target.LangBuildTarget;
 
 public abstract class AdvancedObject extends BasicObject {
@@ -39,40 +38,13 @@ public abstract class AdvancedObject extends BasicObject {
         return frame;
     }
 
-    @Override
-    public boolean canLiteralSurvive(Frame f) {
-        return (f == getFrame());
-    }
-
-    public List<AdvancedObject> getParallelObjs() {
-        return parallelObjs;
-    }
-
     public BasicObject getAddress() {
-        return this;
-    }
-
-    @Override
-    public AdvancedObject getForUse(Statement s) {
-        if (hasRegister()) {
-            reg = reg.snapshot();
-        }
-
         return this;
     }
 
     @Override
     public AdvancedObject castTo(Type t) {
         return new AdvancedObjectHolder(this, t);
-    }
-
-    @Override
-    public String toTarget(LangBuildTarget builder) {
-        if (hasLiteral()) {
-            return literal.toTarget(builder);
-        } else {
-            return reg.toTarget(builder);
-        }
     }
 
     @Override
@@ -83,10 +55,20 @@ public abstract class AdvancedObject extends BasicObject {
             return super.getForCreateVar();
         }
     }
-
+    
+    @Override
+    public String toTarget(LangBuildTarget builder) {
+        if (hasLiteral()) {
+            return literal.toTarget(builder);
+        } else {
+            return reg.toTarget(builder);
+        }
+    }
+    
     /*
-     * ------------------------------- Register Management -------------------------------
+     * ------------------------------- Use Management -------------------------------
      */
+    
     @Override
     public boolean setInUse(IIntermediate by) {
         boolean firstCall = super.setInUse(by);
@@ -98,33 +80,8 @@ public abstract class AdvancedObject extends BasicObject {
         return firstCall;
     }
     
-    @Override
-    public void takeRegister(IIntermediate by) {
-        doTakeRegister(isLastUse(by));
-    }
-    
-    public abstract void doTakeRegister(boolean isLastUse);
-    
-    public boolean hasRegister() {
-        return reg != null;
-    }
-
-    public boolean isRegisterOnStack() {
-        return hasRegister() && reg.isOnStack();
-    }
-
-    public void releaseRegister() {
-        if (hasRegister()) {
-            reg.release();
-        }
-    }
-
-    public void setRegister(IRegister reg) {
-        this.reg = reg;
-    }
-
-    public IRegister getRegister() {
-        return reg;
+    protected List<AdvancedObject> getParallelObjs() {
+        return parallelObjs;
     }
 
     public void addParallelObj(AdvancedObject obj) {
@@ -162,6 +119,39 @@ public abstract class AdvancedObject extends BasicObject {
     };
 
     /*
+     * ------------------------------- Register Management -------------------------------
+     */
+    
+    public abstract void doTakeRegister(boolean isLastUse);
+    
+    @Override
+    public void takeRegister(IIntermediate by) {
+        doTakeRegister(isLastUse(by));
+    }
+    
+    public boolean hasRegister() {
+        return reg != null;
+    }
+
+    public boolean isRegisterOnStack() {
+        return hasRegister() && reg.isOnStack();
+    }
+
+    public void releaseRegister() {
+        if (hasRegister()) {
+            reg.release();
+        }
+    }
+
+    public void setRegister(IRegister reg) {
+        this.reg = reg.snapshot();
+    }
+
+    public IRegister getRegister() {
+        return reg;
+    }
+
+    /*
      * ------------------------------- Literal Management -------------------------------
      */
 
@@ -184,6 +174,11 @@ public abstract class AdvancedObject extends BasicObject {
     public boolean canUpdateLiteral(Frame frame, OPCode op) {
         return hasLiteral() && canLiteralSurvive(frame) && OPCode.doesModify(op);
     }
+    
+    @Override
+    public boolean canLiteralSurvive(Frame f) {
+        return (f == getFrame());
+    }
 
     @Override
     public void setLiteral(Literal lit) {
@@ -195,10 +190,5 @@ public abstract class AdvancedObject extends BasicObject {
     @Override
     public boolean updateLiteral(OPCode op, Literal lit) {
         return literal.updateLiteral(op, lit);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        return (this == o);
     }
 }

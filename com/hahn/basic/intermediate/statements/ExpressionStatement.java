@@ -14,7 +14,7 @@ public abstract class ExpressionStatement extends Statement {
     public ExpressionStatement(Statement continer, BasicObject obj) {
         super(continer);
         
-        this.obj = obj;
+        this.obj = obj;        
         this.forcedGroup = false;
         this.gotAsObject = false;
     }

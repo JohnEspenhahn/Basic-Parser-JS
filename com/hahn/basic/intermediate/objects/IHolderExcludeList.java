@@ -9,7 +9,4 @@ interface IHolderExcludeList {
     public void setType(Type t);
     public BasicObject castTo(Type t);
     public ExpressionStatement getAsExp(Statement container);
-    
-    // These need to be explicitly overridden
-    public BasicObject getForUse(Statement s);
 }

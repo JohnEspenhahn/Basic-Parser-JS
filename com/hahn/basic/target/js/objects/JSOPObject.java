@@ -15,11 +15,6 @@ public class JSOPObject extends OPObject {
     }
     
     @Override
-    public BasicObject getForUse(Statement s) {
-        return this;
-    }
-    
-    @Override
     public boolean setInUse(IIntermediate by) {
         if (OPCode.doesModify(getOP())&& getP1().hasFlag("const")) {
             throw new CompileException("Can not modify the constant variable `" + getP1() + "`");

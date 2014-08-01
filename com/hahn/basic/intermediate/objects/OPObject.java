@@ -28,8 +28,8 @@ public abstract class OPObject extends BasicObject {
         this.frame = container.getFrame();
         
         this.opcode = opcode;
-        this.p1 = p1.getForUse(container);
-        this.p2 = (p2 == null ? null : p2.getForUse(container));
+        this.p1 = p1;
+        this.p2 = p2;
     }
     
     @Override
@@ -107,9 +107,6 @@ public abstract class OPObject extends BasicObject {
     public void setOP(OPCode o) {
         opcode = o;
     }
-    
-    @Override
-    public abstract BasicObject getForUse(Statement s);
     
     @Override
     public boolean setInUse(IIntermediate by) {

@@ -48,6 +48,19 @@ public abstract class BasicObject implements IIntermediate, ITypeable, IHolderEx
     public boolean hasFlag(String name) {
         return false;
     }
+
+    /**
+     * @param t The type to cast to
+     * @return A new, altered version of this
+     */
+    public BasicObject castTo(Type t) {
+        return new BasicObjectHolder(this, t);
+    }
+    
+    
+    /*
+     * ------------------------------- Literal Management -------------------------------
+     */
     
     public Literal getLiteral() {
         return null;
@@ -83,31 +96,9 @@ public abstract class BasicObject implements IIntermediate, ITypeable, IHolderEx
         return false;
     }
     
-    /**
-     * @param t The type to cast to
-     * @return A new, altered version of this
-     */
-    public BasicObject castTo(Type t) {
-        return new BasicObjectHolder(this, t);
-    }
-    
     /*
      * ------------------------------- Use Management -------------------------------
      */
-    
-    /**
-     * TODO: Should only be called once; but always called
-     * prior to the object being used for the first time,
-     * and before any other statements are added.
-     * 
-     * Called while still compiling, do any finalizations
-     * needed in order for this object to be used
-     * @param by The calling statement
-     * @return This
-     */
-    public BasicObject getForUse(Statement by) {
-        return this;
-    }
     
     /**
      * Should be called from reverseOptimize to
@@ -115,9 +106,8 @@ public abstract class BasicObject implements IIntermediate, ITypeable, IHolderEx
      * @param by The object causing this to be set in use
      * @return True if first call (last use)
      */
-    public boolean setInUse(IIntermediate by) {
-        uses += 1;
-        
+    public boolean setInUse(IIntermediate by) {        
+        uses += 1;        
         if (uses == 1) {
             statementOfLastUse = by;
             return true;

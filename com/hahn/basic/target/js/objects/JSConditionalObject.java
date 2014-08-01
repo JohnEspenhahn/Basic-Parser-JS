@@ -13,11 +13,6 @@ public class JSConditionalObject extends ConditionalObject {
     }
     
     @Override
-    public BasicObject getForUse(Statement s) {
-        return this;
-    }
-    
-    @Override
     public String doToTarget(LangBuildTarget builder) {
         return String.format("%s%s%s",
                 getP1().isGrouped() ? "("+getP1().toTarget(builder)+")" : getP1().toTarget(builder),

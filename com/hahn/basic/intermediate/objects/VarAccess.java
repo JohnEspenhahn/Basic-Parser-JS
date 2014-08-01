@@ -22,7 +22,7 @@ public abstract class VarAccess extends BasicObjectHolder {
             throw new CompileException("Illegal attempt to access object `" + var + "` at index `" + index + "`");
         }
         
-        this.index = index.getForUse(container);
+        this.index = index;
     }
     
     public BasicObject getIndex() {

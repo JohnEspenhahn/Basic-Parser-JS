@@ -72,4 +72,9 @@ public abstract class FuncPointer extends BasicObject {
             }
         }
     }
+    
+    @Override
+    public String toString() {
+        return "&" + super.toString();
+    }
 }
