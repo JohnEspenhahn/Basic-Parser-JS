@@ -5,7 +5,8 @@ import com.hahn.basic.parser.IEnumExpression;
 
 public enum EnumExpression implements IEnumExpression {
     FACTOR      ("<ANON_FUNC>|<FUNC_POINTER>|<EVALUABLE>|<ACCESS>|STRING|CHAR|HEX_NUMBER|NUMBER|TRUE|FALSE|OPEN_PRNTH<EXPRESSION>CLOSE_PRNTH"),
-    PRODUCT     ("<FACTOR>{MULT_DIV<FACTOR>}"),
+    NEGATION    ("?NOT <FACTOR>"),
+    PRODUCT     ("<NEGATION>{MULT_DIV<NEGATION>}"),
     SUMMATION   ("<PRODUCT>{ADD_SUB<PRODUCT>}"),
     BOOLEAN     ("<SUMMATION>{<BOOL_OP><SUMMATION>}"),
     EVAL_CNDTN  ("<BOOLEAN>{<BITWISE><BOOLEAN>}", false),
@@ -14,7 +15,7 @@ public enum EnumExpression implements IEnumExpression {
     CAST        ("<TYPE> COLON", false),
     
     BOOL_OP     ("NOTEQUAL|EQUALS|LESS_EQU|GTR_EQU|LESS|GTR"),
-    BITWISE     ("AND|MSC_BITWISE"),
+    BITWISE     ("AND|MSC_BITWISE|SC_BITWISE"),
     
     CREATE      ("NEW <TYPE> OPEN_PRNTH ?<CALL_PARAMS> CLOSE_PRNTH", false),
     

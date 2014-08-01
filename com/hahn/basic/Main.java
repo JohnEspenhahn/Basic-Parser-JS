@@ -97,6 +97,7 @@ public abstract class Main {
         System.out.println(":debug   Toggle debug mode");
         System.out.println(":help    Print this");
         System.out.println(":exit    Quit the shell");
+        System.out.println();
     }
     
     public void shellInput() {

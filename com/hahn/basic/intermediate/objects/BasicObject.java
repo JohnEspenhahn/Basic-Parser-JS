@@ -149,6 +149,20 @@ public abstract class BasicObject implements IIntermediate, ITypeable, IHolderEx
      */
     
     /**
+     * @return True if this object is an expression
+     */
+    public boolean isExpression() {
+        return false;
+    }
+    
+    /**
+     * @return True if this object should be grouped together
+     */
+    public boolean isGrouped() {
+        return false;
+    }
+    
+    /**
      * Convert to its final form
      * @param builder
      * @return A final form object

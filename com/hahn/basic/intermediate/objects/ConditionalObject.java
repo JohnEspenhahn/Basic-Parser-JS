@@ -1,5 +1,6 @@
 package com.hahn.basic.intermediate.objects;
 
+import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.opcode.OPCode;
 import com.hahn.basic.intermediate.statements.Statement;
 
@@ -10,6 +11,10 @@ public abstract class ConditionalObject extends OPObject {
         super(container, opcode, p1, p2);
         
         this.temp = temp;
+    }
+    
+    public Type getType() {
+        return Type.BOOL;
     }
     
     public BasicObject getTemp() {

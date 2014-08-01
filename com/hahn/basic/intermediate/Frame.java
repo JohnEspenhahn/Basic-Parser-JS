@@ -13,9 +13,11 @@ import static com.hahn.basic.definition.EnumToken.LESS;
 import static com.hahn.basic.definition.EnumToken.LESS_EQU;
 import static com.hahn.basic.definition.EnumToken.MSC_BITWISE;
 import static com.hahn.basic.definition.EnumToken.MULT_DIV;
+import static com.hahn.basic.definition.EnumToken.NOT;
 import static com.hahn.basic.definition.EnumToken.NOTEQUAL;
 import static com.hahn.basic.definition.EnumToken.NUMBER;
 import static com.hahn.basic.definition.EnumToken.OPEN_SQR;
+import static com.hahn.basic.definition.EnumToken.SC_BITWISE;
 import static com.hahn.basic.definition.EnumToken.STRING;
 import static com.hahn.basic.definition.EnumToken.TRUE;
 
@@ -50,7 +52,6 @@ import com.hahn.basic.intermediate.statements.IfStatement.Conditional;
 import com.hahn.basic.intermediate.statements.Statement;
 import com.hahn.basic.parser.Node;
 import com.hahn.basic.target.LangBuildTarget;
-import com.hahn.basic.util.DepthIterator;
 import com.hahn.basic.util.Util;
 import com.hahn.basic.util.exceptions.CastException;
 import com.hahn.basic.util.exceptions.CompileException;
@@ -838,7 +839,7 @@ public class Frame extends Statement {
      * @param temp
      * @return ObjectHolder
      */
-    private BasicObject doCast(Node head, DepthIterator<Node> it, BasicObject temp) {
+    private BasicObject doCast(Node head, Iterator<Node> it, BasicObject temp) {
         Iterator<Node> childIt = Util.getIterator(head);
         while (childIt.hasNext()) {
             Node child = childIt.next();
@@ -866,10 +867,10 @@ public class Frame extends Statement {
      * @return An object with the result of the expression
      */    
     public ExpressionStatement handleExpression(Node head) {
-        return doHandleExpression(new DepthIterator<Node>(Util.getIterator(head)));
+        return doHandleExpression(Util.getIterator(head));
     }
     
-    private ExpressionStatement doHandleExpression(DepthIterator<Node> it) {
+    private ExpressionStatement doHandleExpression(Iterator<Node> it) {
         ExpressionStatement exp = LangCompiler.factory.ExpressionStatement(this, null);
         
         // Add tokens
@@ -884,7 +885,7 @@ public class Frame extends Statement {
         }
     }
     
-    private void handleNextExpressionChild(DepthIterator<Node> it, ExpressionStatement exp, BasicObject temp) {
+    private void handleNextExpressionChild(Iterator<Node> it, ExpressionStatement exp, BasicObject temp) {
         Node child = it.next();
         String val = child.getValue();
         Enum<?> token = child.getToken();
@@ -892,7 +893,14 @@ public class Frame extends Statement {
         BasicObject obj = handleNextExpressionChildObject(child, it, temp);
         if (obj != null) {
             exp.setObj(obj);
-        } else if (token == ADD_SUB || token == MULT_DIV || token == AND || token == MSC_BITWISE) {
+        } else if (token == NOT) {
+            OPCode op = OPCode.fromSymbol(val);
+            
+            ExpressionStatement nextExp = LangCompiler.factory.ExpressionStatement(this, null);
+            handleNextExpressionChild(it, nextExp, temp);
+            
+            exp.setObj(LangCompiler.factory.OPObject(exp, op, nextExp.getObj(), null));
+        } else if (token == ADD_SUB || token == MULT_DIV || token == AND || token == MSC_BITWISE || token == SC_BITWISE) {
             OPCode op = OPCode.fromSymbol(val);
             
             ExpressionStatement nextExp = LangCompiler.factory.ExpressionStatement(this, null);
@@ -908,10 +916,10 @@ public class Frame extends Statement {
             if (temp == null) temp = createTempVar(Type.BOOL);
             exp.setObj(LangCompiler.factory.ConditionalObject(exp, op, exp.getObj(), nextExp.getObj(), temp));
         } else if (!child.isTerminal()) {
-            exp.setObj(doHandleExpression(it.enter(child.getAsChildren())));
+            exp.setObj(doHandleExpression(Util.getIterator(child)));
         }
     }
-    private BasicObject handleNextExpressionChildObject(Node child, DepthIterator<Node> it, BasicObject temp) {
+    private BasicObject handleNextExpressionChildObject(Node child, Iterator<Node> it, BasicObject temp) {
         Enum<?> token = child.getToken();
         
         if (child.isTerminal()) {

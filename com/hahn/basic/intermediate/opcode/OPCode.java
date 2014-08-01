@@ -1,10 +1,15 @@
 package com.hahn.basic.intermediate.opcode;
 
 import static com.hahn.basic.intermediate.objects.types.Type.INT;
+import static com.hahn.basic.intermediate.objects.types.Type.BOOL;
 
 import com.hahn.basic.intermediate.objects.types.Type;
 
 public enum OPCode {
+    NOT ("!" , BOOL, null, 0b000000, 0, 0),
+    SAND("&&", BOOL, BOOL, 0b000000, 0, 0),
+    SBOR("||", BOOL, BOOL, 0b000000, 0, 0),
+    
     ADD ("+" , INT, INT,  0b101101, 4, 6),
     ADDE("+=", INT, INT,  0b101101, 4, 6),
     SUB ("-" , INT, INT,  0b101110, 4, 6),

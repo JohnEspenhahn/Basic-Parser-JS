@@ -9,20 +9,26 @@ import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.opcode.OPCode;
 import com.hahn.basic.intermediate.statements.Statement;
 import com.hahn.basic.target.LangBuildTarget;
+import com.sun.istack.internal.Nullable;
 
 public abstract class OPObject extends BasicObject {
     private Frame frame;
     private OPCode opcode;
-    private BasicObject p1, p2;
     
-    public OPObject(Statement container, OPCode opcode, BasicObject p1, @NonNull BasicObject p2) {
+    @NonNull
+    private BasicObject p1;
+    
+    @Nullable
+    private BasicObject p2;
+    
+    public OPObject(Statement container, OPCode opcode, BasicObject p1, @Nullable BasicObject p2) {
         super("@ " + opcode.toString() + " @", p1.getType());
         
         this.frame = container.getFrame();
         
         this.opcode = opcode;
         this.p1 = p1.getForUse(container);
-        this.p2 = p2.getForUse(container);
+        this.p2 = (p2 == null ? null : p2.getForUse(container));
     }
     
     @Override
@@ -38,6 +44,16 @@ public abstract class OPObject extends BasicObject {
     @Override
     public boolean updateLiteral(OPCode op, Literal lit) {
         return p1.updateLiteral(op, lit);
+    }
+    
+    @Override
+    public boolean isExpression() {
+        return true;
+    }
+    
+    @Override
+    public boolean isGrouped() {
+        return getP1().isExpression() || (getP2() != null && getP2().isExpression());
     }
     
     public Frame getFrame() {
@@ -61,7 +77,7 @@ public abstract class OPObject extends BasicObject {
     }
     
     public boolean isP2LastUse() {
-        return p2.isLastUse(this);
+        return p2 != null && p2.isLastUse(this);
     }
     
     /**
@@ -106,7 +122,7 @@ public abstract class OPObject extends BasicObject {
     @Override
     public void takeRegister(IIntermediate by) {        
         // Check registers
-        p2.takeRegister(this);
+        if (p2 != null) p2.takeRegister(this);
         if (p2 instanceof PopObject) StackRegister.pop();
         
         p1.takeRegister(this);
@@ -130,7 +146,8 @@ public abstract class OPObject extends BasicObject {
     }
     
     /**
-     * Called by toTarget is the object is still valid
+     * Called by toTarget is the object is still valid. Should
+     * handle conditions if p2 is not null and if p2 is null
      * @param builder
      * @return A final form of the object
      */
