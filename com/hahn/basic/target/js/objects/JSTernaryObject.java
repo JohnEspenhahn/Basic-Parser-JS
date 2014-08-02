@@ -15,9 +15,9 @@ public class JSTernaryObject extends TernaryObject {
     @Override
     public String toTarget(LangBuildTarget builder) {
         return String.format("%s?%s:%s",
-                getConditional().isGrouped() ? "("+getConditional().toTarget(builder)+")" : getConditional().toTarget(builder),
-                getThenExpression().toTarget(builder),
-                getElseExpression().toTarget(builder));
+                doGroup(getConditional()) ? "("+getConditional().toTarget(builder)+")" : getConditional().toTarget(builder),
+                doGroup(getThen()) ? "("+getThen().toTarget(builder)+")" : getThen().toTarget(builder),
+                doGroup(getElse()) ? "("+getElse().toTarget(builder)+")" : getElse().toTarget(builder));
     }
     
 }
