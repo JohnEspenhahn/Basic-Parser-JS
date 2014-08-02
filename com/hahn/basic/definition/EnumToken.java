@@ -15,6 +15,7 @@ public enum EnumToken implements IEnumToken {
     COMMA       (","                         ),
     DOT         ("\\."                       ),
     SC_BITWISE  ("&&|\\|\\|"                 ),
+    QUESTION    ("\\?"                       ),
     AND         ("&"                         ),
     NOT         ("!"                         ),
     MSC_BITWISE ("<<|>>|\\||\\^"             ),

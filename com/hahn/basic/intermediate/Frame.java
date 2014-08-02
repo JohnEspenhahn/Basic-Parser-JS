@@ -262,25 +262,19 @@ public class Frame extends Statement {
      * @param head EnumExpression.BLOCK
      */
     public void handleBlock(Node head) {
-        Iterator<Node> it = Util.getIterator(head);
-        while (it.hasNext()) {
-            Node child = it.next();
+        List<Node> children = head.getAsChildren();
+        for (int i = 0; i < children.size(); i++) {
+            Node child = children.get(i);
             Enum<?> token = child.getToken();
             
             if (token == EnumExpression.BLOCK || token == EnumExpression.BLOCK_CNTNT) {
                 handleBlock(child);
             } else if (token == EnumExpression.DEFINE) {
                 addCode(defineVar(child));
-            } else if (token == EnumExpression.MODIFY) {
-                addCode(modifyVar(child).getAsExp(this));
             } else if (token == EnumExpression.STRUCT) {
                 defineStruct(child);
             } else if (token == EnumExpression.DEF_FUNC) {
                 defineFunc(child);
-            } else if (token == EnumExpression.CALL_FUNC) {
-                addCode(callFunc(child));
-            } else if (token == EnumExpression.CREATE) {
-                addCode(createInstance(child).getAsExp(this));
             } else if (token == EnumExpression.RETURN) {
                 addCode(doReturn(child));
             } else if (token == EnumToken.CONTINUE) {
@@ -295,10 +289,17 @@ public class Frame extends Statement {
                 addCode(whileStatement(child));
             } else if (token == EnumExpression.FOR_STMT) {
                 addCode(forStatement(child));
+            } else if (token == EnumExpression.EXPR_STMT) {
+                addCode(handleExpression(child));
             } else if (token == EnumToken.EOL || token == EnumToken.OPEN_BRACE || token == EnumToken.CLOSE_BRACE) {
                 continue;
             } else {
-                throw new RuntimeException("No handler defined for token `" + token + "`");
+                ExpressionStatement exp = handleExpression(child);
+                if (exp.getObj().isTernary()) {
+                    addCode(exp);
+                } else {
+                    throw new CompileException("Illegal left-hand side token `" + child + "`");
+                }
             }
         }
     }
@@ -841,6 +842,34 @@ public class Frame extends Statement {
         throw new RuntimeException("Invalid cast definition '" + head + "'");
     }
     
+    private ExpressionStatement parseTernary(ExpressionStatement cnd_exp, Iterator<Node> it) {
+        Node node_then = null, node_colon = null, node_else = null;
+        for (int i = 0; i < 3; i++) {
+            if (it.hasNext()) {
+                if (i == 0) {
+                    it = Util.getIterator(it.next());                    
+                    node_then = it.next();
+                } else if (i == 1) {
+                    node_colon = it.next();
+                } else if (i == 2) {
+                    it = Util.getIterator(it.next());
+                    node_else  = it.next();
+                }
+            } else {
+                throw new CompileException("Unexpected end of input");
+            }
+        }
+        
+        if (node_colon.getToken() != EnumToken.COLON) {
+            throw new CompileException("Expected `:` but got `" + node_colon + "`");
+        }
+        
+        ExpressionStatement exp = LangCompiler.factory.ExpressionStatement(this, null);
+        exp.setObj(LangCompiler.factory.TernaryObject(exp, cnd_exp.getObj(), node_then, node_else));
+        
+        return exp;
+    }
+    
     /**
      * Handle an expression
      * @param head EnumExpression.EXPRESSION or one of it's children
@@ -873,15 +902,18 @@ public class Frame extends Statement {
         BasicObject obj = handleNextExpressionChildObject(child, it, temp);
         if (obj != null) {
             exp.setObj(obj);
+        } else if (token == QUESTION) {
+            exp.setObj(parseTernary(exp, it));
+            
         } else if (token == OPEN_PRNTH) {
-            ExpressionStatement nextExp = LangCompiler.factory.ExpressionStatement(this, null);
-            handleNextExpressionChild(Util.getIterator(it.next()), nextExp, temp);
+            ExpressionStatement nextExp = doHandleExpression(Util.getIterator(it.next()));
             nextExp.setForcedGroup(true);
             
             exp.setObj(nextExp);
             
             // Skip ending parenthesis
             it.next();
+            
         } else if (token == NOT) {
             OPCode op = OPCode.fromSymbol(val);
             
@@ -906,8 +938,11 @@ public class Frame extends Statement {
             exp.setObj(LangCompiler.factory.ConditionalObject(exp, op, exp.getObj(), nextExp.getObj(), temp));
         } else if (!child.isTerminal()) {
             exp.setObj(doHandleExpression(Util.getIterator(child)));
+        } else {
+            throw new CompileException("Unexpected token `" + child + "`");
         }
     }
+    
     private BasicObject handleNextExpressionChildObject(Node child, Iterator<Node> it, BasicObject temp) {
         Enum<?> token = child.getToken();
         
@@ -925,6 +960,8 @@ public class Frame extends Statement {
         } else {
             if (token == EnumExpression.ACCESS) {
                 return accessVar(child);
+            } else if (token == EnumExpression.MODIFY) {
+                return modifyVar(child);
             } else if (token == EnumExpression.CREATE) {
                 return createInstance(child);
             } else if (token == EnumExpression.CAST) {

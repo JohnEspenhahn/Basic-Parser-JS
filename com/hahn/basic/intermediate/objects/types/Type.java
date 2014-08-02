@@ -81,6 +81,7 @@ public class Type implements ITypeable {
      * Should be called from REGISTER OPTIMIZE
      * @param t The type to try and change to
      * @return t on success
+     * @throws CastException If can not cast
      */
     public Type castTo(Type t) {
         if (t == null || t == Type.UNDEFINED) {
@@ -125,18 +126,31 @@ public class Type implements ITypeable {
         return getName();
     }
     
-    public static boolean isValidNode(Node node) {
-        Enum<?> token = node.getToken();
-        return token == EnumToken.IDENTIFIER || token == EnumExpression.TYPE;
-    }
-    
     /**
-     * Auto-casting. Standard to be called from REGISTER OPTIMIZE
+     * Auto-casting from original to newType. Standard to
+     * be called from REGISTER_OPTIMIZE
      * @param original The original/expected type
      * @param newType The new/given type
      * @return Overruling type
+     * @throws CompileException if types are invalid
      */
     public static Type merge(Type original, Type newType) {
+        Type overruling = safeMerge(original, newType);
+        if (overruling != null) {
+            return overruling;
+        } else {
+            throw new CompileException("Incompatible types `" + original.toString() + "` and `" + newType.toString() + "`");
+        }
+    }
+    
+    /**
+     * Auto-casting from original to newType. Standard to
+     * be called from REGISTER_OPTIMIZE
+     * @param original The original/expected type
+     * @param newType The new/given type
+     * @return Overruling type or null if can't merge
+     */
+    public static Type safeMerge(Type original, Type newType) {
         if (newType == null) return original;
         else if (original == null) return newType;
         else if (original.doesExtend(newType)) return newType;
@@ -144,7 +158,27 @@ public class Type implements ITypeable {
         else if (newType == UNDEFINED) return original; 
         else if (original == INT && newType == BOOL) return BOOL;
         
-        throw new CompileException("Incompatible types `" + original.toString() + "` and `" + newType.toString() + "`");
+        return null;
+    }
+    
+    /**
+     * Auto-casting like merge, but either a or b can
+     * be the newType. Called from REGISTER_OPTIMIZE
+     * @param a Type a
+     * @param b Type b
+     * @return Overruling type or null if can't combine
+     */
+    public static Type safeCombine(Type a, Type b) {
+        Type overruling = safeMerge(a, b);
+        if (overruling != null) return overruling;
+        else if (b.doesExtend(a)) return b;
+        
+        return null;
+    }
+    
+    public static boolean isValidNode(Node node) {
+        Enum<?> token = node.getToken();
+        return token == EnumToken.IDENTIFIER || token == EnumExpression.TYPE;
     }
     
     public static Type fromNode(Node node) {

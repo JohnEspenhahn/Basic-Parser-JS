@@ -9,6 +9,7 @@ import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.ConditionalObject;
 import com.hahn.basic.intermediate.objects.FuncCallPointer;
 import com.hahn.basic.intermediate.objects.FuncPointer;
+import com.hahn.basic.intermediate.objects.TernaryObject;
 import com.hahn.basic.intermediate.objects.OPObject;
 import com.hahn.basic.intermediate.objects.Param;
 import com.hahn.basic.intermediate.objects.StringConst;
@@ -37,6 +38,7 @@ import com.hahn.basic.target.js.objects.JSExpressionObject;
 import com.hahn.basic.target.js.objects.JSFuncCallPointer;
 import com.hahn.basic.target.js.objects.JSFuncHead;
 import com.hahn.basic.target.js.objects.JSFuncPointer;
+import com.hahn.basic.target.js.objects.JSTernaryObject;
 import com.hahn.basic.target.js.objects.JSNewInstance;
 import com.hahn.basic.target.js.objects.JSOPObject;
 import com.hahn.basic.target.js.objects.JSStringConst;
@@ -117,6 +119,11 @@ public class JSLangFactory implements ILangFactory {
     @Override
     public ConditionalObject ConditionalObject(Statement container, OPCode op, BasicObject p1, BasicObject p2, BasicObject temp) {
         return new JSConditionalObject(container, op, p1, p2, temp);
+    }
+    
+    @Override
+    public TernaryObject TernaryObject(Statement container, BasicObject condition, Node node_then, Node node_else) {
+        return new JSTernaryObject(container, condition, node_then, node_else);
     }
     
     @Override

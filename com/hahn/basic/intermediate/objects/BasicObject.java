@@ -143,6 +143,14 @@ public abstract class BasicObject implements IIntermediate, ITypeable {
      */
     
     /**
+     * Only TernaryObject should return true
+     * @return True if TernaryObject
+     */
+    public boolean isTernary() {
+        return false;
+    }
+    
+    /**
      * @return True if this object is an expression
      */
     public boolean isExpression() {
