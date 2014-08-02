@@ -9,7 +9,7 @@ public enum EnumExpression implements IEnumExpression {
     PRODUCT     ("<NEGATION>{MULT_DIV<NEGATION>}"),
     SUMMATION   ("<PRODUCT>{ADD_SUB<PRODUCT>}"),
     BOOLEAN     ("<SUMMATION>{<BOOL_OP><SUMMATION>}"),
-    EVAL_CNDTN  ("<BOOLEAN>{<BITWISE><BOOLEAN>}"),
+    EVAL_CNDTN  ("<BOOLEAN>{<BITWISE><BOOLEAN>}(<TERNARY_OP><EXPRESSION>)"),
     EXPRESSION  ("<EVAL_CNDTN>(<TERNARY_OP><EXPRESSION>)", false),
     
     CAST        ("<TYPE> COLON", false),

@@ -847,12 +847,12 @@ public class Frame extends Statement {
         for (int i = 0; i < 3; i++) {
             if (it.hasNext()) {
                 if (i == 0) {
-                    it = Util.getIterator(it.next());                    
+                    it = parseTernaryEnterExp(it);
                     node_then = it.next();
                 } else if (i == 1) {
                     node_colon = it.next();
                 } else if (i == 2) {
-                    it = Util.getIterator(it.next());
+                    it = parseTernaryEnterExp(it);
                     node_else  = it.next();
                 }
             } else {
@@ -868,6 +868,20 @@ public class Frame extends Statement {
         exp.setObj(LangCompiler.factory.TernaryObject(exp, cnd_exp.getObj(), node_then, node_else));
         
         return exp;
+    }
+    
+    private Iterator<Node> parseTernaryEnterExp(Iterator<Node> it) {
+        List<Node> children = it.next().getAsChildren();
+        while (children.size() == 1) {
+            Enum<?> token = children.get(0).getToken();
+            if (token == EnumExpression.EXPRESSION || token == EnumExpression.EVAL_CNDTN) {
+                children = children.get(0).getAsChildren();
+            } else {
+                break;
+            }
+        }
+        
+        return children.iterator();
     }
     
     /**
