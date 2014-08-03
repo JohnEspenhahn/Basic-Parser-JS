@@ -289,21 +289,16 @@ public class Frame extends Statement {
                 addCode(whileStatement(child));
             } else if (token == EnumExpression.FOR_STMT) {
                 addCode(forStatement(child));
-            } else if (token == EnumExpression.EXPR_STMT) {
-                addCode(handleExpression(child));
+            } else if (token == EnumExpression.EXPRESSION) {
+                addCode(handleStatementExpression(child));
             } else if (token == EnumToken.EOL || token == EnumToken.OPEN_BRACE || token == EnumToken.CLOSE_BRACE) {
                 continue;
-            } else {
-                ExpressionStatement exp = handleExpression(child);
-                if (exp.getObj().isTernary()) {
-                    addCode(exp);
-                } else {
-                    throw new CompileException("Illegal left-hand side token `" + child + "`");
-                }
+            } else {                
+                throw new CompileException("Illegal left-hand side token `" + child + "`");
             }
         }
     }
-    
+
     /**
      * `Import` handler
      * @param head EnumToken.IMPORT
@@ -816,27 +811,22 @@ public class Frame extends Statement {
     /**
      * Cast the next expression object
      * @param head EnumExpression.CAST
-     * @param it Parent expression parsing iterator
      * @param temp
      * @return ObjectHolder
      */
-    private BasicObject doCast(Node head, Iterator<Node> it, BasicObject temp) {
-        Iterator<Node> childIt = Util.getIterator(head);
-        while (childIt.hasNext()) {
-            Node child = childIt.next();
+    private BasicObject doCast(Node head, BasicObject temp) {
+        Iterator<Node> it = Util.getIterator(head);
             
-            if (Type.isValidNode(child)) {
-                Type type = Type.fromNode(child);
-                
-                if (it.hasNext()) {
-                    ExpressionStatement nextExp = LangCompiler.factory.ExpressionStatement(this, null);
-                    handleNextExpressionChild(it, nextExp, temp);
-                    
-                    return nextExp.getAsExpObj().castTo(type);
-                } else {
-                    throw new CompileException("Nothing provided to cast to `" + type + "`");
-                }
-            }
+        Node typeNode = it.next();
+        if (Type.isValidNode(typeNode)) {
+            Type type = Type.fromNode(typeNode);
+            
+            it.next(); // Skip colon
+            
+            ExpressionStatement nextExp = LangCompiler.factory.ExpressionStatement(this, null);
+            handleNextExpressionChild(it, nextExp, temp);
+            
+            return nextExp.getAsExpObj().castTo(type);
         }
         
         throw new RuntimeException("Invalid cast definition '" + head + "'");
@@ -882,6 +872,29 @@ public class Frame extends Statement {
         }
         
         return children.iterator();
+    }
+    
+    /**
+     * Handle an expression as a statement rather than an object
+     * @param child EnumExpression.EXPRESSION
+     * @return ExpressionStatement
+     */
+    private ExpressionStatement handleStatementExpression(Node child) {
+        List<Node> children = child.getAsChildren();
+        
+        // Statement Expression are all valid
+        if (children.size() == 1 && children.get(0).getToken() == EnumExpression.STMT_EXPRS) {
+            return handleExpression(children.get(0));
+            
+        // Only other valid form is a ternary operation
+        } else {
+            ExpressionStatement exp = handleExpression(child);
+            if (exp.getObj().isTernary()) {
+                return exp;
+            } else {
+                throw new CompileException("Illegal left-hand side token `" + child + "`");
+            }
+        }
     }
     
     /**
@@ -979,7 +992,7 @@ public class Frame extends Statement {
             } else if (token == EnumExpression.CREATE) {
                 return createInstance(child);
             } else if (token == EnumExpression.CAST) {
-                return doCast(child, it, temp);
+                return doCast(child, temp);
             } else if (token == EnumExpression.FUNC_POINTER) {
                 return getFuncPointer(child);
             } else if (token == EnumExpression.ANON_FUNC) {

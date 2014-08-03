@@ -259,6 +259,7 @@ public abstract class Main {
     private static void toggleDebug() {
         DEBUG = !DEBUG;
         System.out.println("Debug = " + DEBUG);
+        System.out.println();
     }
     
     public static void printCompileException(CompileException e) {
