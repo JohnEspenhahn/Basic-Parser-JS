@@ -11,7 +11,7 @@ public abstract class BreakStatement extends Statement {
         
         loop = getFrame().getLoop();
         if (loop == null) {
-            throw new CompileException("Invalid use of `break`");
+            throw new CompileException("Invalid use of `break` outside a loop", this);
         }
     }
     

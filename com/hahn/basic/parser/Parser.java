@@ -1,10 +1,10 @@
 package com.hahn.basic.parser;
 
-import com.hahn.basic.Main;
 import com.hahn.basic.definition.EnumExpression;
 import com.hahn.basic.lexer.IEnumToken;
 import com.hahn.basic.lexer.PackedToken;
 import com.hahn.basic.util.exceptions.CompileException;
+import com.hahn.basic.util.exceptions.ParseExpressionException;
 
 public class Parser extends IParser {   
     private final BNFParser bnfParser;
@@ -40,8 +40,7 @@ public class Parser extends IParser {
         } else {
             PackedToken last = stream[furthest_idx];
             
-            Main.setLine(last.row, last.col);
-            throw new CompileException("Invalid expression near index " + last.col, last.col);
+            throw new ParseExpressionException(last.row, last.col);
         }
     }
     

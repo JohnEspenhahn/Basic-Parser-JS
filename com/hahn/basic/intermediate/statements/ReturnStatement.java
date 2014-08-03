@@ -1,6 +1,5 @@
 package com.hahn.basic.intermediate.statements;
 
-import com.hahn.basic.Main;
 import com.hahn.basic.intermediate.FuncHead;
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.types.Type;
@@ -32,8 +31,7 @@ public abstract class ReturnStatement extends Statement {
         Type actual = getResult().getType();
         Type expected = getReturnFromFunc().getReturnType();
         if (!actual.doesExtend(expected)) {
-            Main.setLine(row);
-            throw new CompileException("Invalid return type. Expected `" + expected + "` but got `" + actual + "`");
+            throw new CompileException("Invalid return type. Expected `" + expected + "` but got `" + actual + "`", this);
         }
         
         return result;

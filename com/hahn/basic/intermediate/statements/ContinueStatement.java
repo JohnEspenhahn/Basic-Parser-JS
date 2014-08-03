@@ -11,7 +11,7 @@ public abstract class ContinueStatement extends Statement {
         
         loop = getFrame().getLoop();
         if (loop == null) {
-            throw new CompileException("Invalid use of `continue`");
+            throw new CompileException("Invalid use of `continue` outside a loop", this);
         }
     }
 

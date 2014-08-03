@@ -44,6 +44,14 @@ public class Node {
     public static Node newTopNode() {
         return new Node();
     }
+    
+    public int getRow() {
+        return row;
+    }
+    
+    public int getCol() {
+        return col;
+    }
 
     public void print() {
         for (Node child : children)

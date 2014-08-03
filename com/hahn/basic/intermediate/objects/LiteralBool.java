@@ -32,8 +32,8 @@ public class LiteralBool extends Literal {
         else if (op == OPCode.SUB) { badOP(op); }
         else if (op == OPCode.MUL) { badOP(op); }
         else if (op == OPCode.DIV) { badOP(op); }
-        else if (op == OPCode.BOR) { isbool(op, lit); this.value = this.value | toBool(lit.getValue()); }
-        else if (op == OPCode.AND) { isbool(op, lit); this.value = this.value & toBool(lit.getValue()); }
+        else if (op == OPCode.BOR) { isbool(op, lit); this.value = this.value || toBool(lit.getValue()); }
+        else if (op == OPCode.AND) { isbool(op, lit); this.value = this.value && toBool(lit.getValue()); }
         else if (op == OPCode.XOR) { isbool(op, lit); this.value = this.value ^ toBool(lit.getValue()); }
         else if (op == OPCode.SHL) { badOP(op); }
         else if (op == OPCode.SHR) { badOP(op); }

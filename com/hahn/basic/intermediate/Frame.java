@@ -37,6 +37,7 @@ import com.hahn.basic.util.Util;
 import com.hahn.basic.util.exceptions.CastException;
 import com.hahn.basic.util.exceptions.CompileException;
 import com.hahn.basic.util.exceptions.DuplicateDefinitionException;
+import com.hahn.basic.util.exceptions.ParseExpressionException;
 
 public class Frame extends Statement {    
     private final Frame parent;
@@ -245,12 +246,13 @@ public class Frame extends Statement {
         return null;
     }
     
-    public AdvancedObject getVar(String name) {
+    public AdvancedObject getVar(Node nameNode) {
+        String name = nameNode.getValue();
         AdvancedObject obj = safeGetVar(name);
         
         // Not found
         if (obj != null) return obj;
-        else throw new CompileException("Variable `" + name + "` is not defined in this scope");
+        else throw new CompileException("Variable `" + name + "` is not defined in this scope", nameNode);
     }
     
     public String getLabel(String name) {
@@ -294,7 +296,7 @@ public class Frame extends Statement {
             } else if (token == EnumToken.EOL || token == EnumToken.OPEN_BRACE || token == EnumToken.CLOSE_BRACE) {
                 continue;
             } else {                
-                throw new CompileException("Illegal left-hand side token `" + child + "`");
+                throw new CompileException("Illegal left-hand side token `" + child + "`", child);
             }
         }
     }
@@ -316,13 +318,13 @@ public class Frame extends Statement {
     private BasicObject accessVar(Node head) {
         List<Node> children = head.getAsChildren();
 
-        AdvancedObject obj = getVar(children.get(0).getValue());
+        AdvancedObject obj = getVar(children.get(0));
         if (children.size() > 1) {
             if (obj.getType().doesExtend(Type.STRUCT)) {
                 Node nextAccess = children.get(1);
                 return inAccessVar(obj, nextAccess);
             } else {
-                throw new CompileException("Invalid access of type '" + obj.getType() + "'");
+                throw new CompileException("Illegal attempt to index var of type '" + obj.getType() + "'", head);
             }
         } else {
             return obj;
@@ -340,8 +342,9 @@ public class Frame extends Statement {
         
         ExpressionStatement exp = LangCompiler.factory.ExpressionStatement(this, obj);
         Iterator<Node> it = Util.getIterator(head);
-        while (it.hasNext()) {  
-            Enum<?> accessMarker = it.next().getToken();
+        while (it.hasNext()) {
+            Node child = it.next();
+            Enum<?> accessMarker = child.getToken();
             if (accessMarker == OPEN_SQR && t.doesExtend(Type.ARRAY)) {
                 BasicObject offset = handleExpression(it.next()).getAsExpObj();
                 
@@ -354,7 +357,7 @@ public class Frame extends Statement {
                 
                 exp.setObj(LangCompiler.factory.VarAccess(exp, exp.getObj(), sp, sp.getType()));
             } else {
-                throw new CompileException("Invalid access of `" + obj.getName() + "` of type `" + t + "`");
+                throw new CompileException("Illegal attempt to index var `" + obj + "` of type `" + t + "`", child);
             }
         }
         
@@ -456,7 +459,7 @@ public class Frame extends Statement {
                     
                     if (nextToken == EnumExpression.DEF_MODIFY) {
                         if (!canInit) {
-                            throw new CompileException("Can not initialize `" + obj.getName() + "` here");
+                            throw new CompileException("Can not initialize `" + obj.getName() + "` here", nextHead);
                         }
                         
                         List<Node> modify_children = nextHead.getAsChildren();
@@ -499,7 +502,7 @@ public class Frame extends Statement {
         }
         
         if (!(f instanceof FuncHead)) {
-            throw new CompileException("Can only return from a function");
+            throw new CompileException("Can only return from a function", head);
         }
         
         FuncHead func = (FuncHead) f;
@@ -509,12 +512,13 @@ public class Frame extends Statement {
         if (head != null) {
             List<Node> children = head.getAsChildren();
             if (children.size() > 1) {
-                result = handleExpression(children.get(1)).getAsExpObj();
+                Node resultNode = children.get(1);
+                result = handleExpression(resultNode).getAsExpObj();
                 
                 try {
                     result.castTo(func.getReturnType());
                 } catch (CastException e) {
-                    throw new CastException("Invalid return type - ", e);
+                    throw new CastException("Invalid return type - ", resultNode, e);
                 }
             }
         }
@@ -565,34 +569,36 @@ public class Frame extends Statement {
         Iterator<Node> it = Util.getIterator(head);
         
         Type rtnType = Type.VOID;
-        String name = null;
+        Node nameNode = null;
         Node body = null;
         
         List<Param> params = new ArrayList<Param>();
         while (it.hasNext()) {
-            Node parent = it.next();
-            Enum<?> token = parent.getToken();
+            Node child = it.next();
+            Enum<?> token = child.getToken();
             
-            if (token == EnumExpression.TYPE) {
-                rtnType = Type.fromNode(parent);
+            if (token == EnumToken.FUNCTION) {
+                nameNode = child;
+            } else if (token == EnumExpression.TYPE) {
+                rtnType = Type.fromNode(child);
             } else if (token == EnumToken.IDENTIFIER) {
-                name = parent.getValue();
+                nameNode = child;
             } else if (token == EnumExpression.DEF_PARAMS) {      
-                Iterator<Node> pIt = Util.getIterator(parent);
+                Iterator<Node> pIt = Util.getIterator(child);
                 
                 while (pIt.hasNext()) {
                     Node pNode = pIt.next();
                     if (pNode.getToken() == EnumToken.COMMA) {
                         continue;
                     } else {
-                        Node pType = pNode;
-                        Node pName = pIt.next();
+                        Node pTypeNode = pNode;
+                        Node pNameNode = pIt.next();
                         
-                        params.add(new Param(pName.getValue(), Type.fromNode(pType)));
+                        params.add(new Param(pNameNode, Type.fromNode(pTypeNode)));
                     }
                 }
             } else if (token == EnumExpression.BLOCK) {
-                body = parent;
+                body = child;
             }
         }
         
@@ -777,7 +783,7 @@ public class Frame extends Statement {
                 } else if (token == EnumExpression.BLOCK) {
                     body = child;
                 } else {
-                    throw new CompileException("Unhandled expression '" + token + "' in for loop definition");
+                    throw new RuntimeException("Unhandled expression '" + token + "' in for-loop definition");
                 }
             }
         }
@@ -802,7 +808,7 @@ public class Frame extends Statement {
     public Compilable doBreak(Node head) {
         Frame loop = getLoop();
         if (loop == null) {
-            throw new CompileException("Invalid use of `break`");
+            throw new CompileException("No loop to break out of ", head);
         }
         
         return LangCompiler.factory.BreakStatement(this);
@@ -832,26 +838,26 @@ public class Frame extends Statement {
         throw new RuntimeException("Invalid cast definition '" + head + "'");
     }
     
-    private ExpressionStatement parseTernary(ExpressionStatement cnd_exp, Iterator<Node> it) {
+    private ExpressionStatement parseTernary(Node lastChild, ExpressionStatement cnd_exp, Iterator<Node> it) {
         Node node_then = null, node_colon = null, node_else = null;
         for (int i = 0; i < 3; i++) {
             if (it.hasNext()) {
                 if (i == 0) {
                     it = parseTernaryEnterExp(it);
-                    node_then = it.next();
+                    lastChild = node_then = it.next();
                 } else if (i == 1) {
-                    node_colon = it.next();
+                    lastChild = node_colon = it.next();
                 } else if (i == 2) {
                     it = parseTernaryEnterExp(it);
-                    node_else  = it.next();
+                    lastChild = node_else  = it.next();
                 }
             } else {
-                throw new CompileException("Unexpected end of input");
+                throw new ParseExpressionException(lastChild);
             }
         }
         
         if (node_colon.getToken() != EnumToken.COLON) {
-            throw new CompileException("Expected `:` but got `" + node_colon + "`");
+            throw new CompileException("Expected `:` but got `" + node_colon + "`", node_colon);
         }
         
         ExpressionStatement exp = LangCompiler.factory.ExpressionStatement(this, null);
@@ -892,7 +898,7 @@ public class Frame extends Statement {
             if (exp.getObj().isTernary()) {
                 return exp;
             } else {
-                throw new CompileException("Illegal left-hand side token `" + child + "`");
+                throw new CompileException("Illegal left-hand side token `" + child + "`", child);
             }
         }
     }
@@ -915,7 +921,7 @@ public class Frame extends Statement {
         }
  
         if (exp.getObj() == null) {
-            throw new CompileException("Incomplete command"); 
+            throw new CompileException("Incomplete command", -1); 
         } else {
             return exp;
         }
@@ -930,7 +936,7 @@ public class Frame extends Statement {
         if (obj != null) {
             exp.setObj(obj);
         } else if (token == QUESTION) {
-            exp.setObj(parseTernary(exp, it));
+            exp.setObj(parseTernary(child, exp, it));
             
         } else if (token == OPEN_PRNTH) {
             ExpressionStatement nextExp = doHandleExpression(Util.getIterator(it.next()));
@@ -966,7 +972,7 @@ public class Frame extends Statement {
         } else if (!child.isTerminal()) {
             exp.setObj(doHandleExpression(Util.getIterator(child)));
         } else {
-            throw new CompileException("Unexpected token `" + child + "`");
+            throw new CompileException("Unexpected token `" + child + "`", child);
         }
     }
     
