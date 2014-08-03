@@ -64,45 +64,50 @@ public class Type implements ITypeable {
         return this;
     }
     
-    public int sizeOf() {
-        return 1;
+    public Struct getAsStruct() {
+        return (Struct) this;
     }
     
     public boolean doesExtend(Type t) {
         return this == Type.UNDEFINED || t == Type.UNDEFINED || this.equals(t);
     }
     
-    public Struct castToStruct() {
-        return (Struct) this;
-    }
-    
     /**
      * More lenient than merge, but can only go in one direction.
      * Should be called from REGISTER OPTIMIZE
-     * @param t The type to try and change to
-     * @return t on success
+     * @param newType The type to try and change to
+     * @param row
+     * @param col
+     * @return newType on success
      * @throws CastException If can not cast
      */
-    public Type castTo(Type t, int row, int col) {
-        if (t == null || t == Type.UNDEFINED) {
-            return this;
-        } else if (this.equals(t)) {
-            return t;
-        } else if (this == INT) {
-            if (t == BOOL) return BOOL;
-        } else if (this == BOOL) {
-            if (t == INT) return INT;
-        } else if (this == UNDEFINED) {
-            return t;
-        } else if (this == STRING && t.equals(ParameterizedType.UINT_ARRAY)) {
-            return ParameterizedType.UINT_ARRAY;
-        } else if ((this.equals(ParameterizedType.UINT_ARRAY) || this.equals(ParameterizedType.CHAR_ARRAY)) && t == STRING) {
-            return STRING;
-        } else if (this.doesExtend(t)) {
-            return t;
-        }
+    public Type castTo(Type newType, int row, int col) {
+        if (this == UNDEFINED) return newType;
+        else if (this.doesExtend(newType)) return newType;
         
-        throw new CastException("Can not cast `" + this + "` to `" + t + "`", row, col);
+        // TODO upcasting expression
+        
+        throw new CastException("Can not cast `" + this + "` to `" + newType + "`", row, col);
+    }
+    
+    /**
+     * Auto-casting from original to newType. Standard to
+     * be called from REGISTER_OPTIMIZE
+     * @param newType The new/given type
+     * @param row
+     * @param col
+     * @param unsafe If true will throw exception on fail
+     * @return Overruling type, or null if failed and unsafe is false 
+     * @throws CompileException failed and unsafe is true
+     */
+    public Type merge(Type newType, int row, int col, boolean unsafe) {
+        if (newType == null) return this;
+        else if (this == UNDEFINED) return newType;
+        else if (newType == UNDEFINED) return this;
+        else if (newType.doesExtend(this)) return this;
+        
+        if (unsafe) throw new CompileException("Incompatible types `" + this + "` and `" + newType + "`", row, col);
+        else return null;
     }
     
     @Override
@@ -124,56 +129,6 @@ public class Type implements ITypeable {
     @Override
     public String toString() {
         return getName();
-    }
-    
-    /**
-     * Auto-casting from original to newType. Standard to
-     * be called from REGISTER_OPTIMIZE
-     * @param original The original/expected type
-     * @param newType The new/given type
-     * @return Overruling type
-     * @throws CompileException if types are invalid
-     */
-    public static Type merge(Type original, Type newType, int row, int col) {
-        Type overruling = safeMerge(original, newType);
-        if (overruling != null) {
-            return overruling;
-        } else {
-            throw new CompileException("Incompatible types `" + original + "` and `" + newType + "`", row, col);
-        }
-    }
-    
-    /**
-     * Auto-casting from original to newType. Standard to
-     * be called from REGISTER_OPTIMIZE
-     * @param original The original/expected type
-     * @param newType The new/given type
-     * @return Overruling type or null if can't merge
-     */
-    public static Type safeMerge(Type original, Type newType) {
-        if (newType == null) return original;
-        else if (original == null) return newType;
-        else if (original.doesExtend(newType)) return newType;
-        else if (original == UNDEFINED) return newType;
-        else if (newType == UNDEFINED) return original; 
-        else if (original == INT && newType == BOOL) return BOOL;
-        
-        return null;
-    }
-    
-    /**
-     * Auto-casting like merge, but either a or b can
-     * be the newType. Called from REGISTER_OPTIMIZE
-     * @param a Type a
-     * @param b Type b
-     * @return Overruling type or null if can't combine
-     */
-    public static Type safeCombine(Type a, Type b) {
-        Type overruling = safeMerge(a, b);
-        if (overruling != null) return overruling;
-        else if (b.doesExtend(a)) return b;
-        
-        return null;
     }
     
     public static boolean isValidNode(Node node) {

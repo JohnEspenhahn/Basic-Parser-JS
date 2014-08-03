@@ -117,12 +117,12 @@ public abstract class OPObject extends BasicObject {
         
         // Type check
         if (p1 != null) { 
-            Type mergedType = Type.merge(opcode.type1, p1.getType(), p1Node.getRow(), p1Node.getCol());
+            Type mergedType = opcode.type1.merge(p1.getType(), p1Node.getRow(), p1Node.getCol(), true);
             this.setType(mergedType);
         }
         
         if (p2 != null) { 
-            Type.merge(opcode.type2, p2.getType(), p2Node.getRow(), p2Node.getCol());
+            opcode.type2.merge(p2.getType(), p2Node.getRow(), p2Node.getCol(), true);
         }
         
         return false;

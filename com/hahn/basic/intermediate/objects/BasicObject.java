@@ -18,7 +18,7 @@ public abstract class BasicObject implements IIntermediate, ITypeable {
     private int uses;
     private IIntermediate statementOfLastUse;
     
-    public BasicObject(String name, Type type) {
+    public BasicObject(String name, @NonNull Type type) {
         this.name = name;
         this.type = type;
         this.uses = 0;
@@ -53,7 +53,7 @@ public abstract class BasicObject implements IIntermediate, ITypeable {
      * @return A new, altered version of this
      */
     public BasicObject castTo(Type type, int row, int col) {
-        return new ObjectHolder(this, getType().castTo(type, row, col));
+        return new ObjectHolder(this, getType().castTo(type, row, col), row, col);
     }
     
     

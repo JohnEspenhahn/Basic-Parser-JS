@@ -107,8 +107,8 @@ public class JSLangFactory implements ILangFactory {
     }
     
     @Override
-    public VarAccess VarAccess(Statement container, BasicObject var, BasicObject idx, Type type) {
-        return new JSVarAccess(container, var, idx, type);
+    public VarAccess VarAccess(Statement container, BasicObject var, BasicObject idx, Type type, int row, int col) {
+        return new JSVarAccess(container, var, idx, type, row, col);
     }
     
     @Override

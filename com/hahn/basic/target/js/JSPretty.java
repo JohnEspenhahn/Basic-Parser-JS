@@ -75,16 +75,17 @@ public class JSPretty {
         // Frame
         case 'f':
             if (arg instanceof Frame && ((Frame) arg).isEmpty()) {
-                break;
+                str.append("{}");
+            } else {
+                str.append(Main.PRETTY_PRINT ? " {\n" : "{");
+                
+                JSPretty.indent += 1;
+                str.append(arg instanceof IIntermediate ? ((IIntermediate) arg).toTarget() : arg);
+                JSPretty.indent -= 1;
+                
+                str.append(Main.PRETTY_PRINT ? getIndent() + "}" : "}");
             }
-            
-            str.append(Main.PRETTY_PRINT ? " {\n" : "{");
-            
-            JSPretty.indent += 1;
-            str.append(arg instanceof IIntermediate ? ((IIntermediate) arg).toTarget() : arg);
-            JSPretty.indent -= 1;
-            
-            str.append(Main.PRETTY_PRINT ? getIndent() + "}" : "}");
+                
             break;
         
         // List

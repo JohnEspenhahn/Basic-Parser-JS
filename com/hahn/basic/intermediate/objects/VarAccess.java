@@ -13,8 +13,8 @@ public abstract class VarAccess extends ObjectHolder {
      * @param index The index of a property to access. Can be either a literal, another variable, or a struct param
      * @param type The type of the property at the given index
      */
-    public VarAccess(Statement container, BasicObject var, BasicObject index, Type type) {
-        super(var, type);
+    public VarAccess(Statement container, BasicObject var, BasicObject index, Type type, int row, int col) {
+        super(var, type, row, col);
         
         this.index = index;
     }

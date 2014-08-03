@@ -2,9 +2,9 @@ package com.hahn.basic.intermediate.objects;
 
 import com.hahn.basic.intermediate.IIntermediate;
 import com.hahn.basic.intermediate.objects.types.Type;
+import com.hahn.basic.intermediate.objects.types.TypeList;
 import com.hahn.basic.intermediate.statements.Statement;
 import com.hahn.basic.parser.Node;
-import com.hahn.basic.util.exceptions.CompileException;
 
 public abstract class TernaryObject extends BasicObject {
     private BasicObject conditional, then_obj, else_obj;
@@ -46,15 +46,10 @@ public abstract class TernaryObject extends BasicObject {
         
         getConditional().setInUse(by);
         
-        // Type check
-        Type typeThen = getThen().getType();
-        Type typeElse = getElse().getType();
-        Type overruling = Type.safeCombine(typeThen, typeElse);
-        if (overruling != null) {
-            setType(overruling);
-        } else {
-            throw new CompileException("Invalid inline if, types don't match (" + typeThen + " : " + typeElse + ")");
-        }
+        // TODO update holder type
+        
+        // Type pair for then and else
+        setType(new TypeList(getThen().getType(), getElse().getType()));
         
         return super.setInUse(by);
     }

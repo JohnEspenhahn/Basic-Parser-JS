@@ -46,7 +46,7 @@ public class ParameterizedType<T extends ITypeable> extends Type {
     }
     
     @Override
-    public Struct castToStruct() {
+    public Struct getAsStruct() {
         return base;
     }
     

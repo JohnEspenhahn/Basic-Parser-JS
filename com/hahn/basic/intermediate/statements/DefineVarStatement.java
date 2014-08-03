@@ -8,7 +8,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.hahn.basic.Main;
 import com.hahn.basic.intermediate.objects.BasicObject;
-import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.parser.Node;
 import com.sun.istack.internal.Nullable;
 
@@ -109,7 +108,7 @@ public abstract class DefineVarStatement extends Statement {
             
             // Type check
             if (!ignoreTypeCheck) {
-                Type.merge(pair.var.getType(), pair.val.getType(), pair.node.getRow(), pair.node.getCol());
+                pair.var.getType().merge(pair.val.getType(), pair.node.getRow(), pair.node.getCol(), true);
             }
             
             pair.var.removeInUse();            

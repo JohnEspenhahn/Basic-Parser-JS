@@ -2,6 +2,7 @@ package com.hahn.basic.intermediate.opcode;
 
 import static com.hahn.basic.intermediate.objects.types.Type.INT;
 import static com.hahn.basic.intermediate.objects.types.Type.BOOL;
+import static com.hahn.basic.intermediate.objects.types.Type.UNDEFINED;
 
 import com.hahn.basic.intermediate.objects.types.Type;
 
@@ -28,9 +29,9 @@ public enum OPCode {
     BORE("|=", INT, INT,  0b110110, 4, 6),
     XOR ("^" , INT, INT,  0b110111, 4, 6),
     XORE("^=", INT, INT,  0b110111, 4, 6),
-    SET ("=" , null, null,  0b0010  , 6, 6),
-    IFE ("==", null, null,  0b100010, 4, 6), 
-    IFN ("!=", null, null,  0b100011, 4, 6), 
+    SET ("=" , UNDEFINED, UNDEFINED,  0b0010  , 6, 6),
+    IFE ("==", UNDEFINED, UNDEFINED,  0b100010, 4, 6), 
+    IFN ("!=", UNDEFINED, UNDEFINED,  0b100011, 4, 6), 
     IFP (">=", INT , INT, 0b100100, 4, 6),
     IFG (">" , INT , INT, 0b100101, 4, 6),
     IFM ("<=", INT , INT, 0b100111, 4, 6),

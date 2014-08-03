@@ -382,14 +382,14 @@ public class Frame extends Statement {
                 
                 @SuppressWarnings("unchecked")
                 ParameterizedType<ITypeable> arrType = (ParameterizedType<ITypeable>) type;
-                exp.setObj(LangCompiler.factory.VarAccess(exp, exp.getObj(), offset, arrType.getTypable(0).getType()), child);                
+                exp.setObj(LangCompiler.factory.VarAccess(exp, exp.getObj(), offset, arrType.getTypable(0).getType(), child.getRow(), child.getCol()), child);                
                 
                 it.next(); // Skip CLOSE_SQR
             } else if (accessMarker == DOT && type.doesExtend(Type.STRUCT)) {               
                 Node nameNode = it.next();
-                StructParam sp = exp.getObj().getType().castToStruct().getStructParam(nameNode);
+                StructParam sp = exp.getObj().getType().getAsStruct().getStructParam(nameNode);
                 
-                exp.setObj(LangCompiler.factory.VarAccess(exp, exp.getObj(), sp, sp.getType()), child);
+                exp.setObj(LangCompiler.factory.VarAccess(exp, exp.getObj(), sp, sp.getType(), child.getRow(), child.getCol()), child);
             } else {
                 throw new CompileException("Illegal attempt to index var `" + exp.getObj() + "` of type `" + exp.getObj().getType() + "`", child);
             }
@@ -883,9 +883,7 @@ public class Frame extends Statement {
         throw new RuntimeException("Invalid cast definition '" + head + "'");
     }
     
-    private ExpressionStatement parseTernary(Node lastChild, ExpressionStatement cnd_exp, Iterator<Node> it) {
-        final Node node_question = lastChild;
-        
+    private BasicObject parseTernary(Node lastChild, ExpressionStatement cnd_exp, Iterator<Node> it) {        
         Node node_then = null, node_colon = null, node_else = null;
         for (int i = 0; i < 3; i++) {
             if (it.hasNext()) {
@@ -907,10 +905,7 @@ public class Frame extends Statement {
             throw new CompileException("Expected `:` but got `" + node_colon + "`", node_colon);
         }
         
-        ExpressionStatement exp = LangCompiler.factory.ExpressionStatement(this, null);
-        exp.setObj(LangCompiler.factory.TernaryObject(exp, cnd_exp.getObj(), node_then, node_else), node_question);
-        
-        return exp;
+        return LangCompiler.factory.TernaryObject(cnd_exp, cnd_exp.getObj(), node_then, node_else);
     }
     
     private Iterator<Node> parseTernaryEnterExp(Iterator<Node> it) {

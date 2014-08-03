@@ -1,34 +1,46 @@
 package com.hahn.basic.intermediate.objects;
 
-import com.hahn.basic.intermediate.IIntermediate;
-import com.hahn.basic.intermediate.statements.ExpressionStatement;
+import lombok.experimental.Delegate;
 
-public abstract class ExpressionObject extends ObjectHolder {
+import com.hahn.basic.intermediate.IIntermediate;
+import com.hahn.basic.intermediate.objects.types.Type;
+import com.hahn.basic.intermediate.statements.ExpressionStatement;
+import com.hahn.basic.intermediate.statements.Statement;
+
+public abstract class ExpressionObject extends BasicObject {
+    
+    @Delegate(types = BasicObject.class, excludes=ExpressionObject.ExcludesList.class)
+    private BasicObject heldObj;
+    
     private ExpressionStatement statement;
-    private boolean forcedGroup;
     
     public ExpressionObject(ExpressionStatement s) {
-        super(s.getObj(), s.getObj().getType());
+        super(s.getObj().getName(), Type.UNDEFINED);
         
-        this.forcedGroup = s.isForcedGroup();
+        this.heldObj = s.getObj();
+        
         this.statement = s;
     }
     
-    @Override
-    public boolean isGrouped() {
-        return super.isGrouped() || forcedGroup;
-    }
-    
     public void setForcedGroup(boolean b) {
-        this.forcedGroup = b;
+        this.statement.setForcedGroup(b);
     }
     
     public boolean isForcedGroup() {
-        return forcedGroup;
+        return statement.isForcedGroup();
     }
     
     public ExpressionStatement getStatement() {
         return statement;
+    }
+    
+    public BasicObject getHeldObject() {
+        return heldObj;
+    }
+    
+    @Override
+    public boolean isGrouped() {
+        return super.isGrouped() || isForcedGroup();
     }
     
     @Override
@@ -45,4 +57,15 @@ public abstract class ExpressionObject extends ObjectHolder {
     
     @Override
     public abstract String toTarget();
+    
+    interface ExcludesList {
+        public BasicObject castTo(Type t);
+        public ExpressionStatement getAsExp(Statement container);
+        
+        // Explicitly implemented functions
+        public boolean isGrouped();
+        public boolean setInUse(IIntermediate by);
+        public void takeRegister(IIntermediate by);
+        public String toTarget();
+    }
 }

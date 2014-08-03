@@ -8,8 +8,8 @@ import com.hahn.basic.intermediate.statements.Statement;
 
 public class JSVarAccess extends VarAccess {
     
-    public JSVarAccess(Statement container, BasicObject var, BasicObject index, Type type) {
-        super(container, var, index, type);
+    public JSVarAccess(Statement container, BasicObject var, BasicObject index, Type type, int row, int col) {
+        super(container, var, index, type, row, col);
     }
     
     @Override

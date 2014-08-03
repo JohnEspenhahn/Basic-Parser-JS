@@ -49,7 +49,7 @@ public interface ILangFactory {
 	public Var VarParameter(Frame frame, String name, Type type, List<String> flags);
 	public Var VarLocal(Frame frame, String name, Type type, List<String> flags);
 	
-	public VarAccess VarAccess(Statement container, BasicObject var, BasicObject idx, Type type);
+	public VarAccess VarAccess(Statement container, BasicObject var, BasicObject idx, Type type, int row, int col);
 	
 	public BasicObject NewInstance(Type type, List<BasicObject> params);
 	

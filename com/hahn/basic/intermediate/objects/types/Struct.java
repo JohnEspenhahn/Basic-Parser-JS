@@ -86,11 +86,6 @@ public class Struct extends Type {
         return params.values();
     }
     
-    @Override
-    public int sizeOf() {
-        return params.size();
-    }
-    
     public class StructParam extends BasicObject {
         public final int idx;
         
