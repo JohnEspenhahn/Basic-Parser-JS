@@ -59,7 +59,7 @@ public class JSPretty {
         }
         
         if (Main.PRETTY_PRINT && tabs >= 0) {
-            return getIndent() + getTabs(tabs);
+            return getIndent() + getTabs(tabs) + str;
         } else {
             return str;
         }
