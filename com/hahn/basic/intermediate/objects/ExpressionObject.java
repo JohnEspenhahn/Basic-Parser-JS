@@ -9,7 +9,7 @@ public abstract class ExpressionObject extends ObjectHolder {
     private boolean forcedGroup;
     
     public ExpressionObject(ExpressionStatement s) {
-        super(s.getObj(), s.getObj().getType());
+        super(s.getObj());
         
         this.forcedGroup = s.isForcedGroup();
         this.statement = s;

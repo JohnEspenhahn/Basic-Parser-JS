@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.hahn.basic.intermediate.objects.BasicObject;
+import com.hahn.basic.parser.Node;
 import com.hahn.basic.target.LangBuildTarget;
 import com.hahn.basic.util.exceptions.CompileException;
 
@@ -72,21 +73,14 @@ public class Struct extends Type {
         return this;
     }
     
-    public StructParam getStructParam(String name) {
+    public StructParam getStructParam(Node nameNode) {
+        String name = nameNode.getValue();
         StructParam sVar = params.get(name);
         if (sVar != null) {
             return sVar;
         } else {
-            throw new CompileException("Unknown variable '" + name + "' in " + this);
+            throw new CompileException("Unknown variable `" + name + "` in " + this, nameNode);
         }
-    }
-    
-    public int getOffset(String name) {
-        return getStructParam(name).idx;
-    }
-    
-    public Type getType(String name) {
-        return getStructParam(name).getType();
     }
     
     public Collection<StructParam> getAllParams() {

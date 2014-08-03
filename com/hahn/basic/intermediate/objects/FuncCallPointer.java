@@ -9,12 +9,16 @@ import com.hahn.basic.intermediate.objects.types.ParameterizedType;
 import com.hahn.basic.intermediate.objects.types.Type;
 
 public abstract class FuncCallPointer extends FuncPointer {
+    private int row, col;
     private Type returnType;
 
-    public FuncCallPointer(String name, BasicObject[] params) {
+    public FuncCallPointer(String name, BasicObject[] params, int row, int col) {
         super(name, new ParameterizedType<ITypeable>(Type.FUNC, (ITypeable[]) params));
 
         this.returnType = Type.UNDEFINED;
+        
+        this.row = row;
+        this.col = col;
     }
 
     public boolean isUsed() {
@@ -32,8 +36,8 @@ public abstract class FuncCallPointer extends FuncPointer {
      * @return this
      */
     @Override
-    public BasicObject castTo(Type t) {
-        this.returnType = this.returnType.castTo(t);
+    public BasicObject castTo(Type t, int row, int col) {
+        this.returnType = this.returnType.castTo(t, row, col);
 
         return this;
     }
@@ -41,7 +45,7 @@ public abstract class FuncCallPointer extends FuncPointer {
     @Override
     public boolean setInUse(IIntermediate by) {
         checkFunction();
-        returnType = func.getReturnType().castTo(returnType);
+        returnType = func.getReturnType().castTo(returnType, this.row, this.col);
         
         ListIterator<BasicObject> it = Arrays.asList(getParams()).listIterator(countParams());
         while (it.hasPrevious()) {

@@ -87,8 +87,8 @@ public class JSLangFactory implements ILangFactory {
     }
     
     @Override
-    public OPObject OPObject(Statement container, OPCode op, BasicObject p1, BasicObject p2) {
-        return new JSOPObject(container, op, p1, p2);
+    public OPObject OPObject(Statement container, OPCode op, BasicObject p1, Node p1Node, BasicObject p2, Node p2Node) {
+        return new JSOPObject(container, op, p1, p1Node, p2, p2Node);
     }
     
     @Override
@@ -117,8 +117,8 @@ public class JSLangFactory implements ILangFactory {
     }
     
     @Override
-    public ConditionalObject ConditionalObject(Statement container, OPCode op, BasicObject p1, BasicObject p2, BasicObject temp) {
-        return new JSConditionalObject(container, op, p1, p2, temp);
+    public ConditionalObject ConditionalObject(Statement container, OPCode op, BasicObject p1, Node p1Node, BasicObject p2, Node p2Node, BasicObject temp) {
+        return new JSConditionalObject(container, op, p1, p1Node, p2, p2Node, temp);
     }
     
     @Override
@@ -137,8 +137,8 @@ public class JSLangFactory implements ILangFactory {
     }
     
     @Override
-    public FuncCallPointer FuncCallPointer(String name, BasicObject[] params) {
-        return new JSFuncCallPointer(name, params);
+    public FuncCallPointer FuncCallPointer(String name, BasicObject[] params, int row, int col) {
+        return new JSFuncCallPointer(name, params, row, col);
     }
     
     @Override

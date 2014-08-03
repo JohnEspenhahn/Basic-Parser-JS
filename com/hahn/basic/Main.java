@@ -284,7 +284,7 @@ public abstract class Main {
     }
     
     public static void setLine(int row) {
-        Main.setLine(row, 0);
+        Main.setLine(row, -1);
     }
     
     public static void setLine(int row, int col) {

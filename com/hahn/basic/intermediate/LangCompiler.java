@@ -3,6 +3,7 @@ package com.hahn.basic.intermediate;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.hahn.basic.Main;
 import com.hahn.basic.intermediate.library.base.Library;
 import com.hahn.basic.intermediate.objects.Param;
 import com.hahn.basic.intermediate.objects.StringConst;
@@ -124,16 +125,15 @@ public class LangCompiler {
     public static FuncHead defineFunc(Node head, String name, boolean rawName, Type rtnType, Param... params) {
         FuncHead func = LangCompiler.factory.FuncHead(name, rawName, head, rtnType, params);
         
-        FuncGroup old = funcs.get(name);
-        if (old == null) {
-            FuncGroup group = new FuncGroup(func);
+        FuncGroup group = funcs.get(name);
+        if (group == null) {
+            group = new FuncGroup(func);
             funcs.put(name, group);
             
             return func;
-        } else if (old.isDefined(func)) {
-            throw new CompileException("The function `" + func.getName() + "` with those parameters is already defined");
+        } else if (group.isDefined(func)) {
+            throw new CompileException("The function `" + func.getName() + "` with those parameters is already defined", Main.getRow(), Main.getCol());
         } else {
-            FuncGroup group = funcs.get(name);
             group.add(func);
             
             return func;

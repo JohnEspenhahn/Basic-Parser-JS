@@ -4,7 +4,6 @@ import com.hahn.basic.intermediate.IIntermediate;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.statements.Statement;
 import com.hahn.basic.target.LangBuildTarget;
-import com.hahn.basic.util.exceptions.CompileException;
 
 public abstract class VarAccess extends ObjectHolder {
     private BasicObject index;
@@ -16,11 +15,7 @@ public abstract class VarAccess extends ObjectHolder {
      * @param type The type of the property at the given index
      */
     public VarAccess(Statement container, BasicObject var, BasicObject index, Type type) {
-        super(var, type);
-        
-        if (!var.isVar()) {
-            throw new CompileException("Illegal attempt to access object `" + var + "` at index `" + index + "`");
-        }
+        super(var, type, -1, -1);
         
         this.index = index;
     }

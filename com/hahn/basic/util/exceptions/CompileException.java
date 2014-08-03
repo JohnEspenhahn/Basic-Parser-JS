@@ -10,12 +10,12 @@ public class CompileException extends RuntimeException {
     
     final String message;
     
-    public CompileException(String mss, Compilable c) {
-        this(mss, c.row, -1);
+    public CompileException(String mss) {
+        this(mss, Main.getRow(), Main.getCol());
     }
     
-    public CompileException(String mss, int col) {
-        this(mss, Main.getRow(), col);
+    public CompileException(String mss, Compilable c) {
+        this(mss, c.row, -1);
     }
     
     public CompileException(String mss, Node node) {
@@ -26,7 +26,7 @@ public class CompileException extends RuntimeException {
         this(mss, Main.getRow(), Main.getLineStr().indexOf(badLinePart));
     }
     
-    protected CompileException(String mss, int row, int col) {
+    public CompileException(String mss, int row, int col) {
         super(mss + " in line " + row + (col < 0 ? "" : "\n" + Main.getLineStr() + "\n" + Util.createArrow(' ', '^', col)));
         
         this.message = mss;

@@ -42,7 +42,7 @@ public interface ILangFactory {
 	public BasicObject PushObject();
 	public StringConst StringConst(String str);
 	
-	public OPObject OPObject(Statement container, OPCode op, BasicObject p1, BasicObject p2);
+	public OPObject OPObject(Statement container, OPCode op, BasicObject p1, Node p1Node, BasicObject p2, Node p2Node);
 	public BasicObject ExpressionObject(ExpressionStatement exp);
 	
 	public Var VarParameter(Frame frame, String name, Type type, List<String> flags);
@@ -52,13 +52,13 @@ public interface ILangFactory {
 	
 	public BasicObject NewInstance(Type type, List<BasicObject> params);
 	
-	public ConditionalObject ConditionalObject(Statement container, OPCode op, BasicObject p1, BasicObject p2, BasicObject temp);
+	public ConditionalObject ConditionalObject(Statement container, OPCode op, BasicObject p1, Node p1Node, BasicObject p2, Node p2Node, BasicObject temp);
 	public TernaryObject TernaryObject(Statement container, BasicObject condition, Node node_then, Node node_else);
 	
 	public FuncHead FuncHead(String name, boolean rawName, Node head, Type rtnType, Param[] params);
     public FuncPointer FuncPointer(String name, ParameterizedType<ITypeable> funcType);
 
-    public FuncCallPointer FuncCallPointer(String name, BasicObject[] params);
+    public FuncCallPointer FuncCallPointer(String name, BasicObject[] params, int row, int col);
     
     // Commands    
     public ILangCommand Import(String name);

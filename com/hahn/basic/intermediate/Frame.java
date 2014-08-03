@@ -1,6 +1,27 @@
 package com.hahn.basic.intermediate;
 
-import static com.hahn.basic.definition.EnumToken.*;
+import static com.hahn.basic.definition.EnumToken.ADD_SUB;
+import static com.hahn.basic.definition.EnumToken.AND;
+import static com.hahn.basic.definition.EnumToken.CHAR;
+import static com.hahn.basic.definition.EnumToken.DOT;
+import static com.hahn.basic.definition.EnumToken.EQUALS;
+import static com.hahn.basic.definition.EnumToken.FALSE;
+import static com.hahn.basic.definition.EnumToken.GTR;
+import static com.hahn.basic.definition.EnumToken.GTR_EQU;
+import static com.hahn.basic.definition.EnumToken.HEX_NUMBER;
+import static com.hahn.basic.definition.EnumToken.LESS;
+import static com.hahn.basic.definition.EnumToken.LESS_EQU;
+import static com.hahn.basic.definition.EnumToken.MSC_BITWISE;
+import static com.hahn.basic.definition.EnumToken.MULT_DIV;
+import static com.hahn.basic.definition.EnumToken.NOT;
+import static com.hahn.basic.definition.EnumToken.NOTEQUAL;
+import static com.hahn.basic.definition.EnumToken.NUMBER;
+import static com.hahn.basic.definition.EnumToken.OPEN_PRNTH;
+import static com.hahn.basic.definition.EnumToken.OPEN_SQR;
+import static com.hahn.basic.definition.EnumToken.QUESTION;
+import static com.hahn.basic.definition.EnumToken.SC_BITWISE;
+import static com.hahn.basic.definition.EnumToken.STRING;
+import static com.hahn.basic.definition.EnumToken.TRUE;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -217,7 +238,7 @@ public class Frame extends Statement {
     
     public AdvancedObject addVar(AdvancedObject var) {
         if (safeAddVar(var)) return var;
-        else throw new DuplicateDefinitionException("The local var `" + var + "` is already defined");
+        else throw new DuplicateDefinitionException("The variable `" + var + "` is already defined");
     }
     
     public VarTemp createTempVar(Type type) {
@@ -337,27 +358,29 @@ public class Frame extends Statement {
      * @param head EnumExpression.IN_ACCESS
      * @return The object the with retrieved value
      */
-    private BasicObject inAccessVar(AdvancedObject obj, Node head) {
-        Type t = obj.getType();
-        
+    private BasicObject inAccessVar(AdvancedObject obj, Node head) {        
         ExpressionStatement exp = LangCompiler.factory.ExpressionStatement(this, obj);
         Iterator<Node> it = Util.getIterator(head);
         while (it.hasNext()) {
+            Type type = exp.getObj().getType();
+            
             Node child = it.next();
             Enum<?> accessMarker = child.getToken();
-            if (accessMarker == OPEN_SQR && t.doesExtend(Type.ARRAY)) {
+            if (accessMarker == OPEN_SQR && type.doesExtend(Type.ARRAY)) {
                 BasicObject offset = handleExpression(it.next()).getAsExpObj();
                 
-                exp.setObj(LangCompiler.factory.VarAccess(exp, exp.getObj(), offset, Type.INT));                
+                @SuppressWarnings("unchecked")
+                ParameterizedType<ITypeable> arrType = (ParameterizedType<ITypeable>) type;
+                exp.setObj(LangCompiler.factory.VarAccess(exp, exp.getObj(), offset, arrType.getTypable(0).getType()), child);                
                 
                 it.next(); // Skip CLOSE_SQR
-            } else if (accessMarker == DOT && t.doesExtend(Type.STRUCT)) {               
-                String name = it.next().getValue();
-                StructParam sp = t.castToStruct().getStructParam(name);
+            } else if (accessMarker == DOT && type.doesExtend(Type.STRUCT)) {               
+                Node nameNode = it.next();
+                StructParam sp = exp.getObj().getType().castToStruct().getStructParam(nameNode);
                 
-                exp.setObj(LangCompiler.factory.VarAccess(exp, exp.getObj(), sp, sp.getType()));
+                exp.setObj(LangCompiler.factory.VarAccess(exp, exp.getObj(), sp, sp.getType()), child);
             } else {
-                throw new CompileException("Illegal attempt to index var `" + obj + "` of type `" + t + "`", child);
+                throw new CompileException("Illegal attempt to index var `" + exp.getObj() + "` of type `" + exp.getObj().getType() + "`", child);
             }
         }
         
@@ -372,28 +395,31 @@ public class Frame extends Statement {
     public OPObject modifyVar(Node head) {
         List<Node> children = head.getAsChildren();
         
-        BasicObject var = accessVar(children.get(0));
-        BasicObject obj = handleExpression(children.get(2)).getAsExpObj();
+        Node varNode = children.get(0);
+        BasicObject var = accessVar(varNode);
+        
+        Node objNode = children.get(2);
+        BasicObject obj = handleExpression(objNode).getAsExpObj();
         
         switch (children.get(1).getValue()) {
             case "=": 
-                return updateVar(var, obj, OPCode.SET);
+                return updateVar(var, varNode, obj, objNode, OPCode.SET);
             case "+=":
-                return updateVar(var, obj, OPCode.ADDE);
+                return updateVar(var, varNode, obj, objNode, OPCode.ADDE);
             case "-=":
-                return updateVar(var, obj, OPCode.SUBE);
+                return updateVar(var, varNode, obj, objNode, OPCode.SUBE);
             case "*=":
-                return updateVar(var, obj, OPCode.MULE);
+                return updateVar(var, varNode, obj, objNode, OPCode.MULE);
             case "/=":
-                return updateVar(var, obj, OPCode.DIVE);
+                return updateVar(var, varNode, obj, objNode, OPCode.DIVE);
             case "%=":
-                return updateVar(var, obj, OPCode.MODE);
+                return updateVar(var, varNode, obj, objNode, OPCode.MODE);
             case "&=":
-                return updateVar(var, obj, OPCode.ANDE);
+                return updateVar(var, varNode, obj, objNode, OPCode.ANDE);
             case "|=":
-                return updateVar(var, obj, OPCode.BORE);
+                return updateVar(var, varNode, obj, objNode, OPCode.BORE);
             case "^=":
-                return updateVar(var, obj, OPCode.XORE);
+                return updateVar(var, varNode, obj, objNode, OPCode.XORE);
            default:
                throw new RuntimeException("Unhandled modify var '" + children.get(1).getValue() + "'");
         }
@@ -402,12 +428,14 @@ public class Frame extends Statement {
     /**
      * Do the modification of a variable
      * @param var The variable to modify
+     * @param varNode The node by which the var is defined
      * @param obj The object doing the modification
+     * @param objNode The node by which the obj is defined
      * @param op The operation to perform on the variable
      * @return Object to update the var
      */
-    protected OPObject updateVar(BasicObject var, BasicObject obj, OPCode op) {
-        return LangCompiler.factory.OPObject(this, op, var, obj);
+    protected OPObject updateVar(BasicObject var, Node varNode, BasicObject obj, Node objNode, OPCode op) {
+        return LangCompiler.factory.OPObject(this, op, var, varNode, obj, objNode);
     }
     
     /**
@@ -464,8 +492,11 @@ public class Frame extends Statement {
                         
                         List<Node> modify_children = nextHead.getAsChildren();
                         
-                        BasicObject o = handleExpression(modify_children.get(1)).getAsExpObj();
-                        define.addVar(obj, o);
+                        Node equNode = modify_children.get(0);
+                        Node expNode = modify_children.get(1);
+                        
+                        BasicObject o = handleExpression(expNode).getAsExpObj();
+                        define.addVar(obj, o, equNode);
                         
                         hasInit = true;
                     }
@@ -473,7 +504,7 @@ public class Frame extends Statement {
                 
                 // Default value
                 if (!hasInit && canInit) {
-                    define.addVar(obj, LiteralNum.UNDEFINED);
+                    define.addVar(obj, LiteralNum.UNDEFINED, node);
                 }
                 
                 // Make var available
@@ -516,7 +547,7 @@ public class Frame extends Statement {
                 result = handleExpression(resultNode).getAsExpObj();
                 
                 try {
-                    result.castTo(func.getReturnType());
+                    result.castTo(func.getReturnType(), resultNode.getRow(), resultNode.getCol());
                 } catch (CastException e) {
                     throw new CastException("Invalid return type - ", resultNode, e);
                 }
@@ -581,7 +612,7 @@ public class Frame extends Statement {
                 nameNode = child;
             } else if (token == EnumExpression.TYPE) {
                 rtnType = Type.fromNode(child);
-            } else if (token == EnumToken.IDENTIFIER) {
+            } else if (token == EnumToken.FUNCTION || token == EnumToken.IDENTIFIER) {
                 nameNode = child;
             } else if (token == EnumExpression.DEF_PARAMS) {      
                 Iterator<Node> pIt = Util.getIterator(child);
@@ -591,10 +622,10 @@ public class Frame extends Statement {
                     if (pNode.getToken() == EnumToken.COMMA) {
                         continue;
                     } else {
-                        Node pTypeNode = pNode;
-                        Node pNameNode = pIt.next();
+                        Type pType = Type.fromNode(pNode);
+                        String pName = pIt.next().getValue();
                         
-                        params.add(new Param(pNameNode, Type.fromNode(pTypeNode)));
+                        params.add(new Param(pName, pType));
                     }
                 }
             } else if (token == EnumExpression.BLOCK) {
@@ -607,10 +638,12 @@ public class Frame extends Statement {
            
         // Define function
         if (!anonymous) {
+            String name = nameNode.getValue();
+            
             LangCompiler.defineFunc(body, name, false, rtnType, aParams);
             return null;
         } else {
-            name = getLabel("afunc");
+            String name = getLabel("afunc");
             
             LangCompiler.defineFunc(body, name, false, rtnType, aParams);
             return LangCompiler.factory.FuncPointer(name, new ParameterizedType<ITypeable>(Type.FUNC, (ITypeable[]) aParams));
@@ -627,7 +660,8 @@ public class Frame extends Statement {
         Iterator<Node> it = Util.getIterator(head);
         
         // Determine function
-        String name = it.next().getValue();
+        Node nameNode = it.next();
+        String name = nameNode.getValue();
         
         List<BasicObject> params = new ArrayList<BasicObject>();
         while (it.hasNext()) {
@@ -642,7 +676,7 @@ public class Frame extends Statement {
         BasicObject[] aParams = params.toArray(new BasicObject[params.size()]);
         
         // Get FuncCall object
-        FuncCallPointer funcCallPointer = LangCompiler.factory.FuncCallPointer(name, aParams);
+        FuncCallPointer funcCallPointer = LangCompiler.factory.FuncCallPointer(name, aParams, nameNode.getRow(), nameNode.getCol());
         return LangCompiler.factory.DefaultCallFuncStatement(this, funcCallPointer);
     }
     
@@ -832,13 +866,15 @@ public class Frame extends Statement {
             ExpressionStatement nextExp = LangCompiler.factory.ExpressionStatement(this, null);
             handleNextExpressionChild(it, nextExp, temp);
             
-            return nextExp.getAsExpObj().castTo(type);
+            return nextExp.getAsExpObj().castTo(type, typeNode.getRow(), typeNode.getCol());
         }
         
         throw new RuntimeException("Invalid cast definition '" + head + "'");
     }
     
     private ExpressionStatement parseTernary(Node lastChild, ExpressionStatement cnd_exp, Iterator<Node> it) {
+        final Node node_question = lastChild;
+        
         Node node_then = null, node_colon = null, node_else = null;
         for (int i = 0; i < 3; i++) {
             if (it.hasNext()) {
@@ -861,7 +897,7 @@ public class Frame extends Statement {
         }
         
         ExpressionStatement exp = LangCompiler.factory.ExpressionStatement(this, null);
-        exp.setObj(LangCompiler.factory.TernaryObject(exp, cnd_exp.getObj(), node_then, node_else));
+        exp.setObj(LangCompiler.factory.TernaryObject(exp, cnd_exp.getObj(), node_then, node_else), node_question);
         
         return exp;
     }
@@ -921,7 +957,7 @@ public class Frame extends Statement {
         }
  
         if (exp.getObj() == null) {
-            throw new CompileException("Incomplete command", -1); 
+            throw new CompileException("Incomplete command"); 
         } else {
             return exp;
         }
@@ -934,15 +970,16 @@ public class Frame extends Statement {
         
         BasicObject obj = handleNextExpressionChildObject(child, it, temp);
         if (obj != null) {
-            exp.setObj(obj);
+            exp.setObj(obj, child);
         } else if (token == QUESTION) {
-            exp.setObj(parseTernary(child, exp, it));
+            exp.setObj(parseTernary(child, exp, it), child);
             
         } else if (token == OPEN_PRNTH) {
-            ExpressionStatement nextExp = doHandleExpression(Util.getIterator(it.next()));
+            Node inPrnthNode = it.next();
+            ExpressionStatement nextExp = doHandleExpression(Util.getIterator(inPrnthNode));
             nextExp.setForcedGroup(true);
             
-            exp.setObj(nextExp);
+            exp.setObj(nextExp, inPrnthNode);
             
             // Skip ending parenthesis
             it.next();
@@ -953,14 +990,14 @@ public class Frame extends Statement {
             ExpressionStatement nextExp = LangCompiler.factory.ExpressionStatement(this, null);
             handleNextExpressionChild(it, nextExp, temp);
             
-            exp.setObj(LangCompiler.factory.OPObject(exp, op, nextExp.getObj(), null));
+            exp.setObj(LangCompiler.factory.OPObject(exp, op, nextExp.getObj(), nextExp.getNode(), null, null), child);
         } else if (token == ADD_SUB || token == MULT_DIV || token == AND || token == MSC_BITWISE || token == SC_BITWISE) {
             OPCode op = OPCode.fromSymbol(val);
             
             ExpressionStatement nextExp = LangCompiler.factory.ExpressionStatement(this, null);
             handleNextExpressionChild(it, nextExp, temp);
             
-            exp.setObj(LangCompiler.factory.OPObject(exp, op, exp.getObj(), nextExp.getObj()));
+            exp.setObj(LangCompiler.factory.OPObject(exp, op, exp.getObj(), exp.getNode(), nextExp.getObj(), nextExp.getNode()), child);
         } else if (token == NOTEQUAL || token == EQUALS || token == LESS_EQU || token == GTR_EQU || token == LESS || token == GTR) {
             OPCode op = OPCode.fromSymbol(val);
             
@@ -968,9 +1005,9 @@ public class Frame extends Statement {
             handleNextExpressionChild(it, nextExp, temp);
             
             if (temp == null) temp = createTempVar(Type.BOOL);
-            exp.setObj(LangCompiler.factory.ConditionalObject(exp, op, exp.getObj(), nextExp.getObj(), temp));
+            exp.setObj(LangCompiler.factory.ConditionalObject(exp, op, exp.getObj(), exp.getNode(), nextExp.getObj(), nextExp.getNode(), temp), child);
         } else if (!child.isTerminal()) {
-            exp.setObj(doHandleExpression(Util.getIterator(child)));
+            exp.setObj(doHandleExpression(Util.getIterator(child)), child);
         } else {
             throw new CompileException("Unexpected token `" + child + "`", child);
         }

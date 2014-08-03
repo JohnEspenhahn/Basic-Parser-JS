@@ -2,11 +2,11 @@ package com.hahn.basic.target.js.statements;
 
 import java.util.List;
 
-import com.hahn.basic.Main;
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.LiteralNum;
 import com.hahn.basic.intermediate.statements.DefineVarStatement;
 import com.hahn.basic.intermediate.statements.Statement;
+import com.hahn.basic.parser.Node;
 import com.hahn.basic.target.LangBuildTarget;
 import com.hahn.basic.util.exceptions.CompileException;
 
@@ -22,14 +22,12 @@ public class JSDefineVarStatement extends DefineVarStatement {
     }
     
     @Override
-    public void addVar(BasicObject var, BasicObject val) {
-        Main.setLine(row);
-        
+    public void addVar(BasicObject var, BasicObject val, Node node) {
         if (var.hasFlag("const") && val == LiteralNum.UNDEFINED) {
-            throw new CompileException("The constant variable `" + var.getName() + "` must be initialized");
+            throw new CompileException("The constant variable `" + var.getName() + "` must be initialized", node);
         }
         
-        super.addVar(var, val);
+        super.addVar(var, val, node);
     }
 
     @Override

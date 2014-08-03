@@ -7,6 +7,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import com.hahn.basic.Main;
 import com.hahn.basic.util.exceptions.CompileException;
 
 public class Lexer {    
@@ -81,7 +82,7 @@ public class Lexer {
                     }
                 }
                 
-                throw new CompileException("Invalid token", lastEnd);
+                throw new CompileException("Invalid token", Main.getRow(), lastEnd);
             }
             
             // 2 For full capture, space
@@ -111,7 +112,7 @@ public class Lexer {
 
         // Ensure full match
         if (lastEnd != input.length()) {
-            throw new CompileException("Invalid token", lastEnd); 
+            throw new CompileException("Invalid token", Main.getRow(), lastEnd); 
         }
 
         return stream;

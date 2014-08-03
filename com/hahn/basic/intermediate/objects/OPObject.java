@@ -1,12 +1,11 @@
 package com.hahn.basic.intermediate.objects;
 
-import lombok.NonNull;
-
 import com.hahn.basic.intermediate.Frame;
 import com.hahn.basic.intermediate.IIntermediate;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.opcode.OPCode;
 import com.hahn.basic.intermediate.statements.Statement;
+import com.hahn.basic.parser.Node;
 import com.hahn.basic.target.LangBuildTarget;
 import com.sun.istack.internal.Nullable;
 
@@ -14,22 +13,26 @@ public abstract class OPObject extends BasicObject {
     private Frame frame;
     private OPCode opcode;
     
-    @NonNull
+    private Node p1Node;
     private BasicObject p1;
     private boolean isLiteral;
     
-    @Nullable
+    private Node p2Node;
     private BasicObject p2;
     
-    public OPObject(Statement container, OPCode opcode, BasicObject p1, @Nullable BasicObject p2) {
-        super("@ " + opcode.toString() + " @", p1.getType());
+    public OPObject(Statement container, OPCode op, BasicObject p1, Node p1Node, @Nullable BasicObject p2, @Nullable Node p2Node) {
+        super("@ " + op + " @", p1.getType());
         
         this.isLiteral = false;
         this.frame = container.getFrame();
         
-        this.opcode = opcode;
+        this.opcode = op;
+        
         this.p1 = p1;
+        this.p1Node = p1Node;
+        
         this.p2 = p2;
+        this.p2Node = p2Node;
     }
     
     @Override
@@ -115,12 +118,12 @@ public abstract class OPObject extends BasicObject {
         
         // Type check
         if (p1 != null) { 
-            Type mergedType = Type.merge(opcode.type1, p1.getType());
+            Type mergedType = Type.merge(opcode.type1, p1.getType(), p1Node.getRow(), p1Node.getCol());
             this.setType(mergedType);
         }
         
         if (p2 != null) { 
-            Type.merge(opcode.type2, p2.getType());
+            Type.merge(opcode.type2, p2.getType(), p2Node.getRow(), p2Node.getCol());
         }
         
         return false;

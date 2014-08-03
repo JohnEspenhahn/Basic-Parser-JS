@@ -83,7 +83,7 @@ public class Type implements ITypeable {
      * @return t on success
      * @throws CastException If can not cast
      */
-    public Type castTo(Type t) {
+    public Type castTo(Type t, int row, int col) {
         if (t == null || t == Type.UNDEFINED) {
             return this;
         } else if (this.equals(t)) {
@@ -102,7 +102,7 @@ public class Type implements ITypeable {
             return t;
         }
         
-        throw new CastException("Can not cast `" + this + "` to `" + t + "`");
+        throw new CastException("Can not cast `" + this + "` to `" + t + "`", row, col);
     }
     
     @Override
@@ -134,12 +134,12 @@ public class Type implements ITypeable {
      * @return Overruling type
      * @throws CompileException if types are invalid
      */
-    public static Type merge(Type original, Type newType) {
+    public static Type merge(Type original, Type newType, int row, int col) {
         Type overruling = safeMerge(original, newType);
         if (overruling != null) {
             return overruling;
         } else {
-            throw new CompileException("Incompatible types `" + original.toString() + "` and `" + newType.toString() + "`");
+            throw new CompileException("Incompatible types `" + original + "` and `" + newType + "`", row, col);
         }
     }
     
@@ -186,8 +186,10 @@ public class Type implements ITypeable {
     }
 
     @SuppressWarnings("unchecked")
-    public static Type fromNode(Node node, boolean isGettingMain) {        
-        Iterator<Node> it = Util.getIterator(node);
+    public static Type fromNode(Node head, boolean isGettingMain) {
+        if (head == null) return Type.UNDEFINED; 
+        
+        Iterator<Node> it = Util.getIterator(head);
         
         Node nameNode = it.next();
         Type type = Type.fromName(nameNode.getValue());
@@ -195,22 +197,22 @@ public class Type implements ITypeable {
         while (it.hasNext()) {
             // Check not allowed parameters
             if (!(type instanceof Struct) || ((Struct) type).getTypeParams() == 0) {
-                throw new CompileException("The type `" + type.toString() + "` can not be parameterized");
+                throw new CompileException("The type `" + type.toString() + "` can not be parameterized", nameNode);
             }
             
             Struct mainType = (Struct) type;
             type = ParameterizedType.getParameterizedType(mainType, it.next(), mainType.doesExtend(Type.STRUCT));
             
             if (mainType.getTypeParams() != -1 && mainType.getTypeParams() != ((ParameterizedType<Type>) type).getTypes().length) {
-                throw new CompileException("Invalid number of parameters for type `" + mainType.toString() + "`. Expected " + mainType.getTypeParams() + " but got " + ((ParameterizedType<Type>) type).getTypes().length);
+                throw new CompileException("Invalid number of parameters for type `" + mainType.toString() + "`. Expected " + mainType.getTypeParams() + " but got " + ((ParameterizedType<Type>) type).getTypes().length, head);
             }
         }
         
         // Check requires parameters
         if (!isGettingMain && type instanceof Struct && ((Struct) type).getTypeParams() > 0) {
-            throw new CompileException("The type `" + nameNode.getValue() + "` must be parameterized");
+            throw new CompileException("The type `" + nameNode.getValue() + "` must be parameterized", nameNode);
         } else if (type == null)  {
-            throw new CompileException("Invalid type `" + nameNode.getValue() + "` specified");
+            throw new CompileException("Invalid type `" + nameNode.getValue() + "` specified", nameNode);
         } else {
             return type;
         }

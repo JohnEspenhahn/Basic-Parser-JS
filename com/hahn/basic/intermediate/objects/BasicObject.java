@@ -53,8 +53,8 @@ public abstract class BasicObject implements IIntermediate, ITypeable {
      * @param t The type to cast to
      * @return A new, altered version of this
      */
-    public BasicObject castTo(Type t) {
-        return new ObjectHolder(this, t);
+    public BasicObject castTo(Type t, int row, int col) {
+        return new ObjectHolder(this, t, row, col);
     }
     
     

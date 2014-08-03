@@ -7,6 +7,7 @@ import java.util.ListIterator;
 import com.hahn.basic.Main;
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.types.Type;
+import com.hahn.basic.parser.Node;
 import com.hahn.basic.util.Util;
 import com.sun.istack.internal.Nullable;
 
@@ -43,8 +44,8 @@ public abstract class DefineVarStatement extends Statement {
         return hasFlags() && getFlags().contains(name);
     }
     
-    public void addVar(BasicObject var, BasicObject val) {
-        definepairs.add(new DefinePair(var.getForCreateVar(), val));
+    public void addVar(BasicObject var, BasicObject val, Node node) {
+        definepairs.add(new DefinePair(node, var.getForCreateVar(), val));
     }
     
     public List<DefinePair> getDefinePairs() {
@@ -107,7 +108,7 @@ public abstract class DefineVarStatement extends Statement {
             
             // Type check
             if (!ignoreTypeCheck) {
-                Type.merge(pair.var.getType(), pair.val.getType());
+                Type.merge(pair.var.getType(), pair.val.getType(), pair.node.getRow(), pair.node.getCol());
             }
             
             pair.var.removeInUse();            
@@ -152,9 +153,12 @@ public abstract class DefineVarStatement extends Statement {
     }
     
     public class DefinePair {
+        public final Node node;
         public final BasicObject var, val;
         
-        public DefinePair(BasicObject var, BasicObject val) {
+        public DefinePair(Node node, BasicObject var, BasicObject val) {
+            this.node = node;
+            
             this.var = var;
             this.val = val;
         }

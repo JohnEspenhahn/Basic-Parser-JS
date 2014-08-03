@@ -7,8 +7,8 @@ import com.hahn.basic.util.Util;
 
 public class JSFuncCallPointer extends FuncCallPointer {
     
-    public JSFuncCallPointer(String name, BasicObject[] params) {
-        super(name, params);
+    public JSFuncCallPointer(String name, BasicObject[] params, int row, int col) {
+        super(name, params, row, col);
     }
     
     @Override

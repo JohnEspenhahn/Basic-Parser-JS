@@ -4,9 +4,12 @@ import com.hahn.basic.Main;
 import com.hahn.basic.intermediate.LangCompiler;
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.types.Type;
+import com.hahn.basic.parser.Node;
 
 public abstract class ExpressionStatement extends Statement {
     private BasicObject obj;
+    private Node node;
+    
     private boolean forcedGroup;
     
     private boolean gotAsObject;
@@ -31,22 +34,25 @@ public abstract class ExpressionStatement extends Statement {
         return obj;
     }
     
-    public void setObj(BasicObject obj) {
+    public void setObj(ExpressionStatement otherExp, Node node) {
+        setObj(otherExp.getAsExpObj(), node);
+    }
+    
+    public void setObj(BasicObject obj, Node node) {
         enforce();
         
         this.obj = obj;
+        this.node = node;
     }
     
-    public void setObj(ExpressionStatement otherExp) {
-        enforce();
-        
-        this.obj = otherExp.getAsExpObj();
+    public Node getNode() {
+        return node;
     }
     
-    public void castTo(Type type) {
+    public void castTo(Type type, int row, int col) {
         enforce();
         
-        this.obj = this.obj.castTo(type);
+        this.obj = this.obj.castTo(type, row, col);
     }
     
     @Override

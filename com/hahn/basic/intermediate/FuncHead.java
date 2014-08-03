@@ -15,7 +15,7 @@ public abstract class FuncHead extends Frame {
     private final String funcId;
     
     public FuncHead(String name, boolean rawName, Node funcHeadNode, Type rtn, Param... params) {
-        super(LangCompiler.getGlobalFrame(), funcHeadNode);
+        super(LangCompiler.getGlobalFrame(), funcHeadNode); // TODO nest anon func
         
         if (rawName) {
             this.funcId = name;

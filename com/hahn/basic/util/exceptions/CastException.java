@@ -13,4 +13,8 @@ public class CastException extends CompileException {
         super(mss + e.message, node);
     }
 
+    public CastException(String mss, int row, int col) {
+        super(mss, row, col);
+    }
+    
 }
