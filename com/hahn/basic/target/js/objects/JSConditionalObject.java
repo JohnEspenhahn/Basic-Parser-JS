@@ -1,5 +1,6 @@
 package com.hahn.basic.target.js.objects;
 
+import com.hahn.basic.Main;
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.ConditionalObject;
 import com.hahn.basic.intermediate.opcode.OPCode;
@@ -10,6 +11,10 @@ public class JSConditionalObject extends ConditionalObject {
     
     public JSConditionalObject(Statement container, OPCode op, BasicObject p1, Node p1Node, BasicObject p2, Node p2Node, BasicObject temp) {
         super(container, op, p1, p1Node, p2, p2Node, temp);
+    }
+    
+    public String getPrettyFormat() {
+        return (Main.PRETTY_PRINT ? "%s %s %s" : "%s%s%s");
     }
     
     @Override
