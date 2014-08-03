@@ -1,10 +1,9 @@
-package com.hahn.basic.target.js.objects;
+package com.hahn.basic.target.js;
 
 import com.hahn.basic.intermediate.FuncHead;
 import com.hahn.basic.intermediate.objects.Param;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.parser.Node;
-import com.hahn.basic.target.js.JSPretty;
 
 public class JSFuncHead extends FuncHead {
     
@@ -14,6 +13,6 @@ public class JSFuncHead extends FuncHead {
     
     @Override
     public String toFuncAreaTarget() {
-        return JSPretty.format("function %s(%l)%f", getFuncId(), getParams(), this);        
+        return JSPretty.format(0, "function %s(%l)%f", getFuncId(), getParams(), this);        
     }
 }

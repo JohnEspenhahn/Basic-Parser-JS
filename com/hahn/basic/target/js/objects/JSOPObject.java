@@ -1,5 +1,6 @@
 package com.hahn.basic.target.js.objects;
 
+import com.hahn.basic.Main;
 import com.hahn.basic.intermediate.IIntermediate;
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.OPObject;
@@ -21,6 +22,10 @@ public class JSOPObject extends OPObject {
         }
         
         return super.setInUse(by);
+    }
+    
+    public String getPrettyFormat() {
+        return (Main.PRETTY_PRINT ? "%s %s %s" : "%s%s%s");
     }
     
     @Override

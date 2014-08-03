@@ -46,6 +46,6 @@ public class JSWhileStatement extends WhileStatement {
     
     @Override
     public String toTarget() {
-        return JSPretty.format("while(%s)%f", getConditionStatement(), getInnerFrame());
+        return JSPretty.format(0, "while(%s)%f", getConditionStatement(), getInnerFrame());
     }
 }

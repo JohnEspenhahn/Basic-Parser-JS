@@ -1,6 +1,5 @@
 package com.hahn.basic.intermediate.objects;
 
-import com.hahn.basic.Main;
 import com.hahn.basic.intermediate.Frame;
 import com.hahn.basic.intermediate.IIntermediate;
 import com.hahn.basic.intermediate.objects.types.Type;
@@ -148,10 +147,6 @@ public abstract class OPObject extends BasicObject {
         if (p2.hasLiteral() && !p2.canLiteralSurvive(getFrame())) {
             p2.setLiteral(null);
         }
-    }
-    
-    public String getPrettyFormat() {
-        return (Main.PRETTY_PRINT ? "%s %s %s" : "%s%s%s");
     }
     
     /**

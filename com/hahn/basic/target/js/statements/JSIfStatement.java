@@ -69,7 +69,7 @@ public class JSIfStatement extends IfStatement {
             }            
         }
         
-        return str.toString();
+        return JSPretty.getIndent() + str.toString();
     }
     
 }

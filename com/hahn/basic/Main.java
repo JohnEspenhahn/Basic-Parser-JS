@@ -207,7 +207,7 @@ public abstract class Main {
         if (dir == null) dir = System.getProperty("user.dir");
         File dirFile = new File(dir);
         
-        System.out.println("Compiling files in directory `" + dir + "` with extension `" + getLangBuildTarget().getInputExtension() + "`");
+        System.out.println("Compiling files in directory `" + dir + "` with extension `." + getLangBuildTarget().getInputExtension() + "`");
         
         if (dirFile.isDirectory()) {            
             Scanner scanner = null;

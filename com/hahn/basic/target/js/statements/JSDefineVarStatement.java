@@ -49,7 +49,7 @@ public class JSDefineVarStatement extends DefineVarStatement {
         
         // If first is still set then skipped all inits
         if (first) return "";
-        else return JSPretty.format("var " + str);
+        else return JSPretty.format(0, "var " + str);
     }
     
 }

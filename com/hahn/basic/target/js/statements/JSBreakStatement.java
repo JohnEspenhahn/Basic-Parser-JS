@@ -27,7 +27,7 @@ public class JSBreakStatement extends BreakStatement {
     
     @Override
     public String toTarget() {
-        return JSPretty.format("break");
+        return JSPretty.format(0, "break");
     }
     
 }

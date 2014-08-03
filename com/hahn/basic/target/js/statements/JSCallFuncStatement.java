@@ -34,7 +34,7 @@ public class JSCallFuncStatement extends CallFuncStatement {
     @Override
     public String toTarget() {
         FuncCallPointer funccall = getFuncCallPointer();
-        return JSPretty.format("%s(%l)", funccall.getFuncId(), funccall.getParams());
+        return JSPretty.format(0, "%s(%l)", funccall.getFuncId(), funccall.getParams());
     }
     
 }

@@ -38,7 +38,7 @@ public class JSReturnStatement extends ReturnStatement {
     
     @Override
     public String toTarget() {
-        return JSPretty.format("return %s", getResult());
+        return JSPretty.format(0, "return %s", getResult());
     }
     
 }

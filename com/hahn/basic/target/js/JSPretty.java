@@ -13,7 +13,24 @@ import com.hahn.basic.util.Util;
 public class JSPretty {    
     private static int indent = 0;
     
+    /**
+     * Use pretty format with no indent
+     * @param format
+     * @param args
+     * @return
+     */
     public static String format(String format, Object... args) {
+        return JSPretty.format(-1, format, args);
+    }
+    
+    /**
+     * Use pretty format
+     * @param tabs If >= 0 indent and add `tabs` extra tabs
+     * @param format
+     * @param args
+     * @return
+     */
+    public static String format(int tabs, String format, Object... args) {
         String str;
         
         if (args.length > 0) {
@@ -41,8 +58,8 @@ public class JSPretty {
             str = format;
         }
         
-        if (Main.PRETTY_PRINT) {
-            return getIndent() + str;
+        if (Main.PRETTY_PRINT && tabs >= 0) {
+            return getIndent() + getTabs(tabs);
         } else {
             return str;
         }
@@ -101,8 +118,12 @@ public class JSPretty {
         }
     }
     
-    private static String getIndent() {
-        return StringUtils.repeat(TAB, indent);
+    public static String getIndent() {
+        return getTabs(JSPretty.indent);
+    }
+    
+    public static String getTabs(int num) {
+        return StringUtils.repeat(TAB, num);
     }
     
     public static final String TAB = "    ";

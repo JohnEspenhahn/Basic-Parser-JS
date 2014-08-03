@@ -37,7 +37,6 @@ import com.hahn.basic.target.LangBuildTarget;
 import com.hahn.basic.target.js.objects.JSConditionalObject;
 import com.hahn.basic.target.js.objects.JSExpressionObject;
 import com.hahn.basic.target.js.objects.JSFuncCallPointer;
-import com.hahn.basic.target.js.objects.JSFuncHead;
 import com.hahn.basic.target.js.objects.JSFuncPointer;
 import com.hahn.basic.target.js.objects.JSNewInstance;
 import com.hahn.basic.target.js.objects.JSOPObject;

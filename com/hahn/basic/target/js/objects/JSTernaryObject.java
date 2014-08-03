@@ -12,13 +12,15 @@ public class JSTernaryObject extends TernaryObject {
         super(container, condition, node_then, node_else);
     }
     
+    public String getPrettyFormat() {
+        return (Main.PRETTY_PRINT ? "%s ? %s : %s" : "%s?%s:%s");
+    }
+    
     @Override
     public String toTarget() {
-        return String.format("%s%s%s%s%s",
+        return String.format(getPrettyFormat(),
                 doGroup(getConditional()) ? "("+getConditional().toTarget()+")" : getConditional().toTarget(),
-                (Main.PRETTY_PRINT ? " ? " : "?"),
                 doGroup(getThen()) ? "("+getThen().toTarget()+")" : getThen().toTarget(),
-                (Main.PRETTY_PRINT ? " : " : ":"),
                 doGroup(getElse()) ? "("+getElse().toTarget()+")" : getElse().toTarget());
     }
     
