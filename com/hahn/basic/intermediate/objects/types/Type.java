@@ -82,6 +82,19 @@ public class Type implements ITypeable {
      * @throws CastException If can not cast
      */
     public Type castTo(Type newType, int row, int col) {
+        Type result = newType;
+        if (newType instanceof TypeList) {
+            for (Type t: (TypeList) newType) {
+                result = castTo(t, row, col);
+            }
+        } else {
+            result = doCastTo(newType, row, col);
+        }
+        
+        return result;
+    }
+    
+    private final Type doCastTo(Type newType, int row, int col) {
         if (this == UNDEFINED) return newType;
         else if (this.doesExtend(newType)) return newType;
         
@@ -101,6 +114,20 @@ public class Type implements ITypeable {
      * @throws CompileException failed and unsafe is true
      */
     public Type merge(Type newType, int row, int col, boolean unsafe) {
+        Type result = this;
+        if (newType instanceof TypeList) {
+            for (Type t: (TypeList) newType) {
+                result = result.merge(t, row, col, unsafe);
+                if (result == null) return null;
+            }
+        } else {
+            result = doMerge(newType, row, col, unsafe);
+        }
+        
+        return result;
+    }
+    
+    private final Type doMerge(Type newType, int row, int col, boolean unsafe) {
         if (newType == null) return this;
         else if (this == UNDEFINED) return newType;
         else if (newType == UNDEFINED) return this;

@@ -1,19 +1,36 @@
 package com.hahn.basic.intermediate.objects.types;
 
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+
+import lombok.NonNull;
+
 import org.apache.commons.lang3.StringUtils;
 
-public class TypeList extends Type {
-    private Type[] types;
+public class TypeList extends Type implements Iterable<Type> {
+    private List<Type> types;
     
-    public TypeList(Type... types) {
+    public TypeList(@NonNull Type... types) {
         super("[" + StringUtils.join(types, ", ") + "]", false, true);
         
-        this.types = types;
+        this.types = Arrays.asList(types);
+    }
+    
+    @Override
+    public boolean doesExtend(Type other) {
+        for (Type t: types) {
+            if (!t.doesExtend(other)) {
+                return false;
+            }
+        }
+        
+        return true;
     }
     
     @Override
     public Type castTo(Type newType, int row, int col) {
-        for (Type t: types) {
+        for (Type t: this) {
             newType = t.castTo(newType, row, col);
         }
         
@@ -22,7 +39,7 @@ public class TypeList extends Type {
     
     @Override
     public Type merge(Type newType, int row, int col, boolean unsafe) {
-        for (Type t: types) {
+        for (Type t: this) {
             Type result = t.merge(newType, row, col, unsafe);
             
             if (result == null) return null;
@@ -30,5 +47,10 @@ public class TypeList extends Type {
         }
         
         return newType;        
+    }
+
+    @Override
+    public Iterator<Type> iterator() {
+        return types.iterator();
     }
 }
