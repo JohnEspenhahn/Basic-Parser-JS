@@ -96,15 +96,19 @@ public abstract class Main {
     }
     
     public void printShellHelp() {
-        System.out.println(":debug   Toggle debug mode");
-        System.out.println(":help    Print this");
-        System.out.println(":pretty  Toggle pretty print");
-        System.out.println(":exit    Quit the shell");
+        System.out.println("Shell Commands:");
+        System.out.println(" debug   Toggle debug mode");
+        System.out.println(" help    Print this");
+        System.out.println(" pretty  Toggle pretty print");
+        System.out.println(" exit    Quit the shell");
         System.out.println();
     }
     
     public void shellInput() {
         printShellTitle();
+        
+        System.out.println("Type `help` for help");
+        System.out.println();
         
         // Create input scanner
         Scanner scanner = new Scanner(System.in);
@@ -119,13 +123,13 @@ public abstract class Main {
                 input = "";
             }
             
-            if (input.equalsIgnoreCase(":debug")) {
+            if (input.equalsIgnoreCase("debug")) {
                 Main.toggleDebug();
-            } else if (input.equalsIgnoreCase(":pretty")) {
+            } else if (input.equalsIgnoreCase("pretty")) {
                 Main.togglePretty();
-            } else if (input.equalsIgnoreCase(":help")) {
+            } else if (input.equalsIgnoreCase("help")) {
                 printShellHelp();
-            } else if (input.equalsIgnoreCase(":exit")) {
+            } else if (input.equalsIgnoreCase("exit")) {
                 break;
             } else {
                 try {               
