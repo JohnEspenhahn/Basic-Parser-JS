@@ -97,10 +97,10 @@ public abstract class Main {
     
     public void printShellHelp() {
         System.out.println("Shell Commands:");
-        System.out.println(" debug   Toggle debug mode");
-        System.out.println(" help    Print this");
-        System.out.println(" pretty  Toggle pretty print");
-        System.out.println(" exit    Quit the shell");
+        System.out.println(" debug     Toggle debug mode");
+        System.out.println(" help      Print this");
+        System.out.println(" pretty    Toggle pretty print");
+        System.out.println(" exit      Quit the shell");
         System.out.println();
     }
     
