@@ -64,9 +64,13 @@ class Search extends IParser {
         this.stream_start = Owner.getStreamIdx();
         if (stream_start < Stream.length) {
             PackedToken startToken = Stream[stream_start];
-            this.temp_node = new Node(Owner.getNode(), (Enum<?>) ParentExpression, startToken.row, startToken.col);
+            if (this.temp_node != null && this.temp_node.getRow() == startToken.row && this.temp_node.getCol() == startToken.col) {
+                this.temp_node.clearChildren();
+            } else {
+                this.temp_node = new Node(Owner.getNode(), (Enum<?>) ParentExpression, startToken.row, startToken.col);
+            }
         } else { 
-            this.temp_node = new Node(Owner.getNode(), (Enum<?>) ParentExpression, 0, 0);
+            this.temp_node = null;
         }
     }
     

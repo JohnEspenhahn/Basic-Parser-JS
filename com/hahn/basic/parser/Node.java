@@ -1,6 +1,5 @@
 package com.hahn.basic.parser;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,7 +10,6 @@ import com.hahn.basic.lexer.PackedToken;
 public class Node {    
     private final Node parent;
     private final List<Node> children;
-    private List<Node> asChildren;
     
     private final String value;
     private final Enum<?> token;
@@ -72,6 +70,10 @@ public class Node {
                 child.printChildren(space + 1);
         }
     }
+    
+    public void clearChildren() {
+        children.clear();
+    }
 
     public void addChild(Node child) {
         children.add(child.getTerminalListEnd());
@@ -106,14 +108,13 @@ public class Node {
         Main.setLine(row, col);
         
         if (isTerminal()) {
-            if (asChildren == null) {
-                asChildren = new ArrayList<Node>(1);
-                asChildren.add(this);
+            if (children.isEmpty()) {
+                children.add(this);
             }
             
-            return asChildren;
+            return children;
         } else {
-            return this.children;
+            return children;
         }
     }
 
