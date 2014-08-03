@@ -3,7 +3,7 @@ package com.hahn.basic.target.js.statements;
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.statements.ExpressionStatement;
 import com.hahn.basic.intermediate.statements.Statement;
-import com.hahn.basic.target.LangBuildTarget;
+import com.hahn.basic.target.js.JSPretty;
 
 public class JSExpressionStatement extends ExpressionStatement {
     
@@ -17,8 +17,8 @@ public class JSExpressionStatement extends ExpressionStatement {
     }
     
     @Override
-    public String toTarget(LangBuildTarget builder) {
-        return getObj().toTarget(builder);
+    public String toTarget() {
+        return JSPretty.format(getObj().toTarget());
     }
     
 }

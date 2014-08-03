@@ -68,6 +68,8 @@ public abstract class FuncHead extends Frame {
         return this.rtnType.equals(func.rtnType);
     }
     
+    public abstract String toFuncAreaTarget();
+    
     @Override
     public boolean endsWithBlock() {
         return true;

@@ -10,7 +10,6 @@ import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.opcode.OPCode;
 import com.hahn.basic.intermediate.statements.ExpressionStatement;
 import com.hahn.basic.intermediate.statements.Statement;
-import com.hahn.basic.target.LangBuildTarget;
 
 public abstract class BasicObject implements IIntermediate, ITypeable {
     private String name;
@@ -50,11 +49,11 @@ public abstract class BasicObject implements IIntermediate, ITypeable {
     }
 
     /**
-     * @param t The type to cast to
+     * @param type The type to cast to
      * @return A new, altered version of this
      */
-    public BasicObject castTo(Type t, int row, int col) {
-        return new ObjectHolder(this, t, row, col);
+    public BasicObject castTo(Type type, int row, int col) {
+        return new ObjectHolder(this, getType().castTo(type, row, col));
     }
     
     
@@ -171,13 +170,6 @@ public abstract class BasicObject implements IIntermediate, ITypeable {
     public boolean isVar() {
         return false;
     }
-    
-    /**
-     * Convert to its final form
-     * @param builder
-     * @return A final form object
-     */
-    public abstract String toTarget(LangBuildTarget builder);
     
     /**
      * @return The creatable version of this

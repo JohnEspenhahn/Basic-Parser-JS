@@ -5,7 +5,7 @@ import java.util.ListIterator;
 
 import com.hahn.basic.intermediate.statements.IfStatement;
 import com.hahn.basic.intermediate.statements.Statement;
-import com.hahn.basic.target.LangBuildTarget;
+import com.hahn.basic.target.js.JSPretty;
 
 public class JSIfStatement extends IfStatement {
     
@@ -31,8 +31,8 @@ public class JSIfStatement extends IfStatement {
             
             cnd.getInnerFrame().reverseOptimize();
             
-            if (cnd.getConditionStatement() != null) {
-                cnd.getConditionStatement().reverseOptimize();
+            if (cnd.getConditionObject() != null) {
+                cnd.getConditionObject().setInUse(this);
             }
         }
         
@@ -44,9 +44,9 @@ public class JSIfStatement extends IfStatement {
         for (Conditional cnd: getConditionals()) {
             cnd.getInnerFrame().forwardOptimize();
             
-            if (cnd.getConditionStatement() != null) {
+            if (cnd.getConditionObject() != null) {
                 // Make sure don't free register before handling frame
-                cnd.getConditionStatement().forwardOptimize();
+                cnd.getConditionObject().takeRegister(this);
             }
         }
         
@@ -54,7 +54,7 @@ public class JSIfStatement extends IfStatement {
     }
     
     @Override
-    public String toTarget(LangBuildTarget builder) {
+    public String toTarget() {
         StringBuilder str = new StringBuilder();
         
         boolean first = true;
@@ -63,12 +63,9 @@ public class JSIfStatement extends IfStatement {
             else first = false;
             
             if (cnd.hasCondition()) {
-                str.append(String.format("if(%s){%s}", 
-                        cnd.getConditionStatement().toTarget(builder), 
-                        cnd.getInnerFrame().toTarget(builder)));
+                str.append(JSPretty.format("if(%s)%f",  cnd.getConditionObject(), cnd.getInnerFrame()));
             } else {
-                str.append(String.format("{%s}", 
-                        cnd.getInnerFrame().toTarget(builder)));
+                str.append(JSPretty.format("%f", cnd.getInnerFrame()));
             }            
         }
         

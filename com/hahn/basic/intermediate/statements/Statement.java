@@ -96,7 +96,7 @@ public abstract class Statement extends Compilable {
     	StringBuilder str = new StringBuilder();    	
     	if (useAddTargetCode()) {
             for (Compilable c: targetCode) {
-                str.append(c.toTarget(builder));
+                str.append(c.toTarget());
             }
     	}
         

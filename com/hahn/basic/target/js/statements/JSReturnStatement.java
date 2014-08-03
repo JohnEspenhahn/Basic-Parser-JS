@@ -5,7 +5,7 @@ import com.hahn.basic.intermediate.FuncHead;
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.statements.ReturnStatement;
 import com.hahn.basic.intermediate.statements.Statement;
-import com.hahn.basic.target.LangBuildTarget;
+import com.hahn.basic.target.js.JSPretty;
 
 public class JSReturnStatement extends ReturnStatement {
     
@@ -37,8 +37,8 @@ public class JSReturnStatement extends ReturnStatement {
     }
     
     @Override
-    public String toTarget(LangBuildTarget builder) {
-        return "return " + getResult().toTarget(builder);
+    public String toTarget() {
+        return JSPretty.format("return %s", getResult());
     }
     
 }

@@ -2,12 +2,13 @@ package com.hahn.basic.target.js.statements;
 
 import java.util.List;
 
+import com.hahn.basic.Main;
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.LiteralNum;
 import com.hahn.basic.intermediate.statements.DefineVarStatement;
 import com.hahn.basic.intermediate.statements.Statement;
 import com.hahn.basic.parser.Node;
-import com.hahn.basic.target.LangBuildTarget;
+import com.hahn.basic.target.js.JSPretty;
 import com.hahn.basic.util.exceptions.CompileException;
 
 public class JSDefineVarStatement extends DefineVarStatement {
@@ -31,23 +32,24 @@ public class JSDefineVarStatement extends DefineVarStatement {
     }
 
     @Override
-    public String toTarget(LangBuildTarget builder) {
+    public String toTarget() {
         List<DefinePair> pairs = getDefinePairs();
         
         boolean first = true;
         StringBuilder str = new StringBuilder();
         for (DefinePair pair: pairs) {
             if (!pair.var.hasLiteral()) {
-                if (!first) str.append(",");
+                if (!first) str.append(Main.PRETTY_PRINT ? "\n  , " : ",");
                 else first = false;
                 
-                str.append(String.format("%s=%s", pair.var.toTarget(builder), pair.val.toTarget(builder)));
+                String format = (Main.PRETTY_PRINT ? "%s = %s" : "%s=%s");
+                str.append(String.format(format, pair.var.toTarget(), pair.val.toTarget()));
             }
         }
         
         // If first is still set then skipped all inits
         if (first) return "";
-        else return "var " + str;
+        else return JSPretty.format("var " + str);
     }
     
 }

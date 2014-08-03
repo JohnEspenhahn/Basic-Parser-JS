@@ -5,7 +5,6 @@ import java.util.Map;
 
 import com.hahn.basic.intermediate.LangCompiler;
 import com.hahn.basic.intermediate.objects.types.Type;
-import com.hahn.basic.target.LangBuildTarget;
 import com.hahn.basic.util.Util;
 
 public abstract class Library {
@@ -34,7 +33,7 @@ public abstract class Library {
     
     public abstract void define();
     
-    public abstract String toTarget(LangBuildTarget builder);
+    public abstract String toTarget();
     
     public static Library getLib(String name) {
         Library lib = Library.libraries.get(name);

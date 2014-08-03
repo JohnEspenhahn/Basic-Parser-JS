@@ -2,7 +2,7 @@ package com.hahn.basic.target.js.statements;
 
 import com.hahn.basic.intermediate.statements.BreakStatement;
 import com.hahn.basic.intermediate.statements.Statement;
-import com.hahn.basic.target.LangBuildTarget;
+import com.hahn.basic.target.js.JSPretty;
 
 public class JSBreakStatement extends BreakStatement {
     
@@ -26,8 +26,8 @@ public class JSBreakStatement extends BreakStatement {
     }
     
     @Override
-    public String toTarget(LangBuildTarget builder) {
-        return "break";
+    public String toTarget() {
+        return JSPretty.format("break");
     }
     
 }

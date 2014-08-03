@@ -2,7 +2,6 @@ package com.hahn.basic.target.js.objects;
 
 import com.hahn.basic.intermediate.objects.ExpressionObject;
 import com.hahn.basic.intermediate.statements.ExpressionStatement;
-import com.hahn.basic.target.LangBuildTarget;
 
 public class JSExpressionObject extends ExpressionObject {
     
@@ -11,8 +10,8 @@ public class JSExpressionObject extends ExpressionObject {
     }
     
     @Override
-    public String toTarget(LangBuildTarget builder) {
-        return getHeldObject().toTarget(builder);
+    public String toTarget() {
+        return getHeldObject().toTarget();
     }
     
 }

@@ -7,7 +7,6 @@ import java.util.Map;
 
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.parser.Node;
-import com.hahn.basic.target.LangBuildTarget;
 import com.hahn.basic.util.exceptions.CompileException;
 
 public class Struct extends Type {    
@@ -106,8 +105,8 @@ public class Struct extends Type {
         }
 
         @Override
-        public String toTarget(LangBuildTarget builder) {
-            throw new RuntimeException("Cannot convert `StructParam` to target!");
+        public String toTarget() {
+            return getName();
         }
     }
 }

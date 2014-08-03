@@ -3,7 +3,7 @@ package com.hahn.basic.target.js.statements;
 import com.hahn.basic.intermediate.statements.Statement;
 import com.hahn.basic.intermediate.statements.WhileStatement;
 import com.hahn.basic.parser.Node;
-import com.hahn.basic.target.LangBuildTarget;
+import com.hahn.basic.target.js.JSPretty;
 
 public class JSWhileStatement extends WhileStatement {
     
@@ -45,9 +45,7 @@ public class JSWhileStatement extends WhileStatement {
     }
     
     @Override
-    public String toTarget(LangBuildTarget builder) {
-        return String.format("while(%s){%s}", 
-                getConditionStatement().toTarget(builder), 
-                getInnerFrame().toTarget(builder));
+    public String toTarget() {
+        return JSPretty.format("while(%s)%f", getConditionStatement(), getInnerFrame());
     }
 }

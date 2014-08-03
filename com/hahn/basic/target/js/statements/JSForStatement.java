@@ -6,7 +6,7 @@ import com.hahn.basic.intermediate.objects.OPObject;
 import com.hahn.basic.intermediate.statements.ForStatement;
 import com.hahn.basic.intermediate.statements.Statement;
 import com.hahn.basic.parser.Node;
-import com.hahn.basic.target.LangBuildTarget;
+import com.hahn.basic.target.js.JSPretty;
 
 public class JSForStatement extends ForStatement {
     
@@ -70,11 +70,11 @@ public class JSForStatement extends ForStatement {
     }
     
     @Override
-    public String toTarget(LangBuildTarget builder) {
-        return String.format("for(%s;%s;%s){%s}", 
-                getDefineStatement().toTarget(builder),
-                getConditionStatement().toTarget(builder),
-                getModifyStatements().toTarget(builder),
-                getInnerFrame().toTarget(builder));
+    public String toTarget() {
+        return JSPretty.format("for(%s;%s;%s)%f", 
+                getDefineStatement(),
+                getConditionStatement(),
+                getModifyStatements(),
+                getInnerFrame());
     }
 }

@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import com.hahn.basic.Main;
 import com.hahn.basic.definition.EnumExpression;
 import com.hahn.basic.definition.EnumToken;
 import com.hahn.basic.intermediate.objects.AdvancedObject;
@@ -53,7 +54,6 @@ import com.hahn.basic.intermediate.statements.ExpressionStatement;
 import com.hahn.basic.intermediate.statements.IfStatement.Conditional;
 import com.hahn.basic.intermediate.statements.Statement;
 import com.hahn.basic.parser.Node;
-import com.hahn.basic.target.LangBuildTarget;
 import com.hahn.basic.util.Util;
 import com.hahn.basic.util.exceptions.CastException;
 import com.hahn.basic.util.exceptions.CompileException;
@@ -115,17 +115,28 @@ public class Frame extends Statement {
         }
     }
     
+    /**
+     * Should be called from TO_TARGET
+     * @return True if no target code
+     */
+    public boolean isEmpty() {
+        return getTargetCode().isEmpty();
+    }
+    
     @Override
-    public String toTarget(LangBuildTarget builder) {
+    public String toTarget() {
         StringBuilder str = new StringBuilder();
         for (Compilable c: getTargetCode()) {
-            String cs = c.toTarget(builder);
+            String cs = c.toTarget();
             if (cs != null && cs.length() > 0) {
                 str.append(cs);
                 
                 if (!c.endsWithBlock()) {
-                    str.append(builder.getEOL());
+                    str.append(LangCompiler.factory.getLangBuildTarget().getEOL());
                 }
+                
+                // Pretty print new line
+                if (Main.PRETTY_PRINT) str.append('\n');
             }
         }
         

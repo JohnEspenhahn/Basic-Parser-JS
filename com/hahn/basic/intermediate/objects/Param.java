@@ -3,7 +3,6 @@ package com.hahn.basic.intermediate.objects;
 import java.util.List;
 
 import com.hahn.basic.intermediate.objects.types.Type;
-import com.hahn.basic.target.LangBuildTarget;
 import com.sun.istack.internal.Nullable;
 
 public class Param extends BasicObject {
@@ -34,7 +33,7 @@ public class Param extends BasicObject {
     }
     
     @Override
-    public String toTarget(LangBuildTarget builder) {
+    public String toTarget() {
         throw new RuntimeException("Cannot convert `Param` to target language");
     }
 }

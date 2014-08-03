@@ -3,8 +3,7 @@ package com.hahn.basic.target.js.statements;
 import com.hahn.basic.intermediate.objects.FuncCallPointer;
 import com.hahn.basic.intermediate.statements.CallFuncStatement;
 import com.hahn.basic.intermediate.statements.Statement;
-import com.hahn.basic.target.LangBuildTarget;
-import com.hahn.basic.util.Util;
+import com.hahn.basic.target.js.JSPretty;
 
 public class JSCallFuncStatement extends CallFuncStatement {
     
@@ -33,9 +32,9 @@ public class JSCallFuncStatement extends CallFuncStatement {
     }
     
     @Override
-    public String toTarget(LangBuildTarget builder) {
+    public String toTarget() {
         FuncCallPointer funccall = getFuncCallPointer();
-        return funccall.getFuncId() + "(" + Util.toTarget(funccall.getParams(), ",", builder) + ")";
+        return JSPretty.format("%s(%l)", funccall.getFuncId(), funccall.getParams());
     }
     
 }

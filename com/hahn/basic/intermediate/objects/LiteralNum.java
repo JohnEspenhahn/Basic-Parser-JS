@@ -1,6 +1,23 @@
 package com.hahn.basic.intermediate.objects;
 
-import static com.hahn.basic.intermediate.opcode.OPCode.*;
+import static com.hahn.basic.intermediate.opcode.OPCode.ADD;
+import static com.hahn.basic.intermediate.opcode.OPCode.ADDE;
+import static com.hahn.basic.intermediate.opcode.OPCode.AND;
+import static com.hahn.basic.intermediate.opcode.OPCode.ANDE;
+import static com.hahn.basic.intermediate.opcode.OPCode.BOR;
+import static com.hahn.basic.intermediate.opcode.OPCode.BORE;
+import static com.hahn.basic.intermediate.opcode.OPCode.DIV;
+import static com.hahn.basic.intermediate.opcode.OPCode.DIVE;
+import static com.hahn.basic.intermediate.opcode.OPCode.MOD;
+import static com.hahn.basic.intermediate.opcode.OPCode.MODE;
+import static com.hahn.basic.intermediate.opcode.OPCode.MUL;
+import static com.hahn.basic.intermediate.opcode.OPCode.MULE;
+import static com.hahn.basic.intermediate.opcode.OPCode.SHL;
+import static com.hahn.basic.intermediate.opcode.OPCode.SHR;
+import static com.hahn.basic.intermediate.opcode.OPCode.SUB;
+import static com.hahn.basic.intermediate.opcode.OPCode.SUBE;
+import static com.hahn.basic.intermediate.opcode.OPCode.XOR;
+import static com.hahn.basic.intermediate.opcode.OPCode.XORE;
 
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.opcode.OPCode;

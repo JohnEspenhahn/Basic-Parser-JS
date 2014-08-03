@@ -3,7 +3,6 @@ package com.hahn.basic.intermediate.objects;
 import com.hahn.basic.intermediate.IIntermediate;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.statements.Statement;
-import com.hahn.basic.target.LangBuildTarget;
 
 public abstract class VarAccess extends ObjectHolder {
     private BasicObject index;
@@ -15,7 +14,7 @@ public abstract class VarAccess extends ObjectHolder {
      * @param type The type of the property at the given index
      */
     public VarAccess(Statement container, BasicObject var, BasicObject index, Type type) {
-        super(var, type, -1, -1);
+        super(var, type);
         
         this.index = index;
     }
@@ -39,5 +38,5 @@ public abstract class VarAccess extends ObjectHolder {
     }
     
     @Override
-    public abstract String toTarget(LangBuildTarget builder);
+    public abstract String toTarget();
 }

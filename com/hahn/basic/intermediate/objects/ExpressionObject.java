@@ -2,14 +2,13 @@ package com.hahn.basic.intermediate.objects;
 
 import com.hahn.basic.intermediate.IIntermediate;
 import com.hahn.basic.intermediate.statements.ExpressionStatement;
-import com.hahn.basic.target.LangBuildTarget;
 
 public abstract class ExpressionObject extends ObjectHolder {
     private ExpressionStatement statement;
     private boolean forcedGroup;
     
     public ExpressionObject(ExpressionStatement s) {
-        super(s.getObj());
+        super(s.getObj(), s.getObj().getType());
         
         this.forcedGroup = s.isForcedGroup();
         this.statement = s;
@@ -45,5 +44,5 @@ public abstract class ExpressionObject extends ObjectHolder {
     }
     
     @Override
-    public abstract String toTarget(LangBuildTarget builder);
+    public abstract String toTarget();
 }

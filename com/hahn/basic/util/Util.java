@@ -7,21 +7,27 @@ import java.util.List;
 
 import org.apache.commons.lang3.math.NumberUtils;
 
+import com.hahn.basic.Main;
 import com.hahn.basic.intermediate.IIntermediate;
 import com.hahn.basic.intermediate.objects.LiteralNum;
 import com.hahn.basic.intermediate.objects.Param;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.parser.Node;
-import com.hahn.basic.target.LangBuildTarget;
 
 
 public class Util {
     
-    public static String toTarget(IIntermediate[] arr, String seperator, LangBuildTarget builder) {
+    public static String getListSeperator() {
+        return (Main.PRETTY_PRINT ? ", " : ",");
+    }
+    
+    public static String toTarget(IIntermediate[] arr) {
+        String seperator = getListSeperator();
+        
         StringBuffer result = new StringBuffer();
         for (int i = 0; i < arr.length; i++) {
-           result.append(arr[i].toTarget(builder));
+           result.append(arr[i].toTarget());
            
            if (i + 1 < arr.length) {
                result.append(seperator);

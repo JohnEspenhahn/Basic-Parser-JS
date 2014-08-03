@@ -2,7 +2,6 @@ package com.hahn.basic.target.js.library;
 
 import com.hahn.basic.intermediate.library.base.Library;
 import com.hahn.basic.intermediate.objects.types.Type;
-import com.hahn.basic.target.LangBuildTarget;
 
 public class LibraryBuiltinJS extends Library {
     
@@ -17,7 +16,7 @@ public class LibraryBuiltinJS extends Library {
     }
     
     @Override
-    public String toTarget(LangBuildTarget builder) {
+    public String toTarget() {
         return "";
     }
 }

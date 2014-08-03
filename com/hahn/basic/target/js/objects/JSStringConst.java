@@ -1,7 +1,6 @@
 package com.hahn.basic.target.js.objects;
 
 import com.hahn.basic.intermediate.objects.StringConst;
-import com.hahn.basic.target.LangBuildTarget;
 
 public class JSStringConst extends StringConst {
     
@@ -10,7 +9,7 @@ public class JSStringConst extends StringConst {
     }
     
     @Override
-    public String toTarget(LangBuildTarget builder) {
+    public String toTarget() {
         return '"' + getString() + '"';
     }
     

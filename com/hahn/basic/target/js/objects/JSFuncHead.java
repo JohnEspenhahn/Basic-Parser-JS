@@ -4,8 +4,7 @@ import com.hahn.basic.intermediate.FuncHead;
 import com.hahn.basic.intermediate.objects.Param;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.parser.Node;
-import com.hahn.basic.target.LangBuildTarget;
-import com.hahn.basic.util.Util;
+import com.hahn.basic.target.js.JSPretty;
 
 public class JSFuncHead extends FuncHead {
     
@@ -14,11 +13,7 @@ public class JSFuncHead extends FuncHead {
     }
     
     @Override
-    public String toTarget(LangBuildTarget builder) {
-        return String.format("function %s(%s){%s}", 
-                    getFuncId(), 
-                    Util.toTarget(getParams(), ",", builder),
-                    super.toTarget(builder)
-                );        
+    public String toFuncAreaTarget() {
+        return JSPretty.format("function %s(%l)%f", getFuncId(), getParams(), this);        
     }
 }

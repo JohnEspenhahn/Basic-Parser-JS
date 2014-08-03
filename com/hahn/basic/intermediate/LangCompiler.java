@@ -42,7 +42,7 @@ public class LangCompiler {
         frame.forwardOptimize();
         
         // Convert to target
-        builder.appendString(frame.toTarget(builder));
+        builder.appendString(frame.toTarget());
         builder.appendString(builder.endCodeArea());
         
         // Compile function area
@@ -52,14 +52,14 @@ public class LangCompiler {
                     func.reverseOptimize();
                     func.forwardOptimize();
                     
-                    builder.appendString(func.toTarget(builder));
+                    builder.appendString(func.toFuncAreaTarget());
                 }
             }
         }
         
         // Put library import strings
         for (Library lib: libs.values()) {
-            builder.appendString(lib.toTarget(builder));
+            builder.appendString(lib.toTarget());
         }
         
         return builder;

@@ -7,12 +7,13 @@ import com.hahn.basic.intermediate.FuncHead;
 import com.hahn.basic.intermediate.objects.AdvancedObject;
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.ConditionalObject;
+import com.hahn.basic.intermediate.objects.ExpressionObject;
 import com.hahn.basic.intermediate.objects.FuncCallPointer;
 import com.hahn.basic.intermediate.objects.FuncPointer;
-import com.hahn.basic.intermediate.objects.TernaryObject;
 import com.hahn.basic.intermediate.objects.OPObject;
 import com.hahn.basic.intermediate.objects.Param;
 import com.hahn.basic.intermediate.objects.StringConst;
+import com.hahn.basic.intermediate.objects.TernaryObject;
 import com.hahn.basic.intermediate.objects.Var;
 import com.hahn.basic.intermediate.objects.VarAccess;
 import com.hahn.basic.intermediate.objects.register.IRegister;
@@ -38,10 +39,10 @@ import com.hahn.basic.target.js.objects.JSExpressionObject;
 import com.hahn.basic.target.js.objects.JSFuncCallPointer;
 import com.hahn.basic.target.js.objects.JSFuncHead;
 import com.hahn.basic.target.js.objects.JSFuncPointer;
-import com.hahn.basic.target.js.objects.JSTernaryObject;
 import com.hahn.basic.target.js.objects.JSNewInstance;
 import com.hahn.basic.target.js.objects.JSOPObject;
 import com.hahn.basic.target.js.objects.JSStringConst;
+import com.hahn.basic.target.js.objects.JSTernaryObject;
 import com.hahn.basic.target.js.objects.JSVarAccess;
 import com.hahn.basic.target.js.objects.JSVarLocal;
 import com.hahn.basic.target.js.objects.JSVarParameter;
@@ -92,7 +93,7 @@ public class JSLangFactory implements ILangFactory {
     }
     
     @Override
-    public BasicObject ExpressionObject(ExpressionStatement exp) {
+    public ExpressionObject ExpressionObject(ExpressionStatement exp) {
         return new JSExpressionObject(exp);
     }
     

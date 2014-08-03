@@ -3,6 +3,7 @@ package com.hahn.basic.intermediate.statements;
 import java.util.List;
 
 import com.hahn.basic.intermediate.Frame;
+import com.hahn.basic.intermediate.objects.ExpressionObject;
 import com.hahn.basic.parser.Node;
 
 public abstract class IfStatement extends Statement {
@@ -28,7 +29,7 @@ public abstract class IfStatement extends Statement {
             else first = false;
             
             if (cnd.hasCondition()) {
-                str.append(String.format("if (%s) { %s }\n", cnd.getConditionStatement(), cnd.getInnerFrame()));
+                str.append(String.format("if (%s) { %s }\n", cnd.getConditionObject(), cnd.getInnerFrame()));
             } else {
                 str.append(String.format("{ %s }\n", cnd.getInnerFrame()));
             }            
@@ -39,7 +40,7 @@ public abstract class IfStatement extends Statement {
     
     public static class Conditional {
         private Frame outerFrame, innerFrame;
-        private ExpressionStatement condition;
+        private ExpressionObject condition;
         
         /**
          * @param condition EnumExpression.EXPRESSION
@@ -50,7 +51,7 @@ public abstract class IfStatement extends Statement {
             this.innerFrame = new Frame(outerFrame, body);
             
             if (condition != null) {
-                this.condition = outerFrame.handleExpression(condition);
+                this.condition = outerFrame.handleExpression(condition).getAsExpObj();
             }
         }
         
@@ -65,7 +66,7 @@ public abstract class IfStatement extends Statement {
             return condition != null;
         }
         
-        public ExpressionStatement getConditionStatement() {
+        public ExpressionObject getConditionObject() {
             return condition;
         }
         

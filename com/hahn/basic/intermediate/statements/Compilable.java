@@ -4,7 +4,6 @@ import com.hahn.basic.Main;
 import com.hahn.basic.intermediate.Frame;
 import com.hahn.basic.intermediate.IIntermediate;
 import com.hahn.basic.target.ILangCommand;
-import com.hahn.basic.target.LangBuildTarget;
 
 public abstract class Compilable implements IIntermediate, ILangCommand {
     public final int row;
@@ -44,14 +43,6 @@ public abstract class Compilable implements IIntermediate, ILangCommand {
     public boolean endsWithBlock() {
         return false;
     }
-
-    /**
-     * Final conversion to target language. 
-     * Should NOT do any advanced optimization
-     * @param builder The build target
-     * @return String for this build target
-     */
-    public abstract String toTarget(LangBuildTarget builder);
 
     @Override
     public abstract String toString();

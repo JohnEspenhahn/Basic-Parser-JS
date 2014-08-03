@@ -5,7 +5,6 @@ import java.util.List;
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.NewInstance;
 import com.hahn.basic.intermediate.objects.types.Type;
-import com.hahn.basic.target.LangBuildTarget;
 import com.hahn.basic.util.Util;
 
 public class JSNewInstance extends NewInstance {
@@ -15,11 +14,11 @@ public class JSNewInstance extends NewInstance {
     }
     
     @Override
-    public String toTarget(LangBuildTarget builder) {
+    public String toTarget() {
         if (getType().doesExtend(Type.STRUCT)) {
             return "{}";
         } else {
-            return String.format("new %s(%s)", getType().getName(), Util.toTarget(getParams(), ",", builder));
+            return String.format("new %s(%s)", getType().getName(), Util.toTarget(getParams()));
         }
     }
     

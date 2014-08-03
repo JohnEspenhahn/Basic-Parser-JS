@@ -5,7 +5,6 @@ import com.hahn.basic.intermediate.objects.VarAccess;
 import com.hahn.basic.intermediate.objects.types.Struct.StructParam;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.statements.Statement;
-import com.hahn.basic.target.LangBuildTarget;
 
 public class JSVarAccess extends VarAccess {
     
@@ -14,11 +13,11 @@ public class JSVarAccess extends VarAccess {
     }
     
     @Override
-    public String toTarget(LangBuildTarget builder) {
+    public String toTarget() {
         if (getIndex() instanceof StructParam) {
-            return String.format("%s.%s", getHeldObject().toTarget(builder), getIndex().toTarget(builder));
+            return String.format("%s.%s", getHeldObject().toTarget(), getIndex().toTarget());
         } else {
-            return String.format("%s[%s]", getHeldObject().toTarget(builder), getIndex().toTarget(builder));
+            return String.format("%s[%s]", getHeldObject().toTarget(), getIndex().toTarget());
         }
     }
     

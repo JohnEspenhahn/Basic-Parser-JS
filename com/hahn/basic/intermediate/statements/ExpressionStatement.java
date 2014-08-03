@@ -3,6 +3,7 @@ package com.hahn.basic.intermediate.statements;
 import com.hahn.basic.Main;
 import com.hahn.basic.intermediate.LangCompiler;
 import com.hahn.basic.intermediate.objects.BasicObject;
+import com.hahn.basic.intermediate.objects.ExpressionObject;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.parser.Node;
 
@@ -78,7 +79,7 @@ public abstract class ExpressionStatement extends Statement {
      * be called after the statement has been fully evaluated
      * @return ExpressionStatementObject
      */
-    public BasicObject getAsExpObj() {
+    public ExpressionObject getAsExpObj() {
         this.gotAsObject = true;
         
         return LangCompiler.factory.ExpressionObject(this);

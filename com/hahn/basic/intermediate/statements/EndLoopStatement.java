@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.ListIterator;
 
 import com.hahn.basic.intermediate.objects.AdvancedObject;
-import com.hahn.basic.target.LangBuildTarget;
 
 public class EndLoopStatement extends Statement {
     /**
@@ -57,12 +56,12 @@ public class EndLoopStatement extends Statement {
     }
     
     @Override
-    public String toTarget(LangBuildTarget builder) { 
+    public String toTarget() { 
         return "";
     }
 
     @Override
     public String toString() {
         return "use " + objs;
-    }    
+    }  
 }

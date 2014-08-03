@@ -1,10 +1,10 @@
 package com.hahn.basic.target.js.objects;
 
+import com.hahn.basic.Main;
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.TernaryObject;
 import com.hahn.basic.intermediate.statements.Statement;
 import com.hahn.basic.parser.Node;
-import com.hahn.basic.target.LangBuildTarget;
 
 public class JSTernaryObject extends TernaryObject {
     
@@ -13,11 +13,13 @@ public class JSTernaryObject extends TernaryObject {
     }
     
     @Override
-    public String toTarget(LangBuildTarget builder) {
-        return String.format("%s?%s:%s",
-                doGroup(getConditional()) ? "("+getConditional().toTarget(builder)+")" : getConditional().toTarget(builder),
-                doGroup(getThen()) ? "("+getThen().toTarget(builder)+")" : getThen().toTarget(builder),
-                doGroup(getElse()) ? "("+getElse().toTarget(builder)+")" : getElse().toTarget(builder));
+    public String toTarget() {
+        return String.format("%s%s%s%s%s",
+                doGroup(getConditional()) ? "("+getConditional().toTarget()+")" : getConditional().toTarget(),
+                (Main.PRETTY_PRINT ? " ? " : "?"),
+                doGroup(getThen()) ? "("+getThen().toTarget()+")" : getThen().toTarget(),
+                (Main.PRETTY_PRINT ? " : " : ":"),
+                doGroup(getElse()) ? "("+getElse().toTarget()+")" : getElse().toTarget());
     }
     
 }

@@ -18,13 +18,9 @@ public class ObjectHolder extends BasicObject {
     
     @Delegate(types = BasicObject.class, excludes = IHolderExcludeList.class)
     private BasicObject heldObj;
-    
-    protected ObjectHolder(BasicObject obj) {
-        this(obj, obj.getType(), -1, -1);
-    }
 
-    public ObjectHolder(BasicObject obj, @NonNull Type type, int row, int col) {
-        super(obj.getName(), obj.getType().castTo(type, row, col));
+    public ObjectHolder(BasicObject obj, @NonNull Type type) {
+        super(obj.getName(), type);
 
         this.heldObj = obj;
     }

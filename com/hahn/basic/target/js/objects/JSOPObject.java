@@ -6,7 +6,6 @@ import com.hahn.basic.intermediate.objects.OPObject;
 import com.hahn.basic.intermediate.opcode.OPCode;
 import com.hahn.basic.intermediate.statements.Statement;
 import com.hahn.basic.parser.Node;
-import com.hahn.basic.target.LangBuildTarget;
 import com.hahn.basic.util.exceptions.CompileException;
 
 public class JSOPObject extends OPObject {
@@ -25,17 +24,17 @@ public class JSOPObject extends OPObject {
     }
     
     @Override
-    public String doToTarget(LangBuildTarget builder) {
+    public String doToTarget() {
         if (getP2() != null) {
-            return String.format("%s%s%s",
-                    getP1().isGrouped() ? "("+getP1().toTarget(builder)+")" : getP1().toTarget(builder),
+            return String.format(getPrettyFormat(),
+                    getP1().isGrouped() ? "("+getP1().toTarget()+")" : getP1().toTarget(),
                     getOP().getSymbol(), 
-                    getP2().isGrouped() ? "("+getP2().toTarget(builder)+")" : getP2().toTarget(builder)
+                    getP2().isGrouped() ? "("+getP2().toTarget()+")" : getP2().toTarget()
                    );
         } else {
             return String.format("%s%s", 
                     getOP().getSymbol(),
-                    getP1().isExpression() ? "("+getP1().toTarget(builder)+")" : getP1().toTarget(builder)
+                    getP1().isExpression() ? "("+getP1().toTarget()+")" : getP1().toTarget()
                    );
         }
     }    

@@ -7,12 +7,13 @@ import com.hahn.basic.intermediate.FuncHead;
 import com.hahn.basic.intermediate.objects.AdvancedObject;
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.ConditionalObject;
+import com.hahn.basic.intermediate.objects.ExpressionObject;
 import com.hahn.basic.intermediate.objects.FuncCallPointer;
 import com.hahn.basic.intermediate.objects.FuncPointer;
-import com.hahn.basic.intermediate.objects.TernaryObject;
 import com.hahn.basic.intermediate.objects.OPObject;
 import com.hahn.basic.intermediate.objects.Param;
 import com.hahn.basic.intermediate.objects.StringConst;
+import com.hahn.basic.intermediate.objects.TernaryObject;
 import com.hahn.basic.intermediate.objects.Var;
 import com.hahn.basic.intermediate.objects.VarAccess;
 import com.hahn.basic.intermediate.objects.register.IRegister;
@@ -43,7 +44,7 @@ public interface ILangFactory {
 	public StringConst StringConst(String str);
 	
 	public OPObject OPObject(Statement container, OPCode op, BasicObject p1, Node p1Node, BasicObject p2, Node p2Node);
-	public BasicObject ExpressionObject(ExpressionStatement exp);
+	public ExpressionObject ExpressionObject(ExpressionStatement exp);
 	
 	public Var VarParameter(Frame frame, String name, Type type, List<String> flags);
 	public Var VarLocal(Frame frame, String name, Type type, List<String> flags);

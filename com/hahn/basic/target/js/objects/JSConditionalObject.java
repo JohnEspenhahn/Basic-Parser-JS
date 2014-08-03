@@ -5,7 +5,6 @@ import com.hahn.basic.intermediate.objects.ConditionalObject;
 import com.hahn.basic.intermediate.opcode.OPCode;
 import com.hahn.basic.intermediate.statements.Statement;
 import com.hahn.basic.parser.Node;
-import com.hahn.basic.target.LangBuildTarget;
 
 public class JSConditionalObject extends ConditionalObject {
     
@@ -14,11 +13,11 @@ public class JSConditionalObject extends ConditionalObject {
     }
     
     @Override
-    public String doToTarget(LangBuildTarget builder) {
-        return String.format("%s%s%s",
-                getP1().isGrouped() ? "("+getP1().toTarget(builder)+")" : getP1().toTarget(builder),
+    public String doToTarget() {
+        return String.format(getPrettyFormat(),
+                getP1().isGrouped() ? "("+getP1().toTarget()+")" : getP1().toTarget(),
                 getOP().getSymbol(), 
-                getP2().isGrouped() ? "("+getP2().toTarget(builder)+")" : getP2().toTarget(builder)
+                getP2().isGrouped() ? "("+getP2().toTarget()+")" : getP2().toTarget()
                );
     }
     

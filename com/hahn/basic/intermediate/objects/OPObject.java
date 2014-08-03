@@ -1,12 +1,12 @@
 package com.hahn.basic.intermediate.objects;
 
+import com.hahn.basic.Main;
 import com.hahn.basic.intermediate.Frame;
 import com.hahn.basic.intermediate.IIntermediate;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.opcode.OPCode;
 import com.hahn.basic.intermediate.statements.Statement;
 import com.hahn.basic.parser.Node;
-import com.hahn.basic.target.LangBuildTarget;
 import com.sun.istack.internal.Nullable;
 
 public abstract class OPObject extends BasicObject {
@@ -150,21 +150,25 @@ public abstract class OPObject extends BasicObject {
         }
     }
     
+    public String getPrettyFormat() {
+        return (Main.PRETTY_PRINT ? "%s %s %s" : "%s%s%s");
+    }
+    
     /**
      * Called by toTarget is the object is still valid. Should
      * handle conditions if p2 is not null and if p2 is null
      * @param builder
      * @return A final form of the object
      */
-    public abstract String doToTarget(LangBuildTarget builder);
+    public abstract String doToTarget();
     
     @Override
-    public final String toTarget(LangBuildTarget builder) {
+    public final String toTarget() {
         if (hasLiteral()) {
             if (OPCode.doesModify(getOP())) return "";
-            else return p1.toTarget(builder);
+            else return p1.toTarget();
         } else {
-            return doToTarget(builder);
+            return doToTarget();
         }
     }
     

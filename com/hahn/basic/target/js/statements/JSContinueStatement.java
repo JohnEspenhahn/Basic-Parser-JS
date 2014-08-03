@@ -2,7 +2,7 @@ package com.hahn.basic.target.js.statements;
 
 import com.hahn.basic.intermediate.statements.ContinueStatement;
 import com.hahn.basic.intermediate.statements.Statement;
-import com.hahn.basic.target.LangBuildTarget;
+import com.hahn.basic.target.js.JSPretty;
 
 public class JSContinueStatement extends ContinueStatement {
     
@@ -26,8 +26,8 @@ public class JSContinueStatement extends ContinueStatement {
     }
     
     @Override
-    public String toTarget(LangBuildTarget builder) {
-        return "continue";
+    public String toTarget() {
+        return JSPretty.format("continue");
     }
     
 }

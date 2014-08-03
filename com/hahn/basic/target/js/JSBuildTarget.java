@@ -55,7 +55,7 @@ public class JSBuildTarget extends LangBuildTarget {
 
 	@Override
 	public void append(ILangCommand cmd) {
-		builder.append(cmd.toTarget(this));
+		builder.append(cmd.toTarget());
 	}
 
 	@Override
