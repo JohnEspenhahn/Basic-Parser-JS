@@ -3,6 +3,7 @@ package com.hahn.basic.target.js;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import com.hahn.basic.Main;
 import com.hahn.basic.intermediate.LangCompiler;
 import com.hahn.basic.intermediate.library.base.Library;
 import com.hahn.basic.target.ILangCommand;
@@ -44,7 +45,12 @@ public class JSBuildTarget extends LangBuildTarget {
 	
 	@Override
 	public void appendString(String str) {
-	    builder.append(str);
+	    if (Main.PRETTY_PRINT) builder.append(pretty(str));
+	    else builder.append(str);
+	}
+	
+	private String pretty(String str) {
+	    return str;
 	}
 
 	@Override

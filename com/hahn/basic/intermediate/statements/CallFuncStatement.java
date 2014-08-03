@@ -1,10 +1,11 @@
 package com.hahn.basic.intermediate.statements;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.hahn.basic.Main;
 import com.hahn.basic.intermediate.FuncHead;
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.FuncCallPointer;
-import com.hahn.basic.util.Util;
 
 public abstract class CallFuncStatement extends Statement {    
     private FuncCallPointer funcCallPointer;
@@ -51,6 +52,6 @@ public abstract class CallFuncStatement extends Statement {
     
     @Override
     public String toString() {
-        return FuncHead.toHumanReadable(funcCallPointer) + "(" + Util.toString(getParams(), ", ") + ")";
+        return FuncHead.toHumanReadable(funcCallPointer) + "(" + StringUtils.join(getParams(), ", ") + ")";
     }
 }

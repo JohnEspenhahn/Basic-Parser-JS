@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.hahn.basic.definition.EnumExpression;
 import com.hahn.basic.parser.Node;
 import com.hahn.basic.util.Util;
@@ -38,7 +40,7 @@ public class ParameterizedType<T extends ITypeable> extends Type {
     private static String createName(Struct base, ITypeable[] types, ITypeable returnType) {
         return base.getName() 
                 + "<"
-                + (types.length > 0 ? Util.toString(types, "@") : "") 
+                + (types.length > 0 ? StringUtils.join(types, '@') : "") 
                 + (returnType != Type.UNDEFINED || base.doesExtend(Type.FUNC) ? "@@"+returnType.getType() : "")
                 + ">";
     }

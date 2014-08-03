@@ -4,11 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.hahn.basic.Main;
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.parser.Node;
-import com.hahn.basic.util.Util;
 import com.sun.istack.internal.Nullable;
 
 public abstract class DefineVarStatement extends Statement {   
@@ -149,7 +150,7 @@ public abstract class DefineVarStatement extends Statement {
     
     @Override
     public String toString() {
-        return "let " + Util.toString(definepairs.toArray(), ", ");
+        return "let " + StringUtils.join(definepairs.toArray(), ", ");
     }
     
     public class DefinePair {

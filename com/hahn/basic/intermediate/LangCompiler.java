@@ -33,7 +33,6 @@ public class LangCompiler {
         reset();
         
         // Init
-        StringBuilder str = new StringBuilder();
         LangBuildTarget builder = factory.getLangBuildTarget(); 
         builder.init();
         
@@ -43,8 +42,8 @@ public class LangCompiler {
         frame.forwardOptimize();
         
         // Convert to target
-        str.append(frame.toTarget(builder));
-        str.append(builder.endCodeArea());
+        builder.appendString(frame.toTarget(builder));
+        builder.appendString(builder.endCodeArea());
         
         // Compile function area
         for (FuncGroup fg: funcs.values()) {
@@ -53,12 +52,10 @@ public class LangCompiler {
                     func.reverseOptimize();
                     func.forwardOptimize();
                     
-                    str.append(func.toTarget(builder));
+                    builder.appendString(func.toTarget(builder));
                 }
             }
         }
-        
-        builder.appendString(str.toString());
         
         // Put library import strings
         for (Library lib: libs.values()) {

@@ -2,10 +2,10 @@ package com.hahn.basic.util;
 
 import java.math.BigInteger;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
+
+import org.apache.commons.lang3.math.NumberUtils;
 
 import com.hahn.basic.intermediate.IIntermediate;
 import com.hahn.basic.intermediate.objects.LiteralNum;
@@ -17,45 +17,6 @@ import com.hahn.basic.target.LangBuildTarget;
 
 
 public class Util {
-
-    public static String repeat(String str, String delim, int num) {
-        StringBuffer result = new StringBuffer(str.length() * num + delim.length() * (num-1));
-        for (int i = 0; i < num; i++) {
-            result.append(str);
-            
-            if (i + 1 < num) {
-                result.append(delim);
-            }
-        }
-        
-        return result.toString();
-    }
-    
-    public static String toString(int[] arr, String seperator) {
-        StringBuffer result = new StringBuffer();
-        for (int i = 0; i < arr.length; i++) {
-           result.append(arr[i]);
-           
-           if (i + 1 < arr.length) {
-               result.append(seperator);
-           }
-        }
-        
-        return result.toString();
-    }
-    
-    public static String toString(Object[] arr, String seperator) {
-        StringBuffer result = new StringBuffer();
-        for (int i = 0; i < arr.length; i++) {
-           result.append(arr[i].toString());
-           
-           if (i + 1 < arr.length) {
-               result.append(seperator);
-           }
-        }
-        
-        return result.toString();
-    }
     
     public static String toTarget(IIntermediate[] arr, String seperator, LangBuildTarget builder) {
         StringBuffer result = new StringBuffer();
@@ -106,31 +67,6 @@ public class Util {
         return arr;
     }
     
-    public static int[] chars2intarr(String str) {
-        int[] arr = new int[1 + str.length()];
-        arr[0] = str.length();
-        for (int i = 0; i < str.length(); i++) {
-            arr[i+1] = str.charAt(i);
-        }
-        
-        return arr;
-    }
-    
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    public static Map arr2map(Class<?> key, Class<?> value, Object[][] arr) {
-        Map map = new HashMap();
-        
-        for (Object[] pair: arr) {
-            if (pair.length != 2) {
-                throw new RuntimeException("Invalid pair '" + Arrays.toString(pair) + "'");
-            }
-            
-            map.put(key.cast(pair[0]), value.cast(pair[1]));
-        }
-        
-        return map;
-    }
-    
     public static Iterator<Node> getIterator(Node n) {
         return n.getAsChildren().iterator();
     }
@@ -145,20 +81,8 @@ public class Util {
         }
     }
     
-    public static boolean IsPowerOfTwo(int x) {
+    public static boolean isPowerOfTwo(int x) {        
         return (x != 0) && ((x & (x - 1)) == 0);
-    }
-
-    public static String splitChars(String value, String delim) {
-        StringBuilder str = new StringBuilder(value.length() * 3 + ((value.length() - 1) * delim.length()));
-        for (int i = 0; i < value.length(); i++) {
-            str.append((int) value.charAt(i));
-            if (i < value.length() - 1) {
-                str.append(delim);
-            }
-        }
-        
-        return str.toString();
     }
 
     public static String toHexStr(String str) {
@@ -166,7 +90,7 @@ public class Util {
     }
     
     public static boolean toBool(double d) {
-		return (d != 0 ? true : false);
+		return (d != NumberUtils.DOUBLE_ZERO ? true : false);
 	}
 
     public static String createArrow(char main, char pointer, int length) {

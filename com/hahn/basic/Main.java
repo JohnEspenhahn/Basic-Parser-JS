@@ -22,6 +22,7 @@ public abstract class Main {
     private static List<String> LINES = new ArrayList<String>();
     
     public static boolean DEBUG = false; 
+    public static boolean PRETTY_PRINT = false;
     
     private static final String FILE_KEY = "file";
     private static final String DIR_KEY = "dir";
@@ -82,6 +83,7 @@ public abstract class Main {
         System.out.println();
         System.out.println("Options:");
         System.out.println(" --debug                       Run in debug mode");
+        System.out.println(" --pretty                      Run in pretty print mode");
         System.out.println();
         System.out.println("Input Modes:");
         System.out.println(" -d [<path>], --dir [<path>]   Attempt to compile a project");
@@ -96,6 +98,7 @@ public abstract class Main {
     public void printShellHelp() {
         System.out.println(":debug   Toggle debug mode");
         System.out.println(":help    Print this");
+        System.out.println(":pretty  Toggle pretty print");
         System.out.println(":exit    Quit the shell");
         System.out.println();
     }
@@ -118,6 +121,8 @@ public abstract class Main {
             
             if (input.equalsIgnoreCase(":debug")) {
                 Main.toggleDebug();
+            } else if (input.equalsIgnoreCase(":pretty")) {
+                Main.togglePretty();
             } else if (input.equalsIgnoreCase(":help")) {
                 printShellHelp();
             } else if (input.equalsIgnoreCase(":exit")) {
@@ -262,6 +267,12 @@ public abstract class Main {
         System.out.println();
     }
     
+    private static void togglePretty() {
+        PRETTY_PRINT = !PRETTY_PRINT;
+        System.out.println("Pretty Print = " + PRETTY_PRINT);
+        System.out.println();
+    }
+    
     public static void printCompileException(CompileException e) {
         if (DEBUG) e.printStackTrace();
         else System.out.println("ERROR: " + e.getMessage());
@@ -300,7 +311,9 @@ public abstract class Main {
             for (int i = 0; i < args.length; i++) {
                 s = args[i];
                 if (s.equals("--debug")) {
-                    toggleDebug();
+                    Main.toggleDebug();
+                } else if (s.equals("--pretty")) {
+                    Main.togglePretty();
                 } else if (s.equals("--gui") || s.equals("-g")) {
                     main.setInputType(EnumInputType.GUI_FILE);
                 } else if (s.equals("--shell") || s.equals("-s")) {
