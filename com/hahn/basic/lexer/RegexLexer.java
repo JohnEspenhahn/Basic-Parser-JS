@@ -10,16 +10,21 @@ import java.util.regex.PatternSyntaxException;
 import com.hahn.basic.Main;
 import com.hahn.basic.util.exceptions.CompileException;
 
-public class Lexer {    
+public class RegexLexer {
+    /** The pattern compiled from the provided tokens */
     private final Pattern LexRegex;
     
+    /** The provided tokens */
     private final IEnumToken[] Tokens;
+    
+    /** True if in a comment */
     private boolean comment;
     
     /**
+     * Create a new lexer
      * @param enumTokens An Enum that implements IEnumToken. The tokens to lex input to
      */
-    public Lexer(Class<? extends IEnumToken> enumTokens) {
+    public RegexLexer(Class<? extends IEnumToken> enumTokens) {
         // Compile tokens
         if (!enumTokens.isEnum()) throw new InvalidParameterException("Lexer tokens must be an Enum");
         Tokens = enumTokens.getEnumConstants();
@@ -77,7 +82,7 @@ public class Lexer {
                     PackedToken lastToken = stream.get(stream.size() - 1);
                     String lastRegex = lastToken.token.getRegex(); 
                     
-                    if (lastRegex.equals(EnumTokenShorthand.WORD.toString())) {
+                    if (lastRegex.contains(EnumTokenShorthand.WORD.toString())) {
                         lastEnd -= lastToken.value.length();
                     }
                 }
