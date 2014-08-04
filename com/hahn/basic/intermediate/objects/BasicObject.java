@@ -50,6 +50,8 @@ public abstract class BasicObject implements IIntermediate, ITypeable {
 
     /**
      * @param type The type to cast to
+     * @row Row to throw error at
+     * @col Column to throw error at
      * @return A new, altered version of this
      */
     public BasicObject castTo(Type type, int row, int col) {
@@ -131,7 +133,7 @@ public abstract class BasicObject implements IIntermediate, ITypeable {
     
     /**
      * Called from forward optimize
-     * @param by
+     * @param by The calling object or statement
      */
     public void takeRegister(IIntermediate by) {
         // Basic objects don't have registers

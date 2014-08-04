@@ -43,6 +43,7 @@ public abstract class IfStatement extends Statement {
         private ExpressionObject condition;
         
         /**
+         * @param parent Parent frame
          * @param condition EnumExpression.EXPRESSION
          * @param body EnumExpression.BLOCK
          */
@@ -56,6 +57,7 @@ public abstract class IfStatement extends Statement {
         }
         
         /**
+         * @param parent Parent frame
          * @param bodyHead EnumExpression.BLOCK
          */
         public Conditional(Frame parent, Node bodyHead) {

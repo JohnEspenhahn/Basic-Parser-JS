@@ -27,7 +27,7 @@ public class Parser extends IParser {
      * Parse a stream lexed by the lexer with the same IEnumToken
      * @param stream The stream of tokens lexed
      * @return The head node of the parse tree
-     * @throws CompileException
+     * @throws CompileException If parse failed
      */
     public Node parse(PackedToken[] stream) {
         this.stream_idx = 0;

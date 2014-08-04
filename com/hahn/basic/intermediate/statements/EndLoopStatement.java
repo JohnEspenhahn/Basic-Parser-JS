@@ -22,7 +22,7 @@ public class EndLoopStatement extends Statement {
     /**
      * Called while still compiling. Add a var
      * used in a loop but not created within it
-     * @param v The var to add
+     * @param o The object to add
      */
     public void addVar(AdvancedObject o) {
         if (!objs.contains(o)) {

@@ -571,7 +571,7 @@ public class Frame extends Statement {
     
     /**
      * `Struct` definition handler
-     * @param EnumExpression.STRUCT
+     * @param head EnumExpression.STRUCT
      */
     public void defineStruct(Node head) {
         Iterator<Node> it = Util.getIterator(head);
@@ -602,6 +602,7 @@ public class Frame extends Statement {
     /**
      * Define an anonymous functions
      * @param head EnumExpression.ANON_FUNC
+     * @return Pointer to the anonymous function
      */
     public FuncPointer defineAnonFunc(Node head) {
         return doDefineFunc(head, true);

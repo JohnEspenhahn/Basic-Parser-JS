@@ -9,9 +9,12 @@ public abstract class VarAccess extends ObjectHolder {
     
     /**
      * Access a property of a var at a given index
+     * @param container Containing statement
      * @param var The var to access
      * @param index The index of a property to access. Can be either a literal, another variable, or a struct param
      * @param type The type of the property at the given index
+     * @param row Row to throw error at
+     * @param col Column to throw error at
      */
     public VarAccess(Statement container, BasicObject var, BasicObject index, Type type, int row, int col) {
         super(var, type, row, col);

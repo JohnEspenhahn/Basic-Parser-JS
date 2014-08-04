@@ -15,9 +15,9 @@ public class JSPretty {
     
     /**
      * Use pretty format with no indent
-     * @param format
-     * @param args
-     * @return
+     * @param format String with format items to replace with args
+     * @param args If empty will ignore format
+     * @return Formatted string
      */
     public static String format(String format, Object... args) {
         return JSPretty.format(-1, format, args);
@@ -25,10 +25,10 @@ public class JSPretty {
     
     /**
      * Use pretty format
-     * @param tabs If >= 0 indent and add `tabs` extra tabs
-     * @param format
-     * @param args
-     * @return
+     * @param tabs If greater than or equal to 0 indent and add `tabs` extra tabs
+     * @param format String with format items to replace with args
+     * @param args If empty will ignore format
+     * @return Formatted string with indent and `tabs` extra tabs
      */
     public static String format(int tabs, String format, Object... args) {
         String str;

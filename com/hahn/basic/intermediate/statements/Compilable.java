@@ -36,9 +36,8 @@ public abstract class Compilable implements IIntermediate, ILangCommand {
     }
     
     /**
-     * Return true if ends with a block. For example,
+     * @return true if ends with a block. For example,
      * in a javascript an if statement.
-     * @return
      */
     public boolean endsWithBlock() {
         return false;

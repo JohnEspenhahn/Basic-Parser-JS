@@ -152,7 +152,6 @@ public abstract class OPObject extends BasicObject {
     /**
      * Called by toTarget is the object is still valid. Should
      * handle conditions if p2 is not null and if p2 is null
-     * @param builder
      * @return A final form of the object
      */
     public abstract String doToTarget();

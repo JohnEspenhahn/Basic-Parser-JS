@@ -76,8 +76,8 @@ public class Type implements ITypeable {
      * More lenient than merge, but can only go in one direction.
      * Should be called from REGISTER OPTIMIZE
      * @param newType The type to try and change to
-     * @param row
-     * @param col
+     * @param row Row to throw error at
+     * @param col Column to throw error at
      * @return newType on success
      * @throws CastException If can not cast
      */
@@ -107,8 +107,8 @@ public class Type implements ITypeable {
      * Auto-casting from original to newType. Standard to
      * be called from REGISTER_OPTIMIZE
      * @param newType The new/given type
-     * @param row
-     * @param col
+     * @param row Row to throw error at
+     * @param col Column to throw error at
      * @param unsafe If true will throw exception on fail
      * @return Overruling type, or null if failed and unsafe is false 
      * @throws CompileException failed and unsafe is true
