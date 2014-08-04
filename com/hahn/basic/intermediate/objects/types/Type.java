@@ -68,6 +68,11 @@ public class Type implements ITypeable {
         return (Struct) this;
     }
     
+    /**
+     * Check if the given type extends this type
+     * @param t The given type
+     * @return True if `t` extends this
+     */
     public boolean doesExtend(Type t) {
         return this == Type.UNDEFINED || t == Type.UNDEFINED || this.equals(t);
     }
@@ -158,15 +163,33 @@ public class Type implements ITypeable {
         return getName();
     }
     
+    /**
+     * Check if the given node is a valid node to be parsed as a type
+     * @param node The node to check
+     * @return True if a valid node to parse
+     */
     public static boolean isValidNode(Node node) {
         Enum<?> token = node.getToken();
         return token == EnumToken.IDENTIFIER || token == EnumExpression.TYPE;
     }
     
+    /**
+     * Parse the given node to a type
+     * @param node The node to parse
+     * @return The type
+     * @throw CompileException If the node cannot be parsed to a valid type
+     */
     public static Type fromNode(Node node) {
         return Type.fromNode(node, false);
     }
 
+    /**
+     * Convert the given node into a type
+     * @param head The given node
+     * @param isGettingMain If a main type?
+     * @return The new type
+     * @throw CompileException If the node cannot be parsed to a valid type
+     */
     @SuppressWarnings("unchecked")
     public static Type fromNode(Node head, boolean isGettingMain) {
         if (head == null) return Type.UNDEFINED; 

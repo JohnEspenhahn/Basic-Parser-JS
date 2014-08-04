@@ -22,6 +22,19 @@ public class Util {
         return (Main.PRETTY_PRINT ? ", " : ",");
     }
     
+    public static String joinTypes(ITypeable[] arr, char seperator) {
+        StringBuffer result = new StringBuffer();
+        for (int i = 0; i < arr.length; i++) {
+           result.append(arr[i].getType());
+           
+           if (i + 1 < arr.length) {
+               result.append(seperator);
+           }
+        }
+        
+        return result.toString();
+    }
+    
     public static String toTarget(IIntermediate[] arr) {
         String seperator = getListSeperator();
         

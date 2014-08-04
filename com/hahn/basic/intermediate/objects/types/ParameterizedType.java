@@ -4,13 +4,20 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
-
 import com.hahn.basic.definition.EnumExpression;
 import com.hahn.basic.parser.Node;
 import com.hahn.basic.util.Util;
 import com.hahn.basic.util.exceptions.CompileException;
 
+/**
+ * A type consisting of n ITypable parameter types
+ * and one ITypeable return type
+ * 
+ * @author John Espenhahn
+ *
+ * @param <T> Some ITypeable object to allow this to store
+ * either abstract types of actual typed objects
+ */
 public class ParameterizedType<T extends ITypeable> extends Type {
     public static final ParameterizedType<Type> UINT_ARRAY = new ParameterizedType<Type>(Type.ARRAY, new Type[] { Type.INT });
     public static final ParameterizedType<Type> CHAR_ARRAY = new ParameterizedType<Type>(Type.ARRAY, new Type[] { Type.CHAR });
@@ -18,18 +25,33 @@ public class ParameterizedType<T extends ITypeable> extends Type {
     private final Struct base;
     private final T[] types;
     
-    private ITypeable returnType;
+    private Type returnType;
     
+    /**
+     * Create a new parameterized type with no parameters and a undefined return type
+     * @param base The base type of this
+     */
     @SuppressWarnings("unchecked")
     public ParameterizedType(Struct base) {
         this(base, (T[]) new ITypeable[0], Type.UNDEFINED);
     }
     
-    public ParameterizedType(Struct base, T[] types) {
-        this(base, types, Type.UNDEFINED);
+    /**
+     * Create a new parameterized type with the given parameters and an undefined return type
+     * @param base The base type of this
+     * @param params The parameters' types
+     */
+    public ParameterizedType(Struct base, T[] params) {
+        this(base, params, Type.UNDEFINED);
     }
     
-    public ParameterizedType(Struct base, T[] types, ITypeable returnType) {
+    /**
+     * Create a new parameterized type with the given parameters and return type
+     * @param base The base type of this
+     * @param types The parameters' types
+     * @param returnType The return type of this
+     */
+    public ParameterizedType(Struct base, T[] types, Type returnType) {
         super(createName(base, types, returnType), false, true);
         
         this.base = base;
@@ -37,11 +59,18 @@ public class ParameterizedType<T extends ITypeable> extends Type {
         this.returnType = returnType;
     }
     
-    private static String createName(Struct base, ITypeable[] types, ITypeable returnType) {
+    /**
+     * Create what should be a unique name based on the given parameters
+     * @param base The base type
+     * @param params The parameter's types
+     * @param returnType The return type
+     * @return The name in format base<p1,pn...[;return]> 
+     */
+    private static String createName(Struct base, ITypeable[] params, Type returnType) {
         return base.getName() 
                 + "<"
-                + (types.length > 0 ? StringUtils.join(types, '@') : "") 
-                + (returnType != Type.UNDEFINED || base.doesExtend(Type.FUNC) ? "@@"+returnType.getType() : "")
+                + (params.length > 0 ? Util.joinTypes(params, ',') : "") 
+                + (returnType != Type.UNDEFINED || base.doesExtend(Type.FUNC) ? ";"+returnType.getType() : "")
                 + ">";
     }
     
@@ -125,6 +154,11 @@ public class ParameterizedType<T extends ITypeable> extends Type {
         return new ParameterizedType<ITypeable>(base, (ITypeable[]) aParams, returnType);
     }
     
+    /**
+     * Parse the expression into a list of types
+     * @param head EnumExpression.TYPE_LIST
+     * @return List of types
+     */
     private static List<Type> getTypeList(Node head) {
         List<Type> types = new ArrayList<Type>();
         

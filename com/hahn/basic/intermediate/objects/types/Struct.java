@@ -15,6 +15,11 @@ public class Struct extends Type {
 
     private int typeParams;
     
+    /**
+     * Create a new struct
+     * @param name The name of the struct
+     * @param parent The parent struct or null
+     */
     protected Struct(String name, Struct parent) {
         super(name, true);
         
@@ -29,6 +34,12 @@ public class Struct extends Type {
         }
     }
     
+    /**
+     * Extend this
+     * @param name The name of the new struct
+     * @param ps The parameters added by this new struct
+     * @return A new struct object
+     */
     public Struct extendAs(String name, List<BasicObject> ps) {
         Struct struct = new Struct(name, this);
         struct.loadVars(ps);
@@ -36,6 +47,11 @@ public class Struct extends Type {
         return struct;
     }
     
+    /**
+     * Extend this with no additional parameters
+     * @param name The name of the new struct
+     * @return A new struct object
+     */
     public Struct extendAs(String name) {
         return this.extendAs(name, null);
     }
