@@ -58,7 +58,6 @@ import com.hahn.basic.util.Util;
 import com.hahn.basic.util.exceptions.CastException;
 import com.hahn.basic.util.exceptions.CompileException;
 import com.hahn.basic.util.exceptions.DuplicateDefinitionException;
-import com.hahn.basic.util.exceptions.ParseExpressionException;
 
 public class Frame extends Statement {    
     private final Frame parent;
@@ -884,44 +883,6 @@ public class Frame extends Statement {
         throw new RuntimeException("Invalid cast definition '" + head + "'");
     }
     
-    private BasicObject parseTernary(Node lastChild, ExpressionStatement cnd_exp, Iterator<Node> it) {        
-        Node node_then = null, node_colon = null, node_else = null;
-        for (int i = 0; i < 3; i++) {
-            if (it.hasNext()) {
-                if (i == 0) {
-                    it = parseTernaryEnterExp(it);
-                    lastChild = node_then = it.next();
-                } else if (i == 1) {
-                    lastChild = node_colon = it.next();
-                } else if (i == 2) {
-                    lastChild = node_else  = it.next();
-                }
-            } else {
-                throw new ParseExpressionException(lastChild);
-            }
-        }
-        
-        if (node_colon.getToken() != EnumToken.COLON) {
-            throw new CompileException("Expected `:` but got `" + node_colon + "`", node_colon);
-        }
-        
-        return LangCompiler.factory.TernaryObject(cnd_exp, cnd_exp.getObj(), node_then, node_else);
-    }
-    
-    private Iterator<Node> parseTernaryEnterExp(Iterator<Node> it) {
-        List<Node> children = it.next().getAsChildren();
-        while (children.size() == 1) {
-            Enum<?> token = children.get(0).getToken();
-            if (token == EnumExpression.EVAL_CNDTN) {
-                children = children.get(0).getAsChildren();
-            } else {
-                break;
-            }
-        }
-        
-        return children.iterator();
-    }
-    
     /**
      * Handle an expression as a statement rather than an object
      * @param child EnumExpression.EXPRESSION
@@ -978,7 +939,11 @@ public class Frame extends Statement {
         if (obj != null) {
             exp.setObj(obj, child);
         } else if (token == QUESTION) {
-            exp.setObj(parseTernary(child, exp, it), child);
+            Node node_then = it.next();        
+            it.next(); // skip colon        
+            Node node_else = it.next();
+            
+            exp.setObj(LangCompiler.factory.TernaryObject(exp, exp.getObj(), node_then, node_else), child);
             
         } else if (token == OPEN_PRNTH) {
             Node inPrnthNode = it.next();
