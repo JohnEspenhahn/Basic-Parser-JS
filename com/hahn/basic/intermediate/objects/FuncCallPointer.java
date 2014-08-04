@@ -45,7 +45,7 @@ public abstract class FuncCallPointer extends FuncPointer {
     @Override
     public boolean setInUse(IIntermediate by) {
         checkFunction();
-        returnType = func.getReturnType().castTo(returnType, this.row, this.col);
+        returnType = func.getReturnType().merge(returnType, this.row, this.col, true);
         
         ListIterator<BasicObject> it = Arrays.asList(getParams()).listIterator(countParams());
         while (it.hasPrevious()) {
