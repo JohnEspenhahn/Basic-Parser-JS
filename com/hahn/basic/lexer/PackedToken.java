@@ -1,6 +1,5 @@
 package com.hahn.basic.lexer;
 
-
 public class PackedToken {
     public final IEnumToken token;
     public final String value;
