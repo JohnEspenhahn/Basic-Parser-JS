@@ -29,10 +29,18 @@ public abstract class AdvancedObject extends BasicObject {
         this.parallelObjs = new ArrayList<AdvancedObject>();
     }
 
+    /**
+     * Get the owning frame
+     * @return The owning frame
+     */
     public Frame getFrame() {
         return frame;
     }
 
+    /**
+     * Get the address of this object
+     * @return The address of this object
+     */
     public BasicObject getAddress() {
         return this;
     }
@@ -70,10 +78,18 @@ public abstract class AdvancedObject extends BasicObject {
         return firstCall;
     }
     
+    /**
+     * Get the objects that are used in parallel with this
+     * @return List of the objects used in parallel
+     */
     protected List<AdvancedObject> getParallelObjs() {
         return parallelObjs;
     }
 
+    /**
+     * Add an object that is being used at the same time this is
+     * @param obj The object to add
+     */
     public void addParallelObj(AdvancedObject obj) {
         if (!parallelObjs.contains(obj)) {
             parallelObjs.add(obj);
@@ -112,11 +128,21 @@ public abstract class AdvancedObject extends BasicObject {
      * ------------------------------- Register Management -------------------------------
      */
     
+    /**
+     * Called from takeRegister. For most advanced objects do the
+     * actual taking of the register.
+     * @param isLastUse True if this is the first call from
+     * reverse optimize and therefore the last used of this object
+     */
     public abstract void doTakeRegister(boolean isLastUse);
     
     @Override
     public void takeRegister(IIntermediate by) {
         doTakeRegister(isLastUse(by));
+    }
+    
+    public IRegister getRegister() {
+        return reg;
     }
     
     public boolean hasRegister() {
@@ -127,18 +153,23 @@ public abstract class AdvancedObject extends BasicObject {
         return hasRegister() && reg.isOnStack();
     }
 
+    /**
+     * Make the register available for use
+     * by other objects
+     */
     public void releaseRegister() {
         if (hasRegister()) {
             reg.release();
         }
     }
 
+    /**
+     * Stores a snapshot of the given register
+     * as this object's register
+     * @param reg The register to snapshot and store
+     */
     public void setRegister(IRegister reg) {
         this.reg = reg.snapshot();
-    }
-
-    public IRegister getRegister() {
-        return reg;
     }
 
     /*
