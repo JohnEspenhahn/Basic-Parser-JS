@@ -12,6 +12,13 @@ public abstract class FuncCallPointer extends FuncPointer {
     private int row, col;
     private Type returnType;
 
+    /**
+     * A callable pointer to a function
+     * @param name The name of the function to call
+     * @param params The provided parameters for the call
+     * @param row The row to throw an error at
+     * @param col The column to throw an error at
+     */
     public FuncCallPointer(String name, BasicObject[] params, int row, int col) {
         super(name, new ParameterizedType<ITypeable>(Type.FUNC, (ITypeable[]) params));
 
@@ -21,6 +28,10 @@ public abstract class FuncCallPointer extends FuncPointer {
         this.col = col;
     }
 
+    /**
+     * Is this object used
+     * @return True if uses is greater than zero
+     */
     public boolean isUsed() {
         return getUses() > 0;
     }
@@ -66,11 +77,19 @@ public abstract class FuncCallPointer extends FuncPointer {
         super.takeRegister(by);
     }
 
+    /**
+     * Get the actual parameter objects from the parameterized type
+     * @return The parameter objects
+     */
     @SuppressWarnings("unchecked")
     public BasicObject[] getParams() {
         return ((ParameterizedType<BasicObject>) super.getType()).getTypes();
     }
     
+    /**
+     * Get the number of parameters
+     * @return Number of parameters
+     */
     public int countParams() {
         return getParams().length;
     }

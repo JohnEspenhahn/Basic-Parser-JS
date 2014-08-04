@@ -1,6 +1,5 @@
 package com.hahn.basic.intermediate.objects;
 
-import lombok.NonNull;
 import lombok.experimental.Delegate;
 
 import com.hahn.basic.intermediate.IIntermediate;
@@ -26,7 +25,14 @@ public class ObjectHolder extends BasicObject {
     
     private int row, col;
 
-    public ObjectHolder(BasicObject obj, @NonNull Type type, int row, int col) {
+    /**
+     * A holder for an object, usually for a casted object
+     * @param obj The object to hold
+     * @param type The new type of the object to be held
+     * @param row The row to throw an error at
+     * @param col The column to throw an error at
+     */
+    public ObjectHolder(BasicObject obj, Type type, int row, int col) {
         super(obj.getName(), type);
 
         this.heldObj = obj;
@@ -35,6 +41,10 @@ public class ObjectHolder extends BasicObject {
         this.col = col;
     }
     
+    /**
+     * Get the object being held
+     * @return The object being held
+     */
     protected BasicObject getHeldObject() {
         return heldObj;
     }
@@ -55,7 +65,7 @@ public class ObjectHolder extends BasicObject {
         Type pretype = getHeldObject().getType();
         boolean result = getHeldObject().setInUse(by);
         
-        // If held type changed verify cast
+        // If held type changed, verify cast
         if (getHeldObject().getType() != pretype) {
             getHeldObject().getType().castTo(getType(), this.row, this.col);
         }
@@ -68,7 +78,7 @@ public class ObjectHolder extends BasicObject {
         Type pretype = getHeldObject().getType();
         getHeldObject().takeRegister(by);
         
-     // If held type changed verify cast
+        // If held type changed, verify cast
         if (getHeldObject().getType() != pretype) {
             getHeldObject().getType().castTo(getType(), this.row, this.col);
         }
