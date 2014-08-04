@@ -893,7 +893,6 @@ public class Frame extends Statement {
                 } else if (i == 1) {
                     lastChild = node_colon = it.next();
                 } else if (i == 2) {
-                    it = parseTernaryEnterExp(it);
                     lastChild = node_else  = it.next();
                 }
             } else {
@@ -912,7 +911,7 @@ public class Frame extends Statement {
         List<Node> children = it.next().getAsChildren();
         while (children.size() == 1) {
             Enum<?> token = children.get(0).getToken();
-            if (token == EnumExpression.EXPRESSION || token == EnumExpression.EVAL_CNDTN) {
+            if (token == EnumExpression.EVAL_CNDTN) {
                 children = children.get(0).getAsChildren();
             } else {
                 break;
@@ -1013,7 +1012,7 @@ public class Frame extends Statement {
             if (temp == null) temp = createTempVar(Type.BOOL);
             exp.setObj(LangCompiler.factory.ConditionalObject(exp, op, exp.getObj(), exp.getNode(), nextExp.getObj(), nextExp.getNode(), temp), child);
         } else if (!child.isTerminal()) {
-            exp.setObj(doHandleExpression(Util.getIterator(child)), child);
+            exp.setObj(handleExpression(child), child);
         } else {
             throw new CompileException("Unexpected token `" + child + "`", child);
         }
@@ -1049,6 +1048,8 @@ public class Frame extends Statement {
             } else if (token == EnumExpression.CALL_FUNC) {
                 CallFuncStatement fc = callFunc(child);
                 return fc.getFuncCallPointer();
+            } else {
+                return handleExpression(child).getAsExpObj();
             }
         }
         
