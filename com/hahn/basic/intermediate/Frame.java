@@ -954,7 +954,7 @@ public class Frame extends Statement {
         return doHandleExpression(Util.getIterator(head));
     }
     
-    private ExpressionStatement doHandleExpression(Iterator<Node> it) {
+    public ExpressionStatement doHandleExpression(Iterator<Node> it) {
         ExpressionStatement exp = LangCompiler.factory.ExpressionStatement(this, null);
         
         // Add tokens
@@ -969,12 +969,12 @@ public class Frame extends Statement {
         }
     }
     
-    private void handleNextExpressionChild(Iterator<Node> it, ExpressionStatement exp, BasicObject temp) {
+    public void handleNextExpressionChild(Iterator<Node> it, ExpressionStatement exp, BasicObject temp) {
         Node child = it.next();
         String val = child.getValue();
         Enum<?> token = child.getToken();
         
-        BasicObject obj = handleNextExpressionChildObject(child, it, temp);
+        BasicObject obj = handleNextExpressionChildObject(child, temp);
         if (obj != null) {
             exp.setObj(obj, child);
         } else if (token == QUESTION) {
@@ -1019,7 +1019,7 @@ public class Frame extends Statement {
         }
     }
     
-    private BasicObject handleNextExpressionChildObject(Node child, Iterator<Node> it, BasicObject temp) {
+    public BasicObject handleNextExpressionChildObject(Node child, BasicObject temp) {
         Enum<?> token = child.getToken();
         
         if (child.isTerminal()) {

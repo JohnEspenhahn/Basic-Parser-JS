@@ -14,8 +14,8 @@ public abstract class TernaryObject extends BasicObject {
         
         this.conditional = condition;
         
-        this.then_obj = container.getFrame().handleExpression(node_then).getObj();
-        this.else_obj = container.getFrame().handleExpression(node_else).getObj();
+        this.then_obj = container.getFrame().handleNextExpressionChildObject(node_then, null);
+        this.else_obj = container.getFrame().handleNextExpressionChildObject(node_else, null);
     }
     
     public BasicObject getConditional() {
