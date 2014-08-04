@@ -8,6 +8,11 @@ import com.hahn.basic.intermediate.statements.Statement;
 import com.hahn.basic.parser.Node;
 import com.sun.istack.internal.Nullable;
 
+/**
+ * An object that performs an operation on one or two parameters
+ * @author John Espenhahn
+ *
+ */
 public abstract class OPObject extends BasicObject {
     private Frame frame;
     private OPCode opcode;
@@ -19,8 +24,17 @@ public abstract class OPObject extends BasicObject {
     private Node p2Node;
     private BasicObject p2;
     
+    /**
+     * Create a new operation object
+     * @param container The container of this object
+     * @param op The operation to perform
+     * @param p1 The nonnull first parameter
+     * @param p1Node Used when throwing errors related to p1
+     * @param p2 The nullable second parameter
+     * @param p2Node Used when throwing errors related to p2
+     */
     public OPObject(Statement container, OPCode op, BasicObject p1, Node p1Node, @Nullable BasicObject p2, @Nullable Node p2Node) {
-        super("@ " + op + " @", p1.getType());
+        super("@" + op + "@", p1.getType());
         
         this.isLiteral = false;
         this.frame = container.getFrame();
@@ -35,13 +49,18 @@ public abstract class OPObject extends BasicObject {
     }
     
     @Override
+    public boolean isExpression() {
+        return true;
+    }
+    
+    @Override
     public boolean hasLiteral() {
         return isLiteral;
     }
     
     @Override
     public boolean canUpdateLiteral(Frame frame, OPCode op) {
-        return getP1().canUpdateLiteral(frame, op) && hasLiteral();
+        return hasLiteral() && getP1().canUpdateLiteral(frame, op);
     }
     
     @Override
@@ -56,11 +75,6 @@ public abstract class OPObject extends BasicObject {
         } else {
             return null;
         }
-    }
-    
-    @Override
-    public boolean isExpression() {
-        return true;
     }
     
     @Override
@@ -92,34 +106,19 @@ public abstract class OPObject extends BasicObject {
         return p2 != null && p2.isLastUse(this);
     }
     
-    /**
-     * @param o Set this.p1 = o (does not call getForUse)
-     */
-    public void forceP1(BasicObject o) {
-        p1 = o;
-    }
-    
-    /**
-     * @param o Set this.p2 = o (does not call getForUse)
-     */
-    public void forceP2(BasicObject o) {
-        p2 = o;
-    }
-    
     public void setOP(OPCode o) {
         opcode = o;
     }
     
     @Override
     public boolean setInUse(IIntermediate by) {
-        if (p1 != null) p1.setInUse(this);        
+        // Set in use
+        p1.setInUse(this);        
         if (p2 != null) p2.setInUse(this);
         
         // Type check
-        if (p1 != null) { 
-            Type mergedType = opcode.type1.merge(p1.getType(), p1Node.getRow(), p1Node.getCol(), true);
-            this.setType(mergedType);
-        }
+        Type mergedType = opcode.type1.merge(p1.getType(), p1Node.getRow(), p1Node.getCol(), true);
+        this.setType(mergedType);
         
         if (p2 != null) { 
             opcode.type2.merge(p2.getType(), p2Node.getRow(), p2Node.getCol(), true);
@@ -144,7 +143,7 @@ public abstract class OPObject extends BasicObject {
             }
         }
         
-        if (p2.hasLiteral() && !p2.canLiteralSurvive(getFrame())) {
+        if (p2 != null && p2.hasLiteral() && !p2.canLiteralSurvive(getFrame())) {
             p2.setLiteral(null);
         }
     }

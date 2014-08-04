@@ -18,14 +18,16 @@ public abstract class BasicObject implements IIntermediate, ITypeable {
     private int uses;
     private IIntermediate statementOfLastUse;
     
+    /**
+     * A simple object that doesn't do any complex
+     * register or literal optimization
+     * @param name The name of the object
+     * @param type The type of the object
+     */
     public BasicObject(String name, @NonNull Type type) {
         this.name = name;
         this.type = type;
         this.uses = 0;
-    }
-
-    public boolean isTemp() {
-        return false;
     }
     
     public String getName() {
@@ -40,10 +42,19 @@ public abstract class BasicObject implements IIntermediate, ITypeable {
         return type;
     }
     
+    /**
+     * Update the object's type
+     * @param t The nonnull new type
+     */
     public void setType(@NonNull Type t) {
         this.type = t;
     }
     
+    /**
+     * Checks if this object has a given flag
+     * @param name The name of the flag to check
+     * @return True if has the flag
+     */
     public boolean hasFlag(String name) {
         return false;
     }
@@ -71,20 +82,39 @@ public abstract class BasicObject implements IIntermediate, ITypeable {
         // Basic objects don't handle literals
     }
     
+    /**
+     * @return True if has a literal
+     */
+    public boolean hasLiteral() {
+        return false;
+    }
+    
+    /**
+     * @return True if can override any current literal
+     */
     public boolean canSetLiteral() {
         return false;
     }
     
+    /**
+     * Checks if the object has a literal that can be updated
+     * @param frame The calling frame
+     * @param op The operation that is trying to be performed
+     * @return True if has a literal and it can be modified
+     */
+    public boolean canUpdateLiteral(Frame frame, OPCode op) {
+        return hasLiteral() && canSetLiteral();
+    }
+    
+    /**
+     * Check if this object's literal can survive through
+     * to this frame
+     * @param frame The frame from which this is being call
+     * @return False if the literal cannot survive and is
+     * therefor invalid
+     */
     public boolean canLiteralSurvive(Frame frame) {
         return true;
-    }
-    
-    public boolean canUpdateLiteral(Frame frame, OPCode op) {
-        return canSetLiteral();
-    }
-    
-    public boolean hasLiteral() {
-        return false;
     }
     
     /**
@@ -152,6 +182,8 @@ public abstract class BasicObject implements IIntermediate, ITypeable {
     }
     
     /**
+     * Expression objects, such as OPObject, should return true.
+     * Used for checking the groupings of some statements
      * @return True if this object is an expression
      */
     public boolean isExpression() {
@@ -170,6 +202,14 @@ public abstract class BasicObject implements IIntermediate, ITypeable {
      * to a Frame's `vars` should have this set to true
      */
     public boolean isVar() {
+        return false;
+    }
+    
+    /**
+     * @return True if this objects data is transient and
+     * the object can be reused
+     */
+    public boolean isTemp() {
         return false;
     }
     

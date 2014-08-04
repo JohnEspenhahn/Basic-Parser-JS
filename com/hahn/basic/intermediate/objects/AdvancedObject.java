@@ -29,10 +29,6 @@ public abstract class AdvancedObject extends BasicObject {
         this.parallelObjs = new ArrayList<AdvancedObject>();
     }
 
-    public boolean isLocal() {
-        return false;
-    }
-
     public Frame getFrame() {
         return frame;
     }
@@ -184,5 +180,16 @@ public abstract class AdvancedObject extends BasicObject {
     @Override
     public boolean updateLiteral(OPCode op, Literal lit) {
         return literal.updateLiteral(op, lit);
+    }
+    
+    /*
+     * ------------------------------- To Target Tools -------------------------------
+     */
+    
+    /**
+     * @return True if this object is local to a frame
+     */
+    public boolean isLocal() {
+        return false;
     }
 }
