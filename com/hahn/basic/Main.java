@@ -42,9 +42,8 @@ public abstract class Main {
     
     public abstract void printShellTitle();
     
-    public abstract void handleTermInput(String input);
-    public abstract void handleFileLine(String str, int line);
-    public abstract void handleFileReadComplete();
+    public abstract void handleTermInput();
+    public abstract void handleFileInput();
     
     public void setInputType(EnumInputType type) {
         if (this.inputType == null) this.inputType = type;
@@ -134,11 +133,10 @@ public abstract class Main {
             } else {
                 try {               
                     // Reset
-                    Main.setLine(1);
                     Main.LINES.clear();
                     Main.LINES.add(input.trim());
                     
-                    handleTermInput(input);
+                    handleTermInput();
                 } catch (CompileException e) {
                     printCompileException(e);
                 } catch (Exception e) {
@@ -165,7 +163,6 @@ public abstract class Main {
         this.inputFile = file;
         
         // Reset
-        Main.setLine(1);
         Main.LINES.clear();
         
         Scanner scanner = null;
@@ -176,13 +173,10 @@ public abstract class Main {
             while(scanner.hasNextLine()) {
                 String line = scanner.nextLine();
                 
-                Main.LINES.add(line.trim());
-                handleFileLine(line, Main.ROW);
-                
-                Main.ROW += 1;
+                Main.LINES.add(line);
             }
             
-            handleFileReadComplete();
+            handleFileInput();
             
             if (DEBUG) {
                 System.out.println();
@@ -213,7 +207,6 @@ public abstract class Main {
             Scanner scanner = null;
             try {
                 // Reset
-                Main.setLine(1);
                 Main.LINES.clear();
                 
                 int found = 0;
@@ -229,17 +222,14 @@ public abstract class Main {
                         while(scanner.hasNextLine()) {
                             String line = scanner.nextLine();
                             
-                            Main.LINES.add(line.trim());
-                            handleFileLine(line, Main.ROW);
-                            
-                            Main.ROW += 1;
+                            Main.LINES.add(line);
                         }
                         scanner.close();
                         scanner = null;
                     }
                 }
                 
-                handleFileReadComplete();
+                handleFileInput();
                 
                 System.out.println();
                 if (found == 0) {
@@ -280,6 +270,10 @@ public abstract class Main {
     public static void printCompileException(CompileException e) {
         if (DEBUG) e.printStackTrace();
         else System.out.println("ERROR: " + e.getMessage());
+    }
+    
+    public static List<String> getLines() {
+        return LINES;
     }
     
     public static String getLineStr() {

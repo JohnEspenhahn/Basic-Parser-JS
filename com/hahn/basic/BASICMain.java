@@ -47,14 +47,14 @@ public class BASICMain extends Main {
     }
 
     @Override
-    public void handleTermInput(String input) {
+    public void handleTermInput() {
         long start = System.currentTimeMillis();
         
         // Reset
         lexer.reset();
         
         // Parse
-        lexLineToStream(input, 1);
+        lexLines();
         handleStream();
         
         System.out.println();
@@ -62,21 +62,13 @@ public class BASICMain extends Main {
     }
     
     @Override
-    public void handleFileLine(String str, int line) {
-        lexLineToStream(str, line);
-    }
-    
-    private void lexLineToStream(String str, int line) {
-        List<PackedToken> added = lexer.lex(str, line);
-        
-        // Add to stream
-        if (stream == null) stream = added;
-        else stream.addAll(added);
-    }
-    
-    @Override
-    public void handleFileReadComplete() {
+    public void handleFileInput() {
+        lexLines();
         handleStream();
+    }
+    
+    private void lexLines() {
+        stream = lexer.lex(getLines());
     }
 
     private void handleStream() {
@@ -106,7 +98,7 @@ public class BASICMain extends Main {
     private Node parse() {
         if (stream == null) return null;
         
-        return parser.parse(stream.toArray(new PackedToken[0]));
+        return parser.parse(stream.toArray(new PackedToken[stream.size()]));
     }
     
     private void compile(Node tree_head) {
