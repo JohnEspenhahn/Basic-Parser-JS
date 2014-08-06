@@ -11,7 +11,7 @@ import java.util.regex.PatternSyntaxException;
 import com.hahn.basic.Main;
 import com.hahn.basic.util.exceptions.CompileException;
 
-public class RegexLexer {
+public class RegexLexer implements ILexer {
     /** The pattern compiled from the provided tokens */
     private final Pattern LexRegex;
     
@@ -62,10 +62,12 @@ public class RegexLexer {
         reset();
     }
     
+    @Override
     public void reset() {
         this.comment = false;
     }
     
+    @Override
     public List<PackedToken> lex(List<String> input) {
         List<PackedToken> stream = new ArrayList<PackedToken>();
         
