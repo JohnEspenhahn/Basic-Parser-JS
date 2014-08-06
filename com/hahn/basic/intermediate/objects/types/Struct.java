@@ -34,11 +34,6 @@ public class Struct extends Type {
         }
     }
     
-    @Override
-    public boolean isDeterminant() {
-        return false;
-    }
-    
     /**
      * Extend this
      * @param name The name of the new struct

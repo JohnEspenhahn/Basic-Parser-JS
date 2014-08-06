@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.ListIterator;
 
 import com.hahn.basic.intermediate.IIntermediate;
-import com.hahn.basic.intermediate.LangCompiler;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.ParameterizedType;
 import com.hahn.basic.intermediate.objects.types.Type;
@@ -52,26 +51,6 @@ public abstract class FuncCallPointer extends FuncPointer {
         this.returnType = this.returnType.castTo(t, row, col);
 
         return this;
-    }
-    
-    @Override
-    protected void checkFunction() {
-        if (func == null) {
-            // Check if need dynamic dispatch
-            boolean nonDeterminant = false;
-            for (ITypeable t: getTypes()) {
-                if (!t.getType().isDeterminant()) {
-                    nonDeterminant = true;
-                    break;
-                }
-            }
-            
-            if (nonDeterminant) {
-                LangCompiler.factory.DynamicDispatch(this);
-            }
-        }
-        
-        super.checkFunction();
     }
 
     @Override

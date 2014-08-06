@@ -56,7 +56,6 @@ public interface ILangFactory {
 	public ConditionalObject ConditionalObject(Statement container, OPCode op, BasicObject p1, Node p1Node, BasicObject p2, Node p2Node, BasicObject temp);
 	public TernaryObject TernaryObject(Statement container, BasicObject condition, Node node_then, Node node_else);
 	
-	public void DynamicDispatch(FuncCallPointer func);
 	public FuncHead FuncHead(String name, boolean rawName, Node head, Type rtnType, Param[] params);
     public FuncPointer FuncPointer(String name, ParameterizedType<ITypeable> funcType);
 
