@@ -8,7 +8,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import com.hahn.basic.Main;
 import com.hahn.basic.util.exceptions.CompileException;
 
 public class RegexLexer implements ILexer {
@@ -72,7 +71,7 @@ public class RegexLexer implements ILexer {
         List<PackedToken> stream = new ArrayList<PackedToken>();
         
         Iterator<String> it = input.iterator();
-        for (int row = 0; it.hasNext(); row++) {
+        for (int row = 1; it.hasNext(); row++) {
             String line = it.next();
             
             int lastEnd = 0;
@@ -124,7 +123,7 @@ public class RegexLexer implements ILexer {
     
             // Ensure full match
             if (lastEnd != line.length()) {
-                throw new CompileException("Invalid token", Main.getRow(), lastEnd); 
+                throw new CompileException("Invalid token", row, lastEnd); 
             }
         }
 
