@@ -15,7 +15,7 @@ public enum EnumExpression implements IEnumExpression {
     BOOL_OP     ("SC_BITWISE|NOTEQUAL|EQUALS|LESS_EQU|GTR_EQU|LESS|GTR"),
     BITWISE     ("AND|MSC_BITWISE"),
     
-    CAST        ("<TYPE>COLON<FACTOR>", false),
+    CAST        ("OPEN_PRNTH <TYPE>COLON<FACTOR> CLOSE_PRNTH", false),
     CREATE      ("NEW <TYPE> OPEN_PRNTH ?<CALL_PARAMS> CLOSE_PRNTH", false), 
     
     WHILE_STMT  ("WHILE <CONDITIONAL>", false),
