@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.ListIterator;
 
 import com.hahn.basic.intermediate.IIntermediate;
+import com.hahn.basic.intermediate.LangCompiler;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.ParameterizedType;
 import com.hahn.basic.intermediate.objects.types.Type;
@@ -52,6 +53,26 @@ public abstract class FuncCallPointer extends FuncPointer {
 
         return this;
     }
+    
+    @Override
+    protected void checkFunction() {
+        if (func == null) {
+            // Check if need dynamic dispatch
+            boolean nonDeterminant = false;
+            for (ITypeable t: getTypes()) {
+                if (!t.getType().isDeterminant()) {
+                    nonDeterminant = true;
+                    break;
+                }
+            }
+            
+            if (nonDeterminant) {
+                LangCompiler.factory.DynamicDispatch(this);
+            }
+        }
+        
+        super.checkFunction();
+    }
 
     @Override
     public boolean setInUse(IIntermediate by) {        
@@ -76,14 +97,22 @@ public abstract class FuncCallPointer extends FuncPointer {
         
         super.takeRegister(by);
     }
+    
+    /**
+     * Get the function parameterized type
+     * @return The parameterized type
+     */
+    @SuppressWarnings("unchecked")
+    private ParameterizedType<BasicObject> getParameterized() {
+        return (ParameterizedType<BasicObject>) super.getType();
+    }
 
     /**
      * Get the actual parameter objects from the parameterized type
      * @return The parameter objects
      */
-    @SuppressWarnings("unchecked")
     public BasicObject[] getParams() {
-        return ((ParameterizedType<BasicObject>) super.getType()).getTypes();
+        return getParameterized().getTypes();
     }
     
     /**

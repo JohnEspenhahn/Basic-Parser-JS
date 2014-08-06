@@ -40,7 +40,7 @@ public abstract class FuncPointer extends BasicObject {
      * @return The parameterized type
      */
     @SuppressWarnings("unchecked")
-    private ParameterizedType<ITypeable> getPType() {
+    private ParameterizedType<ITypeable> getParameterized() {
         return (ParameterizedType<ITypeable>) super.getType();
     }
     
@@ -49,7 +49,7 @@ public abstract class FuncPointer extends BasicObject {
      * @return Parameter's types
      */
     public ITypeable[] getTypes() {
-        return getPType().getTypes();
+        return getParameterized().getTypes();
     }
 
     /**
@@ -57,7 +57,7 @@ public abstract class FuncPointer extends BasicObject {
      * @return Return type
      */
     public Type getReturn() {
-        return getPType().getReturn();
+        return getParameterized().getReturn();
     }
     
     /**
@@ -65,7 +65,7 @@ public abstract class FuncPointer extends BasicObject {
      * @param t The type
      */
     private void setPTypeReturn(Type t) {
-        getPType().setReturn(t);
+        getParameterized().setReturn(t);
     }
     
     @Override
@@ -81,20 +81,7 @@ public abstract class FuncPointer extends BasicObject {
      */
     protected void checkFunction() {
         if (func == null) {
-            // Check if need dynamic dispatch
-            boolean nonDeterminant = false;
-            for (ITypeable t: getTypes()) {
-                if (!t.getType().isDeterminant()) {
-                    nonDeterminant = true;
-                    break;
-                }
-            }
-            
-            if (nonDeterminant) {
-                // TODO dynamic dispatch
-            } else {
-                setFunction(LangCompiler.getFunc(getName(), getTypes()));
-            }
+            setFunction(LangCompiler.getFunc(getName(), getTypes()));
             
             // Still null then not found
             if (func == null) {
