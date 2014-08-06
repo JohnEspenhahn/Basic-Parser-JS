@@ -81,7 +81,20 @@ public abstract class FuncPointer extends BasicObject {
      */
     protected void checkFunction() {
         if (func == null) {
-            setFunction(LangCompiler.getFunc(getName(), getTypes()));
+            // Check if need dynamic dispatch
+            boolean nonDeterminant = false;
+            for (ITypeable t: getTypes()) {
+                if (!t.getType().isDeterminant()) {
+                    nonDeterminant = true;
+                    break;
+                }
+            }
+            
+            if (nonDeterminant) {
+                // TODO dynamic dispatch
+            } else {
+                setFunction(LangCompiler.getFunc(getName(), getTypes()));
+            }
             
             // Still null then not found
             if (func == null) {

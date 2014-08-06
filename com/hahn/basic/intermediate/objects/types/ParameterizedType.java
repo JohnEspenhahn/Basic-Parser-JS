@@ -75,6 +75,17 @@ public class ParameterizedType<T extends ITypeable> extends Type {
     }
     
     @Override
+    public boolean isDeterminant() {
+        for (T t: types) {
+            if (!t.getType().isDeterminant()) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+    
+    @Override
     public Struct getAsStruct() {
         return base;
     }

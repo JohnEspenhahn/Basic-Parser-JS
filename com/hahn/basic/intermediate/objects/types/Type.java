@@ -64,6 +64,10 @@ public class Type implements ITypeable {
         return this;
     }
     
+    public boolean isDeterminant() {
+        return true;
+    }
+    
     public Struct getAsStruct() {
         return (Struct) this;
     }

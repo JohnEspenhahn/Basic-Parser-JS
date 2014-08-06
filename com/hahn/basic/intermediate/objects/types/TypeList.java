@@ -18,6 +18,11 @@ public class TypeList extends Type implements Iterable<Type> {
     }
     
     @Override
+    public boolean isDeterminant() {
+        return false;
+    }
+    
+    @Override
     public boolean doesExtend(Type other) {
         for (Type t: types) {
             if (!t.doesExtend(other)) {
