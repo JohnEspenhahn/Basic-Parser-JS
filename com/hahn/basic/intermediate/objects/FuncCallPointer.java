@@ -54,16 +54,16 @@ public abstract class FuncCallPointer extends FuncPointer {
     }
 
     @Override
-    public boolean setInUse(IIntermediate by) {
-        checkFunction();
-        returnType = func.getReturnType().merge(returnType, this.row, this.col, true);
-        
+    public boolean setInUse(IIntermediate by) {        
         ListIterator<BasicObject> it = Arrays.asList(getParams()).listIterator(countParams());
         while (it.hasPrevious()) {
             BasicObject param = it.previous();
             
             param.setInUse(this);
         }
+        
+        checkFunction();
+        returnType = func.getReturnType().merge(returnType, this.row, this.col, true);
         
         return super.setInUse(by);
     }
