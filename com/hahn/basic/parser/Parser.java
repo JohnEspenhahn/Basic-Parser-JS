@@ -1,7 +1,7 @@
 package com.hahn.basic.parser;
 
 import com.hahn.basic.definition.EnumExpression;
-import com.hahn.basic.lexer.IEnumToken;
+import com.hahn.basic.lexer.IEnumRegexToken;
 import com.hahn.basic.lexer.PackedToken;
 import com.hahn.basic.util.exceptions.CompileException;
 import com.hahn.basic.util.exceptions.ParseExpressionException;
@@ -15,7 +15,7 @@ public class Parser extends IParser {
     private int stream_idx;
     private PackedToken[] stream;  
     
-    public Parser(Class<? extends IEnumToken> enumTokens, Class<? extends IEnumExpression> enumExpressions) {
+    public Parser(Class<? extends IEnumRegexToken> enumTokens, Class<? extends IEnumExpression> enumExpressions) {
         super(enumTokens, enumExpressions);
         
         this.bnfParser = new BNFParser(this);

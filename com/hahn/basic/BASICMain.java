@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.List;
 
 import com.hahn.basic.intermediate.LangCompiler;
-import com.hahn.basic.lexer.IEnumToken;
+import com.hahn.basic.lexer.IEnumRegexToken;
 import com.hahn.basic.lexer.ILexer;
 import com.hahn.basic.lexer.PackedToken;
 import com.hahn.basic.lexer.RegexLexer;
@@ -27,7 +27,7 @@ public class BASICMain extends Main {
     /** The stream of lexed tokens */
     private List<PackedToken> stream;
 
-    public BASICMain(ILangFactory factory, Class<? extends IEnumToken> tokens, Class<? extends IEnumExpression> expressions) {
+    public BASICMain(ILangFactory factory, Class<? extends IEnumRegexToken> tokens, Class<? extends IEnumExpression> expressions) {
         System.out.println("BASIC Parser v" + VERSION);
         
         this.factory = factory;

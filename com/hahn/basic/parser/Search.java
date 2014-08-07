@@ -2,7 +2,7 @@ package com.hahn.basic.parser;
 
 import java.security.InvalidParameterException;
 
-import com.hahn.basic.lexer.IEnumToken;
+import com.hahn.basic.lexer.IEnumRegexToken;
 import com.hahn.basic.lexer.PackedToken;
 import com.hahn.basic.util.FlagMap;
 
@@ -136,7 +136,7 @@ class Search extends IParser {
     }
 
     private boolean verifyMatch(Enum<?> expObj, PackedToken streamToken) {
-        if (expObj instanceof IEnumToken) {
+        if (expObj instanceof IEnumRegexToken) {
             if (expObj == streamToken.token) {
                 stream_offset += 1;
                 temp_node.addChild(new Node(temp_node, streamToken));

@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.hahn.basic.definition.EnumExpression;
-import com.hahn.basic.definition.EnumToken;
+import com.hahn.basic.definition.EnumRegexToken;
 import com.hahn.basic.intermediate.objects.Param;
 import com.hahn.basic.parser.Node;
 import com.hahn.basic.util.Util;
@@ -165,7 +165,7 @@ public class Type implements ITypeable {
      */
     public static boolean isValidNode(Node node) {
         Enum<?> token = node.getToken();
-        return token == EnumToken.IDENTIFIER || token == EnumExpression.TYPE;
+        return token == EnumRegexToken.IDENTIFIER || token == EnumExpression.TYPE;
     }
     
     /**

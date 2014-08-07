@@ -1,8 +1,8 @@
 package com.hahn.basic.definition;
 
-import com.hahn.basic.lexer.IEnumToken;
+import com.hahn.basic.lexer.IEnumRegexToken;
 
-public enum EnumToken implements IEnumToken {
+public enum EnumRegexToken implements IEnumRegexToken {
     EOL         (";"                         ),
     STRING      ("\".+?\""                   ),
     HEX_NUMBER  ("0x[0-9A-Fa-f]+"            ),
@@ -52,7 +52,7 @@ public enum EnumToken implements IEnumToken {
 
     
     private final String regex;
-    private EnumToken(String r) { this.regex = r; }
+    private EnumRegexToken(String r) { this.regex = r; }
     
     @Override
     public String getRegex() {

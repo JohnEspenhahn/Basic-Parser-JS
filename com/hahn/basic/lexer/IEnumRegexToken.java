@@ -6,6 +6,6 @@ package com.hahn.basic.lexer;
  * @author John Espenhahn
  *
  */
-public interface IEnumToken {
+public interface IEnumRegexToken {
     public String getRegex();
 }

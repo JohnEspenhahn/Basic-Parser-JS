@@ -11,7 +11,7 @@ import java.util.Scanner;
 import javax.swing.JFileChooser;
 
 import com.hahn.basic.definition.EnumExpression;
-import com.hahn.basic.definition.EnumToken;
+import com.hahn.basic.definition.EnumRegexToken;
 import com.hahn.basic.target.LangBuildTarget;
 import com.hahn.basic.target.js.JSLangFactory;
 import com.hahn.basic.util.EnumInputType;
@@ -303,7 +303,7 @@ public abstract class Main {
     
     public static void main(String[] args) {
         try {
-            Main main = new BASICMain(new JSLangFactory(), EnumToken.class, EnumExpression.class);
+            Main main = new BASICMain(new JSLangFactory(), EnumRegexToken.class, EnumExpression.class);
             
             String s;
             for (int i = 0; i < args.length; i++) {

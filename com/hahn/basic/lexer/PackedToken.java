@@ -1,12 +1,12 @@
 package com.hahn.basic.lexer;
 
 public class PackedToken {
-    public final IEnumToken token;
+    public final IEnumRegexToken token;
     public final String value;
     
     public final int row, col;
 
-    public PackedToken(IEnumToken token, String val, int row, int col) {
+    public PackedToken(IEnumRegexToken token, String val, int row, int col) {
         this.token = token;
         this.value = val;
         

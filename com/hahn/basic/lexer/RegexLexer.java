@@ -15,7 +15,7 @@ public class RegexLexer implements ILexer {
     private final Pattern LexRegex;
     
     /** The provided tokens */
-    private final IEnumToken[] Tokens;
+    private final IEnumRegexToken[] Tokens;
     
     /** True if in a comment */
     private boolean comment;
@@ -24,7 +24,7 @@ public class RegexLexer implements ILexer {
      * Create a new lexer
      * @param enumTokens An Enum that implements IEnumToken. The tokens to lex input to
      */
-    public RegexLexer(Class<? extends IEnumToken> enumTokens) {
+    public RegexLexer(Class<? extends IEnumRegexToken> enumTokens) {
         // Compile tokens
         if (!enumTokens.isEnum()) throw new InvalidParameterException("Lexer tokens must be an Enum");
         Tokens = enumTokens.getEnumConstants();
