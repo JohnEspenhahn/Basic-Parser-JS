@@ -71,7 +71,7 @@ public class JSForStatement extends ForStatement {
     
     @Override
     public String toTarget() {
-        return JSPretty.format(0, "for(%s;%s;%s)%f", 
+        return JSPretty.format(0, "for(%s;%s;%s)%b",
                 getDefineStatement(),
                 getConditionStatement(),
                 getModifyStatements(),

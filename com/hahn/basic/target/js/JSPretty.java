@@ -66,24 +66,49 @@ public class JSPretty {
     }
     
     private static void handleFlag(StringBuilder str, char flag, Object arg) {
+        boolean require_brace = true;
+        
         switch (flag) {
         // Standard
         case 's': 
             str.append(arg instanceof IIntermediate ? ((IIntermediate) arg).toTarget() : arg);            
             break;
             
+        // Block
+        case 'b':
+            require_brace = false;
+            
         // Frame
         case 'f':
-            if (arg instanceof Frame && ((Frame) arg).isEmpty()) {
-                str.append("{}");
+            if (!(arg instanceof Frame)) {
+                throw new RuntimeException("Illegal argument `" + arg + "` with flag `%" + flag + "`");
+            }
+            
+            Frame frame = (Frame) arg;
+            if (frame.isEmpty()) {
+                if (require_brace) str.append("{}");
+                else str.append(";");
             } else {
-                str.append(Main.PRETTY_PRINT ? " {\n" : "{");
+                // If more than one object in frame requires brace
+                require_brace = require_brace || frame.getSize() > 1;
                 
-                JSPretty.indent += 1;
+                final int oldIndent = JSPretty.indent;
+                if (require_brace) {
+                    JSPretty.indent += 1;
+                    str.append(Main.PRETTY_PRINT ? " {\n" : "{");
+                } else {
+                    JSPretty.indent = 0;
+                    str.append(Main.PRETTY_PRINT ? " " : "");
+                }
+                
                 str.append(arg instanceof IIntermediate ? ((IIntermediate) arg).toTarget() : arg);
-                JSPretty.indent -= 1;
                 
-                str.append(Main.PRETTY_PRINT ? getIndent() + "}" : "}");
+                if (require_brace) {
+                    JSPretty.indent -= 1;
+                    str.append(Main.PRETTY_PRINT ? getIndent() + "}" : "}");
+                } else {
+                    JSPretty.indent = oldIndent;
+                }
             }
                 
             break;
