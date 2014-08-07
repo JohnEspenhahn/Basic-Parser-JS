@@ -1,4 +1,4 @@
-package com.hahn.basic.lexer;
+package com.hahn.basic.lexer.regex;
 
 /**
  * The tokens enum must implement this

@@ -6,10 +6,10 @@ import java.io.IOException;
 import java.util.List;
 
 import com.hahn.basic.intermediate.LangCompiler;
-import com.hahn.basic.lexer.IEnumRegexToken;
 import com.hahn.basic.lexer.ILexer;
 import com.hahn.basic.lexer.PackedToken;
-import com.hahn.basic.lexer.RegexLexer;
+import com.hahn.basic.lexer.regex.IEnumRegexToken;
+import com.hahn.basic.lexer.regex.RegexLexer;
 import com.hahn.basic.parser.IEnumExpression;
 import com.hahn.basic.parser.Node;
 import com.hahn.basic.parser.Parser;

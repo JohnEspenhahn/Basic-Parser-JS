@@ -1,4 +1,4 @@
-package com.hahn.basic.lexer;
+package com.hahn.basic.lexer.regex;
 
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
@@ -8,6 +8,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import com.hahn.basic.lexer.ILexer;
+import com.hahn.basic.lexer.PackedToken;
 import com.hahn.basic.util.exceptions.CompileException;
 
 public class RegexLexer implements ILexer {
@@ -34,7 +36,7 @@ public class RegexLexer implements ILexer {
         for (int i = 0; i < Tokens.length; i++) {
             String tRegex = Tokens[i].getRegex();
             
-            for (EnumTokenShorthand shorthand: EnumTokenShorthand.values()) {
+            for (EnumRegexTokenShorthand shorthand: EnumRegexTokenShorthand.values()) {
                 tRegex = tRegex.replace(shorthand.toString(), shorthand.Regex);
             }
             
@@ -88,7 +90,7 @@ public class RegexLexer implements ILexer {
                         PackedToken lastToken = stream.get(stream.size() - 1);
                         String lastRegex = lastToken.token.getRegex(); 
                         
-                        if (lastRegex.contains(EnumTokenShorthand.WORD.toString())) {
+                        if (lastRegex.contains(EnumRegexTokenShorthand.WORD.toString())) {
                             lastEnd -= lastToken.value.length();
                         }
                     }

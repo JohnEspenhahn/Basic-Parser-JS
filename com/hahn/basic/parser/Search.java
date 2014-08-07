@@ -2,8 +2,8 @@ package com.hahn.basic.parser;
 
 import java.security.InvalidParameterException;
 
-import com.hahn.basic.lexer.IEnumRegexToken;
 import com.hahn.basic.lexer.PackedToken;
+import com.hahn.basic.lexer.regex.IEnumRegexToken;
 import com.hahn.basic.util.FlagMap;
 
 class Search extends IParser {

@@ -1,6 +1,6 @@
 package com.hahn.basic.definition;
 
-import com.hahn.basic.lexer.IEnumRegexToken;
+import com.hahn.basic.lexer.regex.IEnumRegexToken;
 
 public enum EnumRegexToken implements IEnumRegexToken {
     EOL         (";"                         ),

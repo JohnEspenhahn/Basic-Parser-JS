@@ -1,5 +1,7 @@
 package com.hahn.basic.lexer;
 
+import com.hahn.basic.lexer.regex.IEnumRegexToken;
+
 public class PackedToken {
     public final IEnumRegexToken token;
     public final String value;

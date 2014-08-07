@@ -1,4 +1,4 @@
-package com.hahn.basic.lexer;
+package com.hahn.basic.lexer.regex;
 
 /**
  * Shorthand expressions for tokens. Some are also
@@ -8,11 +8,11 @@ package com.hahn.basic.lexer;
  * @author John Espenhahn
  *
  */
-public enum EnumTokenShorthand {
+public enum EnumRegexTokenShorthand {
     WORD("[_$a-zA-Z][_$a-zA-Z0-9]*");
     
     public final String Regex;
-    private EnumTokenShorthand(String regex) {
+    private EnumRegexTokenShorthand(String regex) {
         Regex = regex;
     }
     

@@ -1,8 +1,8 @@
 package com.hahn.basic.parser;
 
 import com.hahn.basic.definition.EnumExpression;
-import com.hahn.basic.lexer.IEnumRegexToken;
 import com.hahn.basic.lexer.PackedToken;
+import com.hahn.basic.lexer.regex.IEnumRegexToken;
 import com.hahn.basic.util.exceptions.CompileException;
 import com.hahn.basic.util.exceptions.ParseExpressionException;
 
