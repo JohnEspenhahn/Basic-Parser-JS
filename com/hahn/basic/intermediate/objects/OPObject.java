@@ -117,11 +117,11 @@ public abstract class OPObject extends BasicObject {
         if (p2 != null) p2.setInUse(this);
         
         // Type check
-        Type mergedType = opcode.type1.merge(p1.getType(), p1Node.getRow(), p1Node.getCol(), true);
+        Type mergedType = opcode.type1.autocast(p1.getType(), p1Node.getRow(), p1Node.getCol(), true);
         this.setType(mergedType);
         
         if (p2 != null) { 
-            opcode.type2.merge(p2.getType(), p2Node.getRow(), p2Node.getCol(), true);
+            opcode.type2.autocast(p2.getType(), p2Node.getRow(), p2Node.getCol(), true);
         }
         
         return false;

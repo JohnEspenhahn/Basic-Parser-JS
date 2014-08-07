@@ -2,20 +2,23 @@ package com.hahn.basic.intermediate.objects;
 
 import com.hahn.basic.intermediate.IIntermediate;
 import com.hahn.basic.intermediate.objects.types.Type;
-import com.hahn.basic.intermediate.objects.types.TypeList;
 import com.hahn.basic.intermediate.statements.Statement;
 import com.hahn.basic.parser.Node;
 
 public abstract class TernaryObject extends BasicObject {
     private BasicObject conditional, then_obj, else_obj;
+    private int row, col;
     
-    public TernaryObject(Statement container, BasicObject condition, Node node_then, Node node_else) {
+    public TernaryObject(Statement container, BasicObject condition, Node node_then, Node node_else, int row, int col) {
         super("?:", Type.UNDEFINED);
         
         this.conditional = condition;
         
         this.then_obj = container.getFrame().handleNextExpressionChildObject(node_then, null);
         this.else_obj = container.getFrame().handleNextExpressionChildObject(node_else, null);
+        
+        this.row = row;
+        this.col = col;
     }
     
     public BasicObject getConditional() {
@@ -46,10 +49,8 @@ public abstract class TernaryObject extends BasicObject {
         
         getConditional().setInUse(by);
         
-        // TODO update holder type
-        
         // Type pair for then and else
-        setType(new TypeList(getThen().getType(), getElse().getType()));
+        setType(Type.merge(getThen().getType(), getElse().getType(), row, col, true));
         
         return super.setInUse(by);
     }

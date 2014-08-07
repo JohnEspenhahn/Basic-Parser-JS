@@ -54,7 +54,7 @@ public interface ILangFactory {
 	public BasicObject NewInstance(Type type, List<BasicObject> params);
 	
 	public ConditionalObject ConditionalObject(Statement container, OPCode op, BasicObject p1, Node p1Node, BasicObject p2, Node p2Node, BasicObject temp);
-	public TernaryObject TernaryObject(Statement container, BasicObject condition, Node node_then, Node node_else);
+	public TernaryObject TernaryObject(Statement container, BasicObject condition, Node node_then, Node node_else, int row, int col);
 	
 	public FuncHead FuncHead(String name, boolean rawName, Node head, Type rtnType, Param[] params);
     public FuncPointer FuncPointer(String name, ParameterizedType<ITypeable> funcType);

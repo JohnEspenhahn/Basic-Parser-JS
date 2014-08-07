@@ -122,6 +122,14 @@ public class Frame extends Statement {
         return getTargetCode().isEmpty();
     }
     
+    /**
+     * Should be called from TO_TARGET
+     * @return The size of the target code
+     */
+    public int getSize() {
+        return getTargetCode().size();
+    }
+    
     @Override
     public String toTarget() {
         StringBuilder str = new StringBuilder();
@@ -943,7 +951,7 @@ public class Frame extends Statement {
             it.next(); // skip colon        
             Node node_else = it.next();
             
-            exp.setObj(LangCompiler.factory.TernaryObject(exp, exp.getObj(), node_then, node_else), child);
+            exp.setObj(LangCompiler.factory.TernaryObject(exp, exp.getObj(), node_then, node_else, child.getRow(), child.getCol()), child);
             
         } else if (token == OPEN_PRNTH) {
             Node inPrnthNode = it.next();

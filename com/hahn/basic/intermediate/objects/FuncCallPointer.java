@@ -63,7 +63,7 @@ public abstract class FuncCallPointer extends FuncPointer {
         }
         
         checkFunction();
-        returnType = func.getReturnType().merge(returnType, this.row, this.col, true);
+        returnType = func.getReturnType().autocast(returnType, this.row, this.col, true);
         
         return super.setInUse(by);
     }

@@ -87,19 +87,6 @@ public class Type implements ITypeable {
      * @throws CastException If can not cast
      */
     public Type castTo(Type newType, int row, int col) {
-        Type result = newType;
-        if (newType instanceof TypeList) {
-            for (Type t: (TypeList) newType) {
-                result = castTo(t, row, col);
-            }
-        } else {
-            result = doCastTo(newType, row, col);
-        }
-        
-        return result;
-    }
-    
-    private final Type doCastTo(Type newType, int row, int col) {
         if (this == UNDEFINED) return newType;
         else if (this.doesExtend(newType)) return newType;
         
@@ -115,30 +102,38 @@ public class Type implements ITypeable {
      * @param row Row to throw error at
      * @param col Column to throw error at
      * @param unsafe If true will throw exception on fail
-     * @return Overruling type, or null if failed and unsafe is false 
+     * @return Common type, or null if failed and unsafe is false 
      * @throws CompileException failed and unsafe is true
      */
-    public Type merge(Type newType, int row, int col, boolean unsafe) {
-        Type result = this;
-        if (newType instanceof TypeList) {
-            for (Type t: (TypeList) newType) {
-                result = result.merge(t, row, col, unsafe);
-                if (result == null) return null;
-            }
-        } else {
-            result = doMerge(newType, row, col, unsafe);
-        }
-        
-        return result;
-    }
-    
-    private final Type doMerge(Type newType, int row, int col, boolean unsafe) {
+    public Type autocast(Type newType, int row, int col, boolean unsafe) {
         if (newType == null) return this;
         else if (this == UNDEFINED) return newType;
         else if (newType == UNDEFINED) return this;
         else if (newType.doesExtend(this)) return this;
         
         if (unsafe) throw new CompileException("Incompatible types `" + this + "` and `" + newType + "`", row, col);
+        else return null;
+    }
+    
+    /**
+     * Combine two types and return the common type
+     * @param t1 Type one
+     * @param t2 Type two
+     * @param row Row to throw error at
+     * @param col Column to throw error at
+     * @param unsafe If true will throw exception on fail
+     * @return Common type, or null if failed and unsafe is false 
+     * @throws CompileException failed and unsafe is true
+     */
+    public static Type merge(Type t1, Type t2, int row, int col, boolean unsafe) {
+        // Check for nulls
+        if (t1 == null && t2 == null) return null;
+        else if (t1 == null || t1 == UNDEFINED) return t2;
+        else if (t2 == null || t2 == UNDEFINED) return t1;
+        else if (t1.doesExtend(t2)) return t2;
+        else if (t2.doesExtend(t1)) return t1;
+        
+        if (unsafe) throw new CompileException("Incompatible types `" + t1 + "` and `" + t2 + "`", row, col);
         else return null;
     }
     

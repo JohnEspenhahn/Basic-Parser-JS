@@ -8,8 +8,8 @@ import com.hahn.basic.parser.Node;
 
 public class JSTernaryObject extends TernaryObject {
     
-    public JSTernaryObject(Statement container, BasicObject condition, Node node_then, Node node_else) {
-        super(container, condition, node_then, node_else);
+    public JSTernaryObject(Statement container, BasicObject condition, Node node_then, Node node_else, int row, int col) {
+        super(container, condition, node_then, node_else, row, col);
     }
     
     public String getPrettyFormat() {

@@ -122,8 +122,8 @@ public class JSLangFactory implements ILangFactory {
     }
     
     @Override
-    public TernaryObject TernaryObject(Statement container, BasicObject condition, Node node_then, Node node_else) {
-        return new JSTernaryObject(container, condition, node_then, node_else);
+    public TernaryObject TernaryObject(Statement container, BasicObject condition, Node node_then, Node node_else, int row, int col) {
+        return new JSTernaryObject(container, condition, node_then, node_else, row, col);
     }
     
     @Override
