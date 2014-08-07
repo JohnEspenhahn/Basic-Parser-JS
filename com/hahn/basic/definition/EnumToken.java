@@ -65,6 +65,7 @@ public enum EnumToken implements IEnumRegexToken {
     FALSE       ("false"     , Group.IDENT),
     NEW         ("new"       , Group.IDENT),
     IMPORT      ("import"    , Group.IDENT),
+    CLASS       ("class"     , Group.IDENT),
     IDENTIFIER  ("<<WORD>>"  , Group.IDENT);
 
     

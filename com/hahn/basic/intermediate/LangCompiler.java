@@ -116,11 +116,11 @@ public class LangCompiler {
     }
     
     public static FuncHead defineFunc(String name, boolean rawName, Type rtnType, Param... params) {
-        return LangCompiler.defineFunc(null, name, rawName, rtnType, params);
+        return LangCompiler.defineFunc(getGlobalFrame(), null, name, rawName, rtnType, params);
     }
     
-    public static FuncHead defineFunc(Node head, String name, boolean rawName, Type rtnType, Param... params) {
-        FuncHead func = LangCompiler.factory.FuncHead(name, rawName, head, rtnType, params);
+    public static FuncHead defineFunc(Frame parent, Node head, String name, boolean rawName, Type rtnType, Param... params) {
+        FuncHead func = LangCompiler.factory.FuncHead(parent, name, rawName, head, rtnType, params);
         
         FuncGroup group = funcs.get(name);
         if (group == null) {

@@ -2,7 +2,7 @@ package com.hahn.basic.target.js.objects;
 
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.VarAccess;
-import com.hahn.basic.intermediate.objects.types.Struct.StructParam;
+import com.hahn.basic.intermediate.objects.types.StructType.StructParam;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.statements.Statement;
 

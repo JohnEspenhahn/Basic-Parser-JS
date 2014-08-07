@@ -22,7 +22,7 @@ public class ParameterizedType<T extends ITypeable> extends Type {
     public static final ParameterizedType<Type> UINT_ARRAY = new ParameterizedType<Type>(Type.ARRAY, new Type[] { Type.INT });
     public static final ParameterizedType<Type> CHAR_ARRAY = new ParameterizedType<Type>(Type.ARRAY, new Type[] { Type.CHAR });
     
-    private final Struct base;
+    private final StructType base;
     private final T[] types;
     
     private Type returnType;
@@ -32,7 +32,7 @@ public class ParameterizedType<T extends ITypeable> extends Type {
      * @param base The base type of this
      */
     @SuppressWarnings("unchecked")
-    public ParameterizedType(Struct base) {
+    public ParameterizedType(StructType base) {
         this(base, (T[]) new ITypeable[0], Type.UNDEFINED);
     }
     
@@ -41,7 +41,7 @@ public class ParameterizedType<T extends ITypeable> extends Type {
      * @param base The base type of this
      * @param params The parameters' types
      */
-    public ParameterizedType(Struct base, T[] params) {
+    public ParameterizedType(StructType base, T[] params) {
         this(base, params, Type.UNDEFINED);
     }
     
@@ -51,7 +51,7 @@ public class ParameterizedType<T extends ITypeable> extends Type {
      * @param types The parameters' types
      * @param returnType The return type of this
      */
-    public ParameterizedType(Struct base, T[] types, Type returnType) {
+    public ParameterizedType(StructType base, T[] types, Type returnType) {
         super(createName(base, types, returnType), false, true);
         
         this.base = base;
@@ -66,7 +66,7 @@ public class ParameterizedType<T extends ITypeable> extends Type {
      * @param returnType The return type
      * @return The name in format base<p1,pn...[;return]> 
      */
-    private static String createName(Struct base, ITypeable[] params, Type returnType) {
+    private static String createName(StructType base, ITypeable[] params, Type returnType) {
         return base.getName() 
                 + "<"
                 + (params.length > 0 ? Util.joinTypes(params, ',') : "") 
@@ -75,7 +75,7 @@ public class ParameterizedType<T extends ITypeable> extends Type {
     }
     
     @Override
-    public Struct getAsStruct() {
+    public StructType getAsStruct() {
         return base;
     }
     
@@ -127,7 +127,7 @@ public class ParameterizedType<T extends ITypeable> extends Type {
      * @param allowReturn Can include a return type
      * @return List of types or empty list if head not PARAM_TYPES
      */
-    public static ParameterizedType<ITypeable> getParameterizedType(Struct base, Node head, boolean allowReturn) {
+    public static ParameterizedType<ITypeable> getParameterizedType(StructType base, Node head, boolean allowReturn) {
         Type returnType = Type.UNDEFINED;
         List<Type> params = null;
         

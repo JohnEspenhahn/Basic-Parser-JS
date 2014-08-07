@@ -9,8 +9,8 @@ import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.parser.Node;
 import com.hahn.basic.util.exceptions.CompileException;
 
-public class Struct extends Type {    
-    private final Struct parent;
+public class StructType extends Type {    
+    private final StructType parent;
     private final Map<String, StructParam> params;
 
     private int typeParams;
@@ -20,7 +20,7 @@ public class Struct extends Type {
      * @param name The name of the struct
      * @param parent The parent struct or null
      */
-    protected Struct(String name, Struct parent) {
+    protected StructType(String name, StructType parent) {
         super(name, true);
         
         this.parent = parent;
@@ -40,8 +40,8 @@ public class Struct extends Type {
      * @param ps The parameters added by this new struct
      * @return A new struct object
      */
-    public Struct extendAs(String name, List<BasicObject> ps) {
-        Struct struct = new Struct(name, this);
+    public StructType extendAs(String name, List<BasicObject> ps) {
+        StructType struct = new StructType(name, this);
         struct.loadVars(ps);
         
         return struct;
@@ -52,7 +52,7 @@ public class Struct extends Type {
      * @param name The name of the new struct
      * @return A new struct object
      */
-    public Struct extendAs(String name) {
+    public StructType extendAs(String name) {
         return this.extendAs(name, null);
     }
     
@@ -66,7 +66,7 @@ public class Struct extends Type {
      * @param num The number of parameters
      * @return This
      */
-    public Struct setTypeParams(int num) {
+    public StructType setTypeParams(int num) {
         this.typeParams = num;
         return this;
     }
@@ -75,7 +75,7 @@ public class Struct extends Type {
         return this.typeParams;
     }
     
-    private void loadVars(List<BasicObject> ps) {
+    protected void loadVars(List<BasicObject> ps) {
         if (ps != null) {
             for (int i = 0; i < ps.size(); i++) {
                 this.add(ps.get(i));
@@ -83,7 +83,7 @@ public class Struct extends Type {
         }
     }
     
-    public Struct add(BasicObject p) {
+    public StructType add(BasicObject p) {
         params.put(p.getName(), new StructParam(params.size(), p));
         return this;
     }

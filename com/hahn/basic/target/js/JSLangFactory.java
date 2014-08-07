@@ -17,6 +17,7 @@ import com.hahn.basic.intermediate.objects.TernaryObject;
 import com.hahn.basic.intermediate.objects.Var;
 import com.hahn.basic.intermediate.objects.VarAccess;
 import com.hahn.basic.intermediate.objects.register.IRegister;
+import com.hahn.basic.intermediate.objects.types.ClassType;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.ParameterizedType;
 import com.hahn.basic.intermediate.objects.types.Type;
@@ -46,6 +47,7 @@ import com.hahn.basic.target.js.objects.JSVarAccess;
 import com.hahn.basic.target.js.objects.JSVarLocal;
 import com.hahn.basic.target.js.objects.JSVarParameter;
 import com.hahn.basic.target.js.objects.register.JSRegister;
+import com.hahn.basic.target.js.objects.types.JSClassType;
 import com.hahn.basic.target.js.statements.JSBreakStatement;
 import com.hahn.basic.target.js.statements.JSCallFuncStatement;
 import com.hahn.basic.target.js.statements.JSContinueStatement;
@@ -74,6 +76,11 @@ public class JSLangFactory implements ILangFactory {
     @Override
     public int getAvailableRegisters() {
         return Integer.MAX_VALUE;
+    }
+    
+    @Override
+    public ClassType ClassType(String name, ClassType parent) {
+        return new JSClassType(name, parent);
     }
     
     @Override
@@ -127,8 +134,8 @@ public class JSLangFactory implements ILangFactory {
     }
     
     @Override
-    public FuncHead FuncHead(String name, boolean rawName, Node head, Type rtnType, Param[] params) {
-        return new JSFuncHead(name, rawName, head, rtnType, params);
+    public FuncHead FuncHead(Frame parent, String name, boolean rawName, Node head, Type rtnType, Param[] params) {
+        return new JSFuncHead(parent, name, rawName, head, rtnType, params);
     }
     
     @Override

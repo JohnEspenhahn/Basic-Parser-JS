@@ -22,7 +22,7 @@ import com.hahn.basic.intermediate.objects.Param;
 import com.hahn.basic.intermediate.objects.VarTemp;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.ParameterizedType;
-import com.hahn.basic.intermediate.objects.types.Struct.StructParam;
+import com.hahn.basic.intermediate.objects.types.StructType.StructParam;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.opcode.OPCode;
 import com.hahn.basic.intermediate.statements.CallFuncStatement;
@@ -638,12 +638,13 @@ public class Frame extends Statement {
         if (!anonymous) {
             String name = nameNode.getValue();
             
-            LangCompiler.defineFunc(body, name, false, rtnType, aParams);
+            LangCompiler.defineFunc(LangCompiler.getGlobalFrame(), body, name, false, rtnType, aParams);
             return null;
         } else {
+            // Anonymous
             String name = getLabel("afunc");
             
-            LangCompiler.defineFunc(body, name, false, rtnType, aParams);
+            LangCompiler.defineFunc(this, body, name, false, rtnType, aParams);
             return LangCompiler.factory.FuncPointer(name, new ParameterizedType<ITypeable>(Type.FUNC, (ITypeable[]) aParams));
         }
     }

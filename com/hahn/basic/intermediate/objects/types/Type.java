@@ -24,7 +24,7 @@ public class Type implements ITypeable {
                              /** UNDEFINED -> anything */
                              UNDEFINED = new Type("undefined", false, true);
     
-    public static final Struct STRUCT = new Struct("struct", null),
+    public static final StructType STRUCT = new StructType("struct", null),
                                FUNC   = STRUCT.extendAs("func").setTypeParams(-1),
                                ARRAY  = STRUCT.extendAs("array").add(new Param("length", Type.INT)).setTypeParams(1),
                                STRING = ARRAY.extendAs("string").setTypeParams(0);
@@ -64,8 +64,8 @@ public class Type implements ITypeable {
         return this;
     }
     
-    public Struct getAsStruct() {
-        return (Struct) this;
+    public StructType getAsStruct() {
+        return (StructType) this;
     }
     
     /**
@@ -90,7 +90,7 @@ public class Type implements ITypeable {
         if (this == UNDEFINED) return newType;
         else if (this.doesExtend(newType)) return newType;
         
-        // TODO upcasting expression
+        // TODO upcasting and expression to check at runtime
         
         throw new CastException("Can not cast `" + this + "` to `" + newType + "`", row, col);
     }
@@ -196,11 +196,11 @@ public class Type implements ITypeable {
         
         while (it.hasNext()) {
             // Check not allowed parameters
-            if (!(type instanceof Struct) || ((Struct) type).getTypeParams() == 0) {
+            if (!(type instanceof StructType) || ((StructType) type).getTypeParams() == 0) {
                 throw new CompileException("The type `" + type.toString() + "` can not be parameterized", nameNode);
             }
             
-            Struct mainType = (Struct) type;
+            StructType mainType = (StructType) type;
             type = ParameterizedType.getParameterizedType(mainType, it.next(), mainType.doesExtend(Type.STRUCT));
             
             if (mainType.getTypeParams() != -1 && mainType.getTypeParams() != ((ParameterizedType<Type>) type).getTypes().length) {
@@ -209,7 +209,7 @@ public class Type implements ITypeable {
         }
         
         // Check requires parameters
-        if (!isGettingMain && type instanceof Struct && ((Struct) type).getTypeParams() > 0) {
+        if (!isGettingMain && type instanceof StructType && ((StructType) type).getTypeParams() > 0) {
             throw new CompileException("The type `" + nameNode.getValue() + "` must be parameterized", nameNode);
         } else if (type == null)  {
             throw new CompileException("Invalid type `" + nameNode.getValue() + "` specified", nameNode);

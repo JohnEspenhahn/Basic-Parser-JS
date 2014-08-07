@@ -17,6 +17,7 @@ import com.hahn.basic.intermediate.objects.TernaryObject;
 import com.hahn.basic.intermediate.objects.Var;
 import com.hahn.basic.intermediate.objects.VarAccess;
 import com.hahn.basic.intermediate.objects.register.IRegister;
+import com.hahn.basic.intermediate.objects.types.ClassType;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.ParameterizedType;
 import com.hahn.basic.intermediate.objects.types.Type;
@@ -39,6 +40,9 @@ public interface ILangFactory {
 	public int getAvailableRegisters();
 	public IRegister getNextRegister(AdvancedObject objFor);
 	
+	// Types
+    public ClassType ClassType(String name, ClassType parent);
+	
 	// Objects	
 	public BasicObject PushObject();
 	public StringConst StringConst(String str);
@@ -56,7 +60,7 @@ public interface ILangFactory {
 	public ConditionalObject ConditionalObject(Statement container, OPCode op, BasicObject p1, Node p1Node, BasicObject p2, Node p2Node, BasicObject temp);
 	public TernaryObject TernaryObject(Statement container, BasicObject condition, Node node_then, Node node_else, int row, int col);
 	
-	public FuncHead FuncHead(String name, boolean rawName, Node head, Type rtnType, Param[] params);
+	public FuncHead FuncHead(Frame parent, String name, boolean rawName, Node head, Type rtnType, Param[] params);
     public FuncPointer FuncPointer(String name, ParameterizedType<ITypeable> funcType);
 
     public FuncCallPointer FuncCallPointer(String name, BasicObject[] params, int row, int col);
