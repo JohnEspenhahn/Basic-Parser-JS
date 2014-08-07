@@ -4,13 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public enum EnumBasicToken {
-    EOL         (";"        ),
-    QUOTE       ("\""       ),
-    APOSTROPHE  ("'"        ),
+    STRING      (""         ),
     HEX_INTEGER (""         ),
     INTEGER     (""         ), // [0-9]+\\.?[0-9]*
     FLOAT       (""         ),
-    CHAR        ("'.'"      ),
+    CHAR        (""         ),
+    EOL         (";"        ),
     EQUALS      ("=="       ),
     PLUS_EQU    ("+="       ),
     SUB_EQU     ("-="       ),

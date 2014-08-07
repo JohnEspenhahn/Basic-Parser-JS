@@ -1,27 +1,6 @@
 package com.hahn.basic.intermediate;
 
-import static com.hahn.basic.definition.EnumRegexToken.ADD_SUB;
-import static com.hahn.basic.definition.EnumRegexToken.AND;
-import static com.hahn.basic.definition.EnumRegexToken.CHAR;
-import static com.hahn.basic.definition.EnumRegexToken.DOT;
-import static com.hahn.basic.definition.EnumRegexToken.EQUALS;
-import static com.hahn.basic.definition.EnumRegexToken.FALSE;
-import static com.hahn.basic.definition.EnumRegexToken.GTR;
-import static com.hahn.basic.definition.EnumRegexToken.GTR_EQU;
-import static com.hahn.basic.definition.EnumRegexToken.HEX_INTEGER;
-import static com.hahn.basic.definition.EnumRegexToken.LESS;
-import static com.hahn.basic.definition.EnumRegexToken.LESS_EQU;
-import static com.hahn.basic.definition.EnumRegexToken.MSC_BITWISE;
-import static com.hahn.basic.definition.EnumRegexToken.MULT_DIV;
-import static com.hahn.basic.definition.EnumRegexToken.NOT;
-import static com.hahn.basic.definition.EnumRegexToken.NOTEQUAL;
-import static com.hahn.basic.definition.EnumRegexToken.INTEGER;
-import static com.hahn.basic.definition.EnumRegexToken.OPEN_PRNTH;
-import static com.hahn.basic.definition.EnumRegexToken.OPEN_SQR;
-import static com.hahn.basic.definition.EnumRegexToken.QUESTION;
-import static com.hahn.basic.definition.EnumRegexToken.SC_BITWISE;
-import static com.hahn.basic.definition.EnumRegexToken.STRING;
-import static com.hahn.basic.definition.EnumRegexToken.TRUE;
+import static com.hahn.basic.definition.EnumRegexToken.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -970,7 +949,7 @@ public class Frame extends Statement {
             handleNextExpressionChild(it, nextExp, temp);
             
             exp.setObj(LangCompiler.factory.OPObject(exp, op, nextExp.getObj(), nextExp.getNode(), null, null), child);
-        } else if (token == ADD_SUB || token == MULT_DIV || token == AND || token == MSC_BITWISE || token == SC_BITWISE) {
+        } else if (token == ADD || token == SUB || token == MULT || token == DIV || token == MOD || token == AND || token == BOR || token == XOR || token == LSHIFT || token == RSHIFT || token == BOOL_AND || token == BOOL_OR) {
             OPCode op = OPCode.fromSymbol(val);
             
             ExpressionStatement nextExp = LangCompiler.factory.ExpressionStatement(this, null);

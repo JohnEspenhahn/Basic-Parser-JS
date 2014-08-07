@@ -3,12 +3,12 @@ package com.hahn.basic.definition;
 import com.hahn.basic.lexer.regex.IEnumRegexToken;
 
 public enum EnumRegexToken implements IEnumRegexToken {
-    EOL         (";"        ),
-    QUOTE       ("\""       ),
-    APOSTROPHE  ("'"        ),
+    STRING      ("\".*?[^\\\\]\""            ),
     HEX_INTEGER ("0x[0-9A-Fa-f]+"            ),
     FLOAT       ("[0-9]+\\.[0-9]*|\\.[0-9]+" ),
     INTEGER     ("[0-9]+"                    ), // [0-9]+\\.?[0-9]*
+    CHAR        ("'\\?.'"                    ),
+    EOL         (";"         ),
     EQUALS      ("=="        ),
     PLUS_EQU    ("\\+="      ),
     SUB_EQU     ("\\-="      ),
@@ -22,6 +22,7 @@ public enum EnumRegexToken implements IEnumRegexToken {
     COMMA       (","         ),
     DOT         ("\\."       ),
     BOOL_AND    ("&&"        ),
+    BOOL_OR     ("\\|\\|"    ),
     QUESTION    ("\\?"       ),
     AND         ("&"         ),
     NOT         ("!"         ),
