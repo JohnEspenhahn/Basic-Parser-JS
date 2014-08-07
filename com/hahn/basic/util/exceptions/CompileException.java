@@ -27,7 +27,7 @@ public class CompileException extends RuntimeException {
     }
     
     public CompileException(String mss, int row, int col) {
-        super(mss + " in line " + row + (col < 0 ? "" : "\n" + Main.getLineStr() + "\n" + Util.createArrow(' ', '^', col)));
+        super(mss + " in line " + row + (col < 0 ? "" : "\n" + Main.getLineStr(row).replace('\t', ' ') + "\n" + Util.createArrow(' ', '^', col)));
         
         this.message = mss;
     }
