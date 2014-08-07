@@ -10,7 +10,7 @@ import java.util.regex.PatternSyntaxException;
 
 import com.hahn.basic.lexer.ILexer;
 import com.hahn.basic.lexer.PackedToken;
-import com.hahn.basic.util.exceptions.CompileException;
+import com.hahn.basic.util.exceptions.LexException;
 
 public class RegexLexer implements ILexer {
     /** The pattern compiled from the provided tokens */
@@ -23,8 +23,8 @@ public class RegexLexer implements ILexer {
     private boolean comment;
     
     /**
-     * Create a new lexer
-     * @param enumTokens An Enum that implements IEnumToken. The tokens to lex input to
+     * Create a new regex lexer
+     * @param enumTokens An Enum that implements IEnumRegexToken. The tokens to lex input to
      */
     public RegexLexer(Class<? extends IEnumRegexToken> enumTokens) {
         // Compile tokens
@@ -88,14 +88,14 @@ public class RegexLexer implements ILexer {
                     // Go back some if last was <<WORD>> token
                     if (stream.size() > 0) {
                         PackedToken lastToken = stream.get(stream.size() - 1);
-                        String lastRegex = lastToken.token.getRegex(); 
+                        String lastRegex = ((IEnumRegexToken) lastToken.token).getRegex(); 
                         
                         if (lastRegex.contains(EnumRegexTokenShorthand.WORD.toString())) {
                             lastEnd -= lastToken.value.length();
                         }
                     }
                     
-                    throw new CompileException("Invalid token", row, lastEnd);
+                    throw new LexException(row, lastEnd);
                 }
                 
                 // 2 For full capture, space
@@ -116,7 +116,7 @@ public class RegexLexer implements ILexer {
                             
                         // Code
                         } else if (!comment) {
-                            stream.add(new PackedToken(Tokens[g - 5], group, row, matcher.start()));
+                            stream.add(new PackedToken((Enum<?>) Tokens[g - 5], group, row, matcher.start()));
                         }
                         break;
                     }
@@ -125,7 +125,7 @@ public class RegexLexer implements ILexer {
     
             // Ensure full match
             if (lastEnd != line.length()) {
-                throw new CompileException("Invalid token", row, lastEnd); 
+                throw new LexException(row, lastEnd); 
             }
         }
 

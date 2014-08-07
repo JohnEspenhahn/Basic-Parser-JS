@@ -1,7 +1,7 @@
 package com.hahn.basic.lexer.regex;
 
 /**
- * The tokens enum must implement this
+ * The regex lexer tokens enum must implement this
  * 
  * @author John Espenhahn
  *

@@ -8,14 +8,14 @@ import static com.hahn.basic.definition.EnumRegexToken.EQUALS;
 import static com.hahn.basic.definition.EnumRegexToken.FALSE;
 import static com.hahn.basic.definition.EnumRegexToken.GTR;
 import static com.hahn.basic.definition.EnumRegexToken.GTR_EQU;
-import static com.hahn.basic.definition.EnumRegexToken.HEX_NUMBER;
+import static com.hahn.basic.definition.EnumRegexToken.HEX_INTEGER;
 import static com.hahn.basic.definition.EnumRegexToken.LESS;
 import static com.hahn.basic.definition.EnumRegexToken.LESS_EQU;
 import static com.hahn.basic.definition.EnumRegexToken.MSC_BITWISE;
 import static com.hahn.basic.definition.EnumRegexToken.MULT_DIV;
 import static com.hahn.basic.definition.EnumRegexToken.NOT;
 import static com.hahn.basic.definition.EnumRegexToken.NOTEQUAL;
-import static com.hahn.basic.definition.EnumRegexToken.NUMBER;
+import static com.hahn.basic.definition.EnumRegexToken.INTEGER;
 import static com.hahn.basic.definition.EnumRegexToken.OPEN_PRNTH;
 import static com.hahn.basic.definition.EnumRegexToken.OPEN_SQR;
 import static com.hahn.basic.definition.EnumRegexToken.QUESTION;
@@ -482,7 +482,7 @@ public class Frame extends Statement {
             Node node = it.next();
             Enum<?> token = node.getToken();
             
-            if (token == EnumRegexToken.FLAGS) {
+            if (token == EnumRegexToken.CONST) {
                 flags.add(node.getValue());
             } else if (token == EnumExpression.TYPE) {
                 type = Type.fromNode(node);
@@ -997,7 +997,7 @@ public class Frame extends Statement {
         
         if (child.isTerminal()) {
             String val = child.getValue();
-            if (token == NUMBER || token == HEX_NUMBER || token == CHAR) {
+            if (token == INTEGER || token == HEX_INTEGER || token == CHAR) {
                 return Util.parseInt(child);
             } else if (token == TRUE) {
                 return new LiteralBool(true);
