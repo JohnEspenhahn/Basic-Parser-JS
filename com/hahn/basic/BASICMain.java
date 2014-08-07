@@ -8,8 +8,8 @@ import java.util.List;
 import com.hahn.basic.intermediate.LangCompiler;
 import com.hahn.basic.lexer.ILexer;
 import com.hahn.basic.lexer.PackedToken;
+import com.hahn.basic.lexer.basic.BasicLexer;
 import com.hahn.basic.lexer.regex.IEnumRegexToken;
-import com.hahn.basic.lexer.regex.RegexLexer;
 import com.hahn.basic.parser.IEnumExpression;
 import com.hahn.basic.parser.Node;
 import com.hahn.basic.parser.Parser;
@@ -33,7 +33,7 @@ public class BASICMain extends Main {
         this.factory = factory;
         
         // Create handlers
-        this.lexer = new RegexLexer(tokens);
+        this.lexer = new BasicLexer(); // new RegexLexer(tokens);
         this.parser = new Parser(tokens, expressions);
     }
     

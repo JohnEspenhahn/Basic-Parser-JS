@@ -1,6 +1,6 @@
 package com.hahn.basic.intermediate;
 
-import static com.hahn.basic.definition.EnumRegexToken.*;
+import static com.hahn.basic.definition.EnumToken.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -10,7 +10,7 @@ import java.util.List;
 
 import com.hahn.basic.Main;
 import com.hahn.basic.definition.EnumExpression;
-import com.hahn.basic.definition.EnumRegexToken;
+import com.hahn.basic.definition.EnumToken;
 import com.hahn.basic.intermediate.objects.AdvancedObject;
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.FuncCallPointer;
@@ -297,11 +297,11 @@ public class Frame extends Statement {
                 defineFunc(child);
             } else if (token == EnumExpression.RETURN) {
                 addCode(doReturn(child));
-            } else if (token == EnumRegexToken.CONTINUE) {
+            } else if (token == EnumToken.CONTINUE) {
                 addCode(doContinue(child));
-            } else if (token == EnumRegexToken.BREAK) {
+            } else if (token == EnumToken.BREAK) {
                 addCode(doBreak(child));
-            } else if (token == EnumRegexToken.IMPORT) {
+            } else if (token == EnumToken.IMPORT) {
                 doImport(child);
             } else if (token == EnumExpression.IF_STMT) {
                 addCode(ifStatement(child));
@@ -311,7 +311,7 @@ public class Frame extends Statement {
                 addCode(forStatement(child));
             } else if (token == EnumExpression.EXPRESSION) {
                 addCode(handleStatementExpression(child));
-            } else if (token == EnumRegexToken.EOL || token == EnumRegexToken.OPEN_BRACE || token == EnumRegexToken.CLOSE_BRACE) {
+            } else if (token == EnumToken.EOL || token == EnumToken.OPEN_BRACE || token == EnumToken.CLOSE_BRACE) {
                 continue;
             } else {                
                 throw new CompileException("Illegal left-hand side token `" + child + "`", child);
@@ -461,11 +461,11 @@ public class Frame extends Statement {
             Node node = it.next();
             Enum<?> token = node.getToken();
             
-            if (token == EnumRegexToken.CONST) {
+            if (token == EnumToken.CONST) {
                 flags.add(node.getValue());
             } else if (token == EnumExpression.TYPE) {
                 type = Type.fromNode(node);
-            } else if (token == EnumRegexToken.IDENTIFIER) {
+            } else if (token == EnumToken.IDENTIFIER) {
                 String name = node.getValue();
                 
                 // Create var
@@ -606,18 +606,18 @@ public class Frame extends Statement {
             Node child = it.next();
             Enum<?> token = child.getToken();
             
-            if (token == EnumRegexToken.FUNCTION) {
+            if (token == EnumToken.FUNCTION) {
                 nameNode = child;
             } else if (token == EnumExpression.TYPE) {
                 rtnType = Type.fromNode(child);
-            } else if (token == EnumRegexToken.FUNCTION || token == EnumRegexToken.IDENTIFIER) {
+            } else if (token == EnumToken.FUNCTION || token == EnumToken.IDENTIFIER) {
                 nameNode = child;
             } else if (token == EnumExpression.DEF_PARAMS) {      
                 Iterator<Node> pIt = Util.getIterator(child);
                 
                 while (pIt.hasNext()) {
                     Node pNode = pIt.next();
-                    if (pNode.getToken() == EnumRegexToken.COMMA) {
+                    if (pNode.getToken() == EnumToken.COMMA) {
                         continue;
                     } else {
                         Type pType = Type.fromNode(pNode);
@@ -689,7 +689,7 @@ public class Frame extends Statement {
         Iterator<Node> it = Util.getIterator(head);
         while (it.hasNext()) {
             Node pNode = it.next();
-            if (pNode.getToken() == EnumRegexToken.COMMA) {
+            if (pNode.getToken() == EnumToken.COMMA) {
                 continue;
             } else {
                 BasicObject v = handleExpression(pNode).getAsExpObj();
@@ -713,7 +713,7 @@ public class Frame extends Statement {
             Node node = it.next();
             Enum<?> token = node.getToken();
             
-            if (token == EnumRegexToken.IDENTIFIER) {
+            if (token == EnumToken.IDENTIFIER) {
                 name = node.getValue();
             } else if (token == EnumExpression.TYPE_LIST) {
                 types = ParameterizedType.getParameterizedType(Type.FUNC, node, false);
