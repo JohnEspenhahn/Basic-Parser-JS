@@ -643,9 +643,10 @@ public class Frame extends Statement {
         } else {
             // Anonymous
             String name = getLabel("afunc");
+            nameNode.setValue(name);
             
             LangCompiler.defineFunc(this, body, name, false, rtnType, aParams);
-            return LangCompiler.factory.FuncPointer(name, new ParameterizedType<ITypeable>(Type.FUNC, (ITypeable[]) aParams));
+            return LangCompiler.factory.FuncPointer(nameNode, new ParameterizedType<ITypeable>(Type.FUNC, (ITypeable[]) aParams));
         }
     }
     
@@ -660,7 +661,6 @@ public class Frame extends Statement {
         
         // Determine function
         Node nameNode = it.next();
-        String name = nameNode.getValue();
         
         List<BasicObject> params = new ArrayList<BasicObject>();
         while (it.hasNext()) {
@@ -675,7 +675,7 @@ public class Frame extends Statement {
         BasicObject[] aParams = params.toArray(new BasicObject[params.size()]);
         
         // Get FuncCall object
-        FuncCallPointer funcCallPointer = LangCompiler.factory.FuncCallPointer(name, aParams, nameNode.getRow(), nameNode.getCol());
+        FuncCallPointer funcCallPointer = LangCompiler.factory.FuncCallPointer(nameNode, aParams, nameNode.getRow(), nameNode.getCol());
         return LangCompiler.factory.DefaultCallFuncStatement(this, funcCallPointer);
     }
     
@@ -707,7 +707,7 @@ public class Frame extends Statement {
     private FuncPointer getFuncPointer(Node head) {
         Iterator<Node> it = Util.getIterator(head);
         
-        String name = null;
+        Node nameNode = null;
         ParameterizedType<ITypeable> types = null;
         
         while (it.hasNext()) {
@@ -715,7 +715,7 @@ public class Frame extends Statement {
             Enum<?> token = node.getToken();
             
             if (token == EnumToken.IDENTIFIER) {
-                name = node.getValue();
+                nameNode = node;
             } else if (token == EnumExpression.TYPE_LIST) {
                 types = ParameterizedType.getParameterizedType(Type.FUNC, node, false);
             }
@@ -726,7 +726,7 @@ public class Frame extends Statement {
             types = new ParameterizedType<ITypeable>(Type.FUNC);
         }
         
-        return LangCompiler.factory.FuncPointer(name, types);
+        return LangCompiler.factory.FuncPointer(nameNode, types);
     }
     
     /**

@@ -7,6 +7,7 @@ import com.hahn.basic.intermediate.IIntermediate;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.ParameterizedType;
 import com.hahn.basic.intermediate.objects.types.Type;
+import com.hahn.basic.parser.Node;
 
 public abstract class FuncCallPointer extends FuncPointer {
     private int row, col;
@@ -14,13 +15,13 @@ public abstract class FuncCallPointer extends FuncPointer {
 
     /**
      * A callable pointer to a function
-     * @param name The name of the function to call
+     * @param nameNode The node that defines the name of the function to call
      * @param params The provided parameters for the call
      * @param row The row to throw an error at
      * @param col The column to throw an error at
      */
-    public FuncCallPointer(String name, BasicObject[] params, int row, int col) {
-        super(name, new ParameterizedType<ITypeable>(Type.FUNC, (ITypeable[]) params));
+    public FuncCallPointer(Node nameNode, BasicObject[] params, int row, int col) {
+        super(nameNode, new ParameterizedType<ITypeable>(Type.FUNC, (ITypeable[]) params));
 
         this.returnType = Type.UNDEFINED;
         

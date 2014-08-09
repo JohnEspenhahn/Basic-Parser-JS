@@ -3,26 +3,27 @@ package com.hahn.basic.intermediate;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.hahn.basic.Main;
 import com.hahn.basic.intermediate.library.base.Library;
+import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.Param;
 import com.hahn.basic.intermediate.objects.StringConst;
 import com.hahn.basic.intermediate.objects.VarTemp;
+import com.hahn.basic.intermediate.objects.types.ClassType;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.parser.Node;
 import com.hahn.basic.target.ILangFactory;
 import com.hahn.basic.target.LangBuildTarget;
-import com.hahn.basic.util.exceptions.CompileException;
 
 public class LangCompiler {    
     private static Map<String, Library> libs = new HashMap<String, Library>();
     private static Map<String, Integer> labels = new HashMap<String, Integer>();
-    private static Map<String, FuncGroup> funcs = new HashMap<String, FuncGroup>();
     private static Map<String, StringConst> strings = new HashMap<String, StringConst>();
     
     public static ILangFactory factory;
     private static Frame globalFrame, frame;
+    
+    private static FuncBridge funcBridge;
 
     public static LangBuildTarget compile(Node h, ILangFactory f) {
         globalFrame = frame = new Frame(null, h);
@@ -46,8 +47,8 @@ public class LangCompiler {
         builder.appendString(builder.endCodeArea());
         
         // Compile function area
-        for (FuncGroup fg: funcs.values()) {
-            for (FuncHead func: fg.getFuncs()) {
+        for (FuncGroup funcGroup: funcBridge.getFuncs()) {
+            for (FuncHead func: funcGroup) {
                 if (func.hasFrameHead()) {
                     func.reverseOptimize();
                     func.forwardOptimize();
@@ -55,6 +56,11 @@ public class LangCompiler {
                     builder.appendString(func.toFuncAreaTarget());
                 }
             }
+        }
+        
+        // Compile class area
+        for (Type t: Type.getPublicTypes()) {
+            builder.appendString(t.toTarget());
         }
         
         // Put library import strings
@@ -68,9 +74,10 @@ public class LangCompiler {
     private static void reset() {
         VarTemp.NEXT_TEMP_VAR = 0;
         
+        funcBridge = new FuncBridge(null);
+        
         strings.clear();
         labels.clear();
-        funcs.clear();
         libs.clear();
     }
     
@@ -120,29 +127,15 @@ public class LangCompiler {
     }
     
     public static FuncHead defineFunc(Frame parent, Node head, String name, boolean rawName, Type rtnType, Param... params) {
-        FuncHead func = LangCompiler.factory.FuncHead(parent, name, rawName, head, rtnType, params);
-        
-        FuncGroup group = funcs.get(name);
-        if (group == null) {
-            group = new FuncGroup(func);
-            funcs.put(name, group);
-            
-            return func;
-        } else if (group.isDefined(func)) {
-            throw new CompileException("The function `" + func.getName() + "` with those parameters is already defined", Main.getRow(), Main.getCol());
-        } else {
-            group.add(func);
-            
-            return func;
-        }
+        return funcBridge.defineFunc(parent, head, name, rawName, rtnType, params);
     }
     
-    public static FuncHead getFunc(String name, ITypeable[] types) {
-        FuncGroup group = funcs.get(name);
-        if (group == null) {
-            return null;
+    public static FuncHead getFunc(BasicObject obj, Node nameNode, ITypeable[] types) {
+        if (obj != null && obj.getType() instanceof ClassType) {
+            return ((ClassType) obj.getType()).getFunc(nameNode, types);
         } else {
-            return group.get(types);
+            String name = nameNode.getValue();
+            return funcBridge.getFunc(name, types);
         }
     }
     

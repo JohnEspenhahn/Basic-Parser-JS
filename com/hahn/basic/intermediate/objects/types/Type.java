@@ -158,6 +158,10 @@ public class Type implements ITypeable {
         return getName();
     }
     
+    public String toTarget() {
+        return "";
+    }
+    
     /**
      * Check if the given node is a valid node to be parsed as a type
      * @param node The node to check
@@ -237,5 +241,13 @@ public class Type implements ITypeable {
             if (i >= COUNT_PRIMATIVES)
                 it.remove();
         }
+    }
+    
+    /**
+     * Get all types not marked as "abstract"
+     * @return Types
+     */
+    public static List<Type> getPublicTypes() {
+        return Type.TYPES;
     }
 }

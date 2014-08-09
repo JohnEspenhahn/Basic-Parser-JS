@@ -6,23 +6,28 @@ import com.hahn.basic.intermediate.LangCompiler;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.ParameterizedType;
 import com.hahn.basic.intermediate.objects.types.Type;
+import com.hahn.basic.parser.Node;
 import com.hahn.basic.util.exceptions.CompileException;
 
-public abstract class FuncPointer extends BasicObject {    
+public abstract class FuncPointer extends BasicObject {
+    protected Node nameNode;
     protected FuncHead func;
     
     /**
      * A pointer to a function
-     * @param name The function name
+     * @param nameNode The node defining the function's name
      * @param funcType The function parameterized type
      */
-    public FuncPointer(String name, ParameterizedType<ITypeable> funcType) {
-        super(name, funcType);
+    public FuncPointer(Node nameNode, ParameterizedType<ITypeable> funcType) {
+        super(nameNode.getValue(), funcType);
+        
+        this.nameNode = nameNode;
     }
     
     @Override
     @Deprecated
     public void setType(Type t) {
+        // This is required
         throw new RuntimeException("Can not change the type of a function pointer!");
     }
     
@@ -81,7 +86,7 @@ public abstract class FuncPointer extends BasicObject {
      */
     protected void checkFunction() {
         if (func == null) {
-            setFunction(LangCompiler.getFunc(getName(), getTypes()));
+            setFunction(LangCompiler.getFunc(null, nameNode, getTypes()));
             
             // Still null then not found
             if (func == null) {

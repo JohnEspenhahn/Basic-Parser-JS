@@ -11,7 +11,7 @@ public class Node {
     private final Node parent;
     private final List<Node> children;
     
-    private final String value;
+    private String value;
     private final Enum<?> token;
     
     private final int row, col;
@@ -49,6 +49,15 @@ public class Node {
     
     public int getCol() {
         return col;
+    }
+    
+    /**
+     * Change the text value of this node, use
+     * with caution
+     * @param val The new text value
+     */
+    public void setValue(String val) {
+        this.value = val;
     }
 
     public void print() {

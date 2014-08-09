@@ -134,18 +134,18 @@ public class JSLangFactory implements ILangFactory {
     }
     
     @Override
-    public FuncHead FuncHead(Frame parent, String name, boolean rawName, Node head, Type rtnType, Param[] params) {
-        return new JSFuncHead(parent, name, rawName, head, rtnType, params);
+    public FuncHead FuncHead(Frame parent, ClassType classIn, String name, boolean rawName, Node head, Type rtnType, Param[] params) {
+        return new JSFuncHead(parent, classIn, name, rawName, head, rtnType, params);
     }
     
     @Override
-    public FuncPointer FuncPointer(String name, ParameterizedType<ITypeable> funcType) {
-        return new JSFuncPointer(name, funcType);
+    public FuncPointer FuncPointer(Node nameNode, ParameterizedType<ITypeable> funcType) {
+        return new JSFuncPointer(nameNode, funcType);
     }
     
     @Override
-    public FuncCallPointer FuncCallPointer(String name, BasicObject[] params, int row, int col) {
-        return new JSFuncCallPointer(name, params, row, col);
+    public FuncCallPointer FuncCallPointer(Node nameNode, BasicObject[] params, int row, int col) {
+        return new JSFuncCallPointer(nameNode, params, row, col);
     }
     
     @Override

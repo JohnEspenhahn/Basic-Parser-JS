@@ -3,6 +3,7 @@ package com.hahn.basic.intermediate;
 import com.hahn.basic.intermediate.objects.FuncPointer;
 import com.hahn.basic.intermediate.objects.Param;
 import com.hahn.basic.intermediate.objects.Var;
+import com.hahn.basic.intermediate.objects.types.ClassType;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.parser.Node;
@@ -13,8 +14,9 @@ public abstract class FuncHead extends Frame {
     private final Type rtnType;
     
     private final String funcId;
+    private final ClassType classIn;
     
-    public FuncHead(Frame parent, String name, boolean rawName, Node funcHeadNode, Type rtn, Param... params) {
+    public FuncHead(Frame parent, ClassType classIn, String name, boolean rawName, Node funcHeadNode, Type rtn, Param... params) {
         super(parent, funcHeadNode); // TODO nest anon func
         
         if (rawName) {
@@ -22,6 +24,8 @@ public abstract class FuncHead extends Frame {
         } else {
             this.funcId = createFuncId(name, params);
         }
+        
+        this.classIn = classIn;
         
         this.name = name;
         this.rtnType = rtn;
@@ -60,12 +64,16 @@ public abstract class FuncHead extends Frame {
         return params;
     }
     
-    public boolean hasSameName(FuncHead func) {
-        return this.name.equals(func.name);
+    public ClassType getClassIn() {
+        return classIn;
     }
     
-    public boolean hasSameReturnAs(FuncHead func) {
-        return this.rtnType.equals(func.rtnType);
+    public boolean hasSameName(FuncHead func) {
+        return getName().equals(func.getName());
+    }
+    
+    public boolean hasSameReturn(FuncHead func) {
+        return getReturnType().equals(func.getReturnType());
     }
     
     public abstract String toFuncAreaTarget();
@@ -79,7 +87,7 @@ public abstract class FuncHead extends Frame {
     public boolean equals(Object obj) {
         if (obj instanceof FuncHead) {
             FuncHead func = (FuncHead) obj;
-            if (hasSameReturnAs(func) && numParams() == func.numParams()) {
+            if (hasSameReturn(func) && numParams() == func.numParams()) {
                 Var[] funcParams = func.getParams();
                 for (int i = 0; i < params.length; i++) {
                     if (!params[i].getType().equals(funcParams[i].getType())) {

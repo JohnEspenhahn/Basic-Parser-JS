@@ -1,12 +1,13 @@
 package com.hahn.basic.intermediate;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.Type;
 
-public class FuncGroup {
+public class FuncGroup implements Iterable<FuncHead> {
     private List<FuncHead> funcs;
     
     public FuncGroup(FuncHead func) {
@@ -49,5 +50,10 @@ public class FuncGroup {
     
     public List<FuncHead> getFuncs() {
         return funcs;
+    }
+
+    @Override
+    public Iterator<FuncHead> iterator() {
+        return getFuncs().iterator();
     }
 }

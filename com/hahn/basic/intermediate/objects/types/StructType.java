@@ -1,6 +1,5 @@
 package com.hahn.basic.intermediate.objects.types;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,7 +9,7 @@ import com.hahn.basic.parser.Node;
 import com.hahn.basic.util.exceptions.CompileException;
 
 public class StructType extends Type {    
-    private final StructType parent;
+    protected final StructType parent;
     private final Map<String, StructParam> params;
 
     private int typeParams;
@@ -25,13 +24,20 @@ public class StructType extends Type {
         
         this.parent = parent;
         this.params = new HashMap<String, StructParam>();
-        
-        // Copy all parent parameters
-        if (parent != null) {
-            for (StructParam p: parent.getAllParams()) {
-                add(p);
-            }
-        }
+    }
+    
+    @Override
+    public boolean doesExtend(Type t) {
+        return super.doesExtend(t) || (parent != null && parent.doesExtend(t));
+    }
+    
+    /**
+     * Extend this with no additional parameters
+     * @param name The name of the new struct
+     * @return A new struct object
+     */
+    public StructType extendAs(String name) {
+        return this.extendAs(name, null);
     }
     
     /**
@@ -47,18 +53,12 @@ public class StructType extends Type {
         return struct;
     }
     
-    /**
-     * Extend this with no additional parameters
-     * @param name The name of the new struct
-     * @return A new struct object
-     */
-    public StructType extendAs(String name) {
-        return this.extendAs(name, null);
-    }
-    
-    @Override
-    public boolean doesExtend(Type t) {
-        return super.doesExtend(t) || (parent != null && parent.doesExtend(t));
+    protected void loadVars(List<BasicObject> ps) {
+        if (ps != null) {
+            for (int i = 0; i < ps.size(); i++) {
+                this.add(ps.get(i));
+            }
+        }
     }
     
     /**
@@ -71,35 +71,57 @@ public class StructType extends Type {
         return this;
     }
     
+    /**
+     * Get the number of required type parameters
+     * @return The number of parameters or -1 for > 0
+     */
     public int getTypeParams() {
         return this.typeParams;
     }
     
-    protected void loadVars(List<BasicObject> ps) {
-        if (ps != null) {
-            for (int i = 0; i < ps.size(); i++) {
-                this.add(ps.get(i));
-            }
-        }
-    }
-    
+    /**
+     * Add a basic object as a struct param
+     * @param p The basic object to use when defining the struct param
+     * @return This
+     */
     public StructType add(BasicObject p) {
         params.put(p.getName(), new StructParam(params.size(), p));
         return this;
     }
     
+    /**
+     * Get a struct param
+     * @param nameNode The node that contains the requested name
+     * @return The param
+     * @throw CompileException If the requested param is not defined
+     */
     public StructParam getStructParam(Node nameNode) {
+        return getStructParam(nameNode, false);
+    }
+    
+    /**
+     * Get a struct param
+     * @param nameNode The node that contains the requested name
+     * @param safe If false can throw an exception
+     * @return The param; or, if `safe` is true and there is an error, null
+     * @throw CompileException If `safe` is false and the param is not defined
+     */
+    public StructParam getStructParam(Node nameNode, boolean safe) {
         String name = nameNode.getValue();
         StructParam sVar = params.get(name);
         if (sVar != null) {
             return sVar;
-        } else {
+        } else if (parent != null) {
+            sVar =  parent.getStructParam(nameNode, true);
+            if (sVar != null) return sVar;
+        } 
+        
+        // If reached this point then not found
+        if (!safe) {
             throw new CompileException("Unknown variable `" + name + "` in " + this, nameNode);
+        } else {
+            return null;
         }
-    }
-    
-    public Collection<StructParam> getAllParams() {
-        return params.values();
     }
     
     public class StructParam extends BasicObject {
