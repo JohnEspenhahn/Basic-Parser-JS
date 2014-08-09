@@ -7,7 +7,6 @@ import com.hahn.basic.target.js.JSPretty;
 
 public class JSClassType extends ClassType {
     
-    // TODO frame define class
     public JSClassType(String name, ClassType parent) {
         super(name, parent);
     }
@@ -16,7 +15,6 @@ public class JSClassType extends ClassType {
     public String toTarget() {
         String prefix = "class_";
         String name = prefix + getName();
-        String parentName = prefix + parent.getName();
         
         StringBuilder builder = new StringBuilder();
         builder.append(JSPretty.format(0, "function %s(){};", name));
@@ -24,6 +22,8 @@ public class JSClassType extends ClassType {
         // TODO class static values
         
         if (parent != null) {
+            String parentName = prefix + parent.getName();
+            
             builder.append(JSPretty.format(0, "%s.prototype=%s.prototype;", name, parentName));
             builder.append(JSPretty.format(0, "%s.prototype.constructor=%s;", name, name));
         }
