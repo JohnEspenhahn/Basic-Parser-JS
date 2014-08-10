@@ -29,5 +29,5 @@ public abstract class LangBuildTarget {
     @Override
     public abstract String toString();
     
-    public String endCodeArea() { return ""; }
+    public abstract String endCodeArea();
 }

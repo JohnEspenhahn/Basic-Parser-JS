@@ -55,7 +55,7 @@ public interface ILangFactory {
 	
 	public VarAccess VarAccess(Statement container, BasicObject var, BasicObject idx, Type type, int row, int col);
 	
-	public BasicObject NewInstance(Type type, List<BasicObject> params);
+	public BasicObject NewInstance(Type type, Node typeNode, List<BasicObject> params);
 	
 	public ConditionalObject ConditionalObject(Statement container, OPCode op, BasicObject p1, Node p1Node, BasicObject p2, Node p2Node, BasicObject temp);
 	public TernaryObject TernaryObject(Statement container, BasicObject condition, Node node_then, Node node_else, int row, int col);

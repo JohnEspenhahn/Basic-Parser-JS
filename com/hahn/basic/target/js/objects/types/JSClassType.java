@@ -6,6 +6,7 @@ import com.hahn.basic.intermediate.objects.types.ClassType;
 import com.hahn.basic.target.js.JSPretty;
 
 public class JSClassType extends ClassType {
+    public static final String PREFIX = "class_";
     
     public JSClassType(String name, ClassType parent) {
         super(name, parent);
@@ -13,24 +14,23 @@ public class JSClassType extends ClassType {
     
     @Override
     public String toTarget() {
-        String prefix = "class_";
-        String name = prefix + getName();
+        String prefixedName = PREFIX + getName();
         
         StringBuilder builder = new StringBuilder();
-        builder.append(JSPretty.format(0, "function %s(){};", name));
-        // TODO class constructor and default values
+        builder.append(JSPretty.format(0, "function %s(){};", prefixedName));
+        // TODO class default instance values
         // TODO class static values
         
         if (parent != null) {
-            String parentName = prefix + parent.getName();
+            String prefixedParent = PREFIX + parent.getName();
             
-            builder.append(JSPretty.format(0, "%s.prototype=%s.prototype;", name, parentName));
-            builder.append(JSPretty.format(0, "%s.prototype.constructor=%s;", name, name));
+            builder.append(JSPretty.format(0, "%s.prototype=new %s();", prefixedName, prefixedParent));
+            builder.append(JSPretty.format(0, "%s.prototype.constructor=%s;", prefixedName, prefixedName));
         }
         
         for (FuncGroup funcGroup: getDefinedFuncs()) {
             for (FuncHead func: funcGroup) {
-                builder.append(JSPretty.format(0, "%s.prototype.%s=%s;", name, func.getFuncId(), func.toTarget()));
+                builder.append(JSPretty.format(0, "%s.prototype.%s=%s;", prefixedName, func.getFuncId(), func.toTarget()));
             }
         }
         

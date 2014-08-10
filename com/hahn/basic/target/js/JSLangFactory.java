@@ -119,8 +119,8 @@ public class JSLangFactory implements ILangFactory {
     }
     
     @Override
-    public BasicObject NewInstance(Type type, List<BasicObject> params) {
-        return new JSNewInstance(type, params);
+    public BasicObject NewInstance(Type type, Node typeNode, List<BasicObject> params) {
+        return new JSNewInstance(type, typeNode, params);
     }
     
     @Override

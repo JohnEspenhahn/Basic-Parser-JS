@@ -1,6 +1,34 @@
 package com.hahn.basic.intermediate;
 
-import static com.hahn.basic.definition.EnumToken.*;
+import static com.hahn.basic.definition.EnumToken.ADD;
+import static com.hahn.basic.definition.EnumToken.AND;
+import static com.hahn.basic.definition.EnumToken.BOOL_AND;
+import static com.hahn.basic.definition.EnumToken.BOOL_OR;
+import static com.hahn.basic.definition.EnumToken.BOR;
+import static com.hahn.basic.definition.EnumToken.CHAR;
+import static com.hahn.basic.definition.EnumToken.DIV;
+import static com.hahn.basic.definition.EnumToken.DOT;
+import static com.hahn.basic.definition.EnumToken.EQUALS;
+import static com.hahn.basic.definition.EnumToken.FALSE;
+import static com.hahn.basic.definition.EnumToken.GTR;
+import static com.hahn.basic.definition.EnumToken.GTR_EQU;
+import static com.hahn.basic.definition.EnumToken.HEX_INTEGER;
+import static com.hahn.basic.definition.EnumToken.INTEGER;
+import static com.hahn.basic.definition.EnumToken.LESS;
+import static com.hahn.basic.definition.EnumToken.LESS_EQU;
+import static com.hahn.basic.definition.EnumToken.LSHIFT;
+import static com.hahn.basic.definition.EnumToken.MOD;
+import static com.hahn.basic.definition.EnumToken.MULT;
+import static com.hahn.basic.definition.EnumToken.NOT;
+import static com.hahn.basic.definition.EnumToken.NOTEQUAL;
+import static com.hahn.basic.definition.EnumToken.OPEN_PRNTH;
+import static com.hahn.basic.definition.EnumToken.OPEN_SQR;
+import static com.hahn.basic.definition.EnumToken.QUESTION;
+import static com.hahn.basic.definition.EnumToken.RSHIFT;
+import static com.hahn.basic.definition.EnumToken.STRING;
+import static com.hahn.basic.definition.EnumToken.SUB;
+import static com.hahn.basic.definition.EnumToken.TRUE;
+import static com.hahn.basic.definition.EnumToken.XOR;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -737,12 +765,16 @@ public class Frame extends Statement {
     public BasicObject createInstance(Node head) {
     	List<Node> children = head.getAsChildren();
     	
-        Type type = Type.fromNode(children.get(1));
+    	Node typeNode = children.get(1);
+        Type type = Type.fromNode(typeNode);
+        if (!type.doesExtend(Type.STRUCT)) {
+            throw new CompileException("Cannot create a new instance of type `" + type + "`", typeNode);
+        }
         
         List<BasicObject> params = new ArrayList<BasicObject>();
         getFuncCallParams(children.get(3), params);
-        
-        return LangCompiler.factory.NewInstance(type, params);
+                
+        return LangCompiler.factory.NewInstance(type, typeNode, params);
     }
     
     /**

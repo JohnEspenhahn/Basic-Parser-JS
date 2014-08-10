@@ -57,6 +57,20 @@ public class JSBuildTarget extends LangBuildTarget {
 	public void append(ILangCommand cmd) {
 		builder.append(cmd.toTarget());
 	}
+	
+	@Override
+	public String endCodeArea() {
+	    /*
+	     * function construct(clazz, func_constructor) { 
+	     *     var instance = new clazz(); 
+	     *     if (func_constructor) { 
+	     *         func_constructor.apply(instance, Array.prototype.slice.call(arguments, 2));
+	     *     } 
+	     *     return instance;
+	     * }
+	     */
+	    return "function constructor(c,f){var o=new c();if(f){f.apply(o,Array.prototype.slice.call(arguments,2))}return o}";
+	}
 
 	@Override
 	public void writeRunnableTo(FileOutputStream os) throws IOException {

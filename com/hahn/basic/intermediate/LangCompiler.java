@@ -37,7 +37,6 @@ public class LangCompiler {
         LangBuildTarget builder = factory.getLangBuildTarget(); 
         builder.init();
         
-        
         // Optimize
         frame.reverseOptimize();
         frame.forwardOptimize();
