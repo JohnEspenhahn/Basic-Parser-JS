@@ -159,6 +159,8 @@ public class BasicLexer implements ILexer {
         if (c != '"') {
             throw new LexException(row, column);
         } else {
+            column += 1;
+            
             String identifier = line.substring(start, column);
             stream.add(new PackedToken(EnumToken.STRING, identifier, row, start));
         }
