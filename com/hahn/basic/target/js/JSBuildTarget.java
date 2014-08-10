@@ -65,6 +65,11 @@ public class JSBuildTarget extends LangBuildTarget {
 	}
 	
 	@Override
+	public String startClassArea() {
+	    return "";
+	}
+	
+	@Override
 	public String endFuncArea() {
 	    StringBuilder builder = new StringBuilder();
         

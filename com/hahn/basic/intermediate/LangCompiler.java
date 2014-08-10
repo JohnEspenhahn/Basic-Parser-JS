@@ -46,11 +46,17 @@ public class LangCompiler {
         while (it.hasPrevious()) it.previous().reverseOptimize();
         while (it.hasNext()) it.next().forwardOptimize();
         
+        // Compile class area
+        builder.appendString(builder.startClassArea());
+        for (Type t: Type.getPublicTypes()) {
+            builder.appendString(t.toTarget());
+        }
+        
         // Convert to target
         builder.appendString(frame.toTarget());
         builder.appendString(builder.endCodeArea());
         
-        // Compile function area
+        // Compile functions
         for (FuncGroup funcGroup: funcBridge.getFuncs()) {
             for (FuncHead func: funcGroup) {
                 if (func.hasFrameHead()) {                    
@@ -58,13 +64,7 @@ public class LangCompiler {
                 }
             }
         }
-        
         builder.appendString(builder.endFuncArea());
-        
-        // Compile class area
-        for (Type t: Type.getPublicTypes()) {
-            builder.appendString(t.toTarget());
-        }
         
         // Put library import strings
         for (Library lib: libs.values()) {
