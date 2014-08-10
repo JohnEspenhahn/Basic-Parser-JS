@@ -86,14 +86,6 @@ public abstract class FuncHead extends Frame {
         return getReturnType().equals(func.getReturnType());
     }
     
-    @Override
-    public final String toTarget() {
-        reverseOptimize();
-        forwardOptimize();
-        
-        return super.toTarget();
-    }
-    
     public abstract String toFuncAreaTarget();
     
     @Override

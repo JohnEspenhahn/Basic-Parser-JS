@@ -15,6 +15,6 @@ public class JSFuncHead extends FuncHead {
     @Override
     public String toFuncAreaTarget() {
         if (getClassIn() != null) return JSPretty.format(0, "function(%l)%f", getParams(), this);
-        else return JSPretty.format(0, "function %s(%l)%f", getFuncId(), getParams(), this);        
+        else return JSPretty.format(0, "function %s(%l)%f", getFuncId(), getParams(), this);
     }
 }

@@ -17,7 +17,7 @@ public abstract class NewInstance extends BasicObject {
 		this.params = params.toArray(new BasicObject[params.size()]);
 		
 		// Get constructor
-		if (type instanceof ClassType) {
+		if (type.doesExtend(Type.OBJECT) && params.size() > 0) {
             this.constructor = ((ClassType) type).getFunc(typeNode, this.params);
         }
 	}

@@ -94,8 +94,12 @@ public class JSLangFactory implements ILangFactory {
         if (isChild) builder.append(JSPretty.format(0, "%s.prototype=implements(%s,%s);^", c.getName(), c.getName(), c.getParent().getName()));
         for (FuncGroup funcGroup: c.getDefinedFuncs()) {
             for (FuncHead func: funcGroup) {
-                if (!func.hasFrameHead()) continue;
-                builder.append(JSPretty.format(0, "%s.prototype.%s=%s;^", c.getName(), func.getFuncId(), func.toFuncAreaTarget()));
+                if (func.hasFrameHead()) {
+                    func.reverseOptimize();
+                    func.forwardOptimize();
+                    
+                    builder.append(JSPretty.format(0, "%s.prototype.%s=%s;^", c.getName(), func.getFuncId(), func.toFuncAreaTarget()));
+                }
             }
         }
         

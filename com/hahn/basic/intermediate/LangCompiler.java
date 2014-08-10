@@ -59,7 +59,10 @@ public class LangCompiler {
         // Compile functions
         for (FuncGroup funcGroup: funcBridge.getFuncs()) {
             for (FuncHead func: funcGroup) {
-                if (func.hasFrameHead()) {                    
+                if (func.hasFrameHead()) {
+                    func.reverseOptimize();
+                    func.forwardOptimize();
+                    
                     builder.appendString(func.toFuncAreaTarget());
                 }
             }

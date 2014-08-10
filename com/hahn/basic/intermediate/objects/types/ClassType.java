@@ -24,7 +24,7 @@ public class ClassType extends StructType {
     
     private boolean isAbstract;
     
-    public ClassType(String name, ClassType parent, boolean isAbstract) {
+    public ClassType(String name, StructType parent, boolean isAbstract) {
         super(name, parent);
         
         this.isAbstract = isAbstract;
