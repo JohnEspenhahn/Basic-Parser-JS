@@ -16,6 +16,9 @@ import com.hahn.basic.intermediate.objects.StringConst;
 import com.hahn.basic.intermediate.objects.TernaryObject;
 import com.hahn.basic.intermediate.objects.Var;
 import com.hahn.basic.intermediate.objects.VarAccess;
+import com.hahn.basic.intermediate.objects.VarLocal;
+import com.hahn.basic.intermediate.objects.VarParameter;
+import com.hahn.basic.intermediate.objects.VarThis;
 import com.hahn.basic.intermediate.objects.register.IRegister;
 import com.hahn.basic.intermediate.objects.types.ClassType;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
@@ -44,8 +47,7 @@ import com.hahn.basic.target.js.objects.JSOPObject;
 import com.hahn.basic.target.js.objects.JSStringConst;
 import com.hahn.basic.target.js.objects.JSTernaryObject;
 import com.hahn.basic.target.js.objects.JSVarAccess;
-import com.hahn.basic.target.js.objects.JSVarLocal;
-import com.hahn.basic.target.js.objects.JSVarParameter;
+import com.hahn.basic.target.js.objects.JSVarSuper;
 import com.hahn.basic.target.js.objects.register.JSRegister;
 import com.hahn.basic.target.js.objects.types.JSClassType;
 import com.hahn.basic.target.js.statements.JSBreakStatement;
@@ -105,17 +107,27 @@ public class JSLangFactory implements ILangFactory {
     
     @Override
     public Var VarParameter(Frame frame, String name, Type type, List<String> flags) {
-        return new JSVarParameter(frame, name, type, flags);
+        return new VarParameter(frame, name, type, flags);
     }
     
     @Override
     public Var VarLocal(Frame frame, String name, Type type, List<String> flags) {
-        return new JSVarLocal(frame, name, type, flags);
+        return new VarLocal(frame, name, type, flags);
     }
     
     @Override
     public VarAccess VarAccess(Statement container, BasicObject var, BasicObject idx, Type type, int row, int col) {
         return new JSVarAccess(container, var, idx, type, row, col);
+    }
+    
+    @Override
+    public Var VarThis(Frame frame, ClassType type, List<String> flags) {
+        return new VarThis(frame, type, flags);
+    }
+    
+    @Override
+    public Var VarSuper(Frame frame, ClassType type, List<String> flags) {
+        return new JSVarSuper(frame, type, flags);
     }
     
     @Override

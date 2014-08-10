@@ -289,6 +289,8 @@ public class Frame extends Statement {
             }
         }
         
+        // TODO get static class pointer
+        
         return null;
     }
     

@@ -9,7 +9,7 @@ import com.hahn.basic.parser.Node;
 import com.hahn.basic.util.exceptions.CompileException;
 
 public class StructType extends Type {    
-    protected final StructType parent;
+    private final StructType parent;
     private final Map<String, StructParam> params;
 
     private int typeParams;
@@ -24,6 +24,10 @@ public class StructType extends Type {
         
         this.parent = parent;
         this.params = new HashMap<String, StructParam>();
+    }
+    
+    public StructType getParent() {
+        return parent;
     }
     
     @Override

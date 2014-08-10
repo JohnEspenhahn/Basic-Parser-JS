@@ -1,5 +1,8 @@
 package com.hahn.basic.intermediate;
 
+import java.util.Arrays;
+import java.util.List;
+
 import com.hahn.basic.intermediate.objects.FuncPointer;
 import com.hahn.basic.intermediate.objects.Param;
 import com.hahn.basic.intermediate.objects.Var;
@@ -37,6 +40,16 @@ public abstract class FuncHead extends Frame {
             Var var = LangCompiler.factory.VarParameter(this, p.getName(), p.getType(), p.getFlags());
             this.params[i] = var;
         	this.addVar(var);
+        }
+        
+        // Add `this` and `super` variables if applicable
+        if (classIn != null) {
+            List<String> flags = Arrays.asList(new String[] { "const" });
+            addVar(LangCompiler.factory.VarThis(this, classIn, flags));
+            
+            if (classIn.getParent() instanceof ClassType) {
+                addVar(LangCompiler.factory.VarSuper(this, (ClassType) classIn.getParent(), flags));
+            }
         }
     }
     

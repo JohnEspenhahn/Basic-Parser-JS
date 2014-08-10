@@ -68,8 +68,17 @@ public class JSBuildTarget extends LangBuildTarget {
 	     *     } 
 	     *     return instance;
 	     * }
+	     * 
+	     * var implements = this.implements || function(child, parent) {
+	     *     for(var prop_key in parent)
+	     *         if (parent.hasOwnProperty(prop_key)) child[prop_key] = parent[prop_key]; 
+	     *     function __(){ this.constructor = child; }
+	     *     __.prototype = parent.prototype;
+	     *     return new __(); // the child prototype 
+	     * }
 	     */
-	    return "function constructor(c,f){var o=new c();if(f){f.apply(o,Array.prototype.slice.call(arguments,2))}return o}";
+	    return "var constructor=this.constructor||function(c,f){var o=new c();if(f){f.apply(o,Array.prototype.slice.call(arguments,2))}return o}"
+	         + "var implements=this.implements||function(d,b){for(var p in b)if(b.hasOwnProperty(p))d[p]=b[p];function _(){this.constructor = d}_.prototype=b.prototype;return new _()}";
 	}
 
 	@Override

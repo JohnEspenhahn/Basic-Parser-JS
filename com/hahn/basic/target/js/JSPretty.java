@@ -131,14 +131,9 @@ public class JSPretty {
     
     private static void handleToken(StringBuilder str, char token) {
         if (Main.PRETTY_PRINT) {
-            switch (token) {
-            case ',':
-                str.append(", ");
-                break;
-                
-            default:
-                str.append(token);
-            }
+            if (token == ',') str.append(", ");
+            else if (token == '=') str.append(" = ");
+            else str.append(token);
         } else {
             str.append(token);
         }

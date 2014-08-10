@@ -65,8 +65,8 @@ public abstract class ClassType extends StructType {
         FuncHead func = funcBridge.getFunc(name, types);
         if (func != null) {
             return func;
-        } else if (parent instanceof ClassType) {
-            func =  ((ClassType) parent).getFunc(nameNode, types, true);
+        } else if (getParent() instanceof ClassType) {
+            func =  ((ClassType) getParent()).getFunc(nameNode, types, true);
             if (func != null) return func;
         } 
         

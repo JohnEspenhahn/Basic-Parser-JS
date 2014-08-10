@@ -7,7 +7,6 @@ import com.hahn.basic.intermediate.objects.NewInstance;
 import com.hahn.basic.intermediate.objects.types.ClassType;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.parser.Node;
-import com.hahn.basic.target.js.objects.types.JSClassType;
 import com.hahn.basic.util.Util;
 
 public class JSNewInstance extends NewInstance {
@@ -19,13 +18,12 @@ public class JSNewInstance extends NewInstance {
     @Override
     public String toTarget() {
         if (getType() instanceof ClassType) {
-            String params = Util.toTarget(getParams());
             if (getConstructor() == null) { // No constructor
-                return String.format("new %s%s()", JSClassType.PREFIX, getType().getName());
-            } else if (params.length() == 0) { // Constructor with no params
-                return String.format("constructor(%s%s,%s)", JSClassType.PREFIX, getType().getName(), getConstructor());
+                return String.format("new %s()", getType().getName());
+            } else if (getParams().length == 0) { // Constructor with no params
+                return String.format("constructor(%s,%s)", getType().getName(), getConstructor());
             } else { // Constructor with params
-                return String.format("constructor(%s%s,%s,%s)", JSClassType.PREFIX, getType().getName(), getConstructor(), params);
+                return String.format("constructor(%s,%s,%s)", getType().getName(), getConstructor(), Util.toTarget(getParams()));
             }
         } else if (getType().doesExtend(Type.STRUCT)) {
             return "{}";
