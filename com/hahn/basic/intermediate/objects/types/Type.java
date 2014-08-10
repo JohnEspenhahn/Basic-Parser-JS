@@ -25,8 +25,9 @@ public class Type implements ITypeable {
                              UNDEFINED = new Type("undefined", false, true);
     
     public static final StructType STRUCT = new StructType("struct", null),
+                               OBJECT = new ClassType("Object", null, true),
                                FUNC   = STRUCT.extendAs("func").setTypeParams(-1),
-                               ARRAY  = STRUCT.extendAs("array").add(new Param("length", Type.INT)).setTypeParams(1),
+                               ARRAY  = STRUCT.extendAs("array").addParam(new Param("length", Type.INT)).setTypeParams(1),
                                STRING = ARRAY.extendAs("string").setTypeParams(0);
     
     public static final int COUNT_PRIMATIVES = TYPES.size();
@@ -157,6 +158,10 @@ public class Type implements ITypeable {
     public String toString() {
         return getName();
     }
+    
+    public void reverseOptimize() { }
+    
+    public void forwardOptimize() { }
     
     public String toTarget() {
         return "";

@@ -7,13 +7,13 @@ import com.hahn.basic.util.Util;
 
 public class JSFuncCallPointer extends FuncCallPointer {
     
-    public JSFuncCallPointer(Node nameNode, BasicObject[] params, int row, int col) {
-        super(nameNode, params, row, col);
+    public JSFuncCallPointer(Node nameNode, BasicObject objectIn, BasicObject[] params) {
+        super(nameNode, objectIn, params);
     }
     
     @Override
     public String toTarget() {
-        return String.format("%s(%s)", getFuncId(), Util.toTarget(getParams()));
-    }
-    
+        if (getObjectIn() == null) return String.format("%s(%s)", getFuncId(), Util.toTarget(getParams()));
+        else return String.format("%s.%s(%s)", getObjectIn().toTarget(), getFuncId(), Util.toTarget(getParams()));
+    }    
 }

@@ -1,10 +1,12 @@
 package com.hahn.basic.intermediate.objects.types;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.hahn.basic.intermediate.objects.BasicObject;
+import com.hahn.basic.intermediate.objects.Param;
 import com.hahn.basic.parser.Node;
 import com.hahn.basic.util.exceptions.CompileException;
 
@@ -52,15 +54,15 @@ public class StructType extends Type {
      */
     public StructType extendAs(String name, List<BasicObject> ps) {
         StructType struct = new StructType(name, this);
-        struct.loadVars(ps);
+        struct.loadParams(ps);
         
         return struct;
     }
     
-    protected void loadVars(List<BasicObject> ps) {
+    public void loadParams(List<BasicObject> ps) {
         if (ps != null) {
             for (int i = 0; i < ps.size(); i++) {
-                this.add(ps.get(i));
+                this.addParam(ps.get(i));
             }
         }
     }
@@ -87,10 +89,29 @@ public class StructType extends Type {
      * Add a basic object as a struct param
      * @param p The basic object to use when defining the struct param
      * @return This
+     * @throws CompileException If the variable is already defined
      */
-    public StructType add(BasicObject p) {
-        params.put(p.getName(), new StructParam(params.size(), p));
+    public StructType addParam(BasicObject p) {
+        putParam(p);
+        
         return this;
+    }
+    
+    /**
+     * Add a basic object as a struct param
+     * @param p The basic object to use when defining the struct param
+     * @return The added struct param
+     * @throws CompileException If the variable is already defined
+     */
+    public StructParam putParam(BasicObject p) {
+        if (!params.containsKey(p.getName()))   {
+            StructParam param = new StructParam(params.size(), p);
+            params.put(p.getName(), param);
+           
+            return param;
+        } else {
+            throw new CompileException("The instance variable `" + p.getName() + "` is already defined in `" + getName() + "`");
+        }
     }
     
     /**
@@ -99,8 +120,8 @@ public class StructType extends Type {
      * @return The param
      * @throw CompileException If the requested param is not defined
      */
-    public StructParam getStructParam(Node nameNode) {
-        return getStructParam(nameNode, false);
+    public StructParam getParam(Node nameNode) {
+        return getParam(nameNode, false);
     }
     
     /**
@@ -110,29 +131,40 @@ public class StructType extends Type {
      * @return The param; or, if `safe` is true and there is an error, null
      * @throw CompileException If `safe` is false and the param is not defined
      */
-    public StructParam getStructParam(Node nameNode, boolean safe) {
+    public StructParam getParam(Node nameNode, boolean safe) {
         String name = nameNode.getValue();
+        StructParam param = getParamSafe(name);        
+        
+        if (param != null) {
+            return param;
+        } else if (safe) {
+            return null;
+        } else {
+            throw new CompileException("Unknown variable `" + name + "` in " + this, nameNode);
+        }
+    }
+    
+    public StructParam getParamSafe(String name) {
         StructParam sVar = params.get(name);
         if (sVar != null) {
             return sVar;
         } else if (parent != null) {
-            sVar =  parent.getStructParam(nameNode, true);
+            sVar =  parent.getParamSafe(name);
             if (sVar != null) return sVar;
-        } 
-        
-        // If reached this point then not found
-        if (!safe) {
-            throw new CompileException("Unknown variable `" + name + "` in " + this, nameNode);
-        } else {
-            return null;
         }
+        
+        return null;
     }
     
-    public class StructParam extends BasicObject {
+    public Collection<StructParam> getDefinedParams() {
+        return params.values();
+    }
+    
+    public class StructParam extends Param {
         public final int idx;
         
         public StructParam(int i, BasicObject p) {
-            super(p.getName(), p.getType());
+            super(p.getName(), p.getType(), p.getFlags());
             
             this.idx = i;
         }

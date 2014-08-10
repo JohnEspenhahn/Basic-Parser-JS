@@ -15,9 +15,9 @@ public class JSVarAccess extends VarAccess {
     @Override
     public String toTarget() {
         if (getIndex() instanceof StructParam) {
-            return String.format("%s.%s", getHeldObject().toTarget(), getIndex().toTarget());
+            return String.format("%s.%s", getVar().toTarget(), getIndex().toTarget());
         } else {
-            return String.format("%s[%s]", getHeldObject().toTarget(), getIndex().toTarget());
+            return String.format("%s[%s]", getVar().toTarget(), getIndex().toTarget());
         }
     }
     

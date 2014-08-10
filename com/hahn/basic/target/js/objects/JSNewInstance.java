@@ -19,7 +19,7 @@ public class JSNewInstance extends NewInstance {
     public String toTarget() {
         if (getType() instanceof ClassType) {
             if (getConstructor() == null) { // No constructor
-                return String.format("new %s()", getType().getName());
+                return String.format("new %s", getType().getName());
             } else if (getParams().length == 0) { // Constructor with no params
                 return String.format("constructor(%s,%s)", getType().getName(), getConstructor());
             } else { // Constructor with params

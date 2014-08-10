@@ -24,7 +24,7 @@ public class Node {
         this(parent, token, null, row, col);
     }
     
-    private Node(Node parent, Enum<?> token, String value, int row, int col) {
+    public Node(Node parent, Enum<?> token, String value, int row, int col) {
         this.row = row;
         this.col = col;
         

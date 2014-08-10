@@ -1,7 +1,9 @@
 package com.hahn.basic.intermediate.objects.types;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.ListIterator;
 
 import com.hahn.basic.intermediate.FuncBridge;
 import com.hahn.basic.intermediate.FuncGroup;
@@ -9,30 +11,67 @@ import com.hahn.basic.intermediate.FuncHead;
 import com.hahn.basic.intermediate.LangCompiler;
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.Param;
+import com.hahn.basic.intermediate.objects.Var;
+import com.hahn.basic.intermediate.statements.Statement;
 import com.hahn.basic.parser.Node;
 import com.hahn.basic.util.exceptions.CompileException;
 
-public abstract class ClassType extends StructType {
-    private FuncBridge funcBridge;
+public class ClassType extends StructType {
+    private final Var varThis;
     
-    public ClassType(String name, ClassType parent) {
+    private FuncBridge funcBridge;
+    private List<Statement> initStatements;
+    
+    private boolean isAbstract;
+    
+    public ClassType(String name, ClassType parent, boolean isAbstract) {
         super(name, parent);
         
+        this.isAbstract = isAbstract;
         this.funcBridge = new FuncBridge(this);
+        this.initStatements = new ArrayList<Statement>();
+        
+        this.varThis = LangCompiler.factory.VarThis(LangCompiler.getGlobalFrame(), this);
+        
+        // Define function super
+        defineFunc(null, "super", true, Type.VOID);
     }
     
-    /**
-     * Extend this
-     * @param name The name of the new class
-     * @param ps The parameters added by this new class
-     * @return A new class object
-     */
+    public boolean isAbstract() {
+        return isAbstract;
+    }
+    
+    public Var getThis() {
+        return varThis;
+    }
+    
+    @Override
+    public ClassType extendAs(String name) {
+        return this.extendAs(name, null);
+    }
+    
     @Override
     public ClassType extendAs(String name, List<BasicObject> ps) {
-        ClassType newClass = LangCompiler.factory.ClassType(name, this);
-        newClass.loadVars(ps);
+        ClassType newClass = new ClassType(name, this, false);
+        newClass.loadParams(ps);
         
         return newClass;
+    }
+    
+    public void addInitStatements(List<Statement> inits) {
+        if (inits != null) {
+            this.initStatements.addAll(inits);
+        }
+    }
+    
+    public void addInitStatement(Statement init) {
+        if (init != null) {
+            this.initStatements.add(init);
+        }
+    }
+    
+    public List<Statement> getInitStatements() {
+        return initStatements;
     }
     
     public FuncHead defineFunc(Node head, String name, boolean rawName, Type rtnType, Param... params) {
@@ -78,5 +117,21 @@ public abstract class ClassType extends StructType {
         }
     }
     
-    public abstract String toTarget();
+    public void reverseOptimize() {
+        ListIterator<Statement> it = initStatements.listIterator(initStatements.size());
+        while (it.hasPrevious()) {
+            it.previous().reverseOptimize();
+        }
+    }
+    
+    public void forwardOptimize() {
+        ListIterator<Statement> it = initStatements.listIterator(0);
+        while (it.hasNext()) {
+            it.next().forwardOptimize();
+        }
+    }
+    
+    public String toTarget() {
+        return LangCompiler.factory.createClass(this);
+    }
 }

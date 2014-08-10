@@ -41,7 +41,7 @@ public interface ILangFactory {
 	public IRegister getNextRegister(AdvancedObject objFor);
 	
 	// Types
-    public ClassType ClassType(String name, ClassType parent);
+    public String createClass(ClassType c);
 	
 	// Objects	
 	public BasicObject PushObject();
@@ -53,8 +53,8 @@ public interface ILangFactory {
 	public Var VarParameter(Frame frame, String name, Type type, List<String> flags);
 	public Var VarLocal(Frame frame, String name, Type type, List<String> flags);
 	
-	public Var VarThis(Frame frame, ClassType type, List<String> flags);
-	public Var VarSuper(Frame frame, ClassType type, List<String> flags);
+	public Var VarThis(Frame frame, ClassType type);
+	public Var VarSuper(Frame frame, ClassType type);
 	
 	public VarAccess VarAccess(Statement container, BasicObject var, BasicObject idx, Type type, int row, int col);
 	
@@ -64,8 +64,8 @@ public interface ILangFactory {
 	public TernaryObject TernaryObject(Statement container, BasicObject condition, Node node_then, Node node_else, int row, int col);
 	
 	public FuncHead FuncHead(Frame parent, ClassType classIn, String name, boolean rawName, Node head, Type rtnType, Param[] params);
-    public FuncPointer FuncPointer(Node nameNode, ParameterizedType<ITypeable> funcType);
-    public FuncCallPointer FuncCallPointer(Node nameNode, BasicObject[] params, int row, int col);
+    public FuncPointer FuncPointer(Node nameNode, BasicObject objectIn, ParameterizedType<ITypeable> funcType);
+    public FuncCallPointer FuncCallPointer(Node nameNode, BasicObject objectIn, BasicObject[] params);
     
     // Commands    
     public ILangCommand Import(String name);

@@ -6,6 +6,7 @@ import java.io.IOException;
 import com.hahn.basic.Main;
 import com.hahn.basic.intermediate.LangCompiler;
 import com.hahn.basic.intermediate.library.base.Library;
+import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.target.ILangCommand;
 import com.hahn.basic.target.LangBuildTarget;
 import com.hahn.basic.target.js.library.LibraryBuiltinJS;
@@ -60,25 +61,43 @@ public class JSBuildTarget extends LangBuildTarget {
 	
 	@Override
 	public String endCodeArea() {
-	    /*
-	     * function construct(clazz, func_constructor) { 
-	     *     var instance = new clazz(); 
-	     *     if (func_constructor) { 
-	     *         func_constructor.apply(instance, Array.prototype.slice.call(arguments, 2));
-	     *     } 
-	     *     return instance;
-	     * }
-	     * 
-	     * var implements = this.implements || function(child, parent) {
-	     *     for(var prop_key in parent)
-	     *         if (parent.hasOwnProperty(prop_key)) child[prop_key] = parent[prop_key]; 
-	     *     function __(){ this.constructor = child; }
-	     *     __.prototype = parent.prototype;
-	     *     return new __(); // the child prototype 
-	     * }
-	     */
-	    return "var constructor=this.constructor||function(c,f){var o=new c();if(f){f.apply(o,Array.prototype.slice.call(arguments,2))}return o}"
-	         + "var implements=this.implements||function(d,b){for(var p in b)if(b.hasOwnProperty(p))d[p]=b[p];function _(){this.constructor = d}_.prototype=b.prototype;return new _()}";
+	    return (Main.PRETTY_PRINT ? "\n" : "");
+	}
+	
+	@Override
+	public String endFuncArea() {
+	    StringBuilder builder = new StringBuilder();
+        
+        if (Type.getPublicTypes().size() != Type.COUNT_PRIMATIVES) {
+            /*
+             * function construct(clazz, func_constructor) { 
+             *     var instance = new clazz(); 
+             *     if (func_constructor) { 
+             *         func_constructor.apply(instance, Array.prototype.slice.call(arguments, 2));
+             *     } 
+             *     return instance;
+             * }
+             */
+            builder.append("function constructor(c,f,o){o=new c;if(f)f.apply(o,Array.prototype.slice.call(arguments,2));return o}");
+            if (Main.PRETTY_PRINT) builder.append("\n");
+            
+            /*
+             * var implements = this.implements || function(child, parent) {
+             *     for(var prop_key in parent)
+             *         if (parent.hasOwnProperty(prop_key)) child[prop_key] = parent[prop_key]; 
+             *     function __() { 
+             *          this.constructor = child; 
+             *          this.super = parent; 
+             *     }
+             *     __.prototype = parent.prototype;
+             *     return new __(); // the child prototype 
+             * }
+             */
+            builder.append("function implements(d,b,p){for(p in b)if(b.hasOwnProperty(p))d[p]=b[p];function _(){this.constructor=d;this.super=b}_.prototype=b.prototype;return new _}");
+            if (Main.PRETTY_PRINT) builder.append("\n");
+        }
+        
+        return builder.toString();
 	}
 
 	@Override

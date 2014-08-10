@@ -86,8 +86,8 @@ public class JSPretty {
             
             Frame frame = (Frame) arg;
             if (frame.isEmpty()) {
-                if (require_brace) str.append("{}");
-                else str.append(";");
+                if (require_brace) str.append(Main.PRETTY_PRINT ? " {}" : "{}");
+                else str.append(Main.PRETTY_PRINT ? " ;" : ";");
             } else {
                 // If more than one object in frame requires brace
                 require_brace = require_brace || frame.getSize() > 1;
@@ -131,11 +131,29 @@ public class JSPretty {
     
     private static void handleToken(StringBuilder str, char token) {
         if (Main.PRETTY_PRINT) {
-            if (token == ',') str.append(", ");
-            else if (token == '=') str.append(" = ");
-            else str.append(token);
+            switch (token) {
+            case ',':
+                str.append(", ");
+                break;
+            case '=':
+                str.append(" = ");
+                break;
+            case '_':
+                str.append(" ");
+                break;
+            case '^':
+                str.append("\n");
+                break;
+            default:
+                str.append(token);
+            }
         } else {
-            str.append(token);
+            switch (token) {
+            case '_': case '^':
+                break;
+            default:
+                str.append(token);
+            }
         }
     }
     

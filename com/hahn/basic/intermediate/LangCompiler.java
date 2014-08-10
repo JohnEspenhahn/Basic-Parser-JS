@@ -1,6 +1,7 @@
 package com.hahn.basic.intermediate;
 
 import java.util.HashMap;
+import java.util.ListIterator;
 import java.util.Map;
 
 import com.hahn.basic.intermediate.library.base.Library;
@@ -30,7 +31,6 @@ public class LangCompiler {
         factory = f;
         
         // Reset
-        // Type.reset();
         reset();
         
         // Init
@@ -41,6 +41,11 @@ public class LangCompiler {
         frame.reverseOptimize();
         frame.forwardOptimize();
         
+        // Optimize classes
+        ListIterator<Type> it = Type.getPublicTypes().listIterator(Type.getPublicTypes().size());
+        while (it.hasPrevious()) it.previous().reverseOptimize();
+        while (it.hasNext()) it.next().forwardOptimize();
+        
         // Convert to target
         builder.appendString(frame.toTarget());
         builder.appendString(builder.endCodeArea());
@@ -48,14 +53,13 @@ public class LangCompiler {
         // Compile function area
         for (FuncGroup funcGroup: funcBridge.getFuncs()) {
             for (FuncHead func: funcGroup) {
-                if (func.hasFrameHead()) {
-                    func.reverseOptimize();
-                    func.forwardOptimize();
-                    
+                if (func.hasFrameHead()) {                    
                     builder.appendString(func.toFuncAreaTarget());
                 }
             }
         }
+        
+        builder.appendString(builder.endFuncArea());
         
         // Compile class area
         for (Type t: Type.getPublicTypes()) {
@@ -72,6 +76,7 @@ public class LangCompiler {
     
     private static void reset() {
         VarTemp.NEXT_TEMP_VAR = 0;
+        Type.reset();
         
         funcBridge = new FuncBridge(null);
         

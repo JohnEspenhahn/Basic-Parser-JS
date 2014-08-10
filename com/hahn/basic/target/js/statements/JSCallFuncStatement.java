@@ -34,7 +34,11 @@ public class JSCallFuncStatement extends CallFuncStatement {
     @Override
     public String toTarget() {
         FuncCallPointer funccall = getFuncCallPointer();
-        return JSPretty.format(0, "%s(%l)", funccall.getFuncId(), funccall.getParams());
+        if (funccall.getObjectIn() == null) {
+            return JSPretty.format(0, "%s(%l)", funccall.getFuncId(), funccall.getParams());
+        } else {
+            return JSPretty.format(0, "%s.%s(%l)", funccall.getObjectIn().toTarget(), funccall.getFuncId(), funccall.getParams());
+        }
     }
     
 }

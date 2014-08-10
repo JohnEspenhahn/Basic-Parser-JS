@@ -23,6 +23,7 @@ public class Param extends BasicObject {
         return flags != null;
     }
     
+    @Override
     public List<String> getFlags() {
         return flags;
     }

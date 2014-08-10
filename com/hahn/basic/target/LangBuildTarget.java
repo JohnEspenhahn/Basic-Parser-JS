@@ -30,4 +30,5 @@ public abstract class LangBuildTarget {
     public abstract String toString();
     
     public abstract String endCodeArea();
+    public abstract String endFuncArea();
 }

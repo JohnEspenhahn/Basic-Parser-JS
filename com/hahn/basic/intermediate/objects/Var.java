@@ -29,6 +29,7 @@ public abstract class Var extends AdvancedObject {
         return flags != null;
     }
     
+    @Override
     public List<String> getFlags() {
         return flags;
     }

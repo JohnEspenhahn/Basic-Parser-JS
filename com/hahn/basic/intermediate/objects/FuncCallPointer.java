@@ -10,23 +10,18 @@ import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.parser.Node;
 
 public abstract class FuncCallPointer extends FuncPointer {
-    private int row, col;
     private Type returnType;
 
     /**
      * A callable pointer to a function
      * @param nameNode The node that defines the name of the function to call
+     * @param objectIn The object that the function is in or null
      * @param params The provided parameters for the call
-     * @param row The row to throw an error at
-     * @param col The column to throw an error at
      */
-    public FuncCallPointer(Node nameNode, BasicObject[] params, int row, int col) {
-        super(nameNode, new ParameterizedType<ITypeable>(Type.FUNC, (ITypeable[]) params));
+    public FuncCallPointer(Node nameNode, BasicObject objectIn, BasicObject[] params) {
+        super(nameNode, objectIn, new ParameterizedType<ITypeable>(Type.FUNC, (ITypeable[]) params));
 
         this.returnType = Type.UNDEFINED;
-        
-        this.row = row;
-        this.col = col;
     }
 
     /**
@@ -64,7 +59,7 @@ public abstract class FuncCallPointer extends FuncPointer {
         }
         
         checkFunction();
-        returnType = func.getReturnType().autocast(returnType, this.row, this.col, true);
+        returnType = func.getReturnType().autocast(returnType, nameNode.getRow(), nameNode.getCol(), true);
         
         return super.setInUse(by);
     }
@@ -72,7 +67,7 @@ public abstract class FuncCallPointer extends FuncPointer {
     @Override
     public void takeRegister(IIntermediate by) {
         for (BasicObject param: getParams()) {
-            param.takeRegister(by);
+            param.takeRegister(this);
         }
         
         super.takeRegister(by);

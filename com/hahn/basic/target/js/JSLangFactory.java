@@ -3,6 +3,7 @@ package com.hahn.basic.target.js;
 import java.util.List;
 
 import com.hahn.basic.intermediate.Frame;
+import com.hahn.basic.intermediate.FuncGroup;
 import com.hahn.basic.intermediate.FuncHead;
 import com.hahn.basic.intermediate.objects.AdvancedObject;
 import com.hahn.basic.intermediate.objects.BasicObject;
@@ -49,7 +50,6 @@ import com.hahn.basic.target.js.objects.JSTernaryObject;
 import com.hahn.basic.target.js.objects.JSVarAccess;
 import com.hahn.basic.target.js.objects.JSVarSuper;
 import com.hahn.basic.target.js.objects.register.JSRegister;
-import com.hahn.basic.target.js.objects.types.JSClassType;
 import com.hahn.basic.target.js.statements.JSBreakStatement;
 import com.hahn.basic.target.js.statements.JSCallFuncStatement;
 import com.hahn.basic.target.js.statements.JSContinueStatement;
@@ -60,6 +60,7 @@ import com.hahn.basic.target.js.statements.JSForStatement;
 import com.hahn.basic.target.js.statements.JSIfStatement;
 import com.hahn.basic.target.js.statements.JSReturnStatement;
 import com.hahn.basic.target.js.statements.JSWhileStatement;
+import com.hahn.basic.util.Util;
 import com.hahn.basic.util.exceptions.UnimplementedException;
 
 public class JSLangFactory implements ILangFactory {
@@ -81,8 +82,24 @@ public class JSLangFactory implements ILangFactory {
     }
     
     @Override
-    public ClassType ClassType(String name, ClassType parent) {
-        return new JSClassType(name, parent);
+    public String createClass(ClassType c) {
+        if (c.getName().equals("Object")) return "";
+        
+        StringBuilder builder = new StringBuilder();        
+        Statement[] inits = c.getInitStatements().toArray(new Statement[c.getInitStatements().size()]);
+        builder.append(JSPretty.format(0, "function %s()_{%s}^", c.getName(), Util.toTarget(inits, ";")));
+        // TODO class static values
+        
+        boolean isChild = (c.getParent() instanceof ClassType);
+        if (isChild) builder.append(JSPretty.format(0, "%s.prototype=implements(%s,%s);^", c.getName(), c.getName(), c.getParent().getName()));
+        for (FuncGroup funcGroup: c.getDefinedFuncs()) {
+            for (FuncHead func: funcGroup) {
+                if (!func.hasFrameHead()) continue;
+                builder.append(JSPretty.format(0, "%s.prototype.%s=%s;^", c.getName(), func.getFuncId(), func.toFuncAreaTarget()));
+            }
+        }
+        
+        return builder.toString();
     }
     
     @Override
@@ -121,13 +138,13 @@ public class JSLangFactory implements ILangFactory {
     }
     
     @Override
-    public Var VarThis(Frame frame, ClassType type, List<String> flags) {
-        return new VarThis(frame, type, flags);
+    public Var VarThis(Frame frame, ClassType type) {
+        return new VarThis(frame, type);
     }
     
     @Override
-    public Var VarSuper(Frame frame, ClassType type, List<String> flags) {
-        return new JSVarSuper(frame, type, flags);
+    public Var VarSuper(Frame frame, ClassType type) {
+        return new JSVarSuper(frame, type);
     }
     
     @Override
@@ -151,13 +168,13 @@ public class JSLangFactory implements ILangFactory {
     }
     
     @Override
-    public FuncPointer FuncPointer(Node nameNode, ParameterizedType<ITypeable> funcType) {
-        return new JSFuncPointer(nameNode, funcType);
+    public FuncPointer FuncPointer(Node nameNode, BasicObject objectIn, ParameterizedType<ITypeable> funcType) {
+        return new JSFuncPointer(nameNode, objectIn, funcType);
     }
     
     @Override
-    public FuncCallPointer FuncCallPointer(Node nameNode, BasicObject[] params, int row, int col) {
-        return new JSFuncCallPointer(nameNode, params, row, col);
+    public FuncCallPointer FuncCallPointer(Node nameNode, BasicObject objectIn, BasicObject[] params) {
+        return new JSFuncCallPointer(nameNode, objectIn, params);
     }
     
     @Override

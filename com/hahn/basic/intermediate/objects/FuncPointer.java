@@ -11,17 +11,21 @@ import com.hahn.basic.util.exceptions.CompileException;
 
 public abstract class FuncPointer extends BasicObject {
     protected Node nameNode;
+    protected BasicObject objectIn;
+    
     protected FuncHead func;
     
     /**
      * A pointer to a function
      * @param nameNode The node defining the function's name
+     * @param objectIn The object that contains the function or null
      * @param funcType The function parameterized type
      */
-    public FuncPointer(Node nameNode, ParameterizedType<ITypeable> funcType) {
+    public FuncPointer(Node nameNode, BasicObject objectIn, ParameterizedType<ITypeable> funcType) {
         super(nameNode.getValue(), funcType);
         
         this.nameNode = nameNode;
+        this.objectIn = objectIn;
     }
     
     @Override
@@ -38,6 +42,14 @@ public abstract class FuncPointer extends BasicObject {
      */
     public String getFuncId() {        
         return func.getFuncId();
+    }
+    
+    /**
+     * Get the object in which the function this is pointing to lives
+     * @return The object that contains the function that is being pointed to
+     */
+    public BasicObject getObjectIn() {
+        return objectIn;
     }
     
     /**
@@ -76,8 +88,16 @@ public abstract class FuncPointer extends BasicObject {
     @Override
     public boolean setInUse(IIntermediate by) {
         checkFunction();
+        if (objectIn != null) objectIn.setInUse(this);
         
         return super.setInUse(by);
+    }
+    
+    @Override
+    public void takeRegister(IIntermediate by) {
+        if (objectIn != null) objectIn.takeRegister(this);
+        
+        super.setInUse(by);
     }
     
     /**
@@ -86,7 +106,7 @@ public abstract class FuncPointer extends BasicObject {
      */
     protected void checkFunction() {
         if (func == null) {
-            setFunction(LangCompiler.getFunc(null, nameNode, getTypes()));
+            setFunction(LangCompiler.getFunc(objectIn, nameNode, getTypes()));
             
             // Still null then not found
             if (func == null) {
@@ -107,6 +127,7 @@ public abstract class FuncPointer extends BasicObject {
     
     @Override
     public String toString() {
-        return "&" + super.toString();
+        if (getObjectIn() != null) return "&" + getObjectIn() + super.toString();
+        else return "&" + super.toString();
     }
 }

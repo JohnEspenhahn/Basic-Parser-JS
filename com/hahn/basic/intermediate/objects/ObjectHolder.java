@@ -63,7 +63,7 @@ public class ObjectHolder extends BasicObject {
     @Override
     public boolean setInUse(IIntermediate by) {
         Type pretype = getHeldObject().getType();
-        boolean result = getHeldObject().setInUse(by);
+        boolean result = getHeldObject().setInUse(this);
         
         // If held type changed, verify cast
         if (getHeldObject().getType() != pretype) {
@@ -76,7 +76,7 @@ public class ObjectHolder extends BasicObject {
     @Override
     public void takeRegister(IIntermediate by) {
         Type pretype = getHeldObject().getType();
-        getHeldObject().takeRegister(by);
+        getHeldObject().takeRegister(this);
         
         // If held type changed, verify cast
         if (getHeldObject().getType() != pretype) {

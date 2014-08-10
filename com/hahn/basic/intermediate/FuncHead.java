@@ -1,8 +1,6 @@
 package com.hahn.basic.intermediate;
 
-import java.util.Arrays;
-import java.util.List;
-
+import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.FuncPointer;
 import com.hahn.basic.intermediate.objects.Param;
 import com.hahn.basic.intermediate.objects.Var;
@@ -44,11 +42,10 @@ public abstract class FuncHead extends Frame {
         
         // Add `this` and `super` variables if applicable
         if (classIn != null) {
-            List<String> flags = Arrays.asList(new String[] { "const" });
-            addVar(LangCompiler.factory.VarThis(this, classIn, flags));
+            addVar(LangCompiler.factory.VarThis(this, classIn));
             
             if (classIn.getParent() instanceof ClassType) {
-                addVar(LangCompiler.factory.VarSuper(this, (ClassType) classIn.getParent(), flags));
+                addVar(LangCompiler.factory.VarSuper(this, (ClassType) classIn.getParent()));
             }
         }
     }
@@ -87,6 +84,14 @@ public abstract class FuncHead extends Frame {
     
     public boolean hasSameReturn(FuncHead func) {
         return getReturnType().equals(func.getReturnType());
+    }
+    
+    @Override
+    public final String toTarget() {
+        reverseOptimize();
+        forwardOptimize();
+        
+        return super.toTarget();
     }
     
     public abstract String toFuncAreaTarget();
@@ -130,18 +135,20 @@ public abstract class FuncHead extends Frame {
     }
     
     public static String createFuncId(String name, ITypeable... objs) {
-        String funcID = "__" + name + "__";
+        String funcID = name + "__";
         for (ITypeable o: objs) funcID += "_" + o.getType().getName();
         
         return funcID;
     }
     
     public static String toHumanReadable(FuncPointer p) {
-        return toHumanReadable(p.getName(), p.getTypes(), p.getReturn());
+        return toHumanReadable(p.getObjectIn(), p.getName(), p.getTypes(), p.getReturn());
     }
     
-    public static String toHumanReadable(String name, ITypeable[] types, Type returnType) {
-        String funcName = name + "::<";
+    public static String toHumanReadable(BasicObject objectIn, String name, ITypeable[] types, Type returnType) {
+        String funcName = (objectIn != null ? objectIn.getName() + "::" : "");
+        
+        funcName += name + "<";
         for (int i = 0; i < types.length; i++) {
             funcName += types[i].getType();
             if (i + 1 < types.length) {

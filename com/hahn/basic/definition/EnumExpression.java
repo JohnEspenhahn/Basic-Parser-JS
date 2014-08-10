@@ -44,7 +44,8 @@ public enum EnumExpression implements IEnumExpression {
     DEF_PARAMS  ("<TYPE> IDENTIFIER {COMMA <TYPE> IDENTIFIER}", false),
     
     STRUCT      ("STRUCT IDENTIFIER OPEN_BRACE [<DEFINE> EOL] CLOSE_BRACE", false),
-    CLASS       ("CLASS IDENTIFIER OPEN_BRACE ?<FRAME_CNTNT> CLOSE_BRACE", false),
+    CLASS       ("CLASS IDENTIFIER {<C_PARENT>} OPEN_BRACE {<CLASS_CNTNT>} CLOSE_BRACE", false),
+    C_PARENT    ("EXTENDS IDENTIFIER"),
     
     ACCESS      ("IDENTIFIER ?<IN_ACCESS>", false),
     IN_ACCESS   ("OPEN_SQR <EXPRESSION> CLOSE_SQR$|DOT IDENTIFIER$", false),
@@ -60,10 +61,12 @@ public enum EnumExpression implements IEnumExpression {
     RETURN      ("RETURN ?<EXPRESSION> EOL", false),
     
     BLOCK       ("OPEN_BRACE {<BLOCK_CNTNT>} CLOSE_BRACE|<BLOCK_CNTNT>", false),
+    /** Stuff that can be done within if(){} */
     BLOCK_CNTNT ("<DEFINE>EOL|<COMMAND>EOL|<EXPRESSION>EOL|<RETURN>|<IF_STMT>|<WHILE_STMT>|<FOR_STMT>|EOL", false),
-    FRAME_CNTNT ("<DEFINE>EOL|<DEF_FUNC>|<STRUCT>|<CLASS>|EOL"),
+    /** Stuff that can be done within class{} */
+    CLASS_CNTNT ("<DEF_FUNC>|<DEFINE>EOL|EOL"),
     
-    START       ("<BLOCK_CNTNT>$|<FRAME_CNTNT>$", false);
+    START       ("<STRUCT>$|<CLASS>$|<BLOCK_CNTNT>$|<CLASS_CNTNT>$", false);
 
 
     private final String bnf;

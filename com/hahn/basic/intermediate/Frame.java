@@ -47,9 +47,13 @@ import com.hahn.basic.intermediate.objects.LiteralBool;
 import com.hahn.basic.intermediate.objects.LiteralNum;
 import com.hahn.basic.intermediate.objects.OPObject;
 import com.hahn.basic.intermediate.objects.Param;
+import com.hahn.basic.intermediate.objects.Var;
+import com.hahn.basic.intermediate.objects.VarAccess;
 import com.hahn.basic.intermediate.objects.VarTemp;
+import com.hahn.basic.intermediate.objects.types.ClassType;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.ParameterizedType;
+import com.hahn.basic.intermediate.objects.types.StructType;
 import com.hahn.basic.intermediate.objects.types.StructType.StructParam;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.opcode.OPCode;
@@ -317,12 +321,14 @@ public class Frame extends Statement {
             Node child = children.get(i);
             Enum<?> token = child.getToken();
             
-            if (token == EnumExpression.BLOCK || token == EnumExpression.BLOCK_CNTNT) {
+            if (token == EnumExpression.BLOCK || token == EnumExpression.BLOCK_CNTNT || token == EnumExpression.CLASS_CNTNT) {
                 handleBlock(child);
             } else if (token == EnumExpression.DEFINE) {
                 addCode(defineVar(child));
             } else if (token == EnumExpression.STRUCT) {
                 defineStruct(child);
+            } else if (token == EnumExpression.CLASS) {
+                defineClass(child);
             } else if (token == EnumExpression.DEF_FUNC) {
                 defineFunc(child);
             } else if (token == EnumExpression.RETURN) {
@@ -403,7 +409,7 @@ public class Frame extends Statement {
                 it.next(); // Skip CLOSE_SQR
             } else if (accessMarker == DOT && type.doesExtend(Type.STRUCT)) {               
                 Node nameNode = it.next();
-                StructParam sp = exp.getObj().getType().getAsStruct().getStructParam(nameNode);
+                StructParam sp = exp.getObj().getType().getAsStruct().getParam(nameNode);
                 
                 exp.setObj(LangCompiler.factory.VarAccess(exp, exp.getObj(), sp, sp.getType(), child.getRow(), child.getCol()), child);
             } else {
@@ -474,18 +480,17 @@ public class Frame extends Statement {
         return defineVar(head, null, true);
     }
     
-    protected DefineVarStatement defineVar(Node head, List<BasicObject> varsList) {
-        return defineVar(head, varsList, false);
+    protected void defineVar(Node head, StructType struct) {
+        defineVar(head, struct, false);
     }
     
-    private DefineVarStatement defineVar(Node head, List<BasicObject> varsList, boolean canInit) {
+    private DefineVarStatement defineVar(Node head, StructType struct, boolean canInit) {        
         Iterator<Node> it = Util.getIterator(head);
-        
-        DefineVarStatement define = LangCompiler.factory.DefineVarStatement(this, false);
         
         // Init var
         Type type = Type.UNDEFINED;
         ArrayList<String> flags = new ArrayList<String>();
+        DefineVarStatement define = LangCompiler.factory.DefineVarStatement(this, false);
         
         while (it.hasNext()) {
             Node node = it.next();
@@ -500,8 +505,8 @@ public class Frame extends Statement {
                 
                 // Create var
                 final BasicObject obj;
-                if (varsList != null) {
-                    obj = new Param(name, type, flags);                    
+                if (struct != null) {
+                    obj = struct.putParam(new Param(name, type, flags));
                 } else {
                     obj = LangCompiler.factory.VarLocal(this, name, type, flags);
                 }
@@ -523,21 +528,27 @@ public class Frame extends Statement {
                         Node expNode = modify_children.get(1);
                         
                         BasicObject o = handleExpression(expNode).getAsExpObj();
-                        define.addVar(obj, o, equNode);
                         
+                        if (struct instanceof ClassType) {
+                            defineClassVar((ClassType) struct, obj, node, o, expNode);
+                        }
+                        
+                        define.addVar(obj, o, equNode);                        
                         hasInit = true;
                     }
                 }
                 
                 // Default value
                 if (!hasInit && canInit) {
+                    if (struct instanceof ClassType) {
+                        defineClassVar((ClassType) struct, obj, node, LiteralNum.UNDEFINED, node);
+                    }
+                    
                     define.addVar(obj, LiteralNum.UNDEFINED, node);
                 }
                 
                 // Make var available
-                if (varsList != null) {
-                    varsList.add(obj);
-                } else {
+                if (struct == null) {
                     addVar((AdvancedObject) obj);
                 }
             }
@@ -546,6 +557,12 @@ public class Frame extends Statement {
         define.setFlags(flags);
         
         return define;
+    }
+    
+    private void defineClassVar(ClassType classIn, BasicObject p1, Node p1Node, BasicObject p2, Node p2Node) {
+        VarAccess access = LangCompiler.factory.VarAccess(this, classIn.getThis(), p1, p1.getType(), p1Node.getRow(), p1Node.getCol());
+        OPObject op = LangCompiler.factory.OPObject(this, OPCode.SET, access, p1Node, p2, p2Node);
+        classIn.addInitStatement(LangCompiler.factory.ExpressionStatement(this, op));
     }
     
     /**
@@ -593,26 +610,95 @@ public class Frame extends Statement {
         Iterator<Node> it = Util.getIterator(head);
         it.next(); // skip 'struct'
         
-        String structName = it.next().getValue();
-        List<BasicObject> structVars = new ArrayList<BasicObject>();
+        Node nameNode = it.next();
+        Main.setLine(nameNode.getRow(), nameNode.getCol());
+        StructType struct = Type.STRUCT.extendAs(nameNode.getValue());
         
         while (it.hasNext()) {
             Node next = it.next();
             
             if (next.getToken() == EnumExpression.DEFINE) {
-                defineVar(next, structVars);
+                defineVar(next, struct);
             }
-        }
-        
-        Type.STRUCT.extendAs(structName, structVars);
+        }        
     }
     
     /**
-     * Define a functions
+     * `Class` definition handler
+     * @param head EnumExpression.CLASS
+     */
+    public void defineClass(Node head) {
+        Iterator<Node> it = Util.getIterator(head);
+        it.next(); // skip 'class'
+        
+        Node nameNode = it.next();
+        Node parentNode = null;
+        
+        // Get parent classes
+        Node node;
+        while(true) {
+            node = it.next();
+            if (node.getToken() == EnumExpression.C_PARENT) {
+                List<Node> children = node.getAsChildren();
+                Node ckey = children.get(0);
+                Node cvalue = children.get(1);
+                
+                if (ckey.getToken() == EnumToken.EXTENDS) {
+                    if (parent == null) parentNode = cvalue;
+                    else throw new CompileException("Can only extend one class", ckey);
+                } else {
+                    throw new RuntimeException("Unhandled class parent key `" + ckey + "`");
+                }
+            } else {
+                break;
+            }
+        }
+        
+        Type parentType = (parentNode == null ? Type.OBJECT : Type.fromNode(parentNode));
+        if (parentType.doesExtend(Type.OBJECT)) {
+            ClassType classType = ((ClassType) parentType).extendAs(nameNode.getValue());
+            
+            // Call super init
+            Var varThis = LangCompiler.factory.VarThis(this, classType);
+            Node nodeSuper = new Node(nameNode, EnumToken.IDENTIFIER, "super", nameNode.getRow(), nameNode.getCol());
+            
+            FuncCallPointer funcSuper = LangCompiler.factory.FuncCallPointer(nodeSuper, varThis, new BasicObject[0]);
+            classType.addInitStatement(LangCompiler.factory.CallFuncStatement(this, funcSuper));
+            
+            // Handle class content
+            handleClassContent(nameNode, classType, it);
+        } else {
+            throw new CompileException("The class `" + nameNode + "` can not extend `" + parentType + "`", nameNode);
+        }
+    }
+    
+    private void handleClassContent(Node nameNode, ClassType classIn, Iterator<Node> it) {        
+        while (it.hasNext()) {
+            Node child = it.next();
+            Enum<?> token = child.getToken();
+            
+            if (token == EnumExpression.CLASS_CNTNT) {
+                handleClassContent(nameNode, classIn, Util.getIterator(child));
+            } else if (token == EnumExpression.DEF_FUNC) {
+                defineClassFunc(child, classIn);
+            } else if (token == EnumExpression.DEFINE) {
+                defineVar(child, classIn, true);
+            } else if (token == EnumToken.EOL) {
+                continue;
+            } else if (token == EnumToken.CLOSE_BRACE) {
+                break;
+            } else {
+                throw new RuntimeException("Unhandled class content token `" + token + "`");
+            }
+        }
+    }
+    
+    /**
+     * Defines a function in the global frame
      * @param head EnumExpression.DEF_FUNC
      */
     public void defineFunc(Node head) {
-        doDefineFunc(head, false);
+        doDefineFunc(head, null, false);
     }
     
     /**
@@ -621,10 +707,19 @@ public class Frame extends Statement {
      * @return Pointer to the anonymous function
      */
     public FuncPointer defineAnonFunc(Node head) {
-        return doDefineFunc(head, true);
+        return doDefineFunc(head, null, true);
     }
     
-    public FuncPointer doDefineFunc(Node head, boolean anonymous) {
+    /**
+     * Define a function in a class
+     * @param head EnumExpression.DEF_FUNC
+     * @param classIn The class to define the function in
+     */
+    public FuncPointer defineClassFunc(Node head, ClassType classIn) {
+        return doDefineFunc(head, classIn, false);
+    }
+    
+    public FuncPointer doDefineFunc(Node head, ClassType classIn, boolean anonymous) {
         Iterator<Node> it = Util.getIterator(head);
         
         Type rtnType = Type.VOID;
@@ -668,7 +763,8 @@ public class Frame extends Statement {
         if (!anonymous) {
             String name = nameNode.getValue();
             
-            LangCompiler.defineFunc(LangCompiler.getGlobalFrame(), body, name, false, rtnType, aParams);
+            if (classIn == null) LangCompiler.defineFunc(LangCompiler.getGlobalFrame(), body, name, false, rtnType, aParams);
+            else classIn.defineFunc(body, name, false, rtnType, aParams);
             return null;
         } else {
             // Anonymous
@@ -676,17 +772,18 @@ public class Frame extends Statement {
             nameNode.setValue(name);
             
             LangCompiler.defineFunc(this, body, name, false, rtnType, aParams);
-            return LangCompiler.factory.FuncPointer(nameNode, new ParameterizedType<ITypeable>(Type.FUNC, (ITypeable[]) aParams));
+            return LangCompiler.factory.FuncPointer(nameNode, null, new ParameterizedType<ITypeable>(Type.FUNC, (ITypeable[]) aParams));
         }
     }
     
     /**
      * Call a function
      * @param head EnumExpression.CALL_FUNC
+     * @param objectIn The object the function is in or null
      * @return The statement that should be added to the frame
      * and can extract the FuncCallPointer from
      */    
-    public CallFuncStatement callFunc(Node head) {
+    public CallFuncStatement callFunc(Node head, BasicObject objectIn) {
         Iterator<Node> it = Util.getIterator(head);
         
         // Determine function
@@ -705,7 +802,7 @@ public class Frame extends Statement {
         BasicObject[] aParams = params.toArray(new BasicObject[params.size()]);
         
         // Get FuncCall object
-        FuncCallPointer funcCallPointer = LangCompiler.factory.FuncCallPointer(nameNode, aParams, nameNode.getRow(), nameNode.getCol());
+        FuncCallPointer funcCallPointer = LangCompiler.factory.FuncCallPointer(nameNode, objectIn, aParams);
         return LangCompiler.factory.DefaultCallFuncStatement(this, funcCallPointer);
     }
     
@@ -732,9 +829,10 @@ public class Frame extends Statement {
     /**
      * Parse expression node to get function pointer
      * @param head EnumExpression.FUNC_POINTER
+     * @param objectIn The object the function is in or null
      * @return FuncPointer
      */
-    private FuncPointer getFuncPointer(Node head) {
+    private FuncPointer getFuncPointer(Node head, BasicObject objectIn) {
         Iterator<Node> it = Util.getIterator(head);
         
         Node nameNode = null;
@@ -756,7 +854,7 @@ public class Frame extends Statement {
             types = new ParameterizedType<ITypeable>(Type.FUNC);
         }
         
-        return LangCompiler.factory.FuncPointer(nameNode, types);
+        return LangCompiler.factory.FuncPointer(nameNode, objectIn, types);
     }
     
     /**
@@ -769,7 +867,7 @@ public class Frame extends Statement {
     	
     	Node typeNode = children.get(1);
         Type type = Type.fromNode(typeNode);
-        if (!type.doesExtend(Type.STRUCT)) {
+        if (!type.doesExtend(Type.STRUCT) || (type instanceof ClassType && ((ClassType) type).isAbstract())) {
             throw new CompileException("Cannot create a new instance of type `" + type + "`", typeNode);
         }
         
@@ -1030,11 +1128,11 @@ public class Frame extends Statement {
             } else if (token == EnumExpression.CAST) {
                 return doCast(child, temp);
             } else if (token == EnumExpression.FUNC_POINTER) {
-                return getFuncPointer(child);
+                return getFuncPointer(child, null);
             } else if (token == EnumExpression.ANON_FUNC) {
                 return defineAnonFunc(child);
             } else if (token == EnumExpression.CALL_FUNC) {
-                CallFuncStatement fc = callFunc(child);
+                CallFuncStatement fc = callFunc(child, null);
                 return fc.getFuncCallPointer();
             } else {
                 return handleExpression(child).getAsExpObj();

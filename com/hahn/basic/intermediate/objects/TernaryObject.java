@@ -44,10 +44,10 @@ public abstract class TernaryObject extends BasicObject {
     
     @Override
     public boolean setInUse(IIntermediate by) {        
-        getElse().setInUse(by);
-        getThen().setInUse(by);
+        getElse().setInUse(this);
+        getThen().setInUse(this);
         
-        getConditional().setInUse(by);
+        getConditional().setInUse(this);
         
         // Type pair for then and else
         setType(Type.merge(getThen().getType(), getElse().getType(), row, col, true));
@@ -57,10 +57,10 @@ public abstract class TernaryObject extends BasicObject {
     
     @Override
     public void takeRegister(IIntermediate by) {
-        getConditional().takeRegister(by);
+        getConditional().takeRegister(this);
         
-        getThen().takeRegister(by);
-        getElse().takeRegister(by);
+        getThen().takeRegister(this);
+        getElse().takeRegister(this);
     }
     
     @Override

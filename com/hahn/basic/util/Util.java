@@ -36,13 +36,20 @@ public class Util {
     }
     
     public static String toTarget(IIntermediate[] arr) {
-        String seperator = getListSeperator();
-        
+        return toTarget(arr, getListSeperator());
+    }
+    
+    public static String toTarget(IIntermediate[] arr, String seperator) {
+        return toTarget(Arrays.asList(arr), seperator);
+    }
+    
+    public static String toTarget(Iterable<? extends IIntermediate> arr, String seperator) {        
+        Iterator<? extends IIntermediate> it = arr.iterator();
         StringBuffer result = new StringBuffer();
-        for (int i = 0; i < arr.length; i++) {
-           result.append(arr[i].toTarget());
+        while (it.hasNext()) {
+           result.append(it.next().toTarget());
            
-           if (i + 1 < arr.length) {
+           if (it.hasNext()) {
                result.append(seperator);
            }
         }
