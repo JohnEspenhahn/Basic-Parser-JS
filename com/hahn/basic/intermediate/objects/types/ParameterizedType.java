@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import lombok.NonNull;
-
 import com.hahn.basic.definition.EnumExpression;
 import com.hahn.basic.parser.Node;
 import com.hahn.basic.util.Util;
@@ -53,7 +51,7 @@ public class ParameterizedType<T extends ITypeable> extends Type {
      * @param types The parameters' types
      * @param returnType The return type of this
      */
-    public ParameterizedType(StructType base, @NonNull T[] types, Type returnType) {
+    public ParameterizedType(StructType base, T[] types, Type returnType) {
         super(createName(base, types, returnType), false, true);
         
         this.base = base;

@@ -31,47 +31,54 @@ public class JSPretty {
      * @return Formatted string with indent and `tabs` extra tabs
      */
     public static String format(int tabs, String format, Object... args) {
-        String str;
+        if (tabs >= 0) JSPretty.indent += tabs;
         
-        if (args.length > 0) {
-            StringBuilder builder = new StringBuilder(format.length());
-            
-            int argIdx = 0;
-            boolean isFlag = false;
-            for (char c: format.toCharArray()) {
-                if (isFlag) {
-                    isFlag = false;
-                    handleFlag(builder, c, args[argIdx++]);
-                    
-                } else if (c == '%') {
-                    isFlag = true;
-                    
-                } else {
-                    handleToken(builder, c);
-                }
+        StringBuilder builder = new StringBuilder(format.length());
+        
+        int argIdx = 0;
+        boolean isFlag = false;
+        for (char c: format.toCharArray()) {
+            if (isFlag) {
+                isFlag = false;
+                handleFlag(builder, c, args[argIdx++]);
+                
+            } else if (c == '%') {
+                isFlag = true;
+                
+            } else {
+                handleToken(builder, c);
             }
-            
-            if (isFlag) throw new MissingFormatArgumentException(format);
-            
-            str = builder.toString();
-        } else {
-            str = format;
         }
         
+        if (isFlag) throw new MissingFormatArgumentException(format);
+        
+        String str;        
         if (Main.PRETTY_PRINT && tabs >= 0) {
-            return getIndent() + getTabs(tabs) + str;
+            str = getIndent() + builder.toString();
+            JSPretty.indent -= tabs;
         } else {
-            return str;
+            str = builder.toString();
         }
+        
+        return str;
     }
     
     private static void handleFlag(StringBuilder str, char flag, Object arg) {
         boolean require_brace = true;
+        final int oldIndent = JSPretty.indent;
         
         switch (flag) {
         // Standard
         case 's': 
-            str.append(arg instanceof IIntermediate ? ((IIntermediate) arg).toTarget() : arg);            
+            str.append(arg instanceof IIntermediate ? ((IIntermediate) arg).toTarget() : arg);
+            break;
+            
+        // Indentless standard
+        case 'S':
+            JSPretty.indent = 0;
+            str.append(arg instanceof IIntermediate ? ((IIntermediate) arg).toTarget() : arg);
+            JSPretty.indent = oldIndent;
+            
             break;
             
         // Block
@@ -92,7 +99,6 @@ public class JSPretty {
                 // If more than one object in frame requires brace
                 require_brace = require_brace || frame.getSize() > 1;
                 
-                final int oldIndent = JSPretty.indent;
                 if (require_brace) {
                     JSPretty.indent += 1;
                     str.append(Main.PRETTY_PRINT ? " {\n" : "{");
@@ -135,9 +141,6 @@ public class JSPretty {
             case ',':
                 str.append(", ");
                 break;
-            case '=':
-                str.append(" = ");
-                break;
             case '_':
                 str.append(" ");
                 break;
@@ -163,6 +166,14 @@ public class JSPretty {
     
     public static String getTabs(int num) {
         return StringUtils.repeat(TAB, num);
+    }
+    
+    public static void addTab() {
+        JSPretty.indent += 1;
+    }
+    
+    public static void removeTab() {
+        JSPretty.indent -= 1;
     }
     
     public static final String TAB = "    ";

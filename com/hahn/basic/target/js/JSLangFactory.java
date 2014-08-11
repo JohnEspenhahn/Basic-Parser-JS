@@ -2,6 +2,7 @@ package com.hahn.basic.target.js;
 
 import java.util.List;
 
+import com.hahn.basic.definition.EnumToken;
 import com.hahn.basic.intermediate.Frame;
 import com.hahn.basic.intermediate.FuncGroup;
 import com.hahn.basic.intermediate.FuncHead;
@@ -60,7 +61,6 @@ import com.hahn.basic.target.js.statements.JSForStatement;
 import com.hahn.basic.target.js.statements.JSIfStatement;
 import com.hahn.basic.target.js.statements.JSReturnStatement;
 import com.hahn.basic.target.js.statements.JSWhileStatement;
-import com.hahn.basic.util.Util;
 import com.hahn.basic.util.exceptions.UnimplementedException;
 
 public class JSLangFactory implements ILangFactory {
@@ -84,24 +84,37 @@ public class JSLangFactory implements ILangFactory {
     @Override
     public String createClass(ClassType c) {
         if (c.getName().equals("Object")) return "";
+        boolean isChild = (c.getParent() instanceof ClassType);
         
-        StringBuilder builder = new StringBuilder();        
-        Statement[] inits = c.getInitStatements().toArray(new Statement[c.getInitStatements().size()]);
-        builder.append(JSPretty.format(0, "function %s()_{%s}^", c.getName(), Util.toTarget(inits, ";")));
+        StringBuilder builder = new StringBuilder();
+        builder.append(JSPretty.format(0, "var %s_=_(function(%s)_{^", c.getName(), (isChild ? EnumToken.__s__ : "")));
+        
+        JSPretty.addTab();        
+        if (isChild) builder.append(JSPretty.format(0, "implements(%s,%s);^", c.getName(), c.getParent().getName()));
+        builder.append(JSPretty.format(0, "function %s()_{^", c.getName()));
+        builder.append(JSPretty.format(1, "%s.call(this);^", EnumToken.__s__));
+        if (!c.getInitFrame().isEmpty()) {
+            builder.append(JSPretty.format(0, "%s", c.getInitFrame()));
+        }
+        builder.append(JSPretty.format(0, "}^"));
+        
         // TODO class static values
         
-        boolean isChild = (c.getParent() instanceof ClassType);
-        if (isChild) builder.append(JSPretty.format(0, "%s.prototype=implements(%s,%s);^", c.getName(), c.getName(), c.getParent().getName()));
         for (FuncGroup funcGroup: c.getDefinedFuncs()) {
             for (FuncHead func: funcGroup) {
                 if (func.hasFrameHead()) {
                     func.reverseOptimize();
                     func.forwardOptimize();
                     
-                    builder.append(JSPretty.format(0, "%s.prototype.%s=%s;^", c.getName(), func.getFuncId(), func.toFuncAreaTarget()));
+                    builder.append(JSPretty.format(0, "%s.prototype.%s_=_%s", c.getName(), func.getFuncId(), func.toFuncAreaTarget()));
                 }
             }
         }
+        
+        builder.append(JSPretty.format(0, "return %s^", c.getName()));        
+        JSPretty.removeTab();
+        
+        builder.append(JSPretty.format(0, "})(%s)^", (isChild ? c.getParent().getName() : "")));
         
         return builder.toString();
     }

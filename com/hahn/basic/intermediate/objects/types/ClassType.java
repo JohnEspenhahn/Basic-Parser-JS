@@ -1,10 +1,9 @@
 package com.hahn.basic.intermediate.objects.types;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.ListIterator;
 
+import com.hahn.basic.intermediate.Frame;
 import com.hahn.basic.intermediate.FuncBridge;
 import com.hahn.basic.intermediate.FuncGroup;
 import com.hahn.basic.intermediate.FuncHead;
@@ -20,7 +19,7 @@ public class ClassType extends StructType {
     private final Var varThis;
     
     private FuncBridge funcBridge;
-    private List<Statement> initStatements;
+    private Frame initFrame;
     
     private boolean isAbstract;
     
@@ -29,12 +28,9 @@ public class ClassType extends StructType {
         
         this.isAbstract = isAbstract;
         this.funcBridge = new FuncBridge(this);
-        this.initStatements = new ArrayList<Statement>();
+        this.initFrame = new Frame(LangCompiler.getGlobalFrame(), null);
         
         this.varThis = LangCompiler.factory.VarThis(LangCompiler.getGlobalFrame(), this);
-        
-        // Define function super
-        defineFunc(null, "super", true, Type.VOID);
     }
     
     public boolean isAbstract() {
@@ -60,18 +56,18 @@ public class ClassType extends StructType {
     
     public void addInitStatements(List<Statement> inits) {
         if (inits != null) {
-            this.initStatements.addAll(inits);
+            initFrame.getTargetCode().addAll(inits);
         }
     }
     
     public void addInitStatement(Statement init) {
         if (init != null) {
-            this.initStatements.add(init);
+            initFrame.getTargetCode().add(init);
         }
     }
     
-    public List<Statement> getInitStatements() {
-        return initStatements;
+    public Frame getInitFrame() {
+        return initFrame;
     }
     
     public FuncHead defineFunc(Node head, String name, boolean rawName, Type rtnType, Param... params) {
@@ -118,17 +114,11 @@ public class ClassType extends StructType {
     }
     
     public void reverseOptimize() {
-        ListIterator<Statement> it = initStatements.listIterator(initStatements.size());
-        while (it.hasPrevious()) {
-            it.previous().reverseOptimize();
-        }
+        initFrame.reverseOptimize();
     }
     
     public void forwardOptimize() {
-        ListIterator<Statement> it = initStatements.listIterator(0);
-        while (it.hasNext()) {
-            it.next().forwardOptimize();
-        }
+        initFrame.forwardOptimize();
     }
     
     public String toTarget() {

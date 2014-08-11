@@ -47,7 +47,6 @@ import com.hahn.basic.intermediate.objects.LiteralBool;
 import com.hahn.basic.intermediate.objects.LiteralNum;
 import com.hahn.basic.intermediate.objects.OPObject;
 import com.hahn.basic.intermediate.objects.Param;
-import com.hahn.basic.intermediate.objects.Var;
 import com.hahn.basic.intermediate.objects.VarAccess;
 import com.hahn.basic.intermediate.objects.VarTemp;
 import com.hahn.basic.intermediate.objects.types.ClassType;
@@ -691,13 +690,6 @@ public class Frame extends Statement {
         Type parentType = (parentNode == null ? Type.OBJECT : Type.fromNode(parentNode));
         if (parentType.doesExtend(Type.OBJECT)) {
             ClassType classType = ((ClassType) parentType).extendAs(nameNode.getValue());
-            
-            // Call super init
-            Var varThis = LangCompiler.factory.VarThis(this, classType);
-            Node nodeSuper = new Node(nameNode, EnumToken.IDENTIFIER, "super", nameNode.getRow(), nameNode.getCol());
-            
-            FuncCallPointer funcSuper = LangCompiler.factory.FuncCallPointer(nodeSuper, varThis, new BasicObject[0]);
-            classType.addInitStatement(LangCompiler.factory.CallFuncStatement(this, funcSuper));
             
             // Handle class content
             handleClassContent(nameNode, classType, it);

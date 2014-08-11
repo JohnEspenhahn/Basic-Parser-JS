@@ -90,15 +90,15 @@ public class JSBuildTarget extends LangBuildTarget {
              * var implements = this.implements || function(child, parent) {
              *     for(var prop_key in parent)
              *         if (parent.hasOwnProperty(prop_key)) child[prop_key] = parent[prop_key]; 
-             *     function __() { 
-             *          this.constructor = child; 
-             *          this.super = parent; 
+             *     function __() {
+             *          this.constructor = child;
+             *          this.super = parent;
              *     }
              *     __.prototype = parent.prototype;
-             *     return new __(); // the child prototype 
+             *     child.prototype = new __(); // the child prototype 
              * }
              */
-            builder.append("function implements(d,b,p){for(p in b)if(b.hasOwnProperty(p))d[p]=b[p];function _(){this.constructor=d;this.super=b}_.prototype=b.prototype;return new _}");
+            builder.append("function implements(d,b,p){for(p in b)if(b.hasOwnProperty(p))d[p]=b[p];function _(){this.constructor=d}_.prototype=b.prototype;d.prototype=new _}");
             if (Main.PRETTY_PRINT) builder.append("\n");
         }
         

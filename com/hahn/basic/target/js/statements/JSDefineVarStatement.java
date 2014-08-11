@@ -42,7 +42,7 @@ public class JSDefineVarStatement extends DefineVarStatement {
                 if (!first) str.append(Main.PRETTY_PRINT ? "\n  , " : ",");
                 else first = false;
                 
-                str.append(JSPretty.format("%s=%s", pair.var.toTarget(), pair.val.toTarget()));
+                str.append(JSPretty.format("%s_=_%s", pair.var.toTarget(), pair.val.toTarget()));
             }
         }
         

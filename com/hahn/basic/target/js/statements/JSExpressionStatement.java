@@ -18,7 +18,7 @@ public class JSExpressionStatement extends ExpressionStatement {
     
     @Override
     public String toTarget() {
-        return JSPretty.format(0, getObj().toTarget());
+        return JSPretty.format(0, "%s", getObj().toTarget());
     }
     
 }
