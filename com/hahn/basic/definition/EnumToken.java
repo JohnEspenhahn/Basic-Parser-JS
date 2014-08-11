@@ -69,6 +69,8 @@ public enum EnumToken implements IEnumRegexToken {
     CONSTRUCTOR ("constructor", Group.IDENT),
     IMPLEMENTS  ("implements" , Group.IDENT),
     EXTENDS     ("extends"    , Group.IDENT),
+    THIS        ("this"       , Group.IDENT),
+    SUPER       ("super"      , Group.IDENT),
     __s__       ("__s__"      , Group.IDENT),
     IDENTIFIER  ("<<WORD>>"   , Group.IDENT);
 

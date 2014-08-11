@@ -16,7 +16,7 @@ import com.hahn.basic.parser.Node;
 import com.hahn.basic.util.exceptions.CompileException;
 
 public class ClassType extends StructType {
-    private final Var varThis;
+    private final Var varThis, varSuper;
     
     private FuncBridge funcBridge;
     private Frame initFrame;
@@ -31,14 +31,32 @@ public class ClassType extends StructType {
         this.initFrame = new Frame(LangCompiler.getGlobalFrame(), null);
         
         this.varThis = LangCompiler.factory.VarThis(LangCompiler.getGlobalFrame(), this);
+        
+        if (parent instanceof ClassType) {
+            this.varSuper = LangCompiler.factory.VarSuper(LangCompiler.getGlobalFrame(), (ClassType) parent);
+        } else {
+            this.varSuper = null;
+        }
     }
     
     public boolean isAbstract() {
         return isAbstract;
     }
     
+    /**
+     * Get the this var
+     * @return The this var
+     */
     public Var getThis() {
         return varThis;
+    }
+    
+    /**
+     * Get the super var. If parent is not a ClassType will be null
+     * @return The super var or null
+     */
+    public Var getSuper() {
+        return varSuper;
     }
     
     @Override

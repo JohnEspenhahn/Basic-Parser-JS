@@ -47,7 +47,7 @@ public abstract class FuncHead extends Frame {
             addVar(classIn.getThis());
             
             if (classIn.getParent() instanceof ClassType) {
-                addVar(LangCompiler.factory.VarSuper(this, (ClassType) classIn.getParent()));
+                addVar(classIn.getSuper());
             }
         }
     }

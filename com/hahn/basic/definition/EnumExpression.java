@@ -47,7 +47,8 @@ public enum EnumExpression implements IEnumExpression {
     CLASS       ("CLASS IDENTIFIER {<C_PARENT>} OPEN_BRACE {<CLASS_CNTNT>} CLOSE_BRACE", false),
     C_PARENT    ("EXTENDS IDENTIFIER"),
     
-    ACCESS      ("IDENTIFIER ?<IN_ACCESS>", false),
+    IDENTIFIER  ("IDENTIFIER|THIS|SUPER"),
+    ACCESS      ("<IDENTIFIER> ?<IN_ACCESS>", false),
     IN_ACCESS   ("OPEN_SQR <EXPRESSION> CLOSE_SQR$|DOT IDENTIFIER$", false),
     
     FLAGS       ("CONST$"),

@@ -71,7 +71,7 @@ public class Node {
         System.out.print("|- ");
 
         if (this.isTerminal()) {
-            System.out.println(this);
+            System.out.println(token + " (" + this + ")");
         } else {
             System.out.println("<" + token + ">");
 
