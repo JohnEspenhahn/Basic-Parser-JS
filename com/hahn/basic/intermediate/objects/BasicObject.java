@@ -188,6 +188,13 @@ public abstract class BasicObject implements IIntermediate, ITypeable {
      */
     
     /**
+     * @return True if this object is local to a frame
+     */
+    public boolean isLocal() {
+        return false;
+    }
+    
+    /**
      * Only TernaryObject should return true
      * @return True if TernaryObject
      */

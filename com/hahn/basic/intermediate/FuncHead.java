@@ -6,6 +6,7 @@ import com.hahn.basic.intermediate.objects.Param;
 import com.hahn.basic.intermediate.objects.Var;
 import com.hahn.basic.intermediate.objects.types.ClassType;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
+import com.hahn.basic.intermediate.objects.types.StructType.StructParam;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.parser.Node;
 
@@ -14,8 +15,9 @@ public abstract class FuncHead extends Frame {
     private final Var[] params;
     private final Type rtnType;
     
-    private final String funcId;
+    private final String funcId;    
     private final ClassType classIn;
+    
     
     public FuncHead(Frame parent, ClassType classIn, String name, boolean rawName, Node funcHeadNode, Type rtn, Param... params) {
         super(parent, funcHeadNode); // TODO nest anon func
@@ -42,7 +44,7 @@ public abstract class FuncHead extends Frame {
         
         // Add `this` and `super` variables if applicable
         if (classIn != null) {
-            addVar(LangCompiler.factory.VarThis(this, classIn));
+            addVar(classIn.getThis());
             
             if (classIn.getParent() instanceof ClassType) {
                 addVar(LangCompiler.factory.VarSuper(this, (ClassType) classIn.getParent()));
@@ -76,6 +78,18 @@ public abstract class FuncHead extends Frame {
     
     public ClassType getClassIn() {
         return classIn;
+    }
+    
+    @Override
+    public BasicObject getInstanceVar(String name) {
+        if (getClassIn() != null) {
+            StructParam param = classIn.getParamSafe(name);
+            if (param != null) { 
+                return LangCompiler.factory.VarAccess(this, getClassIn().getThis(), param, param.getType(), row, 0);
+            }
+        }
+        
+        return null;
     }
     
     public boolean hasSameName(FuncHead func) {

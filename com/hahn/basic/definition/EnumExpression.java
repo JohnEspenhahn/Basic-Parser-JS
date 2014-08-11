@@ -33,7 +33,7 @@ public enum EnumExpression implements IEnumExpression {
     PARAM_TYPES ("LESS ?<TYPE_LIST> (EOL <TYPE>) GTR", false),
     TYPE_LIST   ("<TYPE> {COMMA <TYPE>}", false),
     
-    CALL_FUNC   ("IDENTIFIER OPEN_PRNTH ?<CALL_PARAMS> CLOSE_PRNTH", false),
+    CALL_FUNC   ("<ACCESS> OPEN_PRNTH ?<CALL_PARAMS> CLOSE_PRNTH", false),
     CALL_PARAMS ("<EXPRESSION> {COMMA <EXPRESSION>}", false),
     
     FUNC_POINTER("AND IDENTIFIER OPEN_PRNTH ?<TYPE_LIST> CLOSE_PRNTH", false),

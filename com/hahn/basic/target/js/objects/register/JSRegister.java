@@ -5,6 +5,7 @@ import java.util.Deque;
 
 import com.hahn.basic.intermediate.Frame;
 import com.hahn.basic.intermediate.objects.AdvancedObject;
+import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.register.Register;
 
 public class JSRegister extends Register {
@@ -44,7 +45,7 @@ public class JSRegister extends Register {
     }
     
     public static JSRegister getNextFree(Frame frame) {
-        AdvancedObject testVar = null;
+        BasicObject testVar = null;
         
         JSRegister first = null, reg;
         if (free.size() > 0) reg = first = free.removeLast();

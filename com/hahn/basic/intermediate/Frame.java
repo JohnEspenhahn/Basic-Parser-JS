@@ -65,6 +65,7 @@ import com.hahn.basic.intermediate.statements.ExpressionStatement;
 import com.hahn.basic.intermediate.statements.IfStatement.Conditional;
 import com.hahn.basic.intermediate.statements.Statement;
 import com.hahn.basic.parser.Node;
+import com.hahn.basic.util.NestedListIterator;
 import com.hahn.basic.util.Util;
 import com.hahn.basic.util.exceptions.CastException;
 import com.hahn.basic.util.exceptions.CompileException;
@@ -274,12 +275,17 @@ public class Frame extends Statement {
         return (VarTemp) addVar(new VarTemp(this, type));
     }
     
-    public AdvancedObject safeGetVar(String name) {
+    public BasicObject safeGetVar(String name) {
         // Local var
-        AdvancedObject obj = vars.get(name);
+        BasicObject obj = vars.get(name);
         if (obj != null) {
             return obj;
-        } 
+        }
+        
+        obj = getInstanceVar(name);
+        if (obj != null) {
+            return obj;
+        }
         
         // Var from parent (still local)
         if (parent != null) {
@@ -298,9 +304,13 @@ public class Frame extends Statement {
         return null;
     }
     
-    public AdvancedObject getVar(Node nameNode) {
+    public BasicObject getInstanceVar(String name) {
+        return null;
+    }
+    
+    public BasicObject getVar(Node nameNode) {
         String name = nameNode.getValue();
-        AdvancedObject obj = safeGetVar(name);
+        BasicObject obj = safeGetVar(name);
         
         // Not found
         if (obj != null) return obj;
@@ -367,18 +377,33 @@ public class Frame extends Statement {
     /**
      * Access a variable
      * @param head EnumExpression.ACCESS
-     * @return The object the with retrieved value
+     * @return The object with the retrieved value
+     * @throws CompileException If illegal indexing of a variable
      */
     private BasicObject accessVar(Node head) {
-        List<Node> children = head.getAsChildren();
-
-        AdvancedObject obj = getVar(children.get(0));
-        if (children.size() > 1) {
+        return accessVar(new NestedListIterator<Node>(head.getAsChildren()), false);
+    }
+    
+    /**
+     * Access a variable
+     * @param it Iterator of children of EnumExpression.ACCESS
+     * @param leaveLast If true will return before processing the last access expression
+     * @return The object with the retrieved value
+     * @throws CompileException If illegal indexing of a variable
+     */
+    private BasicObject accessVar(NestedListIterator<Node> it, boolean leaveLast) {
+        Node nameNode = it.next();
+        if (leaveLast && !it.hasNext()) {
+            it.previous();
+            return null;
+        }
+        
+        BasicObject obj = getVar(nameNode);
+        if (it.hasNext()) {
             if (obj.getType().doesExtend(Type.STRUCT)) {
-                Node nextAccess = children.get(1);
-                return inAccessVar(obj, nextAccess);
+                return inAccessVar(obj, it.enter(it.next().getAsChildren()), leaveLast);
             } else {
-                throw new CompileException("Illegal attempt to index var of type '" + obj.getType() + "'", head);
+                throw new CompileException("Illegal attempt to index var of type '" + obj.getType() + "'", nameNode);
             }
         } else {
             return obj;
@@ -391,9 +416,8 @@ public class Frame extends Statement {
      * @param head EnumExpression.IN_ACCESS
      * @return The object the with retrieved value
      */
-    private BasicObject inAccessVar(AdvancedObject obj, Node head) {        
+    private BasicObject inAccessVar(BasicObject obj, NestedListIterator<Node> it, boolean leaveLast) {        
         ExpressionStatement exp = LangCompiler.factory.ExpressionStatement(this, obj);
-        Iterator<Node> it = Util.getIterator(head);
         while (it.hasNext()) {
             Type type = exp.getObj().getType();
             
@@ -401,14 +425,24 @@ public class Frame extends Statement {
             Enum<?> accessMarker = child.getToken();
             if (accessMarker == OPEN_SQR && type.doesExtend(Type.ARRAY)) {
                 BasicObject offset = handleExpression(it.next()).getAsExpObj();
+                it.next(); // Skip CLOSE_SQR
+                
+                if (leaveLast && !it.hasNext()) {
+                    for (int i = 0; i < 3; i++) it.previous();
+                    break;
+                }
                 
                 @SuppressWarnings("unchecked")
                 ParameterizedType<ITypeable> arrType = (ParameterizedType<ITypeable>) type;
-                exp.setObj(LangCompiler.factory.VarAccess(exp, exp.getObj(), offset, arrType.getTypable(0).getType(), child.getRow(), child.getCol()), child);                
-                
-                it.next(); // Skip CLOSE_SQR
+                exp.setObj(LangCompiler.factory.VarAccess(exp, exp.getObj(), offset, arrType.getTypable(0).getType(), child.getRow(), child.getCol()), child);
             } else if (accessMarker == DOT && type.doesExtend(Type.STRUCT)) {               
                 Node nameNode = it.next();
+                
+                if (leaveLast && !it.hasNext()) {
+                    it.previous();
+                    break;
+                }
+                
                 StructParam sp = exp.getObj().getType().getAsStruct().getParam(nameNode);
                 
                 exp.setObj(LangCompiler.factory.VarAccess(exp, exp.getObj(), sp, sp.getType(), child.getRow(), child.getCol()), child);
@@ -735,7 +769,7 @@ public class Frame extends Statement {
                 nameNode = child;
             } else if (token == EnumExpression.TYPE) {
                 rtnType = Type.fromNode(child);
-            } else if (token == EnumToken.FUNCTION || token == EnumToken.IDENTIFIER) {
+            } else if (token == EnumToken.IDENTIFIER) {
                 nameNode = child;
             } else if (token == EnumExpression.DEF_PARAMS) {      
                 Iterator<Node> pIt = Util.getIterator(child);
@@ -779,15 +813,16 @@ public class Frame extends Statement {
     /**
      * Call a function
      * @param head EnumExpression.CALL_FUNC
-     * @param objectIn The object the function is in or null
      * @return The statement that should be added to the frame
      * and can extract the FuncCallPointer from
      */    
-    public CallFuncStatement callFunc(Node head, BasicObject objectIn) {
+    public CallFuncStatement callFunc(Node head) {
         Iterator<Node> it = Util.getIterator(head);
         
         // Determine function
-        Node nameNode = it.next();
+        NestedListIterator<Node> accessIt = new NestedListIterator<Node>(it.next().getAsChildren());
+        BasicObject objectIn = accessVar(accessIt, true);
+        Node nameNode = accessIt.next();
         
         List<BasicObject> params = new ArrayList<BasicObject>();
         while (it.hasNext()) {
@@ -1132,7 +1167,7 @@ public class Frame extends Statement {
             } else if (token == EnumExpression.ANON_FUNC) {
                 return defineAnonFunc(child);
             } else if (token == EnumExpression.CALL_FUNC) {
-                CallFuncStatement fc = callFunc(child, null);
+                CallFuncStatement fc = callFunc(child);
                 return fc.getFuncCallPointer();
             } else {
                 return handleExpression(child).getAsExpObj();

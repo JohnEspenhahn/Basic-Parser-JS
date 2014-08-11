@@ -4,19 +4,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
-import com.hahn.basic.intermediate.objects.AdvancedObject;
+import com.hahn.basic.intermediate.objects.BasicObject;
 
 public class EndLoopStatement extends Statement {
     /**
      * List of all vars using in this block, but not created within it.
      * Used so last use not tracked as within that block
      */
-    private List<AdvancedObject> objs;
+    private List<BasicObject> objs;
     
     public EndLoopStatement(Statement s) {
         super(s);
         
-        objs = new ArrayList<AdvancedObject>();
+        objs = new ArrayList<BasicObject>();
     }
     
     /**
@@ -24,7 +24,7 @@ public class EndLoopStatement extends Statement {
      * used in a loop but not created within it
      * @param o The object to add
      */
-    public void addVar(AdvancedObject o) {
+    public void addVar(BasicObject o) {
         if (!objs.contains(o)) {
             objs.add(o);
         }
@@ -37,9 +37,9 @@ public class EndLoopStatement extends Statement {
     
     @Override
     public boolean reverseOptimize() {
-        ListIterator<AdvancedObject> it = objs.listIterator(objs.size());
+        ListIterator<BasicObject> it = objs.listIterator(objs.size());
         while (it.hasPrevious()) {
-            AdvancedObject obj = it.previous();
+            BasicObject obj = it.previous();
             obj.setInUse(this);
         }
         
@@ -48,7 +48,7 @@ public class EndLoopStatement extends Statement {
     
     @Override
     public boolean forwardOptimize() {
-        for (AdvancedObject obj: objs) {
+        for (BasicObject obj: objs) {
             obj.takeRegister(this);
         }
         

@@ -212,15 +212,4 @@ public abstract class AdvancedObject extends BasicObject {
     public boolean updateLiteral(OPCode op, Literal lit) {
         return literal.updateLiteral(op, lit);
     }
-    
-    /*
-     * ------------------------------- To Target Tools -------------------------------
-     */
-    
-    /**
-     * @return True if this object is local to a frame
-     */
-    public boolean isLocal() {
-        return false;
-    }
 }
