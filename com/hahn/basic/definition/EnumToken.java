@@ -53,6 +53,8 @@ public enum EnumToken implements IEnumRegexToken {
     OPEN_SQR    ("\\["     , Group.SEP),
     CLOSE_SQR   ("\\]"     , Group.SEP),
     CONST       ("const"      , Group.IDENT),
+    FINAL       ("final"      , Group.IDENT),
+    ABSTRACT    ("abstract"   , Group.IDENT),
     IF          ("if"         , Group.IDENT),
     ELSE        ("else"       , Group.IDENT),
     FOR         ("for"        , Group.IDENT),

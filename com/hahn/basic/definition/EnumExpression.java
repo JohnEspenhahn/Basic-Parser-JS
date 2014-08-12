@@ -44,7 +44,9 @@ public enum EnumExpression implements IEnumExpression {
     DEF_PARAMS  ("<TYPE> IDENTIFIER {COMMA <TYPE> IDENTIFIER}", false),
     
     STRUCT      ("STRUCT IDENTIFIER OPEN_BRACE [<DEFINE> EOL] CLOSE_BRACE", false),
-    CLASS       ("CLASS IDENTIFIER {<C_PARENT>} OPEN_BRACE {<CLASS_CNTNT>} CLOSE_BRACE", false),
+    
+    CLASS       ("{<C_FLAG>} CLASS IDENTIFIER {<C_PARENT>} OPEN_BRACE {<CLASS_CNTNT>} CLOSE_BRACE", false),
+    C_FLAG      ("ABSTRACT|FINAL", false),
     C_PARENT    ("EXTENDS IDENTIFIER"),
     
     IDENTIFIER  ("IDENTIFIER|THIS|SUPER"),

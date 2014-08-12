@@ -21,12 +21,9 @@ public class ClassType extends StructType {
     private FuncBridge funcBridge;
     private Frame initFrame;
     
-    private boolean isAbstract;
-    
-    public ClassType(String name, StructType parent, boolean isAbstract) {
-        super(name, parent);
+    public ClassType(String name, StructType parent, int flags) {
+        super(name, parent, flags);
         
-        this.isAbstract = isAbstract;
         this.funcBridge = new FuncBridge(this);
         this.initFrame = new Frame(LangCompiler.getGlobalFrame(), null);
         
@@ -39,8 +36,13 @@ public class ClassType extends StructType {
         }
     }
     
-    public boolean isAbstract() {
-        return isAbstract;
+    /**
+     * Flag this class as a system class, will not add code
+     * @return This
+     */
+    public ClassType setSystemClass() {
+        setFlag(Flag.SYSTEM);
+        return this;
     }
     
     /**
@@ -60,16 +62,28 @@ public class ClassType extends StructType {
     }
     
     @Override
-    public ClassType extendAs(String name) {
-        return this.extendAs(name, null);
+    public ClassType extendAs(String name, int flags) {
+        return this.extendAs(name, null, flags);
     }
     
     @Override
-    public ClassType extendAs(String name, List<BasicObject> ps) {
-        ClassType newClass = new ClassType(name, this, false);
+    public ClassType extendAs(String name, List<BasicObject> ps, int flags) {
+        ClassType newClass = new ClassType(name, this, flags);
         newClass.loadParams(ps);
         
         return newClass;
+    }
+    
+    @Override
+    public ClassType setTypeParams(int num) {
+        super.setTypeParams(num);
+        return this;
+    }
+    
+    @Override
+    public ClassType addParam(String name, Type type) {
+        super.addParam(name, type);
+        return this;
     }
     
     public void addInitStatements(List<Statement> inits) {
@@ -140,15 +154,31 @@ public class ClassType extends StructType {
     }
     
     public String toTarget() {
-        if (ClassType.isSystemClass(this)) return "";
+        if (hasFlag(Flag.SYSTEM)) return "";
         else return LangCompiler.factory.createClass(this);
     }
     
-    public static boolean isSystemClass(ClassType t) {
-        if (t == Type.OBJECT || t == Type.FUNC || t == Type.ARRAY || t == Type.STRING) {
-            return true;
-        } else {
-            return false;
+    public static class Flag {
+        public static final int SYSTEM   = 0b00000000000000000000000000000001;
+        public static final int ABSTRACT = 0b00000000000000000000000000000010;
+        public static final int FINAL    = 0b00000000000000000000000000000100;
+        
+        /**
+         * Get the flag from the given EnumExpression.C_FLAG node
+         * @param node EnumExpression.C_FLAG
+         * @return The flag
+         * @throws CompileException if not a valid flag
+         */
+        public static int valueOf(Node node) {
+            String name = node.getAsChildren().get(0).getValue();
+            
+            switch (name) {
+            case "abstract": return Flag.ABSTRACT;
+            case "final":    return Flag.FINAL;
+            
+            default:
+                throw new CompileException("Invalid class flag `" + name + "`");
+            }
         }
     }
 }

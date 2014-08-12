@@ -15,14 +15,17 @@ public class StructType extends Type {
     private final Map<String, StructParam> params;
 
     private int typeParams;
+    private int flags;
     
     /**
      * Create a new struct
      * @param name The name of the struct
      * @param parent The parent struct or null
      */
-    protected StructType(String name, StructType parent) {
+    protected StructType(String name, StructType parent, int flags) {
         super(name, true);
+        
+        this.flags = flags;
         
         this.parent = parent;
         this.params = new HashMap<String, StructParam>();
@@ -30,6 +33,14 @@ public class StructType extends Type {
     
     public StructType getParent() {
         return parent;
+    }
+    
+    public boolean hasFlag(int flag) {
+        return (this.flags & flag) != 0;
+    }
+    
+    public void setFlag(int flag) {
+        this.flags |= flag;
     }
     
     @Override
@@ -40,20 +51,22 @@ public class StructType extends Type {
     /**
      * Extend this with no additional parameters
      * @param name The name of the new struct
+     * @param flags Flags for this structs
      * @return A new struct object
      */
-    public StructType extendAs(String name) {
-        return this.extendAs(name, null);
+    public StructType extendAs(String name, int flags) {
+        return this.extendAs(name, null, flags);
     }
     
     /**
      * Extend this
      * @param name The name of the new struct
      * @param ps The parameters added by this new struct
+     * @param flags Flags for this struct
      * @return A new struct object
      */
-    public StructType extendAs(String name, List<BasicObject> ps) {
-        StructType struct = new StructType(name, this);
+    public StructType extendAs(String name, List<BasicObject> ps, int flags) {
+        StructType struct = new StructType(name, this, flags);
         struct.loadParams(ps);
         
         return struct;
@@ -83,6 +96,17 @@ public class StructType extends Type {
      */
     public int getTypeParams() {
         return this.typeParams;
+    }
+    
+    /**
+     * Add a basic object as a struct param
+     * @param name The name of the parameter
+     * @param type The type of the parameter
+     * @return This
+     * @throws CompileException If the variable is already defined
+     */
+    public StructType addParam(String name, Type type) {
+        return addParam(new Param(name, type));
     }
     
     /**

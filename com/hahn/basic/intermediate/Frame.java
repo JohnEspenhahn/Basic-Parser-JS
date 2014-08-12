@@ -678,7 +678,7 @@ public class Frame extends Statement {
         
         Node nameNode = it.next();
         Main.setLine(nameNode.getRow(), nameNode.getCol());
-        StructType struct = Type.STRUCT.extendAs(nameNode.getValue());
+        StructType struct = Type.STRUCT.extendAs(nameNode.getValue(), 0);
         
         while (it.hasNext()) {
             Node next = it.next();
@@ -699,12 +699,22 @@ public class Frame extends Statement {
         
         Node nameNode = it.next();
         Node parentNode = null;
+        int flags = 0;
+        
+        // Don't add class code if library
+        if (Main.LIBRARY) {
+            flags |= ClassType.Flag.SYSTEM;
+        }
         
         // Get parent classes
         Node node;
         while(true) {
             node = it.next();
-            if (node.getToken() == EnumExpression.C_PARENT) {
+            Enum<?> token = node.getToken();
+            
+            if (token == EnumExpression.C_FLAG) {
+                flags |= ClassType.Flag.valueOf(node);
+            } else if (token == EnumExpression.C_PARENT) {
                 List<Node> children = node.getAsChildren();
                 Node ckey = children.get(0);
                 Node cvalue = children.get(1);
@@ -722,12 +732,16 @@ public class Frame extends Statement {
         
         Type parentType = (parentNode == null ? Type.OBJECT : Type.fromNode(parentNode));
         if (parentType.doesExtend(Type.OBJECT)) {
-            ClassType classType = ((ClassType) parentType).extendAs(nameNode.getValue());
+            if (((ClassType) parentType).hasFlag(ClassType.Flag.FINAL)) {
+                throw new CompileException("The class `" + nameNode + "` cannot extend the final class `" + parentType + "`", parentNode);
+            }
+            
+            ClassType classType = ((ClassType) parentType).extendAs(nameNode.getValue(), flags);
             
             // Handle class content
             handleClassContent(nameNode, classType, it);
         } else {
-            throw new CompileException("The class `" + nameNode + "` can not extend `" + parentType + "`", nameNode);
+            throw new CompileException("Cannot extend the non-class type `" + parentType + "`", parentNode);
         }
     }
     
@@ -811,7 +825,8 @@ public class Frame extends Statement {
                     }
                 }
             } else if (token == EnumExpression.BLOCK) {
-                body = child;
+                if (!Main.LIBRARY) body = child;
+                else body = null;
             }
         }
         
@@ -927,8 +942,10 @@ public class Frame extends Statement {
     	
     	Node typeNode = children.get(1);
         Type type = Type.fromNode(typeNode);
-        if (!type.doesExtend(Type.STRUCT) || (type instanceof ClassType && ((ClassType) type).isAbstract())) {
+        if (!type.doesExtend(Type.STRUCT)) {
             throw new CompileException("Cannot create a new instance of type `" + type + "`", typeNode);
+        } else if (type instanceof ClassType && ((ClassType) type).hasFlag(ClassType.Flag.ABSTRACT)) {
+            throw new CompileException("Cannot create a new instance of abstract class `" + type + "`", typeNode);
         }
         
         List<BasicObject> params = new ArrayList<BasicObject>();

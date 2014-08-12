@@ -6,7 +6,6 @@ import java.util.List;
 
 import com.hahn.basic.definition.EnumExpression;
 import com.hahn.basic.definition.EnumToken;
-import com.hahn.basic.intermediate.objects.Param;
 import com.hahn.basic.parser.Node;
 import com.hahn.basic.util.Util;
 import com.hahn.basic.util.exceptions.CastException;
@@ -26,11 +25,11 @@ public class Type implements ITypeable {
                              /** UNDEFINED -> anything */
                              UNDEFINED = new Type("undefined", false, true);
     
-    public static final StructType STRUCT = new StructType("struct", null),
-                                   OBJECT = new ClassType("Object", STRUCT, true),
-                                   FUNC   = OBJECT.extendAs("func").setTypeParams(-1),
-                                   ARRAY  = OBJECT.extendAs("array").addParam(new Param("length", Type.INT)).setTypeParams(1),
-                                   STRING = ARRAY.extendAs("string").setTypeParams(0);
+    public static final StructType STRUCT = new StructType("struct", null, 0);
+    public static final ClassType  OBJECT = new ClassType("Object", STRUCT, ClassType.Flag.ABSTRACT | ClassType.Flag.SYSTEM),
+                                   FUNC   = OBJECT.extendAs("func", ClassType.Flag.FINAL | ClassType.Flag.SYSTEM).setTypeParams(-1),
+                                   ARRAY  = OBJECT.extendAs("array", ClassType.Flag.FINAL | ClassType.Flag.SYSTEM).addParam("length", Type.INT).setTypeParams(1),
+                                   STRING = OBJECT.extendAs("string", ClassType.Flag.FINAL | ClassType.Flag.SYSTEM).addParam("length", Type.INT).setTypeParams(0);
     
     public static final int COUNT_PRIMATIVES = TYPES.size();
     
