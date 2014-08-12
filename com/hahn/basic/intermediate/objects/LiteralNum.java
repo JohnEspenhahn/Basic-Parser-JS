@@ -96,7 +96,7 @@ public class LiteralNum extends Literal {
     
     @Override
     public String toString() {
-        if (getType().doesExtend(Type.INT) || getType() == Type.BOOL) {
+        if (value % 1.0 == 0) {
         	return String.valueOf((int) value);
         } else {
         	return String.valueOf(value);

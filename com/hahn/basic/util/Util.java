@@ -107,6 +107,10 @@ public class Util {
         }
     }
     
+    public static LiteralNum parseFloat(Node n) {
+        return new LiteralNum(Double.valueOf(n.getValue()));
+    }
+    
     public static boolean isPowerOfTwo(int x) {        
         return (x != 0) && ((x & (x - 1)) == 0);
     }

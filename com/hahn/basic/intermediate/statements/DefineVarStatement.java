@@ -108,7 +108,7 @@ public abstract class DefineVarStatement extends Statement {
             
             // Type check
             if (!ignoreTypeCheck) {
-                pair.var.getType().autocast(pair.val.getType(), pair.node.getRow(), pair.node.getCol(), true);
+                pair.val.getType().autocast(pair.var.getType(), pair.node.getRow(), pair.node.getCol(), true);
             }
             
             pair.var.removeInUse();            

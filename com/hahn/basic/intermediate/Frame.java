@@ -10,6 +10,7 @@ import static com.hahn.basic.definition.EnumToken.DIV;
 import static com.hahn.basic.definition.EnumToken.DOT;
 import static com.hahn.basic.definition.EnumToken.EQUALS;
 import static com.hahn.basic.definition.EnumToken.FALSE;
+import static com.hahn.basic.definition.EnumToken.FLOAT;
 import static com.hahn.basic.definition.EnumToken.GTR;
 import static com.hahn.basic.definition.EnumToken.GTR_EQU;
 import static com.hahn.basic.definition.EnumToken.HEX_INTEGER;
@@ -1044,17 +1045,19 @@ public class Frame extends Statement {
      */
     private BasicObject doCast(Node head, BasicObject temp) {
         Iterator<Node> it = Util.getIterator(head);
-            
-        Node typeNode = it.next();
-        if (Type.isValidNode(typeNode)) {
-            Type type = Type.fromNode(typeNode);
-            
-            it.next(); // Skip colon
-            
-            ExpressionStatement nextExp = LangCompiler.factory.ExpressionStatement(this, null);
-            handleNextExpressionChild(it, nextExp, temp);
-            
-            return nextExp.getAsExpObj().castTo(type, typeNode.getRow(), typeNode.getCol());
+        
+        while (it.hasNext()) {
+            Node typeNode = it.next();
+            if (Type.isValidNode(typeNode)) {
+                Type type = Type.fromNode(typeNode);
+                
+                it.next(); // Skip colon
+                
+                ExpressionStatement nextExp = LangCompiler.factory.ExpressionStatement(this, null);
+                handleNextExpressionChild(it, nextExp, temp);
+                
+                return nextExp.getAsExpObj().castTo(type, typeNode.getRow(), typeNode.getCol());
+            }
         }
         
         throw new RuntimeException("Invalid cast definition '" + head + "'");
@@ -1145,7 +1148,7 @@ public class Frame extends Statement {
             ExpressionStatement nextExp = LangCompiler.factory.ExpressionStatement(this, null);
             handleNextExpressionChild(it, nextExp, temp);
             
-            exp.setObj(LangCompiler.factory.OPObject(exp, op, exp.getObj(), exp.getNode(), nextExp.getObj(), nextExp.getNode()), child);
+            exp.setObj(LangCompiler.factory.ArithmeticObject(exp, op, exp.getObj(), exp.getNode(), nextExp.getObj(), nextExp.getNode()), child);
         } else if (token == NOTEQUAL || token == EQUALS || token == LESS_EQU || token == GTR_EQU || token == LESS || token == GTR) {
             OPCode op = OPCode.fromSymbol(val);
             
@@ -1168,6 +1171,8 @@ public class Frame extends Statement {
             String val = child.getValue();
             if (token == INTEGER || token == HEX_INTEGER || token == CHAR) {
                 return Util.parseInt(child);
+            } else if (token == FLOAT ){
+                return Util.parseFloat(child);
             } else if (token == TRUE) {
                 return new LiteralBool(true);
             } else if (token == FALSE) {

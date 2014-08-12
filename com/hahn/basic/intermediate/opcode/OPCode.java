@@ -2,6 +2,7 @@ package com.hahn.basic.intermediate.opcode;
 
 import static com.hahn.basic.intermediate.objects.types.Type.INT;
 import static com.hahn.basic.intermediate.objects.types.Type.BOOL;
+import static com.hahn.basic.intermediate.objects.types.Type.NUM;
 import static com.hahn.basic.intermediate.objects.types.Type.UNDEFINED;
 
 import com.hahn.basic.intermediate.objects.types.Type;
@@ -11,16 +12,16 @@ public enum OPCode {
     SAND("&&", BOOL, BOOL, 0b000000, 0, 0),
     SBOR("||", BOOL, BOOL, 0b000000, 0, 0),
     
-    ADD ("+" , INT, INT,  0b101101, 4, 6),
-    ADDE("+=", INT, INT,  0b101101, 4, 6),
-    SUB ("-" , INT, INT,  0b101110, 4, 6),
-    SUBE("-=", INT, INT,  0b101110, 4, 6),
-    MUL ("*" , INT, INT,  0b101111, 4, 6),
-    MULE("*=", INT, INT,  0b101111, 4, 6),
-    DIV ("/" , INT, INT,  0b110001, 4, 6),
-    DIVE("/=", INT, INT,  0b110001, 4, 6),
-    MOD ("%" , INT, INT,  0b110010, 4, 6),
-    MODE("%=", INT, INT,  0b110010, 4, 6),
+    ADD ("+" , NUM, NUM,  0b101101, 4, 6),
+    ADDE("+=", NUM, NUM,  0b101101, 4, 6),
+    SUB ("-" , NUM, NUM,  0b101110, 4, 6),
+    SUBE("-=", NUM, NUM,  0b101110, 4, 6),
+    MUL ("*" , NUM, NUM,  0b101111, 4, 6),
+    MULE("*=", NUM, NUM,  0b101111, 4, 6),
+    DIV ("/" , NUM, NUM,  0b110001, 4, 6),
+    DIVE("/=", NUM, NUM,  0b110001, 4, 6),
+    MOD ("%" , NUM, NUM,  0b110010, 4, 6),
+    MODE("%=", NUM, NUM,  0b110010, 4, 6),
     SHR (">>", INT, INT,  0b111000, 4, 6),
     SHL ("<<", INT, INT,  0b111010, 4, 6),
     AND ("&" , INT, INT,  0b110101, 4, 6),
@@ -30,14 +31,14 @@ public enum OPCode {
     XOR ("^" , INT, INT,  0b110111, 4, 6),
     XORE("^=", INT, INT,  0b110111, 4, 6),
     SET ("=" , UNDEFINED, UNDEFINED,  0b0010  , 6, 6),
-    IFE ("==", UNDEFINED, UNDEFINED,  0b100010, 4, 6), 
-    IFN ("!=", UNDEFINED, UNDEFINED,  0b100011, 4, 6), 
-    IFP (">=", INT , INT, 0b100100, 4, 6),
-    IFG (">" , INT , INT, 0b100101, 4, 6),
-    IFM ("<=", INT , INT, 0b100111, 4, 6),
-    IFL ("<" , INT , INT, 0b101000, 4, 6),
-    IFA (      INT , INT, 0b100110, 4, 6),
-    IFU (      INT , INT, 0b101001, 4, 6),
+    IFE ("==", UNDEFINED, UNDEFINED,  0b100010, 4, 6),
+    IFN ("!=", UNDEFINED, UNDEFINED,  0b100011, 4, 6),
+    IFP (">=", NUM , NUM, 0b100100, 4, 6),
+    IFG (">" , NUM , NUM, 0b100101, 4, 6),
+    IFM ("<=", NUM , NUM, 0b100111, 4, 6),
+    IFL ("<" , NUM , NUM, 0b101000, 4, 6),
+    IFA (      NUM , NUM, 0b100110, 4, 6),
+    IFU (      NUM , NUM, 0b101001, 4, 6),
     SPA (INT, 0b0001101011, 6, 0),
     JSR (INT, 0b0001000000, 6, 0),
     MOV (INT, 0b0001001101, 6, 0),
@@ -138,7 +139,7 @@ public enum OPCode {
     }
     
     public static boolean isBitwise(OPCode op) {
-        return (op == AND || op == BOR || op == XOR);
+        return (op == AND || op == BOR || op == XOR || op == SHR || op == SHL);
     }
     
     public static boolean isSimpleArithmetic(OPCode op) {

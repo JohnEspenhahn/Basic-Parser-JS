@@ -50,6 +50,8 @@ public interface ILangFactory {
 	public StringConst StringConst(String str);
 	
 	public OPObject OPObject(Statement container, OPCode op, BasicObject p1, Node p1Node, BasicObject p2, Node p2Node);
+	public OPObject ArithmeticObject(Statement container, OPCode op, BasicObject p1, Node p1Node, BasicObject p2, Node p2Node);
+	
 	public ExpressionObject ExpressionObject(ExpressionStatement exp);
 	
 	public Var VarParameter(Frame frame, String name, Type type, List<String> flags);

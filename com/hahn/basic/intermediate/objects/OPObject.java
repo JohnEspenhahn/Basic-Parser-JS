@@ -6,6 +6,7 @@ import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.opcode.OPCode;
 import com.hahn.basic.intermediate.statements.Statement;
 import com.hahn.basic.parser.Node;
+import com.hahn.basic.util.exceptions.CompileException;
 import com.sun.istack.internal.Nullable;
 
 /**
@@ -90,8 +91,16 @@ public abstract class OPObject extends BasicObject {
         return p1;
     }
     
+    public Node getP1Node() {
+        return p1Node;
+    }
+    
     public BasicObject getP2() {
         return p2;
+    }
+    
+    public Node getP2Node() {
+        return p2Node;
     }
     
     public OPCode getOP() {
@@ -112,13 +121,18 @@ public abstract class OPObject extends BasicObject {
     
     @Override
     public boolean setInUse(IIntermediate by) {
+        // Check flags
+        if (OPCode.doesModify(getOP())&& getP1().hasFlag("const")) {
+            throw new CompileException("Can not modify the constant variable `" + getP1() + "`");
+        }
+        
         // Set in use
         p1.setInUse(this);        
         if (p2 != null) p2.setInUse(this);
         
         // Type check
         Type mergedType = opcode.type1.autocast(p1.getType(), p1Node.getRow(), p1Node.getCol(), true);
-        this.setType(mergedType);
+        setType(mergedType);
         
         if (p2 != null) { 
             opcode.type2.autocast(p2.getType(), p2Node.getRow(), p2Node.getCol(), true);

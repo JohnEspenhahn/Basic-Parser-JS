@@ -41,6 +41,7 @@ import com.hahn.basic.parser.Node;
 import com.hahn.basic.target.ILangCommand;
 import com.hahn.basic.target.ILangFactory;
 import com.hahn.basic.target.LangBuildTarget;
+import com.hahn.basic.target.js.objects.JSArithmeticObject;
 import com.hahn.basic.target.js.objects.JSConditionalObject;
 import com.hahn.basic.target.js.objects.JSDefaultStruct;
 import com.hahn.basic.target.js.objects.JSExpressionObject;
@@ -138,6 +139,11 @@ public class JSLangFactory implements ILangFactory {
     @Override
     public OPObject OPObject(Statement container, OPCode op, BasicObject p1, Node p1Node, BasicObject p2, Node p2Node) {
         return new JSOPObject(container, op, p1, p1Node, p2, p2Node);
+    }
+    
+    @Override
+    public OPObject ArithmeticObject(Statement container, OPCode op, BasicObject p1, Node p1Node, BasicObject p2, Node p2Node) {
+        return new JSArithmeticObject(container, op, p1, p1Node, p2, p2Node);
     }
     
     @Override
