@@ -51,6 +51,7 @@ public interface ILangFactory {
 	
 	public OPObject OPObject(Statement container, OPCode op, BasicObject p1, Node p1Node, BasicObject p2, Node p2Node);
 	public OPObject ArithmeticObject(Statement container, OPCode op, BasicObject p1, Node p1Node, BasicObject p2, Node p2Node);
+	public OPObject ArithmeticSetObject(Statement container, OPCode op, BasicObject p1, Node p1Node, BasicObject p2, Node p2Node);
 	
 	public ExpressionObject ExpressionObject(ExpressionStatement exp);
 	

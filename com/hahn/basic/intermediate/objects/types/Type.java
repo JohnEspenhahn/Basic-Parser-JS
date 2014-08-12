@@ -21,8 +21,8 @@ public class Type implements ITypeable {
                              CHAR = new TypeIntLike("char"),
                              INT  = new TypeIntLike("int"),
                              DBL  = new TypeDblLike("dbl"),
-                             /** char|int|dbl -> NUM */
-                             NUM = new Type("number", false, true),
+                             /** char|int|dbl <-> NUM */
+                             NUM = new TypeNumber(),
                              /** UNDEFINED -> anything */
                              UNDEFINED = new Type("undefined", false, true);
     

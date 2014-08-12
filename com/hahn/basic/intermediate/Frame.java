@@ -524,10 +524,10 @@ public class Frame extends Statement {
      * @param obj The object doing the modification
      * @param objNode The node by which the obj is defined
      * @param op The operation to perform on the variable
-     * @return Object to update the var
+     * @return ArithmeticSetObject to update the var
      */
     protected OPObject updateVar(BasicObject var, Node varNode, BasicObject obj, Node objNode, OPCode op) {
-        return LangCompiler.factory.OPObject(this, op, var, varNode, obj, objNode);
+        return LangCompiler.factory.ArithmeticSetObject(this, op, var, varNode, obj, objNode);
     }
     
     /**

@@ -6,7 +6,6 @@ import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.opcode.OPCode;
 import com.hahn.basic.intermediate.statements.Statement;
 import com.hahn.basic.parser.Node;
-import com.hahn.basic.util.exceptions.CompileException;
 import com.sun.istack.internal.Nullable;
 
 /**
@@ -120,12 +119,7 @@ public abstract class OPObject extends BasicObject {
     }
     
     @Override
-    public boolean setInUse(IIntermediate by) {
-        // Check flags
-        if (OPCode.doesModify(getOP())&& getP1().hasFlag("const")) {
-            throw new CompileException("Can not modify the constant variable `" + getP1() + "`");
-        }
-        
+    public boolean setInUse(IIntermediate by) {        
         // Set in use
         p1.setInUse(this);        
         if (p2 != null) p2.setInUse(this);
