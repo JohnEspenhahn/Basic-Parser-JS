@@ -17,7 +17,7 @@ public abstract class ArithmeticSetObject extends ArithmeticObject {
         super.setInUse(by);
         
         // Check flags
-        if (getP1().hasFlag("const")) {
+        if (getP1().hasFlag(Var.Flag.CONST)) {
             throw new CompileException("Can not modify the constant variable `" + getP1() + "`");
         }
         

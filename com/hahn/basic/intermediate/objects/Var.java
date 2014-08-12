@@ -1,6 +1,5 @@
 package com.hahn.basic.intermediate.objects;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.hahn.basic.intermediate.Frame;
@@ -8,13 +7,13 @@ import com.hahn.basic.intermediate.LangCompiler;
 import com.hahn.basic.intermediate.objects.register.IRegister;
 import com.hahn.basic.intermediate.objects.register.StackRegister;
 import com.hahn.basic.intermediate.objects.types.Type;
-import com.sun.istack.internal.Nullable;
+import com.hahn.basic.parser.Node;
+import com.hahn.basic.util.exceptions.CompileException;
 
 public abstract class Var extends AdvancedObject {
-    @Nullable
-    private List<String> flags;
+    private int flags;
     
-    protected Var(Frame frame, String name, Type type, List<String> flags) {
+    protected Var(Frame frame, String name, Type type, int flags) {
         super(frame, name, type);
         
         this.flags = flags;
@@ -25,28 +24,18 @@ public abstract class Var extends AdvancedObject {
         return true;
     }
     
-    public boolean hasFlags() {
-        return flags != null;
-    }
-    
     @Override
-    public List<String> getFlags() {
+    public int getFlags() {
         return flags;
     }
     
-    public void addFlag(String name) {
-        if (!hasFlags()) {
-            flags = new ArrayList<String>(1);
-        }
-        
-        if (!getFlags().contains(name)) {
-            getFlags().add(name);
-        }
+    public void addFlag(int flag) {
+        this.flags |= flag;
     }
     
     @Override
-    public boolean hasFlag(String name) {
-        return hasFlags() && getFlags().contains(name);
+    public boolean hasFlag(int flag) {
+        return (this.flags & flag) != 0;
     }
     
     @Override
@@ -75,5 +64,26 @@ public abstract class Var extends AdvancedObject {
      */
     protected StackRegister getStackRegister() {
         return StackRegister.peek();
+    }
+    
+    public static class Flag {
+        public static final int CONST = 0b00000000000000000000000000000001;
+        
+        /**
+         * Get the flag from the given EnumExpression.FLAG node
+         * @param node EnumExpression.FLAG
+         * @return The flag
+         * @throws CompileException if not a valid flag
+         */
+        public static int valueOf(Node node) {
+            String name = node.getAsChildren().get(0).getValue();
+            
+            switch (name) {
+            case "const": return Flag.CONST;
+            
+            default:
+                throw new CompileException("Invalid variable flag `" + name + "`");
+            }
+        }
     }
 }

@@ -1,7 +1,5 @@
 package com.hahn.basic.intermediate.objects;
 
-import java.util.List;
-
 import com.hahn.basic.intermediate.Frame;
 import com.hahn.basic.intermediate.IIntermediate;
 import com.hahn.basic.intermediate.objects.types.StructType.StructParam;
@@ -59,15 +57,15 @@ public abstract class VarAccess extends BasicObject {
      */
     
     @Override
-    public boolean hasFlag(String name) {
-        if (accessed != null) return accessed.hasFlag(name);
+    public boolean hasFlag(int flag) {
+        if (accessed != null) return accessed.hasFlag(flag);
         else return false;
     }
     
     @Override
-    public List<String> getFlags() {
+    public int getFlags() {
         if (accessed != null) return accessed.getFlags();
-        else return null;
+        else return 0;
     }
     
     /*

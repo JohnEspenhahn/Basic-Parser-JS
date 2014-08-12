@@ -58,7 +58,7 @@ public abstract class ExpressionStatement extends Statement {
     
     @Override
     public boolean reverseOptimize() {
-        Main.setLine(row);
+        Main.setLine(node.getRow(), node.getCol());
         
         getObj().setInUse(this);
         

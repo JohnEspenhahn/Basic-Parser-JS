@@ -5,6 +5,7 @@ import java.util.List;
 import com.hahn.basic.Main;
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.LiteralNum;
+import com.hahn.basic.intermediate.objects.Var;
 import com.hahn.basic.intermediate.statements.DefineVarStatement;
 import com.hahn.basic.intermediate.statements.Statement;
 import com.hahn.basic.parser.Node;
@@ -24,7 +25,7 @@ public class JSDefineVarStatement extends DefineVarStatement {
     
     @Override
     public void addVar(BasicObject var, BasicObject val, Node node) {
-        if (var.hasFlag("const") && val == LiteralNum.UNDEFINED) {
+        if (var.hasFlag(Var.Flag.CONST) && val == LiteralNum.UNDEFINED) {
             throw new CompileException("The constant variable `" + var.getName() + "` must be initialized", node);
         }
         

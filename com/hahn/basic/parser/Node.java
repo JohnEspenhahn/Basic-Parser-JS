@@ -3,7 +3,6 @@ package com.hahn.basic.parser;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.hahn.basic.Main;
 import com.hahn.basic.definition.EnumExpression;
 import com.hahn.basic.lexer.PackedToken;
 
@@ -113,9 +112,7 @@ public class Node {
         return token instanceof IEnumExpression && ((IEnumExpression) token).canFlatten();
     }
     
-    public List<Node> getAsChildren() {
-        Main.setLine(row, col);
-        
+    public List<Node> getAsChildren() {        
         if (isTerminal()) {
             if (children.isEmpty()) {
                 children.add(this);
@@ -135,15 +132,11 @@ public class Node {
         return parent == null;
     }
 
-    public String getValue() {
-        Main.setLine(row, col);
-        
+    public String getValue() {        
         return value;
     }
 
-    public Enum<?> getToken() {
-        Main.setLine(row, col);
-        
+    public Enum<?> getToken() {        
         return token;
     }
 

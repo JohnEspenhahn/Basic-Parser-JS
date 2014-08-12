@@ -57,8 +57,8 @@ public interface ILangFactory {
 	public CastedObject CastedObject(BasicObject obj, Type type, int row, int col);
 	public ExpressionObject ExpressionObject(ExpressionStatement exp);
 	
-	public Var VarParameter(Frame frame, String name, Type type, List<String> flags);
-	public Var VarLocal(Frame frame, String name, Type type, List<String> flags);
+	public Var VarParameter(Frame frame, String name, Type type, int flags);
+	public Var VarLocal(Frame frame, String name, Type type, int flags);
 	
 	public Var VarThis(Frame frame, ClassType type);
 	public Var VarSuper(Frame frame, ClassType type);

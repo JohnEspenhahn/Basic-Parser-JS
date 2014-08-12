@@ -48,6 +48,7 @@ import com.hahn.basic.intermediate.objects.LiteralBool;
 import com.hahn.basic.intermediate.objects.LiteralNum;
 import com.hahn.basic.intermediate.objects.OPObject;
 import com.hahn.basic.intermediate.objects.Param;
+import com.hahn.basic.intermediate.objects.Var;
 import com.hahn.basic.intermediate.objects.VarAccess;
 import com.hahn.basic.intermediate.objects.VarTemp;
 import com.hahn.basic.intermediate.objects.types.ClassType;
@@ -549,16 +550,16 @@ public class Frame extends Statement {
         Iterator<Node> it = Util.getIterator(head);
         
         // Init var
+        int flags = 0;
         Type type = Type.UNDEFINED;
-        ArrayList<String> flags = new ArrayList<String>();
         DefineVarStatement define = LangCompiler.factory.DefineVarStatement(this, false);
         
         while (it.hasNext()) {
             Node node = it.next();
             Enum<?> token = node.getToken();
             
-            if (token == EnumToken.CONST) {
-                flags.add(node.getValue());
+            if (token == EnumExpression.FLAG) {
+                flags |= Var.Flag.valueOf(node);
             } else if (token == EnumExpression.TYPE) {
                 type = Type.fromNode(node);
             } else if (token == EnumToken.IDENTIFIER) {
@@ -1163,7 +1164,7 @@ public class Frame extends Statement {
             
         } else if (token == QUESTION) {
             Node node_then = it.next();        
-            it.next(); // skip colon        
+            it.next(); // skip colon
             Node node_else = it.next();
             
             exp.setObj(LangCompiler.factory.TernaryObject(exp, exp.getObj(), node_then, node_else, child.getRow(), child.getCol()), child);

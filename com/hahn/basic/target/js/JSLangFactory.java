@@ -8,12 +8,12 @@ import com.hahn.basic.intermediate.FuncGroup;
 import com.hahn.basic.intermediate.FuncHead;
 import com.hahn.basic.intermediate.objects.AdvancedObject;
 import com.hahn.basic.intermediate.objects.BasicObject;
+import com.hahn.basic.intermediate.objects.CastedObject;
 import com.hahn.basic.intermediate.objects.ConditionalObject;
 import com.hahn.basic.intermediate.objects.ExpressionObject;
 import com.hahn.basic.intermediate.objects.FuncCallPointer;
 import com.hahn.basic.intermediate.objects.FuncPointer;
 import com.hahn.basic.intermediate.objects.OPObject;
-import com.hahn.basic.intermediate.objects.CastedObject;
 import com.hahn.basic.intermediate.objects.Param;
 import com.hahn.basic.intermediate.objects.StringConst;
 import com.hahn.basic.intermediate.objects.TernaryObject;
@@ -44,6 +44,7 @@ import com.hahn.basic.target.ILangFactory;
 import com.hahn.basic.target.LangBuildTarget;
 import com.hahn.basic.target.js.objects.JSArithmeticObject;
 import com.hahn.basic.target.js.objects.JSArithmeticSetObject;
+import com.hahn.basic.target.js.objects.JSCastedObject;
 import com.hahn.basic.target.js.objects.JSConditionalObject;
 import com.hahn.basic.target.js.objects.JSDefaultStruct;
 import com.hahn.basic.target.js.objects.JSExpressionObject;
@@ -51,7 +52,6 @@ import com.hahn.basic.target.js.objects.JSFuncCallPointer;
 import com.hahn.basic.target.js.objects.JSFuncPointer;
 import com.hahn.basic.target.js.objects.JSNewInstance;
 import com.hahn.basic.target.js.objects.JSOPObject;
-import com.hahn.basic.target.js.objects.JSCastedObject;
 import com.hahn.basic.target.js.objects.JSStringConst;
 import com.hahn.basic.target.js.objects.JSTernaryObject;
 import com.hahn.basic.target.js.objects.JSVarAccess;
@@ -165,12 +165,12 @@ public class JSLangFactory implements ILangFactory {
     }
     
     @Override
-    public Var VarParameter(Frame frame, String name, Type type, List<String> flags) {
+    public Var VarParameter(Frame frame, String name, Type type, int flags) {
         return new VarParameter(frame, name, type, flags);
     }
     
     @Override
-    public Var VarLocal(Frame frame, String name, Type type, List<String> flags) {
+    public Var VarLocal(Frame frame, String name, Type type, int flags) {
         return new VarLocal(frame, name, type, flags);
     }
     

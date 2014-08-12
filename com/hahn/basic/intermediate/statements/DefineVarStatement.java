@@ -9,11 +9,9 @@ import org.apache.commons.lang3.StringUtils;
 import com.hahn.basic.Main;
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.parser.Node;
-import com.sun.istack.internal.Nullable;
 
-public abstract class DefineVarStatement extends Statement {   
-    @Nullable
-    private List<String> flags;
+public abstract class DefineVarStatement extends Statement {
+    private int flags;
     
     private List<DefinePair> definepairs;
     private boolean ignoreTypeCheck;
@@ -24,24 +22,21 @@ public abstract class DefineVarStatement extends Statement {
     public DefineVarStatement(Statement container, boolean ignoreTypeCheck) {
         super(container);
         
+        this.flags = 0;
         this.definepairs = new ArrayList<DefinePair>();
         this.ignoreTypeCheck = ignoreTypeCheck;
     }
     
-    public boolean hasFlags() {
-        return flags != null;
-    }
-    
-    public List<String> getFlags() {
+    public int getFlags() {
         return flags;
     }
     
-    public void setFlags(List<String> flags) {
+    public void setFlags(int flags) {
         this.flags = flags;
     }
     
-    public boolean hasFlag(String name) {
-        return hasFlags() && getFlags().contains(name);
+    public boolean hasFlag(int flag) {
+        return (this.flags & flag) != 0;
     }
     
     public void addVar(BasicObject var, BasicObject val, Node node) {

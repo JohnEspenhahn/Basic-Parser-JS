@@ -1,7 +1,5 @@
 package com.hahn.basic.intermediate.objects;
 
-import java.util.List;
-
 import lombok.NonNull;
 
 import com.hahn.basic.intermediate.Frame;
@@ -58,19 +56,19 @@ public abstract class BasicObject implements IIntermediate, ITypeable {
     
     /**
      * Checks if this object has a given flag
-     * @param name The name of the flag to check
+     * @param flag The flag to check
      * @return True if has the flag
      */
-    public boolean hasFlag(String name) {
+    public boolean hasFlag(int flag) {
         return false;
     }
     
     /**
-     * Get the list of flags or null
-     * @return The list of flags or null
+     * Get the flag bitmap
+     * @return The flag bitmap
      */
-    public List<String> getFlags() {
-        return null;
+    public int getFlags() {
+        return 0;
     }
 
     /**

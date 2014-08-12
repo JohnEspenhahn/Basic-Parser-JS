@@ -1,36 +1,28 @@
 package com.hahn.basic.intermediate.objects;
 
-import java.util.List;
-
 import com.hahn.basic.intermediate.objects.types.Type;
-import com.sun.istack.internal.Nullable;
 
 public class Param extends BasicObject {
-    @Nullable
-    private List<String> flags;
+    private int flags;
     
     public Param(String name, Type type) {
-        this(name, type, null);
+        this(name, type, 0);
     }
     
-    public Param(String name, Type type, List<String> flags) {
+    public Param(String name, Type type, int flags) {
         super(name, type);
         
         this.flags = flags;
     }
     
-    public boolean hasFlags() {
-        return flags != null;
-    }
-    
     @Override
-    public List<String> getFlags() {
+    public int getFlags() {
         return flags;
     }
     
     @Override
-    public boolean hasFlag(String name) {
-        return hasFlags() && getFlags().contains(name);
+    public boolean hasFlag(int flag) {
+        return (this.flags & flag) != 0;
     }
     
     @Override
