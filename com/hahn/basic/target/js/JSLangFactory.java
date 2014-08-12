@@ -25,6 +25,7 @@ import com.hahn.basic.intermediate.objects.register.IRegister;
 import com.hahn.basic.intermediate.objects.types.ClassType;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.ParameterizedType;
+import com.hahn.basic.intermediate.objects.types.StructType;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.opcode.OPCode;
 import com.hahn.basic.intermediate.statements.CallFuncStatement;
@@ -41,6 +42,7 @@ import com.hahn.basic.target.ILangCommand;
 import com.hahn.basic.target.ILangFactory;
 import com.hahn.basic.target.LangBuildTarget;
 import com.hahn.basic.target.js.objects.JSConditionalObject;
+import com.hahn.basic.target.js.objects.JSDefaultStruct;
 import com.hahn.basic.target.js.objects.JSExpressionObject;
 import com.hahn.basic.target.js.objects.JSFuncCallPointer;
 import com.hahn.basic.target.js.objects.JSFuncPointer;
@@ -87,15 +89,14 @@ public class JSLangFactory implements ILangFactory {
         boolean isChild = (c.getParent() instanceof ClassType);
         
         StringBuilder builder = new StringBuilder();
-        builder.append(JSPretty.format(0, "var %s_=_(function(%s)_{^", c.getName(), (isChild ? EnumToken.__s__ : "")));
+        builder.append(JSPretty.format(0, "(function %s(%s)_{^", c.getName(), (isChild ? EnumToken.__s__ : "")));
         
-        JSPretty.addTab();        
+        JSPretty.addTab();
+        
         if (isChild) builder.append(JSPretty.format(0, "implements(%s,%s);^", c.getName(), c.getParent().getName()));
         builder.append(JSPretty.format(0, "function %s()_{^", c.getName()));
         builder.append(JSPretty.format(1, "%s.call(this);^", EnumToken.__s__));
-        if (!c.getInitFrame().isEmpty()) {
-            builder.append(JSPretty.format(0, "%s", c.getInitFrame()));
-        }
+        if (!c.getInitFrame().isEmpty()) builder.append(JSPretty.format(0, "%s", c.getInitFrame()));
         builder.append(JSPretty.format(0, "}^"));
         
         // TODO class static values
@@ -106,22 +107,27 @@ public class JSLangFactory implements ILangFactory {
                     func.reverseOptimize();
                     func.forwardOptimize();
                     
-                    builder.append(JSPretty.format(0, "%s.prototype.%s_=_%s", c.getName(), func.getFuncId(), func.toFuncAreaTarget()));
+                    builder.append(JSPretty.format(0, "%s.prototype.%s_=_%s;", c.getName(), func.getFuncId(), func.toFuncAreaTarget()));
                 }
             }
         }
         
         builder.append(JSPretty.format(0, "return %s^", c.getName()));        
+        
         JSPretty.removeTab();
         
-        builder.append(JSPretty.format(0, "})(%s)^", (isChild ? c.getParent().getName() : "")));
-        
+        builder.append(JSPretty.format(0, "})(%s);^", (isChild ? c.getParent().getName() : "")));
         return builder.toString();
     }
     
     @Override
     public BasicObject PushObject() {
         throw new UnimplementedException();
+    }
+    
+    @Override
+    public BasicObject DefaultStruct(StructType struct) {
+        return new JSDefaultStruct(struct);
     }
     
     @Override

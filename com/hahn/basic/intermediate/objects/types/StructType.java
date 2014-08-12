@@ -145,12 +145,28 @@ public class StructType extends Type {
     }
     
     public StructParam getParamSafe(String name) {
+        return getParam(name, true);
+    }
+    
+    /**
+     * Get a variable unique to this frame's instance <br>
+     * <b>Precondition</b> If `getting` is false call Main.setLine
+     * @param name The name of the variable
+     * @param getting If false may throw exception 
+     * @return The variable found or null
+     * @throws CompileException If getting is false and the variable is found
+     */
+    public StructParam getParam(String name, boolean getting) {
         StructParam sVar = params.get(name);
         if (sVar != null) {
-            return sVar;
+            if (getting) return sVar;
+            else throw new CompileException("The instance variable `" + name + "` is already defined");
         } else if (parent != null) {
             sVar =  parent.getParamSafe(name);
-            if (sVar != null) return sVar;
+            if (sVar != null) {
+                if (getting) return sVar;
+                else throw new CompileException("The instance variable `" + name + "` is already defined in a super class");
+            }
         }
         
         return null;

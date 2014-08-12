@@ -140,6 +140,15 @@ public class ClassType extends StructType {
     }
     
     public String toTarget() {
-        return LangCompiler.factory.createClass(this);
+        if (ClassType.isSystemClass(this)) return "";
+        else return LangCompiler.factory.createClass(this);
+    }
+    
+    public static boolean isSystemClass(ClassType t) {
+        if (t == Type.OBJECT || t == Type.FUNC || t == Type.ARRAY || t == Type.STRING) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

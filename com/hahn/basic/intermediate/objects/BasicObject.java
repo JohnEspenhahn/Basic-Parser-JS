@@ -227,6 +227,13 @@ public abstract class BasicObject implements IIntermediate, ITypeable {
     }
     
     /**
+     * @return Only VarSuper should return true
+     */
+    public boolean isVarSuper() {
+        return false;
+    }
+    
+    /**
      * @return True if this objects data is transient and
      * the object can be reused
      */

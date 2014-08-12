@@ -243,6 +243,33 @@ public class Frame extends Statement {
     }
     
     /**
+     * Create a temporary variable of type `type`
+     * @param type The type of the variable to create
+     * @return The new variable
+     */
+    public VarTemp createTempVar(Type type) {
+        return (VarTemp) addVar(new VarTemp(this, type));
+    }
+    
+    /**
+     * Add a variable to this frame <br>
+     * <b>Precondition:</b> Main.setLine
+     * @param var The variable to add
+     * @return The variable added
+     * @throws DuplicateDefinitionException If the variable is already defined in this scope
+     */
+    public AdvancedObject addVar(AdvancedObject var) {        
+        String name = var.getName();
+        if (safeGetLocalVar(name) == null) {
+            trackVar(var);
+            vars.put(name, var);
+            return var;
+        } else {
+            throw new DuplicateDefinitionException("The variable `" + var + "` is already defined in this scope");
+        }
+    }
+    
+    /**
      * All variables used within this frame, including child frames,
      * are called to this function to be tracked
      * @param var The variable to be tracked
@@ -253,52 +280,50 @@ public class Frame extends Statement {
         }
     }
     
-    public boolean safeAddVar(AdvancedObject var) {
-    	trackVar(var);
-        
-        String name = var.getName();
-        if (safeGetVar(name) == null) {
-            vars.put(name, var);
-            return true;
-        } else {
-            return false;
-        }
-    }
-    
-    public AdvancedObject addVar(AdvancedObject var) {
-        if (safeAddVar(var)) return var;
-        else throw new DuplicateDefinitionException("The variable `" + var + "` is already defined");
-    }
-    
-    public VarTemp createTempVar(Type type) {
-        return (VarTemp) addVar(new VarTemp(this, type));
-    }
-    
+    /**
+     * Get a local or instance variable related to this
+     * frame up to and including the global frame
+     * @param name The name of the variable
+     * @return The variable found or null
+     */
     public BasicObject safeGetVar(String name) {
+        // Local var
+        BasicObject obj = safeGetLocalVar(name);
+        if (obj != null) return obj;
+        
+        // Instance var
+        obj = getInstanceVar(name);
+        if (obj != null) return obj;
+        
+        // TODO get static class pointer
+        
+        return null;
+    }
+    
+    /**
+     * Get a variable from this frame or parent frame up to
+     * and including the global frame
+     * @param name The name of the variable
+     * @return The variable found or null
+     */
+    public BasicObject safeGetLocalVar(String name) {
         // Local var
         BasicObject obj = vars.get(name);
         if (obj != null) {
             return obj;
         }
         
-        obj = getInstanceVar(name);
-        if (obj != null) {
-            return obj;
-        }
-        
-        // Var from parent (still local)
+        // Var from parent
         if (parent != null) {
             obj = parent.safeGetVar(name);
             if (obj != null) {
                 if (endLoop != null) {
-                    endLoop.addVar(obj);
+                    endLoop.addVar(obj);                
                 }
                 
                 return obj;
             }
         }
-        
-        // TODO get static class pointer
         
         return null;
     }
@@ -571,17 +596,22 @@ public class Frame extends Statement {
                     }
                 }
                 
-                // Default value
-                if (!hasInit && canInit) {
+                // Default value for primative types
+                if (!hasInit && canInit && !type.doesExtend(Type.OBJECT)) {
+                    BasicObject defaultVal = LiteralNum.UNDEFINED;
+                    if (type.doesExtend(Type.STRUCT)) defaultVal = LangCompiler.factory.DefaultStruct(type.getAsStruct());
+                    
+                    // Do set value
                     if (struct instanceof ClassType) {
-                        defineClassVar((ClassType) struct, obj, node, LiteralNum.UNDEFINED, node);
+                        defineClassVar((ClassType) struct, obj, node, defaultVal, node);
                     }
                     
-                    define.addVar(obj, LiteralNum.UNDEFINED, node);
+                    define.addVar(obj, defaultVal, node);
                 }
                 
                 // Make var available
                 if (struct == null) {
+                    Main.setLine(node.getRow(), node.getCol());
                     addVar((AdvancedObject) obj);
                 }
             }
@@ -592,9 +622,9 @@ public class Frame extends Statement {
         return define;
     }
     
-    private void defineClassVar(ClassType classIn, BasicObject p1, Node p1Node, BasicObject p2, Node p2Node) {
-        VarAccess access = LangCompiler.factory.VarAccess(this, classIn.getThis(), p1, p1.getType(), p1Node.getRow(), p1Node.getCol());
-        OPObject op = LangCompiler.factory.OPObject(this, OPCode.SET, access, p1Node, p2, p2Node);
+    private void defineClassVar(ClassType classIn, BasicObject var, Node varNode, BasicObject val, Node valNode) {
+        VarAccess access = LangCompiler.factory.VarAccess(this, classIn.getThis(), var, var.getType(), varNode.getRow(), varNode.getCol());
+        OPObject op = LangCompiler.factory.OPObject(this, OPCode.SET, access, varNode, val, valNode);
         classIn.addInitStatement(LangCompiler.factory.ExpressionStatement(this, op));
     }
     

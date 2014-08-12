@@ -25,10 +25,10 @@ public class Type implements ITypeable {
                              UNDEFINED = new Type("undefined", false, true);
     
     public static final StructType STRUCT = new StructType("struct", null),
-                               OBJECT = new ClassType("Object", STRUCT, true),
-                               FUNC   = STRUCT.extendAs("func").setTypeParams(-1),
-                               ARRAY  = STRUCT.extendAs("array").addParam(new Param("length", Type.INT)).setTypeParams(1),
-                               STRING = ARRAY.extendAs("string").setTypeParams(0);
+                                   OBJECT = new ClassType("Object", STRUCT, true),
+                                   FUNC   = OBJECT.extendAs("func").setTypeParams(-1),
+                                   ARRAY  = OBJECT.extendAs("array").addParam(new Param("length", Type.INT)).setTypeParams(1),
+                                   STRING = ARRAY.extendAs("string").setTypeParams(0);
     
     public static final int COUNT_PRIMATIVES = TYPES.size();
     

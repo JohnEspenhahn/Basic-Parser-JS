@@ -20,6 +20,7 @@ import com.hahn.basic.intermediate.objects.register.IRegister;
 import com.hahn.basic.intermediate.objects.types.ClassType;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.ParameterizedType;
+import com.hahn.basic.intermediate.objects.types.StructType;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.opcode.OPCode;
 import com.hahn.basic.intermediate.statements.CallFuncStatement;
@@ -45,6 +46,7 @@ public interface ILangFactory {
 	
 	// Objects	
 	public BasicObject PushObject();
+	public BasicObject DefaultStruct(StructType struct);
 	public StringConst StringConst(String str);
 	
 	public OPObject OPObject(Statement container, OPCode op, BasicObject p1, Node p1Node, BasicObject p2, Node p2Node);

@@ -13,7 +13,12 @@ public class JSFuncCallPointer extends FuncCallPointer {
     
     @Override
     public String toTarget() {
-        if (getObjectIn() == null) return String.format("%s(%s)", getFuncId(), Util.toTarget(getParams()));
-        else return String.format("%s.%s(%s)", getObjectIn().toTarget(), getFuncId(), Util.toTarget(getParams()));
+        if (getObjectIn() == null) {
+            return String.format("%s(%s)", getFuncId(), Util.toTarget(getParams()));
+        } else if (getObjectIn().isVarSuper()) {
+            return String.format("%s.%s.call(this, %s)", getObjectIn().toTarget(), getFuncId(), Util.toTarget(getParams()));
+        } else {
+            return String.format("%s.%s(%s)", getObjectIn().toTarget(), getFuncId(), Util.toTarget(getParams()));
+        }
     }    
 }

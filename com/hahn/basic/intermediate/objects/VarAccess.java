@@ -8,6 +8,7 @@ import com.hahn.basic.intermediate.objects.types.StructType.StructParam;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.opcode.OPCode;
 import com.hahn.basic.intermediate.statements.Statement;
+import com.hahn.basic.util.exceptions.CompileException;
 
 public abstract class VarAccess extends BasicObject {
     private final BasicObject var, index;
@@ -30,6 +31,10 @@ public abstract class VarAccess extends BasicObject {
         
         if (getIndex() instanceof StructParam) {
             this.accessed = var.getType().getAsStruct().getParamSafe(index.getName());
+        }
+        
+        if (getVar().isVarSuper()) {
+            throw new CompileException("Only functions are accessable via the 'super' keyword", row, col);
         }
     }
     
