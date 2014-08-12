@@ -40,7 +40,7 @@ public class LiteralNum extends Literal {
     }
     
     public LiteralNum(double value) {
-    	this(value, Type.DBL);
+    	this(value, Type.FLOAT);
     }
     
     public LiteralNum(double value, Type type) {
@@ -70,7 +70,7 @@ public class LiteralNum extends Literal {
     }
     
     private void mergeTypes(Literal lit) {
-    	if (lit.getType().doesExtend(Type.DBL)) {
+    	if (lit.getType().doesExtend(Type.FLOAT)) {
     		this.setType(lit.getType());
     	} else if (this.getType().doesExtend(Type.INT)) {
     	    this.value = (int) this.value;
@@ -78,7 +78,7 @@ public class LiteralNum extends Literal {
     }
     
     private void isnum(OPCode op, Literal lit) {
-    	if (!lit.getType().doesExtend(Type.INT) && !lit.getType().doesExtend(Type.DBL)) {
+    	if (!lit.getType().doesExtend(Type.INT) && !lit.getType().doesExtend(Type.FLOAT)) {
     		throw new CompileException("Can not preform " + op + " on " + this.getType() + " with " + lit.getType());
     	}
     }

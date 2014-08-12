@@ -8,6 +8,6 @@ public class TypeNumeric extends Type {
     
     @Override
     public boolean doesExtend(Type t) {
-        return t.doesExtend(Type.INT) || t.doesExtend(Type.DBL);
+        return t.doesExtend(Type.INT) || t.doesExtend(Type.FLOAT);
     }
 }

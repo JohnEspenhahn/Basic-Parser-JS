@@ -19,9 +19,9 @@ public class Type implements ITypeable {
     public static final Type VOID = new Type("void"),
                              BOOL = new Type("bool"),
                              CHAR = new TypeIntLike("char"),
-                             INT  = new TypeIntLike("integer"),
-                             DBL  = new TypeDblLike("number"),
-                             /** char|int|dbl <-> NUMERIC */
+                             INT  = new TypeIntLike("int"),
+                             FLOAT  = new TypeDblLike("float"),
+                             /** char|int|float <-> NUMERIC */
                              NUMERIC = new TypeNumeric(),
                              /** UNDEFINED -> anything */
                              UNDEFINED = new Type("undefined", false, true);
@@ -92,8 +92,8 @@ public class Type implements ITypeable {
     public Type castTo(Type newType, int row, int col) {
         if (this == UNDEFINED) return newType;
         else if (this.doesExtend(newType)) return newType;
-        else if (this.doesExtend(INT) && newType.doesExtend(DBL)) return newType;
-        else if (this.doesExtend(DBL) && newType.doesExtend(INT)) return newType;
+        else if (this.doesExtend(INT) && newType.doesExtend(FLOAT)) return newType;
+        else if (this.doesExtend(FLOAT) && newType.doesExtend(INT)) return newType;
         
         // TODO upcasting and expression to check at runtime
         
@@ -115,7 +115,7 @@ public class Type implements ITypeable {
         else if (this == UNDEFINED) return newType;
         else if (newType == UNDEFINED) return this;
         else if (newType.doesExtend(this)) return this;
-        else if (this.doesExtend(INT) && newType.doesExtend(DBL)) return newType;
+        else if (this.doesExtend(INT) && newType.doesExtend(FLOAT)) return newType;
         
         if (unsafe) throw new CompileException("Incompatible types `" + this + "` and `" + newType + "`", row, col);
         else return null;
@@ -137,8 +137,8 @@ public class Type implements ITypeable {
         else if (t2 == null || t2 == UNDEFINED) return t1;
         else if (t1.doesExtend(t2)) return t2;
         else if (t2.doesExtend(t1)) return t1;
-        else if (t1.doesExtend(INT) && t2.doesExtend(DBL)) return t2;
-        else if (t2.doesExtend(INT) && t1.doesExtend(DBL)) return t1;
+        else if (t1.doesExtend(INT) && t2.doesExtend(FLOAT)) return t2;
+        else if (t2.doesExtend(INT) && t1.doesExtend(FLOAT)) return t1;
         
         if (unsafe) throw new CompileException("Incompatible types `" + t1 + "` and `" + t2 + "`", row, col);
         else return null;
