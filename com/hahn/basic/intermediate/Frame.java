@@ -831,7 +831,7 @@ public class Frame extends Statement {
             nameNode.setValue(name);
             
             LangCompiler.defineFunc(this, body, name, false, rtnType, aParams);
-            return LangCompiler.factory.FuncPointer(nameNode, null, new ParameterizedType<ITypeable>(Type.FUNC, (ITypeable[]) aParams));
+            return LangCompiler.factory.FuncPointer(nameNode, null, new ParameterizedType<ITypeable>(Type.FUNC, (ITypeable[]) aParams, rtnType));
         }
     }
     
