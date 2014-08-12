@@ -2,7 +2,7 @@ package com.hahn.basic.target.js.statements;
 
 import java.util.List;
 
-import com.hahn.basic.intermediate.objects.OPObject;
+import com.hahn.basic.intermediate.IIntermediate;
 import com.hahn.basic.intermediate.statements.ForStatement;
 import com.hahn.basic.intermediate.statements.Statement;
 import com.hahn.basic.parser.Node;
@@ -26,12 +26,7 @@ public class JSForStatement extends ForStatement {
     
     @Override
     public boolean reverseOptimize() {
-        if (getModifyStatements() != null) {
-            List<OPObject> modify = getModifyStatements();
-            for (int i = modify.size() - 1; i >= 0; i--) {
-                modify.get(i).setInUse(this);
-            }
-        }
+        getModifyFrame().reverseOptimize();
         
         getInnerFrame().reverseOptimize();
         
@@ -53,13 +48,7 @@ public class JSForStatement extends ForStatement {
         }
         
         getInnerFrame().forwardOptimize();
-        
-        if (getModifyStatements() != null) {
-            List<OPObject> modify = getModifyStatements();
-            for (int i = 0; i < modify.size(); i++) {
-                modify.get(i).takeRegister(this);
-            }
-        }
+        getModifyFrame().forwardOptimize();      
         
         if (getConditionStatement() != null) {
             // Make sure don't free register before handling frame
@@ -71,10 +60,10 @@ public class JSForStatement extends ForStatement {
     
     @Override
     public String toTarget() {
-        return JSPretty.format(0, "for(%s;%s;%s)%b",
+        return JSPretty.format(0, "for(%s;%s;%l)%b",
                 getDefineStatement(),
                 getConditionStatement(),
-                getModifyStatements(),
+                getModifyFrame().getTargetCode().toArray(new IIntermediate[getModifyFrame().getTargetCode().size()]),
                 getInnerFrame());
     }
 }

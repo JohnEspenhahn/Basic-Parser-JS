@@ -3,16 +3,13 @@ package com.hahn.basic.intermediate.statements;
 import java.util.List;
 
 import com.hahn.basic.intermediate.Frame;
-import com.hahn.basic.intermediate.objects.OPObject;
 import com.hahn.basic.parser.Node;
-import com.hahn.basic.util.IntermediateList;
 
 public abstract class ForStatement extends Statement {
-	private Frame outerFrame, innerFrame;
+	private Frame outerFrame, modifyFrame, innerFrame;
 	
     private DefineVarStatement define;
     private ExpressionStatement condition;
-    private IntermediateList<OPObject> modification;
     
     /**
      * @param continer Owning statement
@@ -24,20 +21,24 @@ public abstract class ForStatement extends Statement {
     public ForStatement(Statement continer, Node define, Node condition, List<Node> modification, Node body) {
         super(continer);
         
-        this.outerFrame = new Frame(getFrame(), null);
-        this.innerFrame = new Frame(outerFrame, body);
+        this.outerFrame  = new Frame(getFrame(), null);
+        this.modifyFrame = new Frame(outerFrame, null);
+        this.innerFrame  = new Frame(outerFrame, body, true);
         
         this.define = outerFrame.defineVar(define);
         this.condition = outerFrame.handleExpression(condition);
         
-        this.modification = new IntermediateList<OPObject>();
         for (Node modify: modification) {
-            this.modification.add(outerFrame.modifyVar(modify));
+            this.modifyFrame.addCode(modifyFrame.modifyVar(modify).getAsExp(modifyFrame));
         }
     }
 
     public Frame getOuterFrame() {
     	return outerFrame;
+    }
+    
+    public Frame getModifyFrame() {
+        return modifyFrame;
     }
     
     public Frame getInnerFrame() {
@@ -52,12 +53,8 @@ public abstract class ForStatement extends Statement {
     	return condition;
     }
     
-    public IntermediateList<OPObject> getModifyStatements() {
-    	return modification;
-    }
-    
     @Override
     public String toString() {
-        return "for(" + define + "; " + condition + "; " + modification + ") { " + innerFrame + "}"; 
+        return "for(" + getDefineStatement() + "; " + getConditionStatement() + "; " + getModifyFrame() + ") { " + getInnerFrame() + "}"; 
     }
 }

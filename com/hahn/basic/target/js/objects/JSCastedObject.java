@@ -10,7 +10,7 @@ public class JSCastedObject extends CastedObject {
         super(obj, type, row, col);
     }
     
-    public boolean needsIntCast() {
+    private boolean needsIntCast() {
         return getType().doesExtend(Type.INT) && !getHeldObject().getType().doesExtend(Type.INT);
     }
     
