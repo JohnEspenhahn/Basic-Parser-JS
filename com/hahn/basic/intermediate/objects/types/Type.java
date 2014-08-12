@@ -19,8 +19,8 @@ public class Type implements ITypeable {
     public static final Type VOID = new Type("void"),
                              BOOL = new Type("bool"),
                              CHAR = new TypeIntLike("char"),
-                             INT  = new TypeIntLike("int"),
-                             DBL  = new TypeDblLike("dbl"),
+                             INT  = new TypeIntLike("integer"),
+                             DBL  = new TypeDblLike("num"),
                              /** char|int|dbl <-> NUM */
                              NUM = new TypeNumber(),
                              /** UNDEFINED -> anything */
