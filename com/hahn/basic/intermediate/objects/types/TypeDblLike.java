@@ -8,6 +8,6 @@ public class TypeDblLike extends Type {
     
     @Override
     public boolean doesExtend(Type t) {
-        return t == Type.DBL || t == Type.NUM;
+        return t == Type.DBL || t == Type.NUMERIC;
     }
 }

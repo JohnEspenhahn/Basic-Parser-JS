@@ -129,7 +129,7 @@ public abstract class FuncHead extends Frame {
     public boolean matches(ITypeable[] types) {
         if (params.length == types.length) {
             for (int i = 0; i < params.length; i++) {
-                if (!params[i].getType().equals(types[i].getType())) {
+                if (params[i].getType().autocast(types[i].getType(), -1, -1, false) == null) {
                     return false;
                 }
             }

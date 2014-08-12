@@ -43,6 +43,7 @@ public enum EnumToken implements IEnumRegexToken {
     MOD         ("%"       , Group.OP),
     DBL_COLON   ("\\:\\:"  , Group.OP),
     COLON       ("\\:"     , Group.OP),
+    HASH        ("#"       , Group.OP),
     COMMA       (","       , Group.SEP),
     EOL         (";"       , Group.SEP),
     OPEN_PRNTH  ("\\("     , Group.SEP), 

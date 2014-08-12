@@ -80,7 +80,7 @@ public abstract class BasicObject implements IIntermediate, ITypeable {
      * @return A new, altered version of this
      */
     public BasicObject castTo(Type type, int row, int col) {
-        return new ObjectHolder(this, getType().castTo(type, row, col), row, col);
+        return LangCompiler.factory.CastedObject(this, getType().castTo(type, row, col), row, col);
     }
     
     

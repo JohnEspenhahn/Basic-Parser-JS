@@ -23,7 +23,8 @@ public abstract class Main {
     private static List<String> LINES = new ArrayList<String>();
     
     public static boolean DEBUG = false; 
-    public static boolean PRETTY_PRINT = false;
+    public static boolean PRETTY = false;
+    public static boolean LIBRARY = false;
     
     private static final String FILE_KEY = "file";
     private static final String DIR_KEY = "dir";
@@ -164,7 +165,7 @@ public abstract class Main {
         this.inputFile = file;
         
         // Reset
-        Main.LINES.clear();
+        resetFile();
         
         Scanner scanner = null;
         try {
@@ -176,6 +177,7 @@ public abstract class Main {
                 
                 Main.LINES.add(line);
             }
+            Main.LINES.add("#eof"); // End of File
             
             handleFileInput();
             
@@ -207,8 +209,7 @@ public abstract class Main {
         if (dirFile.isDirectory()) {            
             Scanner scanner = null;
             try {
-                // Reset
-                Main.LINES.clear();
+                resetFile();
                 
                 int found = 0;
                 long start = System.currentTimeMillis();                
@@ -225,6 +226,8 @@ public abstract class Main {
                             
                             Main.LINES.add(line);
                         }
+                        Main.LINES.add("#eof"); // End of File
+                        
                         scanner.close();
                         scanner = null;
                     }
@@ -256,6 +259,11 @@ public abstract class Main {
         }
     }
     
+    private static void resetFile() {
+        Main.LINES.clear();
+        Main.LIBRARY = false;
+    }
+    
     private static void toggleDebug() {
         DEBUG = !DEBUG;
         System.out.println("Debug = " + DEBUG);
@@ -263,8 +271,8 @@ public abstract class Main {
     }
     
     private static void togglePretty() {
-        PRETTY_PRINT = !PRETTY_PRINT;
-        System.out.println("Pretty Print = " + PRETTY_PRINT);
+        PRETTY = !PRETTY;
+        System.out.println("Pretty = " + PRETTY);
         System.out.println();
     }
     

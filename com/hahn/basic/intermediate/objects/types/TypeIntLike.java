@@ -8,6 +8,6 @@ public class TypeIntLike extends Type {
     
     @Override
     public boolean doesExtend(Type t) {
-        return t == Type.INT || t == Type.CHAR || t == Type.NUM;
+        return t == Type.INT || t == Type.CHAR || t == Type.NUMERIC;
     }
 }

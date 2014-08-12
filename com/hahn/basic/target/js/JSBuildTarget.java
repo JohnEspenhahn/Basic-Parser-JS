@@ -46,7 +46,7 @@ public class JSBuildTarget extends LangBuildTarget {
 	
 	@Override
 	public void appendString(String str) {
-	    if (Main.PRETTY_PRINT) builder.append(pretty(str));
+	    if (Main.PRETTY) builder.append(pretty(str));
 	    else builder.append(str);
 	}
 	
@@ -61,7 +61,7 @@ public class JSBuildTarget extends LangBuildTarget {
 	
 	@Override
 	public String endCodeArea() {
-	    return (Main.PRETTY_PRINT ? "\n" : "");
+	    return (Main.PRETTY ? "\n" : "");
 	}
 	
 	@Override
@@ -84,7 +84,7 @@ public class JSBuildTarget extends LangBuildTarget {
              * }
              */
             builder.append("function constructor(c,f,o){o=new c;if(f)f.apply(o,Array.prototype.slice.call(arguments,2));return o}");
-            if (Main.PRETTY_PRINT) builder.append("\n");
+            if (Main.PRETTY) builder.append("\n");
             
             /*
              * var implements = this.implements || function(child, parent) {
@@ -99,7 +99,7 @@ public class JSBuildTarget extends LangBuildTarget {
              * }
              */
             builder.append("function implements(d,b,p){for(p in b)if(b.hasOwnProperty(p))d[p]=b[p];function _(){this.constructor=d}_.prototype=b.prototype;d.prototype=new _}");
-            if (Main.PRETTY_PRINT) builder.append("\n");
+            if (Main.PRETTY) builder.append("\n");
         }
         
         return builder.toString();

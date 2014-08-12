@@ -12,7 +12,7 @@ public class LibraryBuiltinJS extends Library {
     @Override
     public void define() {
         Library.defineFunc("alert", true, Type.VOID, Type.STRING);
-        Library.defineFunc("alert", true, Type.VOID, Type.INT);
+        Library.defineFunc("alert", true, Type.VOID, Type.NUMERIC);
     }
     
     @Override

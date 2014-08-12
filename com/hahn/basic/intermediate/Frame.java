@@ -155,7 +155,7 @@ public class Frame extends Statement {
                 }
                 
                 // Pretty print new line
-                if (Main.PRETTY_PRINT) str.append('\n');
+                if (Main.PRETTY) str.append('\n');
             }
         }
         
@@ -380,11 +380,13 @@ public class Frame extends Statement {
                 addCode(whileStatement(child));
             } else if (token == EnumExpression.FOR_STMT) {
                 addCode(forStatement(child));
+            } else if (token == EnumExpression.DIRECTIVE) {
+                handleDirective(child);
             } else if (token == EnumExpression.EXPRESSION) {
                 addCode(handleStatementExpression(child));
             } else if (token == EnumToken.EOL || token == EnumToken.OPEN_BRACE || token == EnumToken.CLOSE_BRACE) {
                 continue;
-            } else {                
+            } else {
                 throw new CompileException("Illegal left-hand side token `" + child + "`", child);
             }
         }
@@ -1064,6 +1066,29 @@ public class Frame extends Statement {
     }
     
     /**
+     * Handle a directive statement
+     * @param head EnumExpression.DIRECTIVE
+     */
+    private void handleDirective(Node head) {
+        List<Node> children = head.getAsChildren();
+        String directive = children.get(1).getValue();
+        
+        switch (directive) {
+        case "library":
+            Main.LIBRARY = true;
+            break;
+        case "end_library":
+            Main.LIBRARY = false;
+            break;
+        case "eof":
+            Main.LIBRARY = false;
+            break;
+        default:
+            throw new CompileException("Unknown preprocessor directive `" + directive + "`", head);
+        }
+    }
+    
+    /**
      * Handle an expression as a statement rather than an object
      * @param child EnumExpression.EXPRESSION
      * @return ExpressionStatement
@@ -1118,6 +1143,7 @@ public class Frame extends Statement {
         BasicObject obj = handleNextExpressionChildObject(child, temp);
         if (obj != null) {
             exp.setObj(obj, child);
+            
         } else if (token == QUESTION) {
             Node node_then = it.next();        
             it.next(); // skip colon        
@@ -1157,8 +1183,10 @@ public class Frame extends Statement {
             
             if (temp == null) temp = createTempVar(Type.BOOL);
             exp.setObj(LangCompiler.factory.ConditionalObject(exp, op, exp.getObj(), exp.getNode(), nextExp.getObj(), nextExp.getNode(), temp), child);
+            
         } else if (!child.isTerminal()) {
             exp.setObj(handleExpression(child), child);
+            
         } else {
             throw new CompileException("Unexpected token `" + child + "`", child);
         }

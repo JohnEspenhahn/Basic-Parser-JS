@@ -19,7 +19,7 @@ import com.hahn.basic.parser.Node;
 public class Util {
     
     public static String getListSeperator() {
-        return (Main.PRETTY_PRINT ? ", " : ",");
+        return (Main.PRETTY ? ", " : ",");
     }
     
     public static String joinTypes(ITypeable[] arr, char seperator) {

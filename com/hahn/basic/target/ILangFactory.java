@@ -11,6 +11,7 @@ import com.hahn.basic.intermediate.objects.ExpressionObject;
 import com.hahn.basic.intermediate.objects.FuncCallPointer;
 import com.hahn.basic.intermediate.objects.FuncPointer;
 import com.hahn.basic.intermediate.objects.OPObject;
+import com.hahn.basic.intermediate.objects.CastedObject;
 import com.hahn.basic.intermediate.objects.Param;
 import com.hahn.basic.intermediate.objects.StringConst;
 import com.hahn.basic.intermediate.objects.TernaryObject;
@@ -53,6 +54,7 @@ public interface ILangFactory {
 	public OPObject ArithmeticObject(Statement container, OPCode op, BasicObject p1, Node p1Node, BasicObject p2, Node p2Node);
 	public OPObject ArithmeticSetObject(Statement container, OPCode op, BasicObject p1, Node p1Node, BasicObject p2, Node p2Node);
 	
+	public CastedObject CastedObject(BasicObject obj, Type type, int row, int col);
 	public ExpressionObject ExpressionObject(ExpressionStatement exp);
 	
 	public Var VarParameter(Frame frame, String name, Type type, List<String> flags);

@@ -13,6 +13,7 @@ import com.hahn.basic.intermediate.objects.ExpressionObject;
 import com.hahn.basic.intermediate.objects.FuncCallPointer;
 import com.hahn.basic.intermediate.objects.FuncPointer;
 import com.hahn.basic.intermediate.objects.OPObject;
+import com.hahn.basic.intermediate.objects.CastedObject;
 import com.hahn.basic.intermediate.objects.Param;
 import com.hahn.basic.intermediate.objects.StringConst;
 import com.hahn.basic.intermediate.objects.TernaryObject;
@@ -50,6 +51,7 @@ import com.hahn.basic.target.js.objects.JSFuncCallPointer;
 import com.hahn.basic.target.js.objects.JSFuncPointer;
 import com.hahn.basic.target.js.objects.JSNewInstance;
 import com.hahn.basic.target.js.objects.JSOPObject;
+import com.hahn.basic.target.js.objects.JSCastedObject;
 import com.hahn.basic.target.js.objects.JSStringConst;
 import com.hahn.basic.target.js.objects.JSTernaryObject;
 import com.hahn.basic.target.js.objects.JSVarAccess;
@@ -150,6 +152,11 @@ public class JSLangFactory implements ILangFactory {
     @Override
     public OPObject ArithmeticSetObject(Statement container, OPCode op, BasicObject p1, Node p1Node, BasicObject p2, Node p2Node) {
         return new JSArithmeticSetObject(container, op, p1, p1Node, p2, p2Node);
+    }
+    
+    @Override
+    public CastedObject CastedObject(BasicObject obj, Type type, int row, int col) {
+        return new JSCastedObject(obj, type, row, col);
     }
     
     @Override

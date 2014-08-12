@@ -20,9 +20,9 @@ public class Type implements ITypeable {
                              BOOL = new Type("bool"),
                              CHAR = new TypeIntLike("char"),
                              INT  = new TypeIntLike("integer"),
-                             DBL  = new TypeDblLike("num"),
-                             /** char|int|dbl <-> NUM */
-                             NUM = new TypeNumber(),
+                             DBL  = new TypeDblLike("number"),
+                             /** char|int|dbl <-> NUMERIC */
+                             NUMERIC = new TypeNumeric(),
                              /** UNDEFINED -> anything */
                              UNDEFINED = new Type("undefined", false, true);
     

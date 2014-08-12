@@ -13,7 +13,7 @@ public class JSTernaryObject extends TernaryObject {
     }
     
     public String getPrettyFormat() {
-        return (Main.PRETTY_PRINT ? "%s ? %s : %s" : "%s?%s:%s");
+        return (Main.PRETTY ? "%s ? %s : %s" : "%s?%s:%s");
     }
     
     @Override

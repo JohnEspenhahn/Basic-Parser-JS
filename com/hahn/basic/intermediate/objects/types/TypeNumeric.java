@@ -1,9 +1,9 @@
 package com.hahn.basic.intermediate.objects.types;
 
-public class TypeNumber extends Type {
+public class TypeNumeric extends Type {
     
-    public TypeNumber() {
-        super("num", false, true);
+    public TypeNumeric() {
+        super("numeric", false, true);
     }
     
     @Override

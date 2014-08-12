@@ -254,7 +254,7 @@ public class BasicLexer implements ILexer {
     
     static final char[] identifier_start = "_$abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
     static final char[] identifier_continue = "_$abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".toCharArray();
-    static final char[] operators = "+-/*%=<>!^&|?:.".toCharArray();
+    static final char[] operators = "#+-/*%=<>!^&|?:.".toCharArray();
     static final char[] separators = ",{}[]();".toCharArray();
     static final char[] whitespace = " \t\n\f\r".toCharArray();
     static final char[] numeric    = "0123456789".toCharArray();

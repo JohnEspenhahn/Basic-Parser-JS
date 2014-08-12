@@ -7,7 +7,7 @@ import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.statements.ExpressionStatement;
 import com.hahn.basic.intermediate.statements.Statement;
 
-public class ObjectHolder extends BasicObject {
+public abstract class CastedObject extends BasicObject {
 
     interface IHolderExcludeList {
         public Type getType();
@@ -32,7 +32,7 @@ public class ObjectHolder extends BasicObject {
      * @param row The row to throw an error at
      * @param col The column to throw an error at
      */
-    public ObjectHolder(BasicObject obj, Type type, int row, int col) {
+    public CastedObject(BasicObject obj, Type type, int row, int col) {
         super(obj.getName(), type);
 
         this.heldObj = obj;

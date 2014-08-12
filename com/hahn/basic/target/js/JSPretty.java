@@ -53,7 +53,7 @@ public class JSPretty {
         if (isFlag) throw new MissingFormatArgumentException(format);
         
         String str;        
-        if (Main.PRETTY_PRINT && tabs >= 0) {
+        if (Main.PRETTY && tabs >= 0) {
             str = getIndent() + builder.toString();
             JSPretty.indent -= tabs;
         } else {
@@ -93,25 +93,25 @@ public class JSPretty {
             
             Frame frame = (Frame) arg;
             if (frame.isEmpty()) {
-                if (require_brace) str.append(Main.PRETTY_PRINT ? " {}" : "{}");
-                else str.append(Main.PRETTY_PRINT ? " ;" : ";");
+                if (require_brace) str.append(Main.PRETTY ? " {}" : "{}");
+                else str.append(Main.PRETTY ? " ;" : ";");
             } else {
                 // If more than one object in frame requires brace
                 require_brace = require_brace || frame.getSize() > 1;
                 
                 if (require_brace) {
                     JSPretty.indent += 1;
-                    str.append(Main.PRETTY_PRINT ? " {\n" : "{");
+                    str.append(Main.PRETTY ? " {\n" : "{");
                 } else {
                     JSPretty.indent = 0;
-                    str.append(Main.PRETTY_PRINT ? " " : "");
+                    str.append(Main.PRETTY ? " " : "");
                 }
                 
                 str.append(arg instanceof IIntermediate ? ((IIntermediate) arg).toTarget() : arg);
                 
                 if (require_brace) {
                     JSPretty.indent -= 1;
-                    str.append(Main.PRETTY_PRINT ? getIndent() + "}" : "}");
+                    str.append(Main.PRETTY ? getIndent() + "}" : "}");
                 } else {
                     JSPretty.indent = oldIndent;
                 }
@@ -136,7 +136,7 @@ public class JSPretty {
     }
     
     private static void handleToken(StringBuilder str, char token) {
-        if (Main.PRETTY_PRINT) {
+        if (Main.PRETTY) {
             switch (token) {
             case ',':
                 str.append(", ");

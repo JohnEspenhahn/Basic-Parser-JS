@@ -67,7 +67,8 @@ public enum EnumExpression implements IEnumExpression {
     /** Stuff that can be done within class{} */
     CLASS_CNTNT ("<DEF_FUNC>|<DEFINE>EOL|EOL"),
     
-    START       ("<STRUCT>$|<CLASS>$|<BLOCK_CNTNT>$|<CLASS_CNTNT>$", false);
+    DIRECTIVE   ("HASH IDENTIFIER", false),
+    START       ("<DIRECTIVE>$|<STRUCT>$|<CLASS>$|<BLOCK_CNTNT>$|<CLASS_CNTNT>$", false);
 
 
     private final String bnf;
