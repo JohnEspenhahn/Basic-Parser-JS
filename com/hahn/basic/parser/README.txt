@@ -1,16 +1,4 @@
 ==================
-== Lexer
-==================
-Provide an enum with all of the tokens to parse input into. 
-
-The enum should implements IEnumToken and the `regex` for each
-token should be a standard Java regex. The following special
-shorthands can be used 
-
-<<WORD>>  ==  [_a-zA-Z][_a-zA-Z0-9]*
-
-
-==================
 == Parser
 ==================
 Provide an enum with all of the expressions and tokens to parse
