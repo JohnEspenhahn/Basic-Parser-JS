@@ -39,6 +39,12 @@ public abstract class DefineVarStatement extends Statement {
         return (this.flags & flag) != 0;
     }
     
+    /**
+     * Add a variable to be defined in this statement
+     * @param var The variable to define
+     * @param val The value to give it
+     * @param node The node to throw an error at if needed
+     */
     public void addVar(BasicObject var, BasicObject val, Node node) {
         definepairs.add(new DefinePair(node, var.getForCreateVar(), val));
     }
@@ -144,10 +150,10 @@ public abstract class DefineVarStatement extends Statement {
     
     @Override
     public String toString() {
-        return "let " + StringUtils.join(definepairs.toArray(), ", ");
+        return "define " + StringUtils.join(definepairs.toArray(), ", ");
     }
     
-    public class DefinePair {
+    public static class DefinePair {
         public final Node node;
         public final BasicObject var, val;
         

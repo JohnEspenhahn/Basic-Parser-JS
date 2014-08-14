@@ -30,6 +30,7 @@ import static com.hahn.basic.definition.EnumToken.STRING;
 import static com.hahn.basic.definition.EnumToken.SUB;
 import static com.hahn.basic.definition.EnumToken.TRUE;
 import static com.hahn.basic.definition.EnumToken.XOR;
+import static com.hahn.basic.definition.EnumToken.NULL;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -61,9 +62,11 @@ import com.hahn.basic.intermediate.opcode.OPCode;
 import com.hahn.basic.intermediate.statements.CallFuncStatement;
 import com.hahn.basic.intermediate.statements.Compilable;
 import com.hahn.basic.intermediate.statements.DefineVarStatement;
+import com.hahn.basic.intermediate.statements.DefineVarStatement.DefinePair;
 import com.hahn.basic.intermediate.statements.EndLoopStatement;
 import com.hahn.basic.intermediate.statements.ExpressionStatement;
 import com.hahn.basic.intermediate.statements.IfStatement.Conditional;
+import com.hahn.basic.intermediate.statements.ParamDefaultValStatement;
 import com.hahn.basic.intermediate.statements.Statement;
 import com.hahn.basic.parser.Node;
 import com.hahn.basic.util.NestedListIterator;
@@ -606,10 +609,11 @@ public class Frame extends Statement {
                     }
                 }
                 
-                // Default value for primative types
-                if (!hasInit && canInit && !type.doesExtend(Type.OBJECT)) {
+                // Default value
+                if (!hasInit && canInit) {
                     BasicObject defaultVal = LiteralNum.UNDEFINED;
-                    if (type.doesExtend(Type.STRUCT)) defaultVal = LangCompiler.factory.DefaultStruct(type.getAsStruct());
+                    if (type.doesExtend(Type.OBJECT)) defaultVal = LiteralNum.NULL;
+                    else if (type.doesExtend(Type.STRUCT)) defaultVal = LangCompiler.factory.DefaultStruct(type.getAsStruct());
                     
                     // Do set value
                     if (struct instanceof ClassType) {
@@ -806,7 +810,9 @@ public class Frame extends Statement {
         Node nameNode = null;
         Node body = null;
         
+        List<DefinePair> inits = new ArrayList<DefinePair>();        
         List<Param> params = new ArrayList<Param>();
+        
         while (it.hasNext()) {
             Node child = it.next();
             Enum<?> token = child.getToken();
@@ -822,8 +828,13 @@ public class Frame extends Statement {
                 
                 while (pIt.hasNext()) {
                     Node pNode = pIt.next();
-                    if (pNode.getToken() == EnumToken.COMMA) {
+                    Enum<?> pToken = pNode.getToken();
+                    
+                    if (pToken == EnumToken.COMMA) {
                         continue;
+                    } else if (pToken == EnumToken.ASSIGN) {
+                        BasicObject pVal = handleExpression(pIt.next()).getAsExpObj();
+                        inits.add(new DefinePair(pNode, params.get(params.size() - 1), pVal));
                     } else {
                         Type pType = Type.fromNode(pNode);
                         String pName = pIt.next().getValue();
@@ -841,20 +852,36 @@ public class Frame extends Statement {
         Param[] aParams = params.toArray(new Param[params.size()]);
            
         // Define function
+        FuncHead func;
         if (!anonymous) {
+            // Named
             String name = nameNode.getValue();
+            Main.setLine(nameNode.getRow(), nameNode.getCol());
             
-            if (classIn == null) LangCompiler.defineFunc(LangCompiler.getGlobalFrame(), body, name, false, rtnType, aParams);
-            else classIn.defineFunc(body, name, false, rtnType, aParams);
-            return null;
+            if (classIn == null) {
+                func = LangCompiler.defineFunc(LangCompiler.getGlobalFrame(), body, name, false, rtnType, aParams);
+            } else {
+                func = classIn.defineFunc(body, name, false, rtnType, aParams);
+            }
         } else {
             // Anonymous
             String name = getLabel("afunc");
             nameNode.setValue(name);
             
-            LangCompiler.defineFunc(this, body, name, false, rtnType, aParams);
-            return LangCompiler.factory.FuncPointer(nameNode, null, new ParameterizedType<ITypeable>(Type.FUNC, (ITypeable[]) aParams, rtnType));
+            func = LangCompiler.defineFunc(this, body, name, false, rtnType, aParams);
         }
+        
+        // Put default value
+        if (!inits.isEmpty()) {
+            ParamDefaultValStatement defaultVal = LangCompiler.factory.ParamDefaultValStatement(func, false);
+            for (DefinePair pair: inits) defaultVal.addVar(pair);
+            
+            func.addCode(defaultVal);
+        }
+        
+        // Return
+        if (!anonymous) return null;
+        else return LangCompiler.factory.FuncPointer(nameNode, null, new ParameterizedType<ITypeable>(Type.FUNC, (ITypeable[]) aParams, rtnType));
     }
     
     /**
@@ -1231,6 +1258,8 @@ public class Frame extends Statement {
                 return new LiteralBool(false);
             } else if (token == STRING) {
                 return LangCompiler.getString(val.substring(1, val.length() - 1));
+            } else if (token == NULL) {
+                return LiteralNum.NULL;
             }
         } else {
             if (token == EnumExpression.ACCESS) {

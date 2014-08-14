@@ -36,6 +36,7 @@ import com.hahn.basic.intermediate.statements.ExpressionStatement;
 import com.hahn.basic.intermediate.statements.ForStatement;
 import com.hahn.basic.intermediate.statements.IfStatement;
 import com.hahn.basic.intermediate.statements.IfStatement.Conditional;
+import com.hahn.basic.intermediate.statements.ParamDefaultValStatement;
 import com.hahn.basic.intermediate.statements.Statement;
 import com.hahn.basic.intermediate.statements.WhileStatement;
 import com.hahn.basic.parser.Node;
@@ -65,6 +66,7 @@ import com.hahn.basic.target.js.statements.JSDefineVarStatement;
 import com.hahn.basic.target.js.statements.JSExpressionStatement;
 import com.hahn.basic.target.js.statements.JSForStatement;
 import com.hahn.basic.target.js.statements.JSIfStatement;
+import com.hahn.basic.target.js.statements.JSParamDefaultValStatement;
 import com.hahn.basic.target.js.statements.JSReturnStatement;
 import com.hahn.basic.target.js.statements.JSWhileStatement;
 import com.hahn.basic.util.exceptions.UnimplementedException;
@@ -274,4 +276,8 @@ public class JSLangFactory implements ILangFactory {
         return new JSDefineVarStatement(container, ignoreTypeCheck);
     }
     
+    @Override
+    public ParamDefaultValStatement ParamDefaultValStatement(FuncHead func, boolean ignoreTypeCheck) {
+        return new JSParamDefaultValStatement(func, ignoreTypeCheck);
+    }    
 }

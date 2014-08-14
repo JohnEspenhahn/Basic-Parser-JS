@@ -27,6 +27,7 @@ public class LiteralNum extends Literal {
     public static final LiteralNum ZERO = new LiteralNum(0);
     public static final LiteralNum ONE  = new LiteralNum(1);
     
+    public static final LiteralNum NULL  = new LiteralNum(1, Type.UNDEFINED);
     public static final LiteralNum UNDEFINED  = new LiteralNum(0, Type.UNDEFINED);
     
     private double value;
@@ -96,7 +97,9 @@ public class LiteralNum extends Literal {
     
     @Override
     public String toString() {
-        if (getType().doesExtend(Type.INT) || value % 1.0 == 0) {
+        if (this == LiteralNum.NULL) {
+            return "null";
+        } else if (getType().doesExtend(Type.INT) || value % 1.0 == 0) {
         	return String.valueOf((int) value);
         } else {
         	return String.valueOf(value);

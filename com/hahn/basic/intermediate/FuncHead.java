@@ -1,5 +1,7 @@
 package com.hahn.basic.intermediate;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.FuncPointer;
 import com.hahn.basic.intermediate.objects.Param;
@@ -13,11 +15,12 @@ import com.hahn.basic.parser.Node;
 public abstract class FuncHead extends Frame {    
     private final String name;
     private final Var[] params;
+    private final boolean[] isOptional;
+    
     private final Type rtnType;
     
     private final String funcId;    
-    private final ClassType classIn;
-    
+    private final ClassType classIn;    
     
     public FuncHead(Frame parent, ClassType classIn, String name, boolean rawName, Node funcHeadNode, Type rtn, Param... params) {
         super(parent, funcHeadNode); // TODO nest anon func
@@ -34,11 +37,14 @@ public abstract class FuncHead extends Frame {
         this.rtnType = rtn;
         
         this.params = new Var[params.length];
+        this.isOptional = new boolean[params.length];
         for (int i = 0; i < params.length; i++) {
             Param p = params[i];
             
             Var var = LangCompiler.factory.VarParameter(this, p.getName(), p.getType(), p.getFlags());
             this.params[i] = var;
+            this.isOptional[i] = false;
+            
         	this.addVar(var);
         }
         
@@ -92,6 +98,16 @@ public abstract class FuncHead extends Frame {
         return null;
     }
     
+    public void makeOptional(BasicObject p) {
+        for (int i = 0; i < params.length; i++) {
+            Var funcParam = params[i];
+            if (funcParam == p) {
+                isOptional[i] = true;
+                return;
+            }
+        }
+    }
+    
     public boolean hasSameName(FuncHead func) {
         return getName().equals(func.getName());
     }
@@ -100,11 +116,35 @@ public abstract class FuncHead extends Frame {
         return getReturnType().equals(func.getReturnType());
     }
     
+    @Override
+    public boolean reverseOptimize() {
+        for (int i = params.length - 1; i >= 0; i--) {
+            params[i].setInUse(this);
+            params[i].decUses();
+        }
+        
+        return super.reverseOptimize();
+    }
+    
+    @Override
+    public boolean forwardOptimize() {
+        for (int i = 0; i < params.length; i++) {
+            params[i].takeRegister(this);
+        }
+        
+        return super.forwardOptimize();
+    }
+    
     public abstract String toFuncAreaTarget();
     
     @Override
     public boolean endsWithBlock() {
         return true;
+    }
+    
+    @Override
+    public String toString() {
+        return "function " + getName() + "(" + StringUtils.join(params, ", ") + ") {" + super.toString() + "}"; 
     }
     
     @Override
@@ -127,17 +167,26 @@ public abstract class FuncHead extends Frame {
     }
 
     public boolean matches(ITypeable[] types) {
-        if (params.length == types.length) {
-            for (int i = 0; i < params.length; i++) {
-                if (params[i].getType().autocast(types[i].getType(), -1, -1, false) == null) {
-                    return false;
-                }
+        // TODO handle conditions when the given type is optional
+        
+        int pIdx, tIdx;
+        for (pIdx = 0, tIdx = 0; pIdx < params.length && tIdx < types.length; pIdx++) {
+            boolean match = (params[pIdx].getType().autocast(types[tIdx].getType(), -1, -1, false) != null);
+            if (match) {
+                tIdx += 1;
+            } else if (isOptional[pIdx]) {
+                continue;
+            } else {
+                return false;
             }
-            
-            return true;
         }
         
-        return false;
+        while (pIdx < params.length && isOptional[pIdx]) {
+            pIdx += 1;
+        }
+        
+        if (pIdx == params.length && tIdx == types.length) return true;
+        else return false;
     }
     
     public static String createFuncId(String name, ITypeable... objs) {

@@ -160,6 +160,13 @@ public abstract class BasicObject implements IIntermediate, ITypeable {
     }
     
     /**
+     * Reduce the uses counter by 1
+     */
+    public void decUses() {
+        uses -= 1;
+    }
+    
+    /**
      * @param by The object to check if is last use by
      * @return True if last use is by this
      */

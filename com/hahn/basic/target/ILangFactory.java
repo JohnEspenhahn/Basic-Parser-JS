@@ -6,12 +6,12 @@ import com.hahn.basic.intermediate.Frame;
 import com.hahn.basic.intermediate.FuncHead;
 import com.hahn.basic.intermediate.objects.AdvancedObject;
 import com.hahn.basic.intermediate.objects.BasicObject;
+import com.hahn.basic.intermediate.objects.CastedObject;
 import com.hahn.basic.intermediate.objects.ConditionalObject;
 import com.hahn.basic.intermediate.objects.ExpressionObject;
 import com.hahn.basic.intermediate.objects.FuncCallPointer;
 import com.hahn.basic.intermediate.objects.FuncPointer;
 import com.hahn.basic.intermediate.objects.OPObject;
-import com.hahn.basic.intermediate.objects.CastedObject;
 import com.hahn.basic.intermediate.objects.Param;
 import com.hahn.basic.intermediate.objects.StringConst;
 import com.hahn.basic.intermediate.objects.TernaryObject;
@@ -31,6 +31,7 @@ import com.hahn.basic.intermediate.statements.ExpressionStatement;
 import com.hahn.basic.intermediate.statements.ForStatement;
 import com.hahn.basic.intermediate.statements.IfStatement;
 import com.hahn.basic.intermediate.statements.IfStatement.Conditional;
+import com.hahn.basic.intermediate.statements.ParamDefaultValStatement;
 import com.hahn.basic.intermediate.statements.Statement;
 import com.hahn.basic.intermediate.statements.WhileStatement;
 import com.hahn.basic.parser.Node;
@@ -88,6 +89,7 @@ public interface ILangFactory {
     public ForStatement ForStatement(Statement container, Node define, Node condition, List<Node> modification, Node body);
     
 	public DefineVarStatement DefineVarStatement(Statement container, boolean ignoreTypeCheck);
+	public ParamDefaultValStatement ParamDefaultValStatement(FuncHead func, boolean ignoreTypeCheck);
 	
 	public CallFuncStatement CallFuncStatement(Statement container, FuncCallPointer funcCallPointer);
     public CallFuncStatement DefaultCallFuncStatement(Statement container, FuncCallPointer funcCallPointer);

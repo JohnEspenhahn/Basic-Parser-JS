@@ -30,7 +30,7 @@ public class FuncGroup implements Iterable<FuncHead> {
     
     public boolean isDefined(FuncHead func) {
         for (FuncHead f: funcs) {
-            if (f.equals(func)) {
+            if (f.matches(func.getParams())) {
                 return true;
             }
         }

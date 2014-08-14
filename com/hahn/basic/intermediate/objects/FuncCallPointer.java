@@ -59,7 +59,7 @@ public abstract class FuncCallPointer extends FuncPointer {
         }
         
         checkFunction();
-        returnType = func.getReturnType().autocast(returnType, nameNode.getRow(), nameNode.getCol(), true);
+        returnType = returnType.autocast(func.getReturnType(), nameNode.getRow(), nameNode.getCol(), true);
         
         return super.setInUse(by);
     }
