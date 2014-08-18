@@ -2,8 +2,6 @@ package com.hahn.basic.intermediate.statements;
 
 import com.hahn.basic.intermediate.FuncHead;
 import com.hahn.basic.intermediate.objects.BasicObject;
-import com.hahn.basic.intermediate.objects.types.Type;
-import com.hahn.basic.util.exceptions.CompileException;
 
 public abstract class ReturnStatement extends Statement {
 	private FuncHead func;
@@ -28,11 +26,7 @@ public abstract class ReturnStatement extends Statement {
     public final boolean reverseOptimize() {
         boolean result = doReverseOptimize();
         
-        Type actual = getResult().getType();
-        Type expected = getReturnFromFunc().getReturnType();
-        if (!actual.doesExtend(expected)) {
-            throw new CompileException("Invalid return type. Expected `" + expected + "` but got `" + actual + "`", this);
-        }
+        getFrame().flagHasReturn();
         
         return result;
     }

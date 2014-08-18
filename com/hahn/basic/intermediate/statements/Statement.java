@@ -61,7 +61,7 @@ public abstract class Statement extends Compilable {
                 b = a;
                 a = it.next();
                 
-                if (optimize(a, b) || a.reverseOptimize()) {
+                if (a.reverseOptimize() || optimize(a, b)) {
                     a = b;
                     it.remove();
                 }
@@ -104,12 +104,13 @@ public abstract class Statement extends Compilable {
     }
     
     /**
-     * Called from reverse optimize. Optimize a compilable pair
+     * Called from `reverseOptimizeTargetCode` after a, but not b, has 
+     * been REVERSE_OPTIMIZED. Optimize a compilable pair
      * @param a NonNull Compilable
      * @param b NullAble compilable
      * @return True to remove `a`
      */
-    private boolean optimize(@NonNull Compilable a, Compilable b) {
+    protected boolean optimize(@NonNull Compilable a, Compilable b) {
         if (a instanceof ReturnStatement && b instanceof ReturnStatement && a.equals(b)) {
             return true;
         }

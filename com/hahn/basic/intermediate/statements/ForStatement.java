@@ -33,6 +33,16 @@ public abstract class ForStatement extends Statement {
         }
     }
 
+    @Override
+    public boolean isBlock() {
+        return true;
+    }
+    
+    @Override
+    public boolean hasReturn() {
+        return getInnerFrame().hasReturn();
+    }
+    
     public Frame getOuterFrame() {
     	return outerFrame;
     }

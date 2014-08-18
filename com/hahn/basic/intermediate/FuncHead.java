@@ -10,7 +10,9 @@ import com.hahn.basic.intermediate.objects.types.ClassType;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.StructType.StructParam;
 import com.hahn.basic.intermediate.objects.types.Type;
+import com.hahn.basic.intermediate.statements.Compilable;
 import com.hahn.basic.parser.Node;
+import com.hahn.basic.util.exceptions.CompileException;
 
 public abstract class FuncHead extends Frame {    
     private final String name;
@@ -18,6 +20,7 @@ public abstract class FuncHead extends Frame {
     private final boolean[] isOptional;
     
     private final Type rtnType;
+    private boolean allChildrenReturn;
     
     private final String funcId;    
     private final ClassType classIn;    
@@ -35,6 +38,8 @@ public abstract class FuncHead extends Frame {
         
         this.name = name;
         this.rtnType = rtn;
+        this.allChildrenReturn = true;
+        if (rtn == Type.VOID) flagHasReturn();
         
         this.params = new Var[params.length];
         this.isOptional = new boolean[params.length];
@@ -87,6 +92,11 @@ public abstract class FuncHead extends Frame {
     }
     
     @Override
+    public boolean hasReturn() {
+        return this.allChildrenReturn || super.hasReturn();
+    }
+    
+    @Override
     public BasicObject getInstanceVar(String name) {
         if (getClassIn() != null) {
             StructParam param = classIn.getParamSafe(name);
@@ -123,7 +133,22 @@ public abstract class FuncHead extends Frame {
             params[i].decUses();
         }
         
-        return super.reverseOptimize();
+        super.reverseOptimize();
+        
+        if (!hasReturn() && hasFrameHead()) {
+            throw new CompileException("Function must return a result of type `" + getReturnType() + "`", getFrameHead());
+        }
+        
+        return false;
+    }
+    
+    @Override
+    protected boolean optimize(Compilable a, Compilable b) {
+        if (a.isBlock() && !a.hasReturn()) {
+            this.allChildrenReturn = false;
+        }
+        
+        return super.optimize(a, b);
     }
     
     @Override
@@ -138,7 +163,7 @@ public abstract class FuncHead extends Frame {
     public abstract String toFuncAreaTarget();
     
     @Override
-    public boolean endsWithBlock() {
+    public boolean isBlock() {
         return true;
     }
     

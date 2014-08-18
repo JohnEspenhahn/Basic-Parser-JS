@@ -16,6 +16,16 @@ public abstract class WhileStatement extends Statement {
         this.condition = outerFrame.handleExpression(condition);
     }
 
+    @Override
+    public boolean isBlock() {
+        return true;
+    }
+    
+    @Override
+    public boolean hasReturn() {
+        return getInnerFrame().hasReturn();
+    }
+    
     public Frame getOuterFrame() {
     	return outerFrame;
     }

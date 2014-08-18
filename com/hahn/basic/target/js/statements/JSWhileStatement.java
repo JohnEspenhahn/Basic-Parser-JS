@@ -12,11 +12,6 @@ public class JSWhileStatement extends WhileStatement {
     }
     
     @Override
-    public boolean endsWithBlock() {
-        return true;
-    }
-    
-    @Override
     public boolean useAddTargetCode() {
         return false;
     }

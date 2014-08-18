@@ -22,6 +22,7 @@ import static com.hahn.basic.definition.EnumToken.MOD;
 import static com.hahn.basic.definition.EnumToken.MULT;
 import static com.hahn.basic.definition.EnumToken.NOT;
 import static com.hahn.basic.definition.EnumToken.NOTEQUAL;
+import static com.hahn.basic.definition.EnumToken.NULL;
 import static com.hahn.basic.definition.EnumToken.OPEN_PRNTH;
 import static com.hahn.basic.definition.EnumToken.OPEN_SQR;
 import static com.hahn.basic.definition.EnumToken.QUESTION;
@@ -30,7 +31,6 @@ import static com.hahn.basic.definition.EnumToken.STRING;
 import static com.hahn.basic.definition.EnumToken.SUB;
 import static com.hahn.basic.definition.EnumToken.TRUE;
 import static com.hahn.basic.definition.EnumToken.XOR;
-import static com.hahn.basic.definition.EnumToken.NULL;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -71,7 +71,6 @@ import com.hahn.basic.intermediate.statements.Statement;
 import com.hahn.basic.parser.Node;
 import com.hahn.basic.util.NestedListIterator;
 import com.hahn.basic.util.Util;
-import com.hahn.basic.util.exceptions.CastException;
 import com.hahn.basic.util.exceptions.CompileException;
 import com.hahn.basic.util.exceptions.DuplicateDefinitionException;
 
@@ -86,6 +85,7 @@ public class Frame extends Statement {
     private List<AdvancedObject> inUseVars;
     
     private EndLoopStatement endLoop;
+    private boolean hasReturn;
     
     public Frame(Frame parent, Node head) {
     	this(parent, head, false);
@@ -116,6 +116,10 @@ public class Frame extends Statement {
         return frameHead != null;
     }
     
+    protected Node getFrameHead() {
+        return frameHead;
+    }
+    
     public Collection<AdvancedObject> getVars() {
         return vars.values();
     }
@@ -128,6 +132,20 @@ public class Frame extends Statement {
         } else {
             return null;
         }
+    }
+    
+    public void flagHasReturn() {
+        this.hasReturn = true;
+    }
+    
+    @Override
+    public boolean isBlock() {
+        return true;
+    }
+    
+    @Override
+    public boolean hasReturn() {
+        return hasReturn;
     }
     
     /**
@@ -154,7 +172,7 @@ public class Frame extends Statement {
             if (cs != null && cs.length() > 0) {
                 str.append(cs);
                 
-                if (!c.endsWithBlock()) {
+                if (!c.isBlock()) {
                     str.append(LangCompiler.factory.getLangBuildTarget().getEOL());
                 }
                 
@@ -661,17 +679,14 @@ public class Frame extends Statement {
         
         // Set result
         BasicObject result = null;
-        if (head != null) {
-            List<Node> children = head.getAsChildren();
-            if (children.size() > 1) {
-                Node resultNode = children.get(1);
-                result = handleExpression(resultNode).getAsExpObj();
-                
-                try {
-                    result.castTo(func.getReturnType(), resultNode.getRow(), resultNode.getCol());
-                } catch (CastException e) {
-                    throw new CastException("Invalid return type - ", resultNode, e);
-                }
+        List<Node> children = head.getAsChildren();
+        if (children.size() > 1) {
+            Node resultNode = children.get(1);
+            result = handleExpression(resultNode).getAsExpObj();
+            
+            Type newType = result.getType().autocast(func.getReturnType(), resultNode.getRow(), resultNode.getCol(), false);
+            if (newType == null) {
+                throw new CompileException("Invalid return type. Expected `" + func.getReturnType() + "` but got `" + result.getType() + "`", resultNode);
             }
         }
         

@@ -15,6 +15,27 @@ public abstract class IfStatement extends Statement {
         this.conditionals = elseStatements;
     }
 
+    @Override
+    public boolean isBlock() {
+        return true;
+    }
+    
+    @Override
+    public boolean hasReturn() {
+        boolean hasElse = false;
+        for (Conditional c: conditionals) {
+            if (!c.getInnerFrame().hasReturn()) {
+                return false;
+            } else if (c.isElse()) {
+                hasElse = true;
+            }
+        }
+        
+        // Only true if has catch-all else
+        if (hasElse) return true;
+        else return false;
+    }
+    
     public List<Conditional> getConditionals() {
     	return conditionals;
     }
@@ -62,6 +83,10 @@ public abstract class IfStatement extends Statement {
          */
         public Conditional(Frame parent, Node bodyHead) {
             this(parent, null, bodyHead);
+        }
+        
+        public boolean isElse() {
+            return !hasCondition();
         }
         
         public boolean hasCondition() {

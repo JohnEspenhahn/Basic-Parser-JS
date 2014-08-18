@@ -15,11 +15,6 @@ public class JSForStatement extends ForStatement {
     }
     
     @Override
-    public boolean endsWithBlock() {
-        return true;
-    }
-    
-    @Override
     public boolean useAddTargetCode() {
         return false;
     }

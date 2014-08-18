@@ -14,11 +14,6 @@ public class JSIfStatement extends IfStatement {
     }
     
     @Override
-    public boolean endsWithBlock() {
-        return true;
-    }
-    
-    @Override
     public boolean useAddTargetCode() {
         return false;
     }
@@ -69,7 +64,6 @@ public class JSIfStatement extends IfStatement {
             }            
         }
         
-        return JSPretty.getIndent() + str.toString();
-    }
-    
+        return JSPretty.format(0, "%s", str.toString());
+    }   
 }
