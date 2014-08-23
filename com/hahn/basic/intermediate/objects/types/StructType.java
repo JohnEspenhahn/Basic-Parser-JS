@@ -75,7 +75,7 @@ public class StructType extends Type {
     public void loadParams(List<BasicObject> ps) {
         if (ps != null) {
             for (int i = 0; i < ps.size(); i++) {
-                this.addParam(ps.get(i));
+                this.addParam(ps.get(i), null);
             }
         }
     }
@@ -100,23 +100,24 @@ public class StructType extends Type {
     
     /**
      * Add a basic object as a struct param
-     * @param name The name of the parameter
+     * @param nameNode The node with the name of the parameter
      * @param type The type of the parameter
      * @return This
      * @throws CompileException If the variable is already defined
      */
-    public StructType addParam(String name, Type type) {
-        return addParam(new Param(name, type));
+    public StructType addParam(Node nameNode, Type type) {
+        return addParam(new Param(nameNode.getValue(), type), nameNode);
     }
     
     /**
      * Add a basic object as a struct param
      * @param p The basic object to use when defining the struct param
+     * @param node The node to throw an error at
      * @return This
      * @throws CompileException If the variable is already defined
      */
-    public StructType addParam(BasicObject p) {
-        putParam(p);
+    public StructType addParam(BasicObject p, Node node) {
+        putParam(p, node);
         
         return this;
     }
@@ -124,17 +125,18 @@ public class StructType extends Type {
     /**
      * Add a basic object as a struct param
      * @param p The basic object to use when defining the struct param
+     * @param node The node to throw an error at if the parameter is already defined
      * @return The added struct param
      * @throws CompileException If the variable is already defined
      */
-    public StructParam putParam(BasicObject p) {
-        if (getParamSafe(p.getName()) == null)   {
+    public StructParam putParam(BasicObject p, Node node) {
+        if (getParam(p.getName(), node) == null)   {
             StructParam param = new StructParam(params.size(), p);
             params.put(p.getName(), param);
            
             return param;
         } else {
-            throw new CompileException("The instance variable `" + p.getName() + "` is already defined in `" + getName() + "`");
+            throw new RuntimeException();
         }
     }
     
@@ -169,27 +171,27 @@ public class StructType extends Type {
     }
     
     public StructParam getParamSafe(String name) {
-        return getParam(name, true);
+        return getParam(name, null);
     }
     
     /**
      * Get a variable unique to this frame's instance <br>
      * <b>Precondition</b> If `getting` is false call Main.setLine
      * @param name The name of the variable
-     * @param getting If false may throw exception 
+     * @param throwNode If not null can throw an error at this node 
      * @return The variable found or null
-     * @throws CompileException If getting is false and the variable is found
+     * @throws CompileException If throwNode is not null and the variable is already defined
      */
-    public StructParam getParam(String name, boolean getting) {
+    public StructParam getParam(String name, Node throwNode) {
         StructParam sVar = params.get(name);
         if (sVar != null) {
-            if (getting) return sVar;
-            else throw new CompileException("The instance variable `" + name + "` is already defined");
+            if (throwNode == null) return sVar;
+            else throw new CompileException("The instance variable `" + name + "` is already defined", throwNode);
         } else if (parent != null) {
             sVar =  parent.getParamSafe(name);
             if (sVar != null) {
-                if (getting) return sVar;
-                else throw new CompileException("The instance variable `" + name + "` is already defined in a super class");
+                if (throwNode == null) return sVar;
+                else throw new CompileException("The instance variable `" + name + "` is already defined in a super class", throwNode);
             }
         }
         

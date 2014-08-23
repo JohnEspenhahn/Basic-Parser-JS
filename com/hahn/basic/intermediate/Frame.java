@@ -615,7 +615,7 @@ public class Frame extends Statement {
                 // Create var
                 final BasicObject obj;
                 if (struct != null) {
-                    obj = struct.putParam(new Param(name, type, flags));
+                    obj = struct.putParam(new Param(name, type, flags), node);
                 } else {
                     obj = LangCompiler.factory.VarLocal(this, name, type, flags);
                 }

@@ -32,8 +32,8 @@ public class Type implements ITypeable {
     public static final StructType STRUCT = new StructType("struct", null, 0);
     public static final ClassType  OBJECT = new ClassType("Object", STRUCT, ClassType.Flag.ABSTRACT | ClassType.Flag.SYSTEM),
                                    FUNC   = OBJECT.extendAs("func", ClassType.Flag.FINAL | ClassType.Flag.SYSTEM).setTypeParams(-1),
-                                   ARRAY  = OBJECT.extendAs("array", ClassType.Flag.FINAL | ClassType.Flag.SYSTEM).addParam("length", Type.INT).setTypeParams(1),
-                                   STRING = OBJECT.extendAs("string", ClassType.Flag.FINAL | ClassType.Flag.SYSTEM).addParam("length", Type.INT).setTypeParams(0);
+                                   ARRAY  = OBJECT.extendAs("array", ClassType.Flag.FINAL | ClassType.Flag.SYSTEM).systemParam("length", Type.INT).setTypeParams(1),
+                                   STRING = OBJECT.extendAs("string", ClassType.Flag.FINAL | ClassType.Flag.SYSTEM).systemParam("length", Type.INT).setTypeParams(0);
     
     public static final int COUNT_PRIMATIVES = TYPES.size();
     

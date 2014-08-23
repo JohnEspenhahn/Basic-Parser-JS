@@ -81,9 +81,16 @@ public class ClassType extends StructType {
         return this;
     }
     
-    @Override
-    public ClassType addParam(String name, Type type) {
-        super.addParam(name, type);
+    /**
+     * Attempt to force a system parameter for a class. Should
+     * not be used by 3rd parties. Undefined behavior if the 
+     * parameter is already defined
+     * @param name The name of the parameter to define
+     * @param type The type of the parameter to define
+     * @return This
+     */
+    protected ClassType systemParam(String name, Type type) {
+        super.addParam(new Node(null, null, name, -1, -1), type);
         return this;
     }
     
