@@ -4,6 +4,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import com.hahn.basic.Main;
+import com.hahn.basic.definition.EnumToken;
 import com.hahn.basic.intermediate.LangCompiler;
 import com.hahn.basic.intermediate.library.base.Library;
 import com.hahn.basic.intermediate.objects.types.Type;
@@ -78,27 +79,26 @@ public class JSBuildTarget extends LangBuildTarget {
              * function construct(clazz, func_constructor) { 
              *     var instance = new clazz(); 
              *     if (func_constructor) { 
-             *         func_constructor.apply(instance, Array.prototype.slice.call(arguments, 2));
-             *     } 
+             *         instance[func_constructor].apply(instance, Array.prototype.slice.call(arguments, 2));
+             *     }
              *     return instance;
              * }
              */
-            builder.append("function constructor(c,f,o){o=new c;if(f)o[f].apply(Array.prototype.slice.call(arguments,2));return o}");
+            builder.append("function " + EnumToken.__c__ + "(c,f,o){o=new c;if(f)o[f].apply(o,Array.prototype.slice.call(arguments,2));return o}");
             if (Main.PRETTY) builder.append("\n");
             
             /*
-             * var implements = this.implements || function(child, parent) {
+             * function extends(child, parent) {
              *     for(var prop_key in parent)
              *         if (parent.hasOwnProperty(prop_key)) child[prop_key] = parent[prop_key]; 
              *     function __() {
              *          this.constructor = child;
-             *          this.super = parent;
              *     }
              *     __.prototype = parent.prototype;
              *     child.prototype = new __(); // the child prototype 
              * }
              */
-            builder.append("function implements(d,b,p){for(p in b)if(b.hasOwnProperty(p))d[p]=b[p];function _(){this.constructor=d}_.prototype=b.prototype;d.prototype=new _}");
+            builder.append("function " + EnumToken.__e__ + "(d,b,p){for(p in b)if(b.hasOwnProperty(p))d[p]=b[p];function _(){this.constructor=d}_.prototype=b.prototype;d.prototype=new _}");
             if (Main.PRETTY) builder.append("\n");
         }
         

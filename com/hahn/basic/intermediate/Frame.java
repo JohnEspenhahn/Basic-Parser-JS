@@ -182,12 +182,12 @@ public class Frame extends Statement {
             if (cs != null && cs.length() > 0) {
                 str.append(cs);
                 
-                if (!c.isBlock() && it.hasNext()) {
+                if (Main.PRETTY || (!c.isBlock() && it.hasNext())) {
                     str.append(LangCompiler.factory.getLangBuildTarget().getEOL());
+                    
+                    // Pretty print new line
+                    if (Main.PRETTY) str.append('\n');
                 }
-                
-                // Pretty print new line
-                if (Main.PRETTY) str.append('\n');
             }
         }
         
@@ -325,7 +325,7 @@ public class Frame extends Statement {
         if (obj != null) return obj;
         
         // Instance var
-        obj = getInstanceVar(name);
+        obj = safeGetInstanceVar(name);
         if (obj != null) return obj;
         
         // TODO get static class pointer
@@ -361,7 +361,7 @@ public class Frame extends Statement {
         return null;
     }
     
-    public BasicObject getInstanceVar(String name) {
+    public BasicObject safeGetInstanceVar(String name) {
         return null;
     }
     

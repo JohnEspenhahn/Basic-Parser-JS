@@ -79,6 +79,8 @@ public enum EnumToken implements IEnumRegexToken {
     THIS        ("this"       , Group.IDENT),
     SUPER       ("super"      , Group.IDENT),
     __s__       ("__s__"      , Group.IDENT),
+    __c__       ("__c__"      , Group.IDENT),
+    __e__       ("__e__"      , Group.IDENT),
     IDENTIFIER  ("<<WORD>>"   , Group.IDENT);
 
     

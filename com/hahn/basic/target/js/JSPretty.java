@@ -111,7 +111,7 @@ public class JSPretty {
                 
                 if (require_brace) {
                     JSPretty.indent -= 1;
-                    str.append(Main.PRETTY ? getIndent() + "}" : "}");
+                    str.append(Main.PRETTY ? "\n" + getIndent() + "}" : "}");
                 } else {
                     JSPretty.indent = oldIndent;
                 }

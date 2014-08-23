@@ -99,7 +99,8 @@ public class JSLangFactory implements ILangFactory {
         
         JSPretty.addTab();
         
-        if (isChild) builder.append(JSPretty.format(0, "implements(%s,%s);^", c.getName(), c.getParent().getName()));
+        // Extend
+        if (isChild) builder.append(JSPretty.format(0, "%s(%s,%s);^", EnumToken.__e__, c.getName(), c.getParent().getName()));
         builder.append(JSPretty.format(0, "function %s()_{^", c.getName()));
         
         if (!c.getInitFrame().isEmpty()) {
@@ -109,6 +110,7 @@ public class JSLangFactory implements ILangFactory {
             builder.append(JSPretty.format(1, "%s.call(this)^", EnumToken.__s__));
         }
         
+        builder.append(JSPretty.format(0, "^"));
         builder.append(JSPretty.format(0, "}^"));
         
         // TODO class static values

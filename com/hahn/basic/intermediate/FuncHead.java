@@ -2,7 +2,6 @@ package com.hahn.basic.intermediate;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.hahn.basic.Main;
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.FuncPointer;
 import com.hahn.basic.intermediate.objects.Param;
@@ -99,11 +98,11 @@ public abstract class FuncHead extends Frame {
     }
     
     @Override
-    public BasicObject getInstanceVar(String name) {
+    public BasicObject safeGetInstanceVar(String name) {
         if (getClassIn() != null) {
             StructParam param = classIn.getParamSafe(name);
             if (param != null) { 
-                return LangCompiler.factory.VarAccess(this, getClassIn().getThis(), param, param.getType(), Main.getRow(), Main.getCol());
+                return LangCompiler.factory.VarAccess(this, getClassIn().getThis(), param, param.getType(), -1, -1);
             }
         }
         
