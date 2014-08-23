@@ -13,6 +13,7 @@ import com.hahn.basic.intermediate.objects.Param;
 import com.hahn.basic.intermediate.objects.Var;
 import com.hahn.basic.intermediate.statements.Statement;
 import com.hahn.basic.parser.Node;
+import com.hahn.basic.util.Util;
 import com.hahn.basic.util.exceptions.CompileException;
 
 public class ClassType extends StructType {
@@ -139,7 +140,7 @@ public class ClassType extends StructType {
         
         // If reached this point then not found
         if (!safe) {
-            throw new CompileException("Unknown function `" + name + "` in " + this, nameNode);
+            throw new CompileException("Unknown function `" + name + "` with parameters `(" + Util.joinTypes(types, ',') + ")` in " + this, nameNode);
         } else {
             return null;
         }

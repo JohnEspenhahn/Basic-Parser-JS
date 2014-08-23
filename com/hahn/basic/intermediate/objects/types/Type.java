@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import lombok.NonNull;
+
 import com.hahn.basic.definition.EnumExpression;
 import com.hahn.basic.definition.EnumToken;
 import com.hahn.basic.parser.Node;
@@ -236,6 +238,18 @@ public class Type implements ITypeable {
         } else {
             return type;
         }
+    }
+    
+    /**
+     * Get the node with the actual name of the type
+     * @param head The given node
+     * @return The new type
+     * @throw CompileException If the node cannot be parsed to a valid type
+     */
+    public static Node getNameNode(@NonNull Node head) {
+        Iterator<Node> it = Util.getIterator(head);
+        
+        return it.next();
     }
     
     private static Type fromName(String name) {

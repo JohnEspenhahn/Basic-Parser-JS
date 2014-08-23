@@ -2,6 +2,7 @@ package com.hahn.basic.intermediate.objects;
 
 import java.util.List;
 
+import com.hahn.basic.definition.EnumToken;
 import com.hahn.basic.intermediate.FuncHead;
 import com.hahn.basic.intermediate.objects.types.ClassType;
 import com.hahn.basic.intermediate.objects.types.Type;
@@ -18,7 +19,8 @@ public abstract class NewInstance extends BasicObject {
 		
 		// Get constructor
 		if (type.doesExtend(Type.OBJECT) && params.size() > 0) {
-            this.constructor = ((ClassType) type).getFunc(typeNode, this.params);
+		    Node constructorNode = new Node(typeNode, EnumToken.CONSTRUCTOR, "constructor", typeNode.getRow(), typeNode.getCol());
+            this.constructor = ((ClassType) type).getFunc(constructorNode, this.params);
         }
 	}
 	

@@ -38,7 +38,8 @@ public enum EnumExpression implements IEnumExpression {
     
     FUNC_POINTER("AND IDENTIFIER OPEN_PRNTH ?<TYPE_LIST> CLOSE_PRNTH", false),
     
-    ANON_FUNC   ("FUNCTION ?<TYPE> OPEN_PRNTH ?<DEF_PARAMS> CLOSE_PRNTH <BLOCK>", false),    
+    ANON_FUNC   ("FUNCTION ?<TYPE> OPEN_PRNTH ?<DEF_PARAMS> CLOSE_PRNTH <BLOCK>", false),
+    CONSTRUCTOR ("CONSTRUCTOR OPEN_PRNTH ?<DEF_PARAMS> CLOSE_PRNTH <BLOCK>", false),
     DEF_FUNC    ("<TYPE> IDENTIFIER OPEN_PRNTH ?<DEF_PARAMS> CLOSE_PRNTH <BLOCK>", false),
     DEF_PARAMS  ("<TYPE> IDENTIFIER (ASSIGN <EXPRESSION>) {COMMA <TYPE> IDENTIFIER (ASSIGN <EXPRESSION>)}", false),
     
@@ -66,7 +67,7 @@ public enum EnumExpression implements IEnumExpression {
     /** Stuff that can be done within if(){} */
     BLOCK_CNTNT ("<DEFINE>EOL|<COMMAND>EOL|<EXPRESSION>EOL|<RETURN>|<IF_STMT>|<WHILE_STMT>|<FOR_STMT>|EOL", false),
     /** Stuff that can be done within class{} */
-    CLASS_CNTNT ("<DEF_FUNC>|<DEFINE>EOL|EOL"),
+    CLASS_CNTNT ("<DEF_FUNC>|<CONSTRUCTOR>|<DEFINE>EOL|EOL"),
     
     DIRECTIVE   ("HASH IDENTIFIER", false),
     START       ("<DIRECTIVE>$|<STRUCT>$|<CLASS>$|<BLOCK_CNTNT>$|<CLASS_CNTNT>$", false);

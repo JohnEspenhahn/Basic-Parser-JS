@@ -396,6 +396,8 @@ public class Frame extends Statement {
                 defineClass(child);
             } else if (token == EnumExpression.DEF_FUNC) {
                 defineFunc(child);
+            } else if (token == EnumExpression.CONSTRUCTOR) {
+                defineConstructor(child, null);
             } else if (token == EnumExpression.RETURN) {
                 addCode(doReturn(child));
             } else if (token == EnumToken.CONTINUE) {
@@ -782,6 +784,8 @@ public class Frame extends Statement {
                 handleClassContent(nameNode, classIn, Util.getIterator(child));
             } else if (token == EnumExpression.DEF_FUNC) {
                 defineClassFunc(child, classIn);
+            } else if (token == EnumExpression.CONSTRUCTOR) {
+                defineConstructor(child, classIn);
             } else if (token == EnumExpression.DEFINE) {
                 defineVar(child, classIn, true);
             } else if (token == EnumToken.EOL) {
@@ -820,6 +824,12 @@ public class Frame extends Statement {
         return doDefineFunc(head, classIn, false);
     }
     
+    public FuncPointer defineConstructor(Node head, ClassType classIn) {
+        if (classIn == null) throw new CompileException("Illegal definition of a constructor outside of a class", head);
+        
+        return defineClassFunc(head, classIn);
+    }
+    
     public FuncPointer doDefineFunc(Node head, ClassType classIn, boolean anonymous) {
         Iterator<Node> it = Util.getIterator(head);
         
@@ -834,7 +844,7 @@ public class Frame extends Statement {
             Node child = it.next();
             Enum<?> token = child.getToken();
             
-            if (token == EnumToken.FUNCTION) {
+            if (token == EnumToken.FUNCTION || token == EnumToken.CONSTRUCTOR) {
                 nameNode = child;
             } else if (token == EnumExpression.TYPE) {
                 rtnType = Type.fromNode(child);
