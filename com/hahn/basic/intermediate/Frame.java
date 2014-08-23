@@ -167,12 +167,14 @@ public class Frame extends Statement {
     @Override
     public String toTarget() {
         StringBuilder str = new StringBuilder();
-        for (Compilable c: getTargetCode()) {
+        Iterator<Compilable> it = getTargetCode().iterator();
+        while (it.hasNext()) {
+            Compilable c = it.next();
             String cs = c.toTarget();
             if (cs != null && cs.length() > 0) {
                 str.append(cs);
                 
-                if (!c.isBlock()) {
+                if (!c.isBlock() && it.hasNext()) {
                     str.append(LangCompiler.factory.getLangBuildTarget().getEOL());
                 }
                 

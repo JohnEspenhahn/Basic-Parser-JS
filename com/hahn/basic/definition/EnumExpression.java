@@ -39,7 +39,7 @@ public enum EnumExpression implements IEnumExpression {
     FUNC_POINTER("AND IDENTIFIER OPEN_PRNTH ?<TYPE_LIST> CLOSE_PRNTH", false),
     
     ANON_FUNC   ("FUNCTION ?<TYPE> OPEN_PRNTH ?<DEF_PARAMS> CLOSE_PRNTH <BLOCK>", false),    
-    DEF_FUNC    ("FUNCTION <TYPE> IDENTIFIER OPEN_PRNTH ?<DEF_PARAMS> CLOSE_PRNTH <BLOCK>", false),
+    DEF_FUNC    ("<TYPE> IDENTIFIER OPEN_PRNTH ?<DEF_PARAMS> CLOSE_PRNTH <BLOCK>", false),
     DEF_PARAMS  ("<TYPE> IDENTIFIER (ASSIGN <EXPRESSION>) {COMMA <TYPE> IDENTIFIER (ASSIGN <EXPRESSION>)}", false),
     
     STRUCT      ("STRUCT IDENTIFIER OPEN_BRACE [<DEFINE> EOL] CLOSE_BRACE", false),
@@ -52,7 +52,7 @@ public enum EnumExpression implements IEnumExpression {
     ACCESS      ("<IDENTIFIER> ?<IN_ACCESS>", false),
     IN_ACCESS   ("OPEN_SQR <EXPRESSION> CLOSE_SQR$|DOT IDENTIFIER$", false),
     
-    FLAG        ("CONST", false),
+    FLAG        ("CONST|PRIVATE", false),
     DEFINE      ("{<FLAG>} <TYPE> IDENTIFIER ?<DEF_MODIFY> {COMMA IDENTIFIER ?<DEF_MODIFY>}", false),
     DEF_MODIFY  ("ASSIGN <EXPRESSION>", false),
     

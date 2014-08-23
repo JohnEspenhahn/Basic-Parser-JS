@@ -95,14 +95,20 @@ public class JSLangFactory implements ILangFactory {
         boolean isChild = (c.getParent() instanceof ClassType);
         
         StringBuilder builder = new StringBuilder();
-        builder.append(JSPretty.format(0, "(function %s(%s)_{^", c.getName(), (isChild ? EnumToken.__s__ : "")));
+        builder.append(JSPretty.format(0, "var %s_=_(function(%s)_{^", c.getName(), (isChild ? EnumToken.__s__ : "")));
         
         JSPretty.addTab();
         
         if (isChild) builder.append(JSPretty.format(0, "implements(%s,%s);^", c.getName(), c.getParent().getName()));
         builder.append(JSPretty.format(0, "function %s()_{^", c.getName()));
-        builder.append(JSPretty.format(1, "%s.call(this);^", EnumToken.__s__));
-        if (!c.getInitFrame().isEmpty()) builder.append(JSPretty.format(0, "%s", c.getInitFrame()));
+        
+        if (!c.getInitFrame().isEmpty()) {
+            builder.append(JSPretty.format(1, "%s.call(this);^", EnumToken.__s__));
+            builder.append(JSPretty.format(0, "%s", c.getInitFrame()));
+        } else {
+            builder.append(JSPretty.format(1, "%s.call(this)^", EnumToken.__s__));
+        }
+        
         builder.append(JSPretty.format(0, "}^"));
         
         // TODO class static values
@@ -113,7 +119,7 @@ public class JSLangFactory implements ILangFactory {
                     func.reverseOptimize();
                     func.forwardOptimize();
                     
-                    builder.append(JSPretty.format(0, "%s.prototype.%s_=_%s;", c.getName(), func.getFuncId(), func.toFuncAreaTarget()));
+                    builder.append(JSPretty.format(0, "%s.prototype.%s_=_%s;^", c.getName(), func.getFuncId(), func.toFuncAreaTarget()));
                 }
             }
         }

@@ -67,7 +67,8 @@ public abstract class Var extends AdvancedObject {
     }
     
     public static class Flag {
-        public static final int CONST = 0b00000000000000000000000000000001;
+        public static final int CONST   = 0b00000000000000000000000000000001;
+        public static final int PRIVATE = 0b00000000000000000000000000000010;
         
         /**
          * Get the flag from the given EnumExpression.FLAG node
@@ -80,6 +81,7 @@ public abstract class Var extends AdvancedObject {
             
             switch (name) {
             case "const": return Flag.CONST;
+            case "private": return Flag.PRIVATE;
             
             default:
                 throw new CompileException("Invalid variable flag `" + name + "`");
