@@ -4,6 +4,7 @@ import com.hahn.basic.intermediate.IIntermediate;
 import com.hahn.basic.intermediate.opcode.OPCode;
 import com.hahn.basic.intermediate.statements.Statement;
 import com.hahn.basic.parser.Node;
+import com.hahn.basic.util.BitFlag;
 import com.hahn.basic.util.exceptions.CompileException;
 
 public abstract class ArithmeticSetObject extends ArithmeticObject {
@@ -17,7 +18,7 @@ public abstract class ArithmeticSetObject extends ArithmeticObject {
         super.setInUse(by);
         
         // Check flags
-        if (getP1().hasFlag(Var.Flag.CONST)) {
+        if (getP1().hasFlag(BitFlag.CONST)) {
             throw new CompileException("Can not modify the constant variable `" + getP1() + "`");
         }
         

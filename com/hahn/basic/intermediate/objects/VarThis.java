@@ -3,10 +3,11 @@ package com.hahn.basic.intermediate.objects;
 import com.hahn.basic.intermediate.Frame;
 import com.hahn.basic.intermediate.objects.types.ClassType;
 import com.hahn.basic.intermediate.objects.types.Type;
+import com.hahn.basic.util.BitFlag;
 import com.hahn.basic.util.exceptions.CompileException;
 
 public class VarThis extends Var {
-    private static final int FLAGS = Var.Flag.CONST;
+    private static final int FLAGS = BitFlag.CONST.b | BitFlag.PRIVATE.b;
     
     public VarThis(Frame frame, ClassType type) {
         super(frame, "this", type, FLAGS);

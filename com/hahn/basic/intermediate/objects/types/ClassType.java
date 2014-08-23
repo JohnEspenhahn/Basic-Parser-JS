@@ -13,6 +13,7 @@ import com.hahn.basic.intermediate.objects.Param;
 import com.hahn.basic.intermediate.objects.Var;
 import com.hahn.basic.intermediate.statements.Statement;
 import com.hahn.basic.parser.Node;
+import com.hahn.basic.util.BitFlag;
 import com.hahn.basic.util.Util;
 import com.hahn.basic.util.exceptions.CompileException;
 
@@ -42,7 +43,7 @@ public class ClassType extends StructType {
      * @return This
      */
     public ClassType setSystemClass() {
-        setFlag(Flag.SYSTEM);
+        setFlag(BitFlag.SYSTEM);
         return this;
     }
     
@@ -162,31 +163,7 @@ public class ClassType extends StructType {
     }
     
     public String toTarget() {
-        if (hasFlag(Flag.SYSTEM)) return "";
+        if (hasFlag(BitFlag.SYSTEM)) return "";
         else return LangCompiler.factory.createClass(this);
-    }
-    
-    public static class Flag {
-        public static final int SYSTEM   = 0b00000000000000000000000000000001;
-        public static final int ABSTRACT = 0b00000000000000000000000000000010;
-        public static final int FINAL    = 0b00000000000000000000000000000100;
-        
-        /**
-         * Get the flag from the given EnumExpression.C_FLAG node
-         * @param node EnumExpression.C_FLAG
-         * @return The flag
-         * @throws CompileException if not a valid flag
-         */
-        public static int valueOf(Node node) {
-            String name = node.getAsChildren().get(0).getValue();
-            
-            switch (name) {
-            case "abstract": return Flag.ABSTRACT;
-            case "final":    return Flag.FINAL;
-            
-            default:
-                throw new CompileException("Invalid class flag `" + name + "`");
-            }
-        }
     }
 }

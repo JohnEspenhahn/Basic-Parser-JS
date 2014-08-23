@@ -9,6 +9,7 @@ import lombok.NonNull;
 import com.hahn.basic.definition.EnumExpression;
 import com.hahn.basic.definition.EnumToken;
 import com.hahn.basic.parser.Node;
+import com.hahn.basic.util.BitFlag;
 import com.hahn.basic.util.Util;
 import com.hahn.basic.util.exceptions.CastException;
 import com.hahn.basic.util.exceptions.CompileException;
@@ -30,10 +31,10 @@ public class Type implements ITypeable {
                              NULL = new Type("null", false, true);
     
     public static final StructType STRUCT = new StructType("struct", null, 0);
-    public static final ClassType  OBJECT = new ClassType("Object", STRUCT, ClassType.Flag.ABSTRACT | ClassType.Flag.SYSTEM),
-                                   FUNC   = OBJECT.extendAs("func", ClassType.Flag.FINAL | ClassType.Flag.SYSTEM).setTypeParams(-1),
-                                   ARRAY  = OBJECT.extendAs("array", ClassType.Flag.FINAL | ClassType.Flag.SYSTEM).systemParam("length", Type.INT).setTypeParams(1),
-                                   STRING = OBJECT.extendAs("string", ClassType.Flag.FINAL | ClassType.Flag.SYSTEM).systemParam("length", Type.INT).setTypeParams(0);
+    public static final ClassType  OBJECT = new ClassType("Object", STRUCT, BitFlag.ABSTRACT.b | BitFlag.SYSTEM.b),
+                                   FUNC   = OBJECT.extendAs("func", BitFlag.FINAL.b | BitFlag.SYSTEM.b).setTypeParams(-1),
+                                   ARRAY  = OBJECT.extendAs("array", BitFlag.FINAL.b | BitFlag.SYSTEM.b).systemParam("length", Type.INT).setTypeParams(1),
+                                   STRING = OBJECT.extendAs("string", BitFlag.FINAL.b | BitFlag.SYSTEM.b).systemParam("length", Type.INT).setTypeParams(0);
     
     public static final int COUNT_PRIMATIVES = TYPES.size();
     

@@ -6,6 +6,7 @@ import com.hahn.basic.intermediate.objects.types.StructType.StructParam;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.opcode.OPCode;
 import com.hahn.basic.intermediate.statements.Statement;
+import com.hahn.basic.util.BitFlag;
 import com.hahn.basic.util.exceptions.CompileException;
 
 public abstract class VarAccess extends BasicObject {
@@ -58,7 +59,7 @@ public abstract class VarAccess extends BasicObject {
      */
     
     @Override
-    public boolean hasFlag(int flag) {
+    public boolean hasFlag(BitFlag flag) {
         if (accessed != null) return accessed.hasFlag(flag);
         else return false;
     }

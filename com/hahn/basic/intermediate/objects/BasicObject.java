@@ -10,6 +10,7 @@ import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.opcode.OPCode;
 import com.hahn.basic.intermediate.statements.ExpressionStatement;
 import com.hahn.basic.intermediate.statements.Statement;
+import com.hahn.basic.util.BitFlag;
 
 public abstract class BasicObject implements IIntermediate, ITypeable {
     private String name;
@@ -59,7 +60,7 @@ public abstract class BasicObject implements IIntermediate, ITypeable {
      * @param flag The flag to check
      * @return True if has the flag
      */
-    public boolean hasFlag(int flag) {
+    public boolean hasFlag(BitFlag flag) {
         return false;
     }
     

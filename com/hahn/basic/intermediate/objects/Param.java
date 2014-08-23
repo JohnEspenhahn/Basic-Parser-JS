@@ -1,6 +1,7 @@
 package com.hahn.basic.intermediate.objects;
 
 import com.hahn.basic.intermediate.objects.types.Type;
+import com.hahn.basic.util.BitFlag;
 
 public class Param extends BasicObject {
     private int flags;
@@ -21,8 +22,8 @@ public class Param extends BasicObject {
     }
     
     @Override
-    public boolean hasFlag(int flag) {
-        return (this.flags & flag) != 0;
+    public boolean hasFlag(BitFlag flag) {
+        return (this.flags & flag.b) != 0;
     }
     
     @Override

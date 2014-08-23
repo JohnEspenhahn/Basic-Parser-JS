@@ -8,6 +8,7 @@ import java.util.Map;
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.Param;
 import com.hahn.basic.parser.Node;
+import com.hahn.basic.util.BitFlag;
 import com.hahn.basic.util.exceptions.CompileException;
 
 public class StructType extends Type {    
@@ -35,12 +36,12 @@ public class StructType extends Type {
         return parent;
     }
     
-    public boolean hasFlag(int flag) {
-        return (this.flags & flag) != 0;
+    public boolean hasFlag(BitFlag flag) {
+        return (this.flags & flag.b) != 0;
     }
     
-    public void setFlag(int flag) {
-        this.flags |= flag;
+    public void setFlag(BitFlag flag) {
+        this.flags |= flag.b;
     }
     
     @Override

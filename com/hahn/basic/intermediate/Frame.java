@@ -49,7 +49,6 @@ import com.hahn.basic.intermediate.objects.LiteralBool;
 import com.hahn.basic.intermediate.objects.LiteralNum;
 import com.hahn.basic.intermediate.objects.OPObject;
 import com.hahn.basic.intermediate.objects.Param;
-import com.hahn.basic.intermediate.objects.Var;
 import com.hahn.basic.intermediate.objects.VarAccess;
 import com.hahn.basic.intermediate.objects.VarTemp;
 import com.hahn.basic.intermediate.objects.types.ClassType;
@@ -69,6 +68,7 @@ import com.hahn.basic.intermediate.statements.IfStatement.Conditional;
 import com.hahn.basic.intermediate.statements.ParamDefaultValStatement;
 import com.hahn.basic.intermediate.statements.Statement;
 import com.hahn.basic.parser.Node;
+import com.hahn.basic.util.BitFlag;
 import com.hahn.basic.util.NestedListIterator;
 import com.hahn.basic.util.Util;
 import com.hahn.basic.util.exceptions.CompileException;
@@ -372,7 +372,7 @@ public class Frame extends Statement {
         // Found
         if (obj != null) {
             ClassType classIn = getClassIn();
-            if (classIn != null && obj.hasFlag(Var.Flag.PRIVATE) && !classIn.getDefinedParams().contains(obj.getAccessedObject())) {
+            if (classIn != null && obj.hasFlag(BitFlag.PRIVATE) && !classIn.getDefinedParams().contains(obj.getAccessedObject())) {
                 throw new CompileException("The field `" + name + "` is private", nameNode);
             }
             
@@ -606,7 +606,7 @@ public class Frame extends Statement {
             Enum<?> token = node.getToken();
             
             if (token == EnumExpression.FLAG) {
-                flags |= Var.Flag.valueOf(node);
+                flags |= BitFlag.valueOf(node);
             } else if (token == EnumExpression.TYPE) {
                 type = Type.fromNode(node);
             } else if (token == EnumToken.IDENTIFIER) {
@@ -749,7 +749,7 @@ public class Frame extends Statement {
         
         // Don't add class code if library
         if (Main.LIBRARY) {
-            flags |= ClassType.Flag.SYSTEM;
+            flags |= BitFlag.SYSTEM.b;
         }
         
         // Get parent classes
@@ -759,7 +759,7 @@ public class Frame extends Statement {
             Enum<?> token = node.getToken();
             
             if (token == EnumExpression.C_FLAG) {
-                flags |= ClassType.Flag.valueOf(node);
+                flags |= BitFlag.valueOf(node);
             } else if (token == EnumExpression.C_PARENT) {
                 List<Node> children = node.getAsChildren();
                 Node ckey = children.get(0);
@@ -778,7 +778,7 @@ public class Frame extends Statement {
         
         Type parentType = (parentNode == null ? Type.OBJECT : Type.fromNode(parentNode));
         if (parentType.doesExtend(Type.OBJECT)) {
-            if (((ClassType) parentType).hasFlag(ClassType.Flag.FINAL)) {
+            if (((ClassType) parentType).hasFlag(BitFlag.FINAL)) {
                 throw new CompileException("The class `" + nameNode + "` cannot extend the final class `" + parentType + "`", parentNode);
             }
             
@@ -1021,7 +1021,7 @@ public class Frame extends Statement {
         Type type = Type.fromNode(typeNode);
         if (!type.doesExtend(Type.STRUCT)) {
             throw new CompileException("Cannot create a new instance of type `" + type + "`", typeNode);
-        } else if (type instanceof ClassType && ((ClassType) type).hasFlag(ClassType.Flag.ABSTRACT)) {
+        } else if (type instanceof ClassType && ((ClassType) type).hasFlag(BitFlag.ABSTRACT)) {
             throw new CompileException("Cannot create a new instance of abstract class `" + type + "`", typeNode);
         }
         
