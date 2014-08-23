@@ -23,7 +23,7 @@ public class JSNewInstance extends NewInstance {
             } else if (getParams().length == 0) { // Constructor with no params
                 return String.format("constructor(%s,%s)", getType().getName(), getConstructor());
             } else { // Constructor with params
-                return String.format("constructor(%s,%s,%s)", getType().getName(), getConstructor(), Util.toTarget(getParams()));
+                return String.format("constructor(%s,'%s',%s)", getType().getName(), getConstructor().getFuncId(), Util.toTarget(getParams()));
             }
         } else if (getType().doesExtend(Type.STRUCT)) {
             return "{}";

@@ -200,6 +200,13 @@ public abstract class BasicObject implements IIntermediate, ITypeable {
     }
     
     /**
+     * @return True if this object extends VarThis
+     */
+    public boolean isThis() {
+        return false;
+    }
+    
+    /**
      * Only TernaryObject should return true
      * @return True if TernaryObject
      */
@@ -250,6 +257,13 @@ public abstract class BasicObject implements IIntermediate, ITypeable {
      * @return The creatable version of this
      */
     public BasicObject getForCreateVar() {
+        return this;
+    }
+    
+    /**
+     * @return The reference to the variable actually being accessed
+     */
+    public BasicObject getAccessedObject() {
         return this;
     }
     

@@ -58,28 +58,22 @@ public abstract class ExpressionStatement extends Statement {
     
     @Override
     public boolean reverseOptimize() {
-        int oldRow = Main.getRow();
-        int oldCol = Main.getCol();
-        
-        if (node != null) Main.setLine(node.getRow(), node.getCol());   
+        if (node != null) Main.pushLine(node.getRow(), node.getCol());   
         
         getObj().setInUse(this);
         
-        Main.setLine(oldRow, oldCol);
+        if (node != null) Main.popLine();
         
         return false;
     }
     
     @Override
     public boolean forwardOptimize() {
-        int oldRow = Main.getRow();
-        int oldCol = Main.getCol();
-        
-        Main.setLine(row, 0);
+        Main.pushLine(row, 0);
         
         getObj().takeRegister(this);
         
-        Main.setLine(oldRow, oldCol);
+        Main.popLine();
         
         return false;
     }

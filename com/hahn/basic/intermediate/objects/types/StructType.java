@@ -128,7 +128,7 @@ public class StructType extends Type {
      * @throws CompileException If the variable is already defined
      */
     public StructParam putParam(BasicObject p) {
-        if (!params.containsKey(p.getName()))   {
+        if (getParamSafe(p.getName()) == null)   {
             StructParam param = new StructParam(params.size(), p);
             params.put(p.getName(), param);
            

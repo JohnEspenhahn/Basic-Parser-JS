@@ -31,7 +31,7 @@ public class JSPretty {
      * @return Formatted string with indent and `tabs` extra tabs
      */
     public static String format(int tabs, String format, Object... args) {
-        if (tabs >= 0) JSPretty.indent += tabs;
+        if (Main.PRETTY && tabs >= 0) JSPretty.indent += tabs;
         
         StringBuilder builder = new StringBuilder(format.length());
         

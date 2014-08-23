@@ -112,6 +112,14 @@ public class Frame extends Statement {
         return this;
     }
     
+    public ClassType getClassIn() {
+        if (parent != null) {
+            return parent.getClassIn();
+        } else {
+            return null;
+        }
+    }
+    
     public boolean hasFrameHead() {
         return frameHead != null;
     }
@@ -361,9 +369,17 @@ public class Frame extends Statement {
         String name = nameNode.getValue();
         BasicObject obj = safeGetVar(name);
         
-        // Not found
-        if (obj != null) return obj;
-        else throw new CompileException("Variable `" + name + "` is not defined in this scope", nameNode);
+        // Found
+        if (obj != null) {
+            ClassType classIn = getClassIn();
+            if (classIn != null && obj.hasFlag(Var.Flag.PRIVATE) && !classIn.getDefinedParams().contains(obj.getAccessedObject())) {
+                throw new CompileException("The field `" + name + "` is private", nameNode);
+            }
+            
+            return obj;
+        } else {
+            throw new CompileException("Variable `" + name + "` is not defined in this scope", nameNode);
+        }
     }
     
     public String getLabel(String name) {

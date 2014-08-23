@@ -48,6 +48,7 @@ public abstract class VarAccess extends BasicObject {
      * If it can be determined gets the actual object that is being accessed
      * @return The actual object being accessed, or null if it cannot be determined
      */
+    @Override
     public final BasicObject getAccessedObject() {
         return accessed;
     }

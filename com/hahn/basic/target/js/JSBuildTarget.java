@@ -83,7 +83,7 @@ public class JSBuildTarget extends LangBuildTarget {
              *     return instance;
              * }
              */
-            builder.append("function constructor(c,f,o){o=new c;if(f)f.apply(o,Array.prototype.slice.call(arguments,2));return o}");
+            builder.append("function constructor(c,f,o){o=new c;if(f)o[f].apply(Array.prototype.slice.call(arguments,2));return o}");
             if (Main.PRETTY) builder.append("\n");
             
             /*

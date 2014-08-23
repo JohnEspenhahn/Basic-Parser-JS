@@ -13,6 +13,11 @@ public class VarThis extends Var {
     }
     
     @Override
+    public boolean isThis() {
+        return true;
+    }
+    
+    @Override
     public boolean isLocal() {
         return false;
     }

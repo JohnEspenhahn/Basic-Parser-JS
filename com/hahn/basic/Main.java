@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Stack;
 
 import javax.swing.JFileChooser;
 
@@ -19,7 +20,8 @@ import com.hahn.basic.util.EnumInputType;
 import com.hahn.basic.util.exceptions.CompileException;
 
 public abstract class Main {
-    private static int ROW, COLUMN;    
+    private static int ROW, COLUMN;
+    private static Stack<Integer> ROWS = new Stack<Integer>(), COLUMNS = new Stack<Integer>();
     private static List<String> LINES = new ArrayList<String>();
     
     public static boolean DEBUG = false; 
@@ -308,6 +310,17 @@ public abstract class Main {
     public static void setLine(int row, int col) {
         Main.ROW = row;
         Main.COLUMN = col;
+    }
+    
+    public static void pushLine(int row, int col) {
+        Main.ROWS.push(Main.ROW);
+        Main.COLUMNS.push(Main.COLUMN);
+        
+        setLine(row, col);
+    }
+    
+    public static void popLine() {
+        setLine(Main.ROWS.pop(), Main.COLUMNS.pop());
     }
     
     public static void main(String[] args) {
