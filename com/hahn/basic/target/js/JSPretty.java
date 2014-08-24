@@ -37,13 +37,23 @@ public class JSPretty {
         
         int argIdx = 0;
         boolean isFlag = false;
-        for (char c: format.toCharArray()) {
+        for (int i = 0; i < format.length(); i++) {
+            char c = format.charAt(i);
             if (isFlag) {
                 isFlag = false;
                 handleFlag(builder, c, args[argIdx++]);
                 
             } else if (c == '%') {
                 isFlag = true;
+                
+            } else if (c == '<') {
+                if (!Main.PRETTY) {
+                    do {
+                        i += 1;
+                    } while (i < format.length() && format.charAt(i) != '>');
+                }
+            } else if (c == '>') {
+                continue;
                 
             } else {
                 handleToken(builder, c);
