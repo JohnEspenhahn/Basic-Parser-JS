@@ -91,7 +91,6 @@ public class JSLangFactory implements ILangFactory {
     
     @Override
     public String createClass(ClassType c) {
-        if (c.getName().equals("Object")) return "";
         boolean isChild = (c.getParent() instanceof ClassType);
         
         StringBuilder builder = new StringBuilder();
