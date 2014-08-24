@@ -7,7 +7,7 @@ import com.hahn.basic.util.BitFlag;
 import com.hahn.basic.util.exceptions.CompileException;
 
 public class VarSuper extends Var {
-    private static final int FLAGS = BitFlag.CONST.b | BitFlag.PRIVATE.b;
+    private static final int FLAGS = BitFlag.CONST.b;
     
     public VarSuper(Frame frame, ClassType type) {
         super(frame, "super", type, FLAGS);

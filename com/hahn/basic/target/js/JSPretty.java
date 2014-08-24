@@ -30,8 +30,8 @@ public class JSPretty {
      * @param args If empty will ignore format
      * @return Formatted string with indent and `tabs` extra tabs
      */
-    public static String format(int tabs, String format, Object... args) {
-        if (Main.PRETTY && tabs >= 0) JSPretty.indent += tabs;
+    public static String format(final int tabs, String format, Object... args) {
+        if (Main.PRETTY && tabs >= 0) JSPretty.setTabs(getTabs() + tabs);
         
         StringBuilder builder = new StringBuilder(format.length());
         
@@ -65,7 +65,7 @@ public class JSPretty {
     
     private static void handleFlag(StringBuilder str, char flag, Object arg) {
         boolean require_brace = true;
-        final int oldIndent = JSPretty.indent;
+        final int oldIndent = JSPretty.getTabs();
         
         switch (flag) {
         // Standard
@@ -75,9 +75,9 @@ public class JSPretty {
             
         // Indentless standard
         case 'S':
-            JSPretty.indent = 0;
+            JSPretty.setTabs(0);
             str.append(arg instanceof IIntermediate ? ((IIntermediate) arg).toTarget() : arg);
-            JSPretty.indent = oldIndent;
+            JSPretty.setTabs(oldIndent);
             
             break;
             
@@ -100,20 +100,20 @@ public class JSPretty {
                 require_brace = require_brace || frame.getSize() > 1;
                 
                 if (require_brace) {
-                    JSPretty.indent += 1;
+                    JSPretty.setTabs(getTabs() + 1);
                     str.append(Main.PRETTY ? " {\n" : "{");
                 } else {
-                    JSPretty.indent = 0;
+                    JSPretty.setTabs(0);
                     str.append(Main.PRETTY ? " " : "");
                 }
                 
                 str.append(arg instanceof IIntermediate ? ((IIntermediate) arg).toTarget() : arg);
                 
                 if (require_brace) {
-                    JSPretty.indent -= 1;
+                    JSPretty.setTabs(getTabs() - 1);
                     str.append(Main.PRETTY ? "\n" + getIndent() + "}" : "}");
                 } else {
-                    JSPretty.indent = oldIndent;
+                    JSPretty.setTabs(oldIndent);
                 }
             }
                 
@@ -161,7 +161,7 @@ public class JSPretty {
     }
     
     public static String getIndent() {
-        return getTabs(JSPretty.indent);
+        return getTabs(getTabs());
     }
     
     public static String getTabs(int num) {
@@ -174,6 +174,14 @@ public class JSPretty {
     
     public static void removeTab() {
         JSPretty.indent -= 1;
+    }
+    
+    public static void setTabs(int i) {
+        JSPretty.indent = i;
+    }
+    
+    public static int getTabs() {
+        return JSPretty.indent;
     }
     
     public static final String TAB = "    ";

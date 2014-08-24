@@ -20,7 +20,7 @@ public abstract class NewInstance extends BasicObject {
 		// Get constructor
 		if (type.doesExtend(Type.OBJECT)) {
 		    Node constructorNode = new Node(typeNode, EnumToken.CONSTRUCTOR, "constructor", typeNode.getRow(), typeNode.getCol());
-            this.constructor = ((ClassType) type).getFunc(constructorNode, this.params);
+            this.constructor = ((ClassType) type).getFunc(null, constructorNode, this.params);
         }
 	}
 	

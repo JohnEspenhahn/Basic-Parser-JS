@@ -62,7 +62,7 @@ public class JSBuildTarget extends LangBuildTarget {
 	
 	@Override
 	public String endCodeArea() {
-	    return (Main.PRETTY ? ";\n" : ";");
+	    return (Main.PRETTY ? "\n" : ";");
 	}
 	
 	@Override

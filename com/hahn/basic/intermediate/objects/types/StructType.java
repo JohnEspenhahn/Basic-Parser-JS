@@ -163,7 +163,12 @@ public class StructType extends Type {
         StructParam param = getParamSafe(name);        
         
         if (param != null) {
-            return param;
+            if (param.hasFlag(BitFlag.PRIVATE) && !getDefinedParams().contains(param)) {
+                if (safe) return null;
+                else throw new CompileException("The field `" + name + "` is private", nameNode);
+            } else {
+                return param;
+            }
         } else if (safe) {
             return null;
         } else {

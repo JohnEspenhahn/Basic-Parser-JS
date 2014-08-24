@@ -182,11 +182,12 @@ public class Frame extends Statement {
             if (cs != null && cs.length() > 0) {
                 str.append(cs);
                 
-                if (Main.PRETTY || (!c.isBlock() && it.hasNext())) {
+                boolean eol = !c.isBlock() && it.hasNext();
+                if (Main.PRETTY || eol) {
                     str.append(LangCompiler.factory.getLangBuildTarget().getEOL());
                     
                     // Pretty print new line
-                    if (Main.PRETTY) str.append('\n');
+                    if (Main.PRETTY && eol) str.append('\n');
                 }
             }
         }
@@ -372,7 +373,7 @@ public class Frame extends Statement {
         // Found
         if (obj != null) {
             ClassType classIn = getClassIn();
-            if (classIn != null && obj.hasFlag(BitFlag.PRIVATE) && !classIn.getDefinedParams().contains(obj.getAccessedObject())) {
+            if (classIn != null && obj.hasFlag(BitFlag.PRIVATE) && (!obj.isVarThis() || !classIn.getDefinedParams().contains(obj.getAccessedObject()))) {
                 throw new CompileException("The field `" + name + "` is private", nameNode);
             }
             
@@ -852,6 +853,7 @@ public class Frame extends Statement {
         Type rtnType = Type.VOID;
         Node nameNode = null;
         Node body = null;
+        int flags = 0;
         
         List<DefinePair> inits = new ArrayList<DefinePair>();        
         List<Param> params = new ArrayList<Param>();
@@ -864,6 +866,8 @@ public class Frame extends Statement {
                 nameNode = child;
             } else if (token == EnumExpression.TYPE) {
                 rtnType = Type.fromNode(child);
+            } else if (token == EnumExpression.F_FLAG) {
+                flags |= BitFlag.valueOf(child);
             } else if (token == EnumToken.IDENTIFIER) {
                 nameNode = child;
             } else if (token == EnumExpression.DEF_PARAMS) {      
@@ -913,6 +917,9 @@ public class Frame extends Statement {
             
             func = LangCompiler.defineFunc(this, body, name, false, rtnType, aParams);
         }
+        
+        // Put flags
+        func.setFlags(flags);
         
         // Put default value
         if (!inits.isEmpty()) {
@@ -984,7 +991,7 @@ public class Frame extends Statement {
      * @param objectIn The object the function is in or null
      * @return FuncPointer
      */
-    private FuncPointer getFuncPointer(Node head, BasicObject objectIn) {
+    private FuncPointer getFuncPointer(Node head, AdvancedObject objectIn) {
         Iterator<Node> it = Util.getIterator(head);
         
         Node nameNode = null;

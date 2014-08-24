@@ -137,9 +137,9 @@ public class LangCompiler {
         return funcBridge.defineFunc(parent, head, name, rawName, rtnType, params);
     }
     
-    public static FuncHead getFunc(BasicObject obj, Node nameNode, ITypeable[] types) {
-        if (obj != null && obj.getType() instanceof ClassType) {
-            return ((ClassType) obj.getType()).getFunc(nameNode, types);
+    public static FuncHead getFunc(BasicObject objIn, Node nameNode, ITypeable[] types) {
+        if (objIn != null && objIn.getType() instanceof ClassType) {
+            return ((ClassType) objIn.getType()).getFunc(objIn, nameNode, types);
         } else {
             String name = nameNode.getValue();
             return funcBridge.getFunc(name, types);

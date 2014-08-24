@@ -201,13 +201,6 @@ public abstract class BasicObject implements IIntermediate, ITypeable {
     }
     
     /**
-     * @return True if this object extends VarThis
-     */
-    public boolean isThis() {
-        return false;
-    }
-    
-    /**
      * Only TernaryObject should return true
      * @return True if TernaryObject
      */
@@ -243,6 +236,13 @@ public abstract class BasicObject implements IIntermediate, ITypeable {
      * @return Only VarSuper should return true
      */
     public boolean isVarSuper() {
+        return false;
+    }
+    
+    /**
+     * @return Only VarThis should return true
+     */
+    public boolean isVarThis() {
         return false;
     }
     

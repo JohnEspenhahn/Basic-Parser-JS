@@ -2,6 +2,7 @@ package com.hahn.basic.target.js;
 
 import java.util.List;
 
+import com.hahn.basic.Main;
 import com.hahn.basic.definition.EnumToken;
 import com.hahn.basic.intermediate.Frame;
 import com.hahn.basic.intermediate.FuncGroup;
@@ -104,10 +105,12 @@ public class JSLangFactory implements ILangFactory {
         builder.append(JSPretty.format(0, "function %s()_{^", c.getName()));
         
         if (!c.getInitFrame().isEmpty()) {
-            builder.append(JSPretty.format(1, "%s.call(this);^", EnumToken.__s__));
-            builder.append(JSPretty.format(0, "%s", c.getInitFrame()));
+            JSPretty.addTab();
+            builder.append(JSPretty.format(0, "%s.call(this);^", EnumToken.__s__));
+            builder.append(JSPretty.format(-1, "%s", c.getInitFrame()));
+            JSPretty.removeTab();
         } else {
-            builder.append(JSPretty.format(1, "%s.call(this)^", EnumToken.__s__));
+            builder.append(JSPretty.format(1, "%s.call(this)%s", EnumToken.__s__, (Main.PRETTY ? ";" : "")));
         }
         
         builder.append(JSPretty.format(0, "^"));
@@ -126,7 +129,7 @@ public class JSLangFactory implements ILangFactory {
             }
         }
         
-        builder.append(JSPretty.format(0, "return %s^", c.getName()));        
+        builder.append(JSPretty.format(0, "return %s%s", c.getName(), (Main.PRETTY ? ";\n" : "")));        
         
         JSPretty.removeTab();
         

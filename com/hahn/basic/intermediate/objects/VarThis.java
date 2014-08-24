@@ -7,14 +7,14 @@ import com.hahn.basic.util.BitFlag;
 import com.hahn.basic.util.exceptions.CompileException;
 
 public class VarThis extends Var {
-    private static final int FLAGS = BitFlag.CONST.b | BitFlag.PRIVATE.b;
+    private static final int FLAGS = BitFlag.CONST.b;
     
     public VarThis(Frame frame, ClassType type) {
         super(frame, "this", type, FLAGS);
     }
     
     @Override
-    public boolean isThis() {
+    public boolean isVarThis() {
         return true;
     }
     

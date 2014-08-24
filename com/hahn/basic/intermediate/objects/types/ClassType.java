@@ -121,34 +121,46 @@ public class ClassType extends StructType {
     
     /**
      * Get a function
+     * @param objIn The object the function is in or null
      * @param nameNode The node that contains the requested name
      * @return The function
      * @throw CompileException If the requested function is not defined
      */
-    public FuncHead getFunc(Node nameNode, ITypeable[] types) {
-        return getFunc(nameNode, types, false);
+    public FuncHead getFunc(BasicObject objIn, Node nameNode, ITypeable[] types) {
+        return getFunc(objIn, nameNode, types, false);
     }
     
     /**
      * Get a function
+     * @param objIn The object the function is in or null
      * @param nameNode The node that contains the requested name
      * @param safe If false can throw an exception
      * @return The function; or, if `safe` is true and there is an error, null
      * @throw CompileException If `safe` is false and the function is not defined
      */
-    public FuncHead getFunc(Node nameNode, ITypeable[] types, boolean safe) {
+    public FuncHead getFunc(BasicObject objIn, Node nameNode, ITypeable[] types, boolean safe) {
         String name = nameNode.getValue();
         FuncHead func = funcBridge.getFunc(name, types);
         if (func != null) {
             return func;
         } else if (getParent() instanceof ClassType) {
-            func =  ((ClassType) getParent()).getFunc(nameNode, types, true);
-            if (func != null) return func;
+            func = ((ClassType) getParent()).getFunc(objIn, nameNode, types, true);
+            if (func != null) {
+                if (func.hasFlag(BitFlag.PRIVATE)) {
+                    if (!safe) {
+                        throw new CompileException("The function `" + name + "(" + Util.joinTypes(types, ',') + ")` is private");
+                    } else {
+                        return null;
+                    }
+                } else {
+                    return func;
+                }
+            }
         } 
         
         // If reached this point then not found
         if (!safe) {
-            throw new CompileException("Unknown function `" + name + "` with parameters `(" + Util.joinTypes(types, ',') + ")` in " + this, nameNode);
+            throw new CompileException("Unknown function `" + name + "(" + Util.joinTypes(types, ',') + ")` in " + this, nameNode);
         } else {
             return null;
         }

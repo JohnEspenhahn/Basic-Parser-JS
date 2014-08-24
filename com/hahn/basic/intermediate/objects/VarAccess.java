@@ -129,6 +129,18 @@ public abstract class VarAccess extends BasicObject {
         super.takeRegister(this);
     }
     
+    /*
+     * ------------------------------- To Target Tools -------------------------------
+     */
+    
+    public boolean isVarSuper() {
+        return var.isVarSuper();
+    }
+    
+    public boolean isVarThis() {
+        return var.isVarThis();
+    }
+    
     @Override
     public abstract String toTarget();
 }

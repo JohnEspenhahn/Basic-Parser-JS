@@ -12,9 +12,11 @@ import com.hahn.basic.intermediate.objects.types.StructType.StructParam;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.statements.Compilable;
 import com.hahn.basic.parser.Node;
+import com.hahn.basic.util.BitFlag;
 import com.hahn.basic.util.exceptions.CompileException;
 
-public abstract class FuncHead extends Frame {    
+public abstract class FuncHead extends Frame {
+    private int flags;
     private final String name;
     private final Var[] params;
     private final boolean[] isOptional;
@@ -36,6 +38,7 @@ public abstract class FuncHead extends Frame {
         
         this.classIn = classIn;
         
+        this.flags = 0;
         this.name = name;
         this.rtnType = rtn;
         this.allChildrenReturn = true;
@@ -61,6 +64,18 @@ public abstract class FuncHead extends Frame {
                 addVar(classIn.getSuper());
             }
         }
+    }
+    
+    public void setFlags(int i) {
+        this.flags = i;
+    }
+    
+    public int getFlags() {
+        return this.flags;
+    }
+    
+    public boolean hasFlag(BitFlag flag) {
+        return (this.flags & flag.b) != 0;
     }
     
     public String getName() {
