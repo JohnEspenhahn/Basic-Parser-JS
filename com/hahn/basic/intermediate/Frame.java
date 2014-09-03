@@ -329,9 +329,25 @@ public class Frame extends Statement {
         obj = safeGetInstanceVar(name);
         if (obj != null) return obj;
         
-        // TODO get static class pointer
+        obj = safeGetClassObj(name);
+        if (obj != null) return obj;
         
         return null;
+    }
+    
+    /**
+     * Get an object representation of a class
+     * with the given name.
+     * @param name The name of the class
+     * @return The class object found or null
+     */
+    public BasicObject safeGetClassObj(String name) {
+        Type t = Type.fromName(name);
+        if (t != null && t.doesExtend(Type.OBJECT)) {
+            return ((ClassType) t).getClassObj();
+        } else {
+            return null;
+        }
     }
     
     /**
@@ -519,8 +535,7 @@ public class Frame extends Statement {
                     break;
                 }
                 
-                StructParam sp = exp.getObj().getType().getAsStruct().getParam(nameNode);
-                
+                StructParam sp = exp.getObj().getType().getAsStruct().getParam(nameNode);                
                 exp.setObj(LangCompiler.factory.VarAccess(exp, exp.getObj(), sp, sp.getType(), child.getRow(), child.getCol()), child);
             } else {
                 throw new CompileException("Illegal attempt to index var `" + exp.getObj() + "` of type `" + exp.getObj().getType() + "`", child);

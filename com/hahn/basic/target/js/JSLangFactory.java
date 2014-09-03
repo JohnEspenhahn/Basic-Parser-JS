@@ -9,6 +9,7 @@ import com.hahn.basic.intermediate.FuncHead;
 import com.hahn.basic.intermediate.objects.AdvancedObject;
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.CastedObject;
+import com.hahn.basic.intermediate.objects.ClassObject;
 import com.hahn.basic.intermediate.objects.ConditionalObject;
 import com.hahn.basic.intermediate.objects.ExpressionObject;
 import com.hahn.basic.intermediate.objects.FuncCallPointer;
@@ -28,6 +29,7 @@ import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.ParameterizedType;
 import com.hahn.basic.intermediate.objects.types.StructType;
 import com.hahn.basic.intermediate.objects.types.Type;
+import com.hahn.basic.intermediate.objects.types.StructType.StructParam;
 import com.hahn.basic.intermediate.opcode.OPCode;
 import com.hahn.basic.intermediate.statements.CallFuncStatement;
 import com.hahn.basic.intermediate.statements.Compilable;
@@ -46,6 +48,7 @@ import com.hahn.basic.target.LangBuildTarget;
 import com.hahn.basic.target.js.objects.JSArithmeticObject;
 import com.hahn.basic.target.js.objects.JSArithmeticSetObject;
 import com.hahn.basic.target.js.objects.JSCastedObject;
+import com.hahn.basic.target.js.objects.JSClassObject;
 import com.hahn.basic.target.js.objects.JSConditionalObject;
 import com.hahn.basic.target.js.objects.JSDefaultStruct;
 import com.hahn.basic.target.js.objects.JSExpressionObject;
@@ -69,6 +72,7 @@ import com.hahn.basic.target.js.statements.JSIfStatement;
 import com.hahn.basic.target.js.statements.JSParamDefaultValStatement;
 import com.hahn.basic.target.js.statements.JSReturnStatement;
 import com.hahn.basic.target.js.statements.JSWhileStatement;
+import com.hahn.basic.util.BitFlag;
 import com.hahn.basic.util.exceptions.UnimplementedException;
 
 public class JSLangFactory implements ILangFactory {
@@ -114,7 +118,14 @@ public class JSLangFactory implements ILangFactory {
         builder.append(JSPretty.format(0, "^"));
         builder.append(JSPretty.format(0, "}^"));
         
-        // TODO class static values
+        // Define class's static parameters
+        for (StructParam param: c.getDefinedParams()) {
+            if (param.hasFlag(BitFlag.STATIC)) {
+                builder.append(JSPretty.format(0, "%s.%s_=_undefined;^", c.getName(), param.getName()));
+            }
+        }
+        
+        // TODO class static frame
         
         for (FuncGroup funcGroup: c.getDefinedFuncs()) {
             for (FuncHead func: funcGroup) {
@@ -148,6 +159,11 @@ public class JSLangFactory implements ILangFactory {
     @Override
     public StringConst StringConst(String str) {
         return new JSStringConst(str);
+    }
+    
+    @Override
+    public ClassObject ClassObject(ClassType classType) {
+        return new JSClassObject(classType);
     }
     
     @Override

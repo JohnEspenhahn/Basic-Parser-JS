@@ -57,6 +57,7 @@ public enum EnumToken implements IEnumRegexToken {
     CONST       ("const"      , Group.IDENT),
     FINAL       ("final"      , Group.IDENT),
     PRIVATE     ("private"    , Group.IDENT),
+    STATIC      ("static"     , Group.IDENT),
     ABSTRACT    ("abstract"   , Group.IDENT),
     IF          ("if"         , Group.IDENT),
     ELSE        ("else"       , Group.IDENT),

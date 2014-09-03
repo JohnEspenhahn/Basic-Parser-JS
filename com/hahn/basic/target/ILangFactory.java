@@ -7,6 +7,7 @@ import com.hahn.basic.intermediate.FuncHead;
 import com.hahn.basic.intermediate.objects.AdvancedObject;
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.CastedObject;
+import com.hahn.basic.intermediate.objects.ClassObject;
 import com.hahn.basic.intermediate.objects.ConditionalObject;
 import com.hahn.basic.intermediate.objects.ExpressionObject;
 import com.hahn.basic.intermediate.objects.FuncCallPointer;
@@ -50,6 +51,7 @@ public interface ILangFactory {
 	public BasicObject PushObject();
 	public BasicObject DefaultStruct(StructType struct);
 	public StringConst StringConst(String str);
+	public ClassObject ClassObject(ClassType classType);
 	
 	public OPObject OPObject(Statement container, OPCode op, BasicObject p1, Node p1Node, BasicObject p2, Node p2Node);
 	public OPObject ArithmeticObject(Statement container, OPCode op, BasicObject p1, Node p1Node, BasicObject p2, Node p2Node);

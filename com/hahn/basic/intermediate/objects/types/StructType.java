@@ -22,9 +22,10 @@ public class StructType extends Type {
      * Create a new struct
      * @param name The name of the struct
      * @param parent The parent struct or null
+     * @param isAbstract If true won't check for other types with the same name
      */
-    protected StructType(String name, StructType parent, int flags) {
-        super(name, true);
+    protected StructType(String name, StructType parent, int flags, boolean isAbstract) {
+        super(name, true, isAbstract);
         
         this.flags = flags;
         
@@ -67,7 +68,7 @@ public class StructType extends Type {
      * @return A new struct object
      */
     public StructType extendAs(String name, List<BasicObject> ps, int flags) {
-        StructType struct = new StructType(name, this, flags);
+        StructType struct = new StructType(name, this, flags, false);
         struct.loadParams(ps);
         
         return struct;
@@ -131,7 +132,7 @@ public class StructType extends Type {
      * @throws CompileException If the variable is already defined
      */
     public StructParam putParam(BasicObject p, Node node) {
-        if (getParam(p.getName(), node) == null)   {
+        if (checkParamUnique(p.getName(), node) == null)   {
             StructParam param = new StructParam(params.size(), p);
             params.put(p.getName(), param);
            
@@ -141,6 +142,19 @@ public class StructType extends Type {
         }
     }
     
+    private StructParam checkParamUnique(String name, Node node) {
+        return getParam(name, true, true, node);
+    }
+    
+    /**
+     * Get a struct param
+     * @param name The name of the parameter to get
+     * @return Then parameter found or null if it can't be retrieved
+     */
+    public StructParam getParamSafe(String name) {
+        return getParam(name, false, true, null);
+    }
+    
     /**
      * Get a struct param
      * @param nameNode The node that contains the requested name
@@ -148,60 +162,45 @@ public class StructType extends Type {
      * @throw CompileException If the requested param is not defined
      */
     public StructParam getParam(Node nameNode) {
-        return getParam(nameNode, false);
+        return getParam(nameNode.getValue(), false, false, nameNode);
     }
     
     /**
-     * Get a struct param
-     * @param nameNode The node that contains the requested name
-     * @param safe If false can throw an exception
-     * @return The param; or, if `safe` is true and there is an error, null
-     * @throw CompileException If `safe` is false and the param is not defined
-     */
-    public StructParam getParam(Node nameNode, boolean safe) {
-        String name = nameNode.getValue();
-        StructParam param = getParamSafe(name);        
-        
-        if (param != null) {
-            if (param.hasFlag(BitFlag.PRIVATE) && !getDefinedParams().contains(param)) {
-                if (safe) return null;
-                else throw new CompileException("The field `" + name + "` is private", nameNode);
-            } else {
-                return param;
-            }
-        } else if (safe) {
-            return null;
-        } else {
-            throw new CompileException("Unknown variable `" + name + "` in " + this, nameNode);
-        }
-    }
-    
-    public StructParam getParamSafe(String name) {
-        return getParam(name, null);
-    }
-    
-    /**
-     * Get a variable unique to this frame's instance <br>
-     * <b>Precondition</b> If `getting` is false call Main.setLine
+     * Get a variable unique to this frame's instance
      * @param name The name of the variable
-     * @param throwNode If not null can throw an error at this node 
+     * @param requireUnique If true will throw uniqueness errors
+     * @param safe If false will throw additional errors
+     * @param throwNode Throws uniqueness errors at this node
      * @return The variable found or null
-     * @throws CompileException If throwNode is not null and the variable is already defined
+     * @throws CompileException If requireUnique is true and the variable is already defined
+     * @throws CompileException If safe is false and an error occurs
      */
-    public StructParam getParam(String name, Node throwNode) {
+    public StructParam getParam(String name, boolean requireUnique, boolean safe, Node throwNode) {        
+        boolean fromParent = false;
         StructParam sVar = params.get(name);
-        if (sVar != null) {
-            if (throwNode == null) return sVar;
-            else throw new CompileException("The instance variable `" + name + "` is already defined", throwNode);
-        } else if (parent != null) {
+        if (sVar != null && requireUnique) {
+            throw new CompileException("The instance variable `" + name + "` is already defined", throwNode);
+        } else if (sVar == null && parent != null) {
+            fromParent = true;
             sVar =  parent.getParamSafe(name);
-            if (sVar != null) {
-                if (throwNode == null) return sVar;
-                else throw new CompileException("The instance variable `" + name + "` is already defined in a super class", throwNode);
+            if (sVar != null && requireUnique) {
+                throw new CompileException("The instance variable `" + name + "` is already defined in a super class", throwNode);
             }
         }
         
-        return null;
+        if (sVar != null) {
+            // Private variables
+            if (fromParent && sVar.hasFlag(BitFlag.PRIVATE)) {
+                if (safe) return null;
+                else throw new CompileException("The instance variable `" + name + "` is private", throwNode);
+            }
+            
+            return sVar;
+        } else if (!safe) {
+            throw new CompileException("Unknown variable `" + name + "` in " + this, throwNode);
+        } else {
+            return null;
+        }
     }
     
     public Collection<StructParam> getDefinedParams() {

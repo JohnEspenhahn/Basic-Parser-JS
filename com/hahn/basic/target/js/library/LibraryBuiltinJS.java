@@ -1,7 +1,9 @@
 package com.hahn.basic.target.js.library;
 
 import com.hahn.basic.intermediate.library.base.Library;
+import com.hahn.basic.intermediate.objects.types.ClassType;
 import com.hahn.basic.intermediate.objects.types.Type;
+import com.hahn.basic.util.BitFlag;
 
 public class LibraryBuiltinJS extends Library {
     
@@ -11,8 +13,11 @@ public class LibraryBuiltinJS extends Library {
     
     @Override
     public void define() {
-        Library.defineFunc("alert", true, Type.VOID, Type.STRING);
+        Library.defineFunc("alert", true, Type.VOID, Type.OBJECT);
         Library.defineFunc("alert", true, Type.VOID, Type.NUMERIC);
+        
+        ClassType console = Library.defineClass("console", true);
+        Library.defineFunc(console, "log", true, BitFlag.STATIC.b, Type.VOID, Type.OBJECT);
     }
     
     @Override

@@ -54,7 +54,7 @@ public enum EnumExpression implements IEnumExpression {
     ACCESS      ("<IDENTIFIER> ?<IN_ACCESS>", false),
     IN_ACCESS   ("OPEN_SQR <EXPRESSION> CLOSE_SQR$|DOT IDENTIFIER$", false),
     
-    FLAG        ("CONST|PRIVATE", false),
+    FLAG        ("CONST|PRIVATE|STATIC", false),
     DEFINE      ("{<FLAG>} <TYPE> IDENTIFIER ?<DEF_MODIFY> {COMMA IDENTIFIER ?<DEF_MODIFY>}", false),
     DEF_MODIFY  ("ASSIGN <EXPRESSION>", false),
     

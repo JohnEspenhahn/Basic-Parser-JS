@@ -4,7 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.hahn.basic.intermediate.LangCompiler;
+import com.hahn.basic.intermediate.objects.types.ClassType;
 import com.hahn.basic.intermediate.objects.types.Type;
+import com.hahn.basic.util.BitFlag;
 import com.hahn.basic.util.Util;
 
 public abstract class Library {
@@ -50,11 +52,15 @@ public abstract class Library {
         LangCompiler.getString(str);
     }
     
-    public static void defineFunc(String name, boolean rawName, Type rtnType) {
-        Library.defineFunc(name, rawName, rtnType, new Type[0]);
-    }
-
     public static void defineFunc(String name, boolean rawName, Type rtnType, Type... types) {        
         LangCompiler.defineFunc(name, rawName, rtnType, Util.toParams(types));
+    }
+    
+    public static void defineFunc(ClassType classIn, String name, boolean rawName, int flags, Type rtnType, Type... types) {
+        classIn.defineFunc(null, name, rawName, rtnType, Util.toParams(types)).setFlags(flags);
+    }
+    
+    public static ClassType defineClass(String name, boolean isFinal) {
+        return Type.OBJECT.extendAs(name, BitFlag.SYSTEM.b | (isFinal ? BitFlag.FINAL.b : 0));
     }
 }

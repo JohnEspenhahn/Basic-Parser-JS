@@ -30,10 +30,11 @@ public class Type implements ITypeable {
                              /** NULL -> extends OBJECT */
                              NULL = new Type("null", false, true);
     
-    public static final StructType STRUCT = new StructType("struct", null, 0);
-    public static final ClassType  OBJECT = new ClassType("Object", STRUCT, BitFlag.ABSTRACT.b | BitFlag.SYSTEM.b),
+    public static final StructType STRUCT = new StructType("struct", null, 0, true),
+                                   ARRAY  = new StructType("array", null, 0, true);
+    
+    public static final ClassType  OBJECT = new ClassType("Object", STRUCT, BitFlag.ABSTRACT.b | BitFlag.SYSTEM.b, false),
                                    FUNC   = OBJECT.extendAs("func", BitFlag.FINAL.b | BitFlag.SYSTEM.b).setTypeParams(-1),
-                                   ARRAY  = OBJECT.extendAs("array", BitFlag.FINAL.b | BitFlag.SYSTEM.b).systemParam("length", Type.INT).setTypeParams(1),
                                    STRING = OBJECT.extendAs("string", BitFlag.FINAL.b | BitFlag.SYSTEM.b).systemParam("length", Type.INT).setTypeParams(0);
     
     public static final int COUNT_PRIMATIVES = TYPES.size();
@@ -253,7 +254,13 @@ public class Type implements ITypeable {
         return it.next();
     }
     
-    private static Type fromName(String name) {
+    /**
+     * Gets the Type with the given name or null
+     * if no Type with that name exists
+     * @param name The name of the type to get
+     * @return The type or null
+     */
+    public static Type fromName(String name) {
         for (Type t: Type.TYPES) {
             if (t.getName().equals(name)) {
                 return t;

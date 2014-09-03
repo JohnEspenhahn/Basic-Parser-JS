@@ -9,6 +9,7 @@ import com.hahn.basic.intermediate.FuncGroup;
 import com.hahn.basic.intermediate.FuncHead;
 import com.hahn.basic.intermediate.LangCompiler;
 import com.hahn.basic.intermediate.objects.BasicObject;
+import com.hahn.basic.intermediate.objects.ClassObject;
 import com.hahn.basic.intermediate.objects.Param;
 import com.hahn.basic.intermediate.objects.Var;
 import com.hahn.basic.intermediate.statements.Statement;
@@ -18,24 +19,33 @@ import com.hahn.basic.util.Util;
 import com.hahn.basic.util.exceptions.CompileException;
 
 public class ClassType extends StructType {
-    private final Var varThis, varSuper;
+    private ClassObject classObj;    
+    private Var varThis, varSuper;
     
     private FuncBridge funcBridge;
     private Frame initFrame;
+    private Frame staticFrame;
     
-    public ClassType(String name, StructType parent, int flags) {
-        super(name, parent, flags);
+    public ClassType(String name, StructType parent, int flags, boolean isAbstract) {
+        super(name, parent, flags, isAbstract);
+        
+        if (name == null) return;
         
         this.funcBridge = new FuncBridge(this);
         this.initFrame = new Frame(LangCompiler.getGlobalFrame(), null);
+        this.staticFrame = new Frame(LangCompiler.getGlobalFrame(), null);
         
+        this.classObj = LangCompiler.factory.ClassObject(this);
         this.varThis = LangCompiler.factory.VarThis(LangCompiler.getGlobalFrame(), this);
-        
         if (parent instanceof ClassType) {
             this.varSuper = LangCompiler.factory.VarSuper(LangCompiler.getGlobalFrame(), (ClassType) parent);
         } else {
             this.varSuper = null;
         }
+    }
+    
+    public ClassObject getClassObj() {
+        return classObj;
     }
     
     /**
@@ -70,7 +80,7 @@ public class ClassType extends StructType {
     
     @Override
     public ClassType extendAs(String name, List<BasicObject> ps, int flags) {
-        ClassType newClass = new ClassType(name, this, flags);
+        ClassType newClass = new ClassType(name, this, flags, false);
         newClass.loadParams(ps);
         
         return newClass;
@@ -93,6 +103,10 @@ public class ClassType extends StructType {
     protected ClassType systemParam(String name, Type type) {
         super.addParam(new Node(null, null, name, -1, -1), type);
         return this;
+    }
+    
+    public Frame getStaticFrame() {
+        return staticFrame;
     }
     
     public void addInitStatements(List<Statement> inits) {

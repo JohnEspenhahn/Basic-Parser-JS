@@ -1,6 +1,5 @@
 package com.hahn.basic.target.js.objects;
 
-import com.hahn.basic.Main;
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.TernaryObject;
 import com.hahn.basic.intermediate.statements.Statement;
