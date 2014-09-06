@@ -217,29 +217,49 @@ public class Type implements ITypeable {
         
         Node nameNode = it.next();
         Type type = Type.fromName(nameNode.getValue());
+        if (type == null) throw new CompileException("Invalid type `" + nameNode.getValue() + "` specified", nameNode);
         
-        while (it.hasNext()) {
-            // Check not allowed parameters
-            if (!(type instanceof StructType) || ((StructType) type).getTypeParams() == 0) {
-                throw new CompileException("The type `" + type.toString() + "` can not be parameterized", nameNode);
-            }
-            
-            StructType mainType = (StructType) type;
-            type = ParameterizedType.getParameterizedType(mainType, it.next(), mainType.doesExtend(Type.STRUCT));
-            
-            if (mainType.getTypeParams() != -1 && mainType.getTypeParams() != ((ParameterizedType<Type>) type).getTypes().length) {
-                throw new CompileException("Invalid number of parameters for type `" + mainType.toString() + "`. Expected " + mainType.getTypeParams() + " but got " + ((ParameterizedType<Type>) type).getTypes().length, head);
+        Node child = null;
+        if (it.hasNext()) {
+            child = it.next();
+            if (child.getToken() == EnumExpression.PARAM_TYPES) {
+                // Check not allowed parameters
+                if (!(type instanceof StructType) || ((StructType) type).getTypeParams() == 0) {
+                    throw new CompileException("The type `" + type.toString() + "` can not be parameterized", nameNode);
+                }
+                
+                StructType mainType = type.getAsStruct();
+                type = ParameterizedType.getParameterizedType(mainType, child, mainType.doesExtend(Type.FUNC));
+                
+                if (mainType.getTypeParams() != -1 && mainType.getTypeParams() != ((ParameterizedType<Type>) type).getTypes().length) {
+                    throw new CompileException("Invalid number of parameters for type `" + mainType.toString() + "`. Expected " + mainType.getTypeParams() + " but got " + ((ParameterizedType<Type>) type).getTypes().length, head);
+                }
+                
+                // Go past PARAM_TYPES
+                child = it.next();
             }
         }
         
         // Check requires parameters
         if (!isGettingMain && type instanceof StructType && ((StructType) type).getTypeParams() > 0) {
             throw new CompileException("The type `" + nameNode.getValue() + "` must be parameterized", nameNode);
-        } else if (type == null)  {
-            throw new CompileException("Invalid type `" + nameNode.getValue() + "` specified", nameNode);
-        } else {
-            return type;
         }
+        
+        // Check for array definition
+        if (child != null) {
+            do {
+                Enum<?> token = child.getToken();
+                
+                if (token == EnumToken.CLOSE_BRACE) {
+                    continue;
+                } else if (token == EnumToken.OPEN_BRACE) {
+                    type = new ParameterizedType<Type>(Type.ARRAY, new Type[] { type });
+                }
+            } while (it.hasNext() && (child = it.next()) != null);
+        }
+        
+        // Return
+        return type;
     }
     
     /**

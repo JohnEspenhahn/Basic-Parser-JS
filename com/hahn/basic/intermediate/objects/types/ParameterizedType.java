@@ -130,27 +130,21 @@ public class ParameterizedType<T extends ITypeable> extends Type {
     public static ParameterizedType<ITypeable> getParameterizedType(StructType base, Node head, boolean allowReturn) {
         Type returnType = Type.UNDEFINED;
         List<Type> params = null;
-        
-        Enum<?> token = head.getToken();
-        if (token == EnumExpression.PARAM_TYPES) {        
-            Iterator<Node> it = Util.getIterator(head);
-            while (it.hasNext()) {
-                Node node = it.next();
-                Enum<?> t = node.getToken();
-                
-                if (t == EnumExpression.TYPE) {
-                    if (allowReturn) returnType = Type.fromNode(node);
-                    else throw new CompileException("Cannot provide return type for the parameterized type `" + base + "`");
-                } else if (t == EnumExpression.TYPE_LIST) {
-                    params = getTypeList(node);
-                }
+               
+        Iterator<Node> it = Util.getIterator(head);
+        while (it.hasNext()) {
+            Node node = it.next();
+            Enum<?> t = node.getToken();
+            
+            if (t == EnumExpression.TYPE) {
+                if (allowReturn) returnType = Type.fromNode(node);
+                else throw new CompileException("Cannot provide return type for the parameterized type `" + base + "`");
+            } else if (t == EnumExpression.TYPE_LIST) {
+                params = getTypeList(node);
             }
-        } else if (token == EnumExpression.TYPE_LIST) {
-            params = getTypeList(head);
         }
 
-        Type[] aParams = (params != null ? params.toArray(new Type[params.size()]) : new Type[0]);
-        
+        Type[] aParams = (params != null ? params.toArray(new Type[params.size()]) : new Type[0]);        
         return new ParameterizedType<ITypeable>(base, (ITypeable[]) aParams, returnType);
     }
     

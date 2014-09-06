@@ -803,6 +803,7 @@ public class Frame extends Statement {
             // Handle class content
             handleClassContent(nameNode, classType, it);
         } else {
+            if (parentNode == null) parentNode = head;
             throw new CompileException("Cannot extend the non-class type `" + parentType + "`", parentNode);
         }
     }

@@ -76,7 +76,7 @@ public abstract class ClassObject extends BasicObject {
             if (!func.hasFlag(BitFlag.STATIC)) {
                 if (safe) return null;
                 else throw new CompileException("Can not make a static reference to a non-static function", nameNode);
-            } else if (!heldClass.getDefinedFuncs().contains(func)) {
+            } else if (!heldClass.getDefinedFuncs().contains(func)) { // mix-matched contains check
                 if (safe) return null;
                 else throw new CompileException("Must access static function `" + func + "` directly through its defining class", nameNode);                
             } else {

@@ -12,6 +12,7 @@ import com.hahn.basic.intermediate.objects.ConditionalObject;
 import com.hahn.basic.intermediate.objects.ExpressionObject;
 import com.hahn.basic.intermediate.objects.FuncCallPointer;
 import com.hahn.basic.intermediate.objects.FuncPointer;
+import com.hahn.basic.intermediate.objects.NewArray;
 import com.hahn.basic.intermediate.objects.OPObject;
 import com.hahn.basic.intermediate.objects.Param;
 import com.hahn.basic.intermediate.objects.StringConst;
@@ -68,6 +69,7 @@ public interface ILangFactory {
 	
 	public VarAccess VarAccess(Statement container, BasicObject var, BasicObject idx, Type type, int row, int col);
 	
+	public NewArray NewArray(Type containedType, Node node, int dimensions, BasicObject[] values);
 	public BasicObject NewInstance(Type type, Node typeNode, List<BasicObject> params);
 	
 	public ConditionalObject ConditionalObject(Statement container, OPCode op, BasicObject p1, Node p1Node, BasicObject p2, Node p2Node, BasicObject temp);

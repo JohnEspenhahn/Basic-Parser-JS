@@ -14,6 +14,7 @@ import com.hahn.basic.intermediate.objects.ConditionalObject;
 import com.hahn.basic.intermediate.objects.ExpressionObject;
 import com.hahn.basic.intermediate.objects.FuncCallPointer;
 import com.hahn.basic.intermediate.objects.FuncPointer;
+import com.hahn.basic.intermediate.objects.NewArray;
 import com.hahn.basic.intermediate.objects.OPObject;
 import com.hahn.basic.intermediate.objects.Param;
 import com.hahn.basic.intermediate.objects.StringConst;
@@ -28,8 +29,8 @@ import com.hahn.basic.intermediate.objects.types.ClassType;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.ParameterizedType;
 import com.hahn.basic.intermediate.objects.types.StructType;
-import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.objects.types.StructType.StructParam;
+import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.opcode.OPCode;
 import com.hahn.basic.intermediate.statements.CallFuncStatement;
 import com.hahn.basic.intermediate.statements.Compilable;
@@ -54,6 +55,7 @@ import com.hahn.basic.target.js.objects.JSDefaultStruct;
 import com.hahn.basic.target.js.objects.JSExpressionObject;
 import com.hahn.basic.target.js.objects.JSFuncCallPointer;
 import com.hahn.basic.target.js.objects.JSFuncPointer;
+import com.hahn.basic.target.js.objects.JSNewArray;
 import com.hahn.basic.target.js.objects.JSNewInstance;
 import com.hahn.basic.target.js.objects.JSOPObject;
 import com.hahn.basic.target.js.objects.JSStringConst;
@@ -214,6 +216,11 @@ public class JSLangFactory implements ILangFactory {
     @Override
     public Var VarSuper(Frame frame, ClassType type) {
         return new JSVarSuper(frame, type);
+    }
+    
+    @Override
+    public NewArray NewArray(Type containedType, Node node, int dimensions, BasicObject[] values) {
+        return new JSNewArray(containedType, node, dimensions, values);
     }
     
     @Override
