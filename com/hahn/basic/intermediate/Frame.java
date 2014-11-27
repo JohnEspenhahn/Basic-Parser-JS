@@ -49,6 +49,7 @@ import com.hahn.basic.intermediate.objects.LiteralBool;
 import com.hahn.basic.intermediate.objects.LiteralNum;
 import com.hahn.basic.intermediate.objects.OPObject;
 import com.hahn.basic.intermediate.objects.Param;
+import com.hahn.basic.intermediate.objects.Var;
 import com.hahn.basic.intermediate.objects.VarAccess;
 import com.hahn.basic.intermediate.objects.VarTemp;
 import com.hahn.basic.intermediate.objects.types.ClassType;
@@ -389,7 +390,7 @@ public class Frame extends Statement {
         // Found
         if (obj != null) {
             ClassType classIn = getClassIn();
-            if (classIn != null && obj.hasFlag(BitFlag.PRIVATE) && (!obj.isVarThis() || !classIn.getDefinedParams().contains(obj.getAccessedObject()))) {
+            if (classIn != null && obj.hasFlag(BitFlag.PRIVATE) && (obj.getVarThisFlag() == Var.NOT_THIS || !classIn.getDefinedParams().contains(obj.getAccessedObject()))) {
                 throw new CompileException("The field `" + name + "` is private", nameNode);
             }
             
@@ -487,7 +488,12 @@ public class Frame extends Statement {
         Node nameNode = it.next();
         if (leaveLast && !it.hasNext()) {
             it.previous();
-            return null;
+            
+            if (this instanceof FuncHead) {
+                return ((FuncHead) this).getClassIn().getImpliedThis();
+            } else {
+                return null;
+            }
         }
         
         BasicObject obj = getVar(nameNode);

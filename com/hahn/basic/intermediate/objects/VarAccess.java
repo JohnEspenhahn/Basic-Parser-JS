@@ -137,8 +137,8 @@ public abstract class VarAccess extends BasicObject {
         return var.isVarSuper();
     }
     
-    public boolean isVarThis() {
-        return var.isVarThis();
+    public int getVarThisFlag() {
+        return var.getVarThisFlag();
     }
     
     @Override

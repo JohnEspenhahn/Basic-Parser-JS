@@ -65,6 +65,8 @@ public interface ILangFactory {
 	public Var VarLocal(Frame frame, String name, Type type, int flags);
 	
 	public Var VarThis(Frame frame, ClassType type);
+	public Var VarImpliedThis(Frame frame, ClassType type);
+	
 	public Var VarSuper(Frame frame, ClassType type);
 	
 	public VarAccess VarAccess(Statement container, BasicObject var, BasicObject idx, Type type, int row, int col);

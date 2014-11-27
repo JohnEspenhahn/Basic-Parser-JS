@@ -8,7 +8,9 @@ import java.util.List;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import com.hahn.basic.Main;
+import com.hahn.basic.definition.EnumToken;
 import com.hahn.basic.intermediate.IIntermediate;
+import com.hahn.basic.intermediate.objects.AdvancedObject;
 import com.hahn.basic.intermediate.objects.LiteralNum;
 import com.hahn.basic.intermediate.objects.Param;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
@@ -17,6 +19,10 @@ import com.hahn.basic.parser.Node;
 
 
 public class Util {
+    
+    public static boolean isConstructorName(String name) {
+        return name.equals(EnumToken.CONSTRUCTOR.toString());
+    }
     
     public static String getListSeperator() {
         return (Main.PRETTY ? ", " : ",");
@@ -74,6 +80,15 @@ public class Util {
         Type[] arr = new Type[params.length];
         for (int i = 0; i < params.length; i++) {
             arr[i] = params[i].getType();
+        }
+        
+        return arr;
+    }
+    
+    public static Param[] toParams(AdvancedObject... params) {
+        Param[] arr = new Param[params.length];
+        for (int i = 0; i < arr.length; i++) {
+            arr[i] = new Param(params[i].getName(), params[i].getType());
         }
         
         return arr;

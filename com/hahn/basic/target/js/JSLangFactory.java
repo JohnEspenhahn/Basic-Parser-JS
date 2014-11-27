@@ -21,6 +21,7 @@ import com.hahn.basic.intermediate.objects.StringConst;
 import com.hahn.basic.intermediate.objects.TernaryObject;
 import com.hahn.basic.intermediate.objects.Var;
 import com.hahn.basic.intermediate.objects.VarAccess;
+import com.hahn.basic.intermediate.objects.VarImpliedThis;
 import com.hahn.basic.intermediate.objects.VarLocal;
 import com.hahn.basic.intermediate.objects.VarParameter;
 import com.hahn.basic.intermediate.objects.VarThis;
@@ -211,6 +212,11 @@ public class JSLangFactory implements ILangFactory {
     @Override
     public Var VarThis(Frame frame, ClassType type) {
         return new VarThis(frame, type);
+    }
+    
+    @Override
+    public Var VarImpliedThis(Frame frame, ClassType type) {
+        return new VarImpliedThis(frame, type);
     }
     
     @Override

@@ -2,6 +2,7 @@ package com.hahn.basic.intermediate;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.hahn.basic.definition.EnumToken;
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.FuncPointer;
 import com.hahn.basic.intermediate.objects.Param;
@@ -13,6 +14,7 @@ import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.statements.Compilable;
 import com.hahn.basic.parser.Node;
 import com.hahn.basic.util.BitFlag;
+import com.hahn.basic.util.Util;
 import com.hahn.basic.util.exceptions.CompileException;
 
 public abstract class FuncHead extends Frame {
@@ -25,7 +27,8 @@ public abstract class FuncHead extends Frame {
     private boolean allChildrenReturn;
     
     private final String funcId;    
-    private final ClassType classIn;    
+    private final ClassType classIn;
+    private final boolean isConstructor;
     
     public FuncHead(Frame parent, ClassType classIn, String name, boolean rawName, Node funcHeadNode, Type rtn, Param... params) {
         super(parent, funcHeadNode); // TODO nest anon func
@@ -37,6 +40,7 @@ public abstract class FuncHead extends Frame {
         }
         
         this.classIn = classIn;
+        this.isConstructor = Util.isConstructorName(name);
         
         this.flags = 0;
         this.name = name;
@@ -80,6 +84,10 @@ public abstract class FuncHead extends Frame {
     
     public String getName() {
         return name;
+    }
+    
+    public boolean isConstructor() {
+        return isConstructor;
     }
     
     /**
@@ -231,6 +239,8 @@ public abstract class FuncHead extends Frame {
     }
     
     public static String createFuncId(String name, ITypeable... objs) {
+        if (name.equals(EnumToken.SUPER.getString())) name = EnumToken.CONSTRUCTOR.getString();
+        
         String funcID = name + "__";
         for (ITypeable o: objs) funcID += "_" + o.getType().getName();
         

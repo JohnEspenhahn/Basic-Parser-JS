@@ -20,7 +20,7 @@ import com.hahn.basic.util.exceptions.CompileException;
 
 public class ClassType extends StructType {
     private ClassObject classObj;    
-    private Var varThis, varSuper;
+    private Var varThis, varImpliedThis, varSuper;
     
     private FuncBridge funcBridge;
     private Frame initFrame;
@@ -36,11 +36,33 @@ public class ClassType extends StructType {
         this.staticFrame = new Frame(LangCompiler.getGlobalFrame(), null);
         
         this.classObj = LangCompiler.factory.ClassObject(this);
+        
         this.varThis = LangCompiler.factory.VarThis(LangCompiler.getGlobalFrame(), this);
+        this.varImpliedThis = LangCompiler.factory.VarImpliedThis(LangCompiler.getGlobalFrame(), this);
+        
         if (parent instanceof ClassType) {
-            this.varSuper = LangCompiler.factory.VarSuper(LangCompiler.getGlobalFrame(), (ClassType) parent);
+            defineSuper((ClassType) parent);
         } else {
             this.varSuper = null;
+        }
+    }
+    
+    /**
+     * Adds necessary super objects and functions
+     * @param parent
+     */
+    private void defineSuper(ClassType parent) {
+        this.varSuper = LangCompiler.factory.VarSuper(LangCompiler.getGlobalFrame(), parent);
+        
+        for (FuncGroup funcs: parent.getDefinedFuncs()) {
+            if (funcs.isConstructor()) {
+                for (FuncHead func: funcs.getFuncs()) {
+                    FuncHead superFunc = defineFunc(null, "super", false, func.getReturnType(), Util.toParams(func.getParams()));
+                    superFunc.setFlags(BitFlag.PRIVATE.b);
+                }
+                
+                break;
+            }
         }
     }
     
@@ -63,6 +85,15 @@ public class ClassType extends StructType {
      */
     public Var getThis() {
         return varThis;
+    }
+    
+    /**
+     * Get a version of `this var` which knows it is implied
+     * Ex] speak() vs this.speak()
+     * @return The implied this var
+     */
+    public Var getImpliedThis() {
+        return varImpliedThis;
     }
     
     /**
@@ -153,7 +184,7 @@ public class ClassType extends StructType {
      * @throw CompileException If `safe` is false and the function is not defined
      */
     public FuncHead getFunc(BasicObject objIn, Node nameNode, ITypeable[] types, boolean safe) {
-        boolean findingConstructor = (nameNode.getValue().equals("constructor"));
+        boolean findingConstructor = Util.isConstructorName(nameNode.getValue());
         
         String name = nameNode.getValue();
         FuncHead func = funcBridge.getFunc(name, types);

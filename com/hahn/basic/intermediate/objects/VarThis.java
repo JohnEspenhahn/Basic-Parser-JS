@@ -14,8 +14,8 @@ public class VarThis extends Var {
     }
     
     @Override
-    public boolean isVarThis() {
-        return true;
+    public int getVarThisFlag() {
+        return IS_THIS;
     }
     
     @Override

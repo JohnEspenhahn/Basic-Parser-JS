@@ -79,7 +79,7 @@ public class JSBuildTarget extends LangBuildTarget {
              *     return instance;
              * }
              */
-            endBuilder.append("function " + EnumToken.__c__ + "(c,f,o){o=new c;if(f)o[f].apply(o,Array.prototype.slice.call(arguments,2));return o}^");
+            endBuilder.append("function " + EnumToken.__c__ + "(c,f,o){o=new c;if(f)o[f].apply(o,Array.prototype.slice.call(arguments,2));return o}");
             
             /*
              * function extends(child, parent) {
@@ -92,7 +92,7 @@ public class JSBuildTarget extends LangBuildTarget {
              *     child.prototype = new __(); // the child prototype 
              * }
              */
-            endBuilder.append("function " + EnumToken.__e__ + "(d,b,p){for(p in b)if(b.hasOwnProperty(p))d[p]=b[p];function _(){this.constructor=d}_.prototype=b.prototype;d.prototype=new _}^");
+            endBuilder.append("function " + EnumToken.__e__ + "(d,b,p){for(p in b)if(b.hasOwnProperty(p))d[p]=b[p];function _(){this.constructor=d}_.prototype=b.prototype;d.prototype=new _}");
         }
         
         return endBuilder.toString();

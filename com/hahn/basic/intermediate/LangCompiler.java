@@ -6,8 +6,10 @@ import java.util.Map;
 
 import com.hahn.basic.intermediate.library.base.Library;
 import com.hahn.basic.intermediate.objects.BasicObject;
+import com.hahn.basic.intermediate.objects.FuncCallPair;
 import com.hahn.basic.intermediate.objects.Param;
 import com.hahn.basic.intermediate.objects.StringConst;
+import com.hahn.basic.intermediate.objects.Var;
 import com.hahn.basic.intermediate.objects.VarTemp;
 import com.hahn.basic.intermediate.objects.types.ClassType;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
@@ -137,13 +139,32 @@ public class LangCompiler {
         return funcBridge.defineFunc(parent, head, name, rawName, rtnType, params);
     }
     
-    public static FuncHead getFunc(BasicObject objIn, Node nameNode, ITypeable[] types) {
-        if (objIn != null && objIn.getType() instanceof ClassType) {
-            return ((ClassType) objIn.getType()).getFunc(objIn, nameNode, types);
+    public static FuncCallPair getFunc(BasicObject objIn, Node nameNode, ITypeable[] types) {
+        if (objIn != null && objIn.getType() instanceof ClassType) {            
+            // If object in is implied this, check for global function first
+            if (objIn.getVarThisFlag() == Var.IS_IMPLIED_THIS) {
+                FuncCallPair funcPair = getGlobalFunc(nameNode, types);
+                
+                // If found in global frame, return that
+                if (funcPair != null) {
+                    return funcPair;
+                }
+            }
+            
+            // If no global function by this name, check `this`
+            FuncHead func = ((ClassType) objIn.getType()).getFunc(objIn, nameNode, types);
+            return new FuncCallPair(func, objIn);
         } else {
-            String name = nameNode.getValue();
-            return funcBridge.getFunc(name, types);
+            return getGlobalFunc(nameNode, types);
         }
+    }
+    
+    public static FuncCallPair getGlobalFunc(Node nameNode, ITypeable[] types) {
+        String name = nameNode.getValue();
+        FuncHead func = funcBridge.getFunc(name, types);
+        
+        if (func != null) return new FuncCallPair(func, null);
+        else return null;
     }
     
     public static Frame getGlobalFrame() {

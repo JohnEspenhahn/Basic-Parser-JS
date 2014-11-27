@@ -240,10 +240,10 @@ public abstract class BasicObject implements IIntermediate, ITypeable {
     }
     
     /**
-     * @return Only VarThis should return true
+     * @return `This` type flag. (0 = NOT_THIS, 1 = IS_THIS, 2 = IS_IMPLIED_THIS)
      */
-    public boolean isVarThis() {
-        return false;
+    public int getVarThisFlag() {
+        return NOT_THIS;
     }
     
     /**
@@ -286,4 +286,6 @@ public abstract class BasicObject implements IIntermediate, ITypeable {
     public String toString() {
         return getName();
     }
+    
+    public static final int NOT_THIS = 0, IS_THIS = 1, IS_IMPLIED_THIS = 2;
 }

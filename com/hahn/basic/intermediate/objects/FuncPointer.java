@@ -106,7 +106,15 @@ public abstract class FuncPointer extends BasicObject {
      */
     protected void checkFunction() {
         if (func == null) {
-            setFunction(LangCompiler.getFunc(objectIn, nameNode, getTypes()));
+            FuncCallPair funcPair = LangCompiler.getFunc(objectIn, nameNode, getTypes());
+            if (funcPair != null) {
+                // If returned a function pair, update variables
+                setFunction(funcPair.getFunc());
+                this.objectIn = funcPair.getObjectIn();
+            } else {
+                // Otherwise default function to null
+                setFunction(null);
+            }
             
             // Still null then not found
             if (func == null) {
