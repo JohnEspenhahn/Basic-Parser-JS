@@ -153,6 +153,8 @@ public class ClassType extends StructType {
      * @throw CompileException If `safe` is false and the function is not defined
      */
     public FuncHead getFunc(BasicObject objIn, Node nameNode, ITypeable[] types, boolean safe) {
+        boolean findingConstructor = (nameNode.getValue().equals("constructor"));
+        
         String name = nameNode.getValue();
         FuncHead func = funcBridge.getFunc(name, types);
         if (func != null) {
@@ -174,7 +176,8 @@ public class ClassType extends StructType {
         
         // If reached this point then not found
         if (!safe) {
-            throw new CompileException("Unknown function `" + name + "(" + Util.joinTypes(types, ',') + ")` in " + this, nameNode);
+            if (findingConstructor) throw new CompileException("Unknown contructor with parameters `(" + Util.joinTypes(types, ',') + ")` in " + this, nameNode);
+            else throw new CompileException("Unknown function `" + name + "(" + Util.joinTypes(types, ',') + ")` in " + this, nameNode);
         } else {
             return null;
         }
