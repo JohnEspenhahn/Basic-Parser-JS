@@ -19,6 +19,8 @@ public class LibraryBuiltinJS extends Library {
         
         ClassType console = Library.defineClass("console", true);
         Library.defineFunc(console, "log", true, BitFlag.STATIC.b, Type.VOID, Type.OBJECT);
+        Library.defineFunc(console, "log", true, BitFlag.STATIC.b, Type.VOID, Type.NUMERIC);
+        Library.defineFunc(console, "log", true, BitFlag.STATIC.b, Type.VOID, Type.STRING);
     }
     
     @Override

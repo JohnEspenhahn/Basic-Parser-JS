@@ -27,7 +27,7 @@ public abstract class ClassObject extends BasicObject {
         FuncHead getFunc(BasicObject objIn, Node nameNode, ITypeable[] types, boolean safe);
     }
     
-    static class StaticClassTypeHolder extends StructType implements StaticClassExcludes {
+    static class StaticClassTypeHolder extends ClassType implements StaticClassExcludes {
         @Delegate(excludes=StaticClassExcludes.class)
         private final ClassType heldClass;
         
