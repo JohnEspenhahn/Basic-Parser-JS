@@ -79,9 +79,14 @@ public enum EnumToken implements IEnumRegexToken {
     EXTENDS     ("extends"    , Group.IDENT),
     THIS        ("this"       , Group.IDENT),
     SUPER       ("super"      , Group.IDENT),
-    __s__       ("__s__"      , Group.IDENT),
-    __c__       ("__c__"      , Group.IDENT),
-    __e__       ("__e__"      , Group.IDENT),
+    
+    // Special reserved keywords
+    /** super     */__s__       ("__s__"      , Group.IDENT),
+    /** construct */ __c__       ("__c__"      , Group.IDENT),
+    /** extend    */ __e__       ("__e__"      , Group.IDENT),
+    /** name      */ __n__       ("__n__"      , Group.IDENT),
+    // End special reserved keywords
+    
     IDENTIFIER  ("<<WORD>>"   , Group.IDENT);
 
     

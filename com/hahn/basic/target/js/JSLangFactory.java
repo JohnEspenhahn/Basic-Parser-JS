@@ -105,10 +105,21 @@ public class JSLangFactory implements ILangFactory {
         
         JSPretty.addTab();
         
+        ///////////////////////
         // Extend
-        if (isChild) builder.append(JSPretty.format(0, "%s(%s,%s);^", EnumToken.__e__, c.getName(), c.getParent().getName()));
-        builder.append(JSPretty.format(0, "function %s()_{^", c.getName()));
+        //////////////////////
         
+        // Get short local name
+        String localName = c.getName();
+        if (localName.length() > EnumToken.__n__.toString().length()) localName = EnumToken.__n__.toString();
+        
+        // Extend super
+        if (isChild) builder.append(JSPretty.format(0, "%s(%s,%s);^", EnumToken.__e__, localName, c.getParent().getName()));
+        
+        // Main constructor
+        builder.append(JSPretty.format(0, "function %s()_{^", localName));
+        
+        // Call super constructor and, if needed, add init frame
         if (!c.getInitFrame().isEmpty()) {
             JSPretty.addTab();
             builder.append(JSPretty.format(0, "%s.call(this);^", EnumToken.__s__));
@@ -124,7 +135,7 @@ public class JSLangFactory implements ILangFactory {
         // Define class's static parameters
         for (StructParam param: c.getDefinedParams()) {
             if (param.hasFlag(BitFlag.STATIC)) {
-                builder.append(JSPretty.format(0, "%s.%s_=_undefined;^", c.getName(), param.getName()));
+                builder.append(JSPretty.format(0, "%s.%s_=_undefined;^", localName, param.getName()));
             }
         }
         
@@ -136,12 +147,12 @@ public class JSLangFactory implements ILangFactory {
                     func.reverseOptimize();
                     func.forwardOptimize();
                     
-                    builder.append(JSPretty.format(0, "%s.prototype.%s_=_%s;^", c.getName(), func.getFuncId(), func.toFuncAreaTarget()));
+                    builder.append(JSPretty.format(0, "%s.prototype.%s_=_%s;^", localName, func.getFuncId(), func.toFuncAreaTarget()));
                 }
             }
         }
         
-        builder.append(JSPretty.format(0, "return %s<;^>", c.getName()));        
+        builder.append(JSPretty.format(0, "return %s<;^>", localName));        
         
         JSPretty.removeTab();
         
