@@ -928,16 +928,16 @@ public class Frame extends Statement {
             Main.setLine(nameNode.getRow(), nameNode.getCol());
             
             if (classIn == null) {
-                func = LangCompiler.defineFunc(LangCompiler.getGlobalFrame(), body, name, false, rtnType, aParams);
+                func = LangCompiler.defineFunc(LangCompiler.getGlobalFrame(), body, name, null, rtnType, aParams);
             } else {
-                func = classIn.defineFunc(body, name, false, rtnType, aParams);
+                func = classIn.defineFunc(body, name, null, rtnType, aParams);
             }
         } else {
             // Anonymous
             String name = getLabel("afunc");
             nameNode.setValue(name);
             
-            func = LangCompiler.defineFunc(this, body, name, false, rtnType, aParams);
+            func = LangCompiler.defineFunc(this, body, name, null, rtnType, aParams);
         }
         
         // Put flags

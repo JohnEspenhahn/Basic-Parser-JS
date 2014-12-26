@@ -52,12 +52,12 @@ public abstract class Library {
         LangCompiler.getString(str);
     }
     
-    public static void defineFunc(String name, boolean rawName, Type rtnType, Type... types) {        
-        LangCompiler.defineFunc(name, rawName, rtnType, Util.toParams(types));
+    public static void defineFunc(String inName, String outName, Type rtnType, Type... types) {        
+        LangCompiler.defineFunc(inName, outName, rtnType, Util.toParams(types));
     }
     
-    public static void defineFunc(ClassType classIn, String name, boolean rawName, int flags, Type rtnType, Type... types) {
-        classIn.defineFunc(null, name, rawName, rtnType, Util.toParams(types)).setFlags(flags);
+    public static void defineFunc(ClassType classIn, String inName, String outName, int flags, Type rtnType, Type... types) {
+        classIn.defineFunc(null, inName, outName, rtnType, Util.toParams(types)).setFlags(flags);
     }
     
     public static ClassType defineClass(String name, boolean isFinal) {

@@ -57,7 +57,7 @@ public class ClassType extends StructType {
         for (FuncGroup funcs: parent.getDefinedFuncs()) {
             if (funcs.isConstructor()) {
                 for (FuncHead func: funcs.getFuncs()) {
-                    FuncHead superFunc = defineFunc(null, "super", false, func.getReturnType(), Util.toParams(func.getParams()));
+                    FuncHead superFunc = defineFunc(null, "super", null, func.getReturnType(), Util.toParams(func.getParams()));
                     superFunc.setFlags(BitFlag.PRIVATE.b);
                 }
                 
@@ -156,8 +156,8 @@ public class ClassType extends StructType {
         return initFrame;
     }
     
-    public FuncHead defineFunc(Node head, String name, boolean rawName, Type rtnType, Param... params) {
-        return funcBridge.defineFunc(LangCompiler.getGlobalFrame(), head, name, rawName, rtnType, params);
+    public FuncHead defineFunc(Node head, String inName, String outName, Type rtnType, Param... params) {
+        return funcBridge.defineFunc(LangCompiler.getGlobalFrame(), head, inName, outName, rtnType, params);
     }
     
     public Collection<FuncGroup> getDefinedFuncs() {

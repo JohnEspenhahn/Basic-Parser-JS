@@ -25,13 +25,13 @@ public class FuncBridge {
         return funcs.values();
     }
     
-    public FuncHead defineFunc(Frame parent, Node head, String name, boolean rawName, Type rtnType, Param... params) {
-        FuncHead func = LangCompiler.factory.FuncHead(parent, classType, name, rawName, head, rtnType, params);
+    public FuncHead defineFunc(Frame parent, Node head, String inName, String outName, Type rtnType, Param... params) {
+        FuncHead func = LangCompiler.factory.FuncHead(parent, classType, inName, outName, head, rtnType, params);
         
-        FuncGroup group = funcs.get(name);
+        FuncGroup group = funcs.get(inName);
         if (group == null) {
             group = new FuncGroup(func);
-            funcs.put(name, group);
+            funcs.put(inName, group);
             
             return func;
         } else if (group.isDefined(func)) {

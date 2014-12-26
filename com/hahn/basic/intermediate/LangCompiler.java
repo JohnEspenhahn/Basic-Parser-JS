@@ -131,12 +131,12 @@ public class LangCompiler {
     	}
     }
     
-    public static FuncHead defineFunc(String name, boolean rawName, Type rtnType, Param... params) {
-        return LangCompiler.defineFunc(getGlobalFrame(), null, name, rawName, rtnType, params);
+    public static FuncHead defineFunc(String inName, String outName, Type rtnType, Param... params) {
+        return LangCompiler.defineFunc(getGlobalFrame(), null, inName, outName, rtnType, params);
     }
     
-    public static FuncHead defineFunc(Frame parent, Node head, String name, boolean rawName, Type rtnType, Param... params) {
-        return funcBridge.defineFunc(parent, head, name, rawName, rtnType, params);
+    public static FuncHead defineFunc(Frame parent, Node head, String inName, String outName, Type rtnType, Param... params) {
+        return funcBridge.defineFunc(parent, head, inName, outName, rtnType, params);
     }
     
     public static FuncCallPair getFunc(BasicObject objIn, Node nameNode, ITypeable[] types) {

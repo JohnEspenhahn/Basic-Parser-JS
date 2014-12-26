@@ -77,7 +77,7 @@ public interface ILangFactory {
 	public ConditionalObject ConditionalObject(Statement container, OPCode op, BasicObject p1, Node p1Node, BasicObject p2, Node p2Node, BasicObject temp);
 	public TernaryObject TernaryObject(Statement container, BasicObject condition, Node node_then, Node node_else, int row, int col);
 	
-	public FuncHead FuncHead(Frame parent, ClassType classIn, String name, boolean rawName, Node head, Type rtnType, Param[] params);
+	public FuncHead FuncHead(Frame parent, ClassType classIn, String inName, String outName, Node head, Type rtnType, Param[] params);
     public FuncPointer FuncPointer(Node nameNode, BasicObject objectIn, ParameterizedType<ITypeable> funcType);
     public FuncCallPointer FuncCallPointer(Node nameNode, BasicObject objectIn, BasicObject[] params);
     

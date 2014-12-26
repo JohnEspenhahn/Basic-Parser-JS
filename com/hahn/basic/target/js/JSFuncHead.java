@@ -8,8 +8,8 @@ import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.parser.Node;
 
 public class JSFuncHead extends FuncHead {    
-    public JSFuncHead(Frame parent, ClassType classIn, String name, boolean rawName, Node funcHeadNode, Type rtn, Param... params) {
-        super(parent, classIn, name, rawName, funcHeadNode, rtn, params);
+    public JSFuncHead(Frame parent, ClassType classIn, String inName, String outName, Node funcHeadNode, Type rtn, Param... params) {
+        super(parent, classIn, inName, outName, funcHeadNode, rtn, params);
     }
     
     @Override

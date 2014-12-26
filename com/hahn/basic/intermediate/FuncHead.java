@@ -30,20 +30,31 @@ public abstract class FuncHead extends Frame {
     private final ClassType classIn;
     private final boolean isConstructor;
     
-    public FuncHead(Frame parent, ClassType classIn, String name, boolean rawName, Node funcHeadNode, Type rtn, Param... params) {
+    /**
+     * A function head defines a function header
+     * 
+     * @param parent Containing frame
+     * @param classIn Containing class
+     * @param inName The name for this language
+     * @param outName The name for the target language or null to create function id
+     * @param funcHeadNode The node of the function
+     * @param rtn The return type of the function
+     * @param params The parameters for the function
+     */
+    public FuncHead(Frame parent, ClassType classIn, String inName, String outName, Node funcHeadNode, Type rtn, Param... params) {
         super(parent, funcHeadNode); // TODO nest anon func
         
-        if (rawName) {
-            this.funcId = name;
+        if (outName != null) {
+            this.funcId = outName;
         } else {
-            this.funcId = createFuncId(name, params);
+            this.funcId = createFuncId(inName, params);
         }
         
         this.classIn = classIn;
-        this.isConstructor = Util.isConstructorName(name);
+        this.isConstructor = Util.isConstructorName(inName);
         
         this.flags = 0;
-        this.name = name;
+        this.name = inName;
         this.rtnType = rtn;
         this.allChildrenReturn = true;
         if (rtn == Type.VOID) flagHasReturn();
