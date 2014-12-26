@@ -126,7 +126,7 @@ public class JSPretty {
                     JSPretty.setTabs(oldIndent);
                 }
             }
-                
+            
             break;
         
         // List

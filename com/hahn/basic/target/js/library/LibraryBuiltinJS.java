@@ -17,16 +17,15 @@ public class LibraryBuiltinJS extends Library {
         Library.defineFunc("alert", "alert", Type.VOID, Type.NUMERIC);
         Library.defineFunc("alert", "alert", Type.VOID, Type.STRING);
         
+        Library.defineFunc("prompt", "prompt", Type.STRING, Type.STRING);
+        
         ClassType console = Library.defineClass("console", true);
         Library.defineFunc(console, "log", "log", BitFlag.STATIC.b, Type.VOID, Type.OBJECT);
         Library.defineFunc(console, "log", "log", BitFlag.STATIC.b, Type.VOID, Type.NUMERIC);
         Library.defineFunc(console, "log", "log", BitFlag.STATIC.b, Type.VOID, Type.STRING);
         
-        Library.defineFunc("prompt", "prompt", Type.STRING, Type.STRING);
-        
         Library.defineFunc("parseInt", "parseInt", Type.INT, Type.STRING);
         Library.defineFunc("parseFloat", "parseFloat", Type.FLOAT, Type.STRING);
-        
     }
     
     @Override
