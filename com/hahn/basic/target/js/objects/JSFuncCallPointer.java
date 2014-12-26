@@ -16,7 +16,8 @@ public class JSFuncCallPointer extends FuncCallPointer {
         if (getObjectIn() == null) {
             return String.format("%s(%s)", getFuncId(), Util.toTarget(getParams()));
         } else if (getObjectIn().isVarSuper()) {
-            return String.format("%s.%s.call(this, %s)", getObjectIn().toTarget(), getFuncId(), Util.toTarget(getParams()));
+            if (getParams().length > 0) return String.format("%s.%s.call(this, %s)", getObjectIn().toTarget(), getFuncId(), Util.toTarget(getParams()));
+            else return String.format("%s.%s.call(this)", getObjectIn().toTarget(), getFuncId());
         } else {
             return String.format("%s.%s(%s)", getObjectIn().toTarget(), getFuncId(), Util.toTarget(getParams()));
         }

@@ -20,7 +20,7 @@ public class VarSuper extends Var {
     
     @Override
     public boolean isVarSuper() {
-        return false;
+        return true;
     }
     
     @Override
