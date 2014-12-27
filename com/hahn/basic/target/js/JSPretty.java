@@ -140,6 +140,19 @@ public class JSPretty {
             }
             break;
             
+        // Indentless List
+        case 'L':
+            JSPretty.setTabs(0);
+            if (arg instanceof IIntermediate[]) {
+                str.append(Util.toTarget((IIntermediate[]) arg));
+            } else if (arg instanceof Object[]) {
+                str.append(StringUtils.join((Object[]) arg, Util.getListSeperator()));
+            } else {
+                throw new IllegalArgumentException(arg + " is not an array and cannot be formatted with %l");
+            }
+            JSPretty.setTabs(oldIndent);
+            break;
+            
         default:
             throw new UnknownFormatConversionException("%" + flag);
         }
