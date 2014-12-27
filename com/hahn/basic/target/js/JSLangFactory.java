@@ -63,7 +63,6 @@ import com.hahn.basic.target.js.objects.JSStringConst;
 import com.hahn.basic.target.js.objects.JSTernaryObject;
 import com.hahn.basic.target.js.objects.JSVarAccess;
 import com.hahn.basic.target.js.objects.JSVarSuper;
-import com.hahn.basic.target.js.objects.register.JSRegister;
 import com.hahn.basic.target.js.statements.JSBreakStatement;
 import com.hahn.basic.target.js.statements.JSCallFuncStatement;
 import com.hahn.basic.target.js.statements.JSContinueStatement;
@@ -88,7 +87,7 @@ public class JSLangFactory implements ILangFactory {
     
     @Override
     public IRegister getNextRegister(AdvancedObject objFor) {
-        return JSRegister.getForObject(objFor);
+        return build.registerFactory.getForObject(objFor);
     }
     
     @Override

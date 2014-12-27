@@ -7,26 +7,29 @@ import com.hahn.basic.Main;
 import com.hahn.basic.definition.EnumToken;
 import com.hahn.basic.intermediate.LangCompiler;
 import com.hahn.basic.intermediate.library.base.Library;
+import com.hahn.basic.intermediate.objects.register.SimpleRegisterFactory;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.target.ILangCommand;
 import com.hahn.basic.target.LangBuildTarget;
 import com.hahn.basic.target.js.library.LibraryBuiltinJS;
-import com.hahn.basic.target.js.objects.register.JSRegister;
 
 public class JSBuildTarget extends LangBuildTarget {
     public static final Library BuiltinJS = new LibraryBuiltinJS();
     
 	StringBuilder builder;
+	SimpleRegisterFactory registerFactory;
 
 	public JSBuildTarget() {
 		builder = new StringBuilder();
+		registerFactory = new SimpleRegisterFactory();
 	}
 	
 	@Override
 	public void init() {
 	    builder.setLength(0);
 	    
-	    JSRegister.init();
+	    registerFactory.reset();
+	    
 	    LangCompiler.addLibrary("BuiltinJS");
 	}
 	

@@ -1,4 +1,4 @@
-package com.hahn.basic.target.js.objects.register;
+package com.hahn.basic.intermediate.objects.register;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -6,63 +6,62 @@ import java.util.Deque;
 import com.hahn.basic.intermediate.Frame;
 import com.hahn.basic.intermediate.objects.AdvancedObject;
 import com.hahn.basic.intermediate.objects.BasicObject;
-import com.hahn.basic.intermediate.objects.register.Register;
 
-public class JSRegister extends Register {
-    private static final Deque<JSRegister> free = new ArrayDeque<JSRegister>();
-    private static int next_idx = 0;
+public class SimpleRegisterFactory {  
+    private final Deque<SimpleRegister> free;
+    private int next_idx;
     
-    protected JSRegister() {
-        this(idxToName(next_idx));
-        
-        next_idx += 1;
+    public SimpleRegisterFactory() {
+        free = new ArrayDeque<SimpleRegister>();
+        next_idx = 0;
     }
     
-    protected JSRegister(String name) {
-        super(name);
+    public void reset() {
+        free.clear();
+        next_idx = 0;
     }
     
-    @Override
-    public void release() {
-        super.release();
-        
-        free.push(this);
+    protected void release(SimpleRegister r) {
+        free.push(r);
     }
     
-    public static void init() {
-        JSRegister.next_idx = 0;
-    }
-    
-    public static JSRegister getForObject(AdvancedObject obj) {
+    public SimpleRegister getForObject(AdvancedObject obj) {
         if (obj.isLocal()) {
-            return JSRegister.getNextFree(obj.getFrame());
+            return getNextFree(obj.getFrame());
         } else {
-            JSRegister reg = new JSRegister(obj.getName());
+            SimpleRegister reg = new SimpleRegister(obj.getName(), this);
             reg.reserve();
         
             return reg;
         }
     }
     
-    public static JSRegister getNextFree(Frame frame) {
+    protected SimpleRegister getNextFree(Frame frame) {
         BasicObject testVar = null;
         
-        JSRegister first = null, reg;
+        SimpleRegister first = null, reg;
         if (free.size() > 0) reg = first = free.removeLast();
-        else reg = new JSRegister();
+        else reg = getNextByIndex();
         
         do {
             free.addFirst(reg);
             
             if (free.peek() != first) reg = free.removeLast();
-            else reg = new JSRegister();
+            else reg = getNextByIndex();
         } while ((testVar = frame.safeGetVar(reg.getName())) != null && !testVar.isLocal());
         
         reg.reserve();        
         return reg;
     }
     
-    public static String idxToName(int i) {
+    private SimpleRegister getNextByIndex() {
+        return new SimpleRegister(idxToName(next_idx++), this);
+    }
+    
+    private String idxToName(int i) {
+        char[] char1 = getFirstChars();
+        char[] charN = getNthChars();
+        
         int remainder = i % char1.length;
         String str = String.valueOf(char1[remainder]);
         i = (i - remainder) / char1.length;
@@ -74,6 +73,14 @@ public class JSRegister extends Register {
         }
         
         return str;
+    }
+    
+    public char[] getFirstChars() {
+        return char1;
+    }
+    
+    public char[] getNthChars() {
+        return charN;
     }
     
     private static final char[] char1 = new char[] {
