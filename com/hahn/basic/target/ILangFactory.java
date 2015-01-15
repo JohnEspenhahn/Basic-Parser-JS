@@ -5,6 +5,7 @@ import java.util.List;
 import com.hahn.basic.intermediate.Frame;
 import com.hahn.basic.intermediate.FuncHead;
 import com.hahn.basic.intermediate.objects.AdvancedObject;
+import com.hahn.basic.intermediate.objects.ArithmeticObject;
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.CastedObject;
 import com.hahn.basic.intermediate.objects.ClassObject;
@@ -37,6 +38,7 @@ import com.hahn.basic.intermediate.statements.ParamDefaultValStatement;
 import com.hahn.basic.intermediate.statements.Statement;
 import com.hahn.basic.intermediate.statements.WhileStatement;
 import com.hahn.basic.parser.Node;
+import com.hahn.basic.target.js.objects.JSArithmeticSetObject;
 
 public interface ILangFactory {
 	public LangBuildTarget getLangBuildTarget();
@@ -55,8 +57,9 @@ public interface ILangFactory {
 	public ClassObject ClassObject(ClassType classType);
 	
 	public OPObject OPObject(Statement container, OPCode op, BasicObject p1, Node p1Node, BasicObject p2, Node p2Node);
-	public OPObject ArithmeticObject(Statement container, OPCode op, BasicObject p1, Node p1Node, BasicObject p2, Node p2Node);
-	public OPObject ArithmeticSetObject(Statement container, OPCode op, BasicObject p1, Node p1Node, BasicObject p2, Node p2Node);
+	public OPObject PostfixOPObject(Statement container, OPCode op, BasicObject p, Node pNode);
+	public ArithmeticObject ArithmeticObject(Statement container, OPCode op, BasicObject p1, Node p1Node, BasicObject p2, Node p2Node);
+	public JSArithmeticSetObject ArithmeticSetObject(Statement container, OPCode op, BasicObject p1, Node p1Node, BasicObject p2, Node p2Node);
 	
 	public CastedObject CastedObject(BasicObject obj, Type type, int row, int col);
 	public ExpressionObject ExpressionObject(ExpressionStatement exp);

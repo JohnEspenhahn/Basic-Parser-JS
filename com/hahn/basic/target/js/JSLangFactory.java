@@ -7,6 +7,7 @@ import com.hahn.basic.intermediate.Frame;
 import com.hahn.basic.intermediate.FuncGroup;
 import com.hahn.basic.intermediate.FuncHead;
 import com.hahn.basic.intermediate.objects.AdvancedObject;
+import com.hahn.basic.intermediate.objects.ArithmeticObject;
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.CastedObject;
 import com.hahn.basic.intermediate.objects.ClassObject;
@@ -17,6 +18,7 @@ import com.hahn.basic.intermediate.objects.FuncPointer;
 import com.hahn.basic.intermediate.objects.NewArray;
 import com.hahn.basic.intermediate.objects.OPObject;
 import com.hahn.basic.intermediate.objects.Param;
+import com.hahn.basic.intermediate.objects.PostfixOPObject;
 import com.hahn.basic.intermediate.objects.StringConst;
 import com.hahn.basic.intermediate.objects.TernaryObject;
 import com.hahn.basic.intermediate.objects.Var;
@@ -58,7 +60,6 @@ import com.hahn.basic.target.js.objects.JSFuncCallPointer;
 import com.hahn.basic.target.js.objects.JSFuncPointer;
 import com.hahn.basic.target.js.objects.JSNewArray;
 import com.hahn.basic.target.js.objects.JSNewInstance;
-import com.hahn.basic.target.js.objects.JSOPObject;
 import com.hahn.basic.target.js.objects.JSStringConst;
 import com.hahn.basic.target.js.objects.JSTernaryObject;
 import com.hahn.basic.target.js.objects.JSVarAccess;
@@ -181,16 +182,21 @@ public class JSLangFactory implements ILangFactory {
     
     @Override
     public OPObject OPObject(Statement container, OPCode op, BasicObject p1, Node p1Node, BasicObject p2, Node p2Node) {
-        return new JSOPObject(container, op, p1, p1Node, p2, p2Node);
+        return new OPObject(container, op, p1, p1Node, p2, p2Node);
     }
     
     @Override
-    public OPObject ArithmeticObject(Statement container, OPCode op, BasicObject p1, Node p1Node, BasicObject p2, Node p2Node) {
+    public OPObject PostfixOPObject(Statement container, OPCode op, BasicObject p, Node pNode) {
+        return new PostfixOPObject(container, op, p, pNode);
+    }
+    
+    @Override
+    public ArithmeticObject ArithmeticObject(Statement container, OPCode op, BasicObject p1, Node p1Node, BasicObject p2, Node p2Node) {
         return new JSArithmeticObject(container, op, p1, p1Node, p2, p2Node);
     }
     
     @Override
-    public OPObject ArithmeticSetObject(Statement container, OPCode op, BasicObject p1, Node p1Node, BasicObject p2, Node p2Node) {
+    public JSArithmeticSetObject ArithmeticSetObject(Statement container, OPCode op, BasicObject p1, Node p1Node, BasicObject p2, Node p2Node) {
         return new JSArithmeticSetObject(container, op, p1, p1Node, p2, p2Node);
     }
     

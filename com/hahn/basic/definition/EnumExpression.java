@@ -5,8 +5,9 @@ import com.hahn.basic.parser.IEnumExpression;
 public enum EnumExpression implements IEnumExpression {   
     STMT_EXPRS  ("<CREATE>|<CREATE_ARR>|<CALL_FUNC>|<MODIFY>", false),
     FACTOR      ("<STMT_EXPRS>|<CAST>|<ANON_FUNC>|<FUNC_POINTER>|<ACCESS>|NULL|STRING|CHAR|HEX_INTEGER|INTEGER|FLOAT|TRUE|FALSE|OPEN_PRNTH<EXPRESSION>CLOSE_PRNTH"),
-    NEGATION    ("?NOT <FACTOR>"),
-    PRODUCT     ("<NEGATION>{<MULT_DIV><NEGATION>}"),
+    PREFIX_OP   ("NOT|SUB"),
+    PREFIX      ("?<PREFIX_OP> <FACTOR>"),
+    PRODUCT     ("<PREFIX>{<MULT_DIV><PREFIX>}"),
     SUMMATION   ("<PRODUCT>{<ADD_SUB><PRODUCT>}"),
     BOOLEAN     ("<SUMMATION>{<BOOL_OP><SUMMATION>}"),
     EVAL_CNDTN  ("<BOOLEAN>{<BITWISE><BOOLEAN>}"),
@@ -60,7 +61,8 @@ public enum EnumExpression implements IEnumExpression {
     DEFINE      ("{<FLAG>} <TYPE> IDENTIFIER ?<DEF_MODIFY> {COMMA IDENTIFIER ?<DEF_MODIFY>}", false),
     DEF_MODIFY  ("ASSIGN <EXPRESSION>", false),
     
-    MODIFY      ("<ACCESS><ASSIGN_OP><EXPRESSION>", false),
+    ADD2_SUB2   ("ADD ADD|SUB SUB", false),
+    MODIFY      ("<ADD2_SUB2> <ACCESS>|<ACCESS> <ADD2_SUB2>|<ACCESS><ASSIGN_OP><EXPRESSION>", false),
     ASSIGN_OP   ("ASSIGN|PLUS_EQU|SUB_EQU|MULT_EQU|DIV_EQU|AND_EQU|BOR_EQU|XOR_EQU"),
     
     COMMAND     ("CONTINUE|BREAK|IMPORT"),

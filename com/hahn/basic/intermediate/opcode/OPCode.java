@@ -14,8 +14,10 @@ public enum OPCode {
     
     ADD ("+" , NUMERIC, NUMERIC,  0b101101, 4, 6),
     ADDE("+=", NUMERIC, NUMERIC,  0b101101, 4, 6),
+    PADD("++", NUMERIC, null   ,  0b000000, 0, 0),
     SUB ("-" , NUMERIC, NUMERIC,  0b101110, 4, 6),
     SUBE("-=", NUMERIC, NUMERIC,  0b101110, 4, 6),
+    PSUB("--", NUMERIC, null   ,  0b000000, 0, 0),
     MUL ("*" , NUMERIC, NUMERIC,  0b101111, 4, 6),
     MULE("*=", NUMERIC, NUMERIC,  0b101111, 4, 6),
     DIV ("/" , NUMERIC, NUMERIC,  0b110001, 4, 6),
@@ -135,7 +137,7 @@ public enum OPCode {
     
     public static boolean doesModify(OPCode op) {
         return op == SET  || op == ADDE || op == SUBE || op == MULE || op == DIVE
-                || op == MODE || op == ANDE || op == BORE || op == XORE;
+                || op == MODE || op == ANDE || op == BORE || op == XORE || op == PADD || op == PSUB;
     }
     
     public static boolean isBitwise(OPCode op) {

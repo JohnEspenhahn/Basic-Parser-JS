@@ -558,14 +558,17 @@ public class Frame extends Statement {
      */
     public OPObject modifyVar(Node head) {
         List<Node> children = head.getAsChildren();
+        boolean isPrefix = (children.size() == 2 && children.get(0).getToken() != EnumExpression.ACCESS);
         
-        Node varNode = children.get(0);
+        Node varNode = (isPrefix ? children.get(1) : children.get(0));
         BasicObject var = accessVar(varNode);
         
-        Node objNode = children.get(2);
-        BasicObject obj = handleExpression(objNode).getAsExpObj();
+        Node opNode = (isPrefix ? children.get(0) : children.get(1));
         
-        switch (children.get(1).getValue()) {
+        Node objNode = (children.size() > 2 ? children.get(2) : null);
+        BasicObject obj = (children.size() > 2 ? handleExpression(objNode).getAsExpObj() : null);
+        
+        switch (opNode.joinToString()) {
             case "=": 
                 return updateVar(var, varNode, obj, objNode, OPCode.SET);
             case "+=":
@@ -584,6 +587,12 @@ public class Frame extends Statement {
                 return updateVar(var, varNode, obj, objNode, OPCode.BORE);
             case "^=":
                 return updateVar(var, varNode, obj, objNode, OPCode.XORE);
+            case "++":
+                if (isPrefix) return prefixUpdateVar(var, varNode, OPCode.PADD);
+                else return postfixUpdateVar(var, varNode, OPCode.PADD);
+            case "--":
+                if (isPrefix) return prefixUpdateVar(var, varNode, OPCode.PSUB);
+                else return postfixUpdateVar(var, varNode, OPCode.PSUB);
            default:
                throw new RuntimeException("Unhandled modify var '" + children.get(1).getValue() + "'");
         }
@@ -600,6 +609,28 @@ public class Frame extends Statement {
      */
     protected OPObject updateVar(BasicObject var, Node varNode, BasicObject obj, Node objNode, OPCode op) {
         return LangCompiler.factory.ArithmeticSetObject(this, op, var, varNode, obj, objNode);
+    }
+    
+    /**
+     * Do the pre-unary modification of a variable
+     * @param var The variable to modify
+     * @param varNode The node by which the var is defined
+     * @param op The operation to perform on the variable
+     * @return OPObject to update the var
+     */
+    protected OPObject prefixUpdateVar(BasicObject var, Node varNode, OPCode op) {
+        return LangCompiler.factory.OPObject(this, op, var, varNode, null, null);
+    }
+    
+    /**
+     * Do the post-unary modification of a variable
+     * @param var The variable to modify
+     * @param varNode The node by which the var is defined
+     * @param op The operation to perform on the variable
+     * @return OPObject to update the var
+     */
+    protected OPObject postfixUpdateVar(BasicObject var, Node varNode, OPCode op) {
+        return LangCompiler.factory.PostfixOPObject(this, op, var, varNode);
     }
     
     /**
@@ -1284,7 +1315,8 @@ public class Frame extends Statement {
             // Skip ending parenthesis
             it.next();
             
-        } else if (token == NOT) {
+        } else if (token == NOT 
+                || (exp.getObj() == null && token == SUB)) {
             OPCode op = OPCode.fromSymbol(val);
             
             ExpressionStatement nextExp = LangCompiler.factory.ExpressionStatement(this, null);

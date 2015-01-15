@@ -6,6 +6,8 @@ import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.opcode.OPCode;
 import com.hahn.basic.intermediate.statements.Statement;
 import com.hahn.basic.parser.Node;
+import com.hahn.basic.target.js.JSPretty;
+import com.hahn.basic.util.exceptions.CompileException;
 import com.sun.istack.internal.Nullable;
 
 /**
@@ -13,7 +15,7 @@ import com.sun.istack.internal.Nullable;
  * @author John Espenhahn
  *
  */
-public abstract class OPObject extends BasicObject {
+public class OPObject extends BasicObject {
     private Frame frame;
     private OPCode opcode;
     
@@ -124,6 +126,11 @@ public abstract class OPObject extends BasicObject {
         p1.setInUse(this);        
         if (p2 != null) p2.setInUse(this);
         
+        // Special case to prevent "++1"
+        if ((opcode == OPCode.PADD || opcode == OPCode.PSUB) && !p1.isVar()) {
+            throw new CompileException("Illegal left-side argument `" + p1 + "` with operator `" + opcode.getSymbol() + "`");
+        }
+        
         // Type check
         Type mergedType = p1.getType().autocast(opcode.type1, p1Node.getRow(), p1Node.getCol(), true);
         setType(mergedType);
@@ -142,8 +149,8 @@ public abstract class OPObject extends BasicObject {
         p1.takeRegister(this);
         
         // Check literals
-        if (p1.hasLiteral() && p2 != null && OPCode.canChangeLiteral(getOP())) {
-            if (p1.canUpdateLiteral(getFrame(), getOP()) && p2.hasLiteral()
+        if (p1.hasLiteral() && OPCode.canChangeLiteral(getOP())) {
+            if (p2 != null && p1.canUpdateLiteral(getFrame(), getOP()) && p2.hasLiteral()
                     && p1.updateLiteral(opcode, p2.getLiteral())) {
                 this.isLiteral = true;
             } else {
@@ -161,7 +168,20 @@ public abstract class OPObject extends BasicObject {
      * handle conditions if p2 is not null and if p2 is null
      * @return A final form of the object
      */
-    public abstract String doToTarget();
+    public String doToTarget() {
+        if (getP2() != null) {
+            return JSPretty.format("%s_%s_%s",
+                    getP1().isGrouped() ? "("+getP1().toTarget()+")" : getP1().toTarget(),
+                    getOP().getSymbol(), 
+                    getP2().isGrouped() ? "("+getP2().toTarget()+")" : getP2().toTarget()
+                   );
+        } else {
+            return JSPretty.format("%s%s",
+                    getOP().getSymbol(),
+                    getP1().isExpression() ? "("+getP1().toTarget()+")" : getP1().toTarget()
+                   );
+        }
+    }  
     
     @Override
     public final String toTarget() {

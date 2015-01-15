@@ -3,6 +3,8 @@ package com.hahn.basic.parser;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.hahn.basic.definition.EnumExpression;
 import com.hahn.basic.lexer.PackedToken;
 
@@ -132,6 +134,9 @@ public class Node {
         return parent == null;
     }
 
+    /**
+     * @return If terminal will return the value, otherwise returns null
+     */
     public String getValue() {        
         return value;
     }
@@ -139,11 +144,30 @@ public class Node {
     public Enum<?> getToken() {        
         return token;
     }
+    
+    /**
+     * Join all of the contained token values into a single string
+     * Ex] (add, add) => "++"
+     * @return A joined string representation without separating commas
+     */
+    public String joinToString() {
+        if (isTerminal()) {
+            return getValue();
+        } else {
+            return StringUtils.join(children.stream().map(child -> child.joinToString()).toArray());
+        }
+    }
 
+    /**
+     * Join all of the contained token values into a single string. If there
+     * is more than one child they are seperated by commas (like a list)
+     * Ex] (add, add) => "+,+"
+     * @return A joined string representation with separating commas
+     */
     @Override
     public String toString() {
-        if (this.isTerminal()) {
-            return value;
+        if (isTerminal()) {
+            return getValue();
         } else {
             return children.toString();
         }
