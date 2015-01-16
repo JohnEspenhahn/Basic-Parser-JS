@@ -17,6 +17,7 @@ public class LibraryBuiltinJS extends Library {
         Library.defineFunc("alert", "alert", Type.VOID, Type.NUMERIC);
         Library.defineFunc("alert", "alert", Type.VOID, Type.STRING);
         
+        Library.defineClass("console", true);
         Library.defineFunc("puts", "console.log", Type.VOID, Type.OBJECT);
         Library.defineFunc("puts", "console.log", Type.VOID, Type.NUMERIC);
         Library.defineFunc("puts", "console.log", Type.VOID, Type.STRING);
