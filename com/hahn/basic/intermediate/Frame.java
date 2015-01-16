@@ -32,6 +32,9 @@ import static com.hahn.basic.definition.EnumToken.SUB;
 import static com.hahn.basic.definition.EnumToken.SUB_SUB;
 import static com.hahn.basic.definition.EnumToken.TRUE;
 import static com.hahn.basic.definition.EnumToken.XOR;
+import static com.hahn.basic.definition.EnumToken.IDENTIFIER;
+import static com.hahn.basic.definition.EnumToken.THIS;
+import static com.hahn.basic.definition.EnumToken.SUPER;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -386,18 +389,24 @@ public class Frame extends Statement {
     
     public BasicObject getVar(Node nameNode) {
         String name = nameNode.getValue();
-        BasicObject obj = safeGetVar(name);
+        Enum<?> token = nameNode.getToken();
         
-        // Found
-        if (obj != null) {
-            ClassType classIn = getClassIn();
-            if (classIn != null && obj.hasFlag(BitFlag.PRIVATE) && (obj.getVarThisFlag() == Var.NOT_THIS || !classIn.getDefinedParams().contains(obj.getAccessedObject()))) {
-                throw new CompileException("The field `" + name + "` is private", nameNode);
-            }
+        if (token == IDENTIFIER || token == THIS || token == SUPER) {    
+            BasicObject obj = safeGetVar(name);
             
-            return obj;
+            // Found
+            if (obj != null) {
+                ClassType classIn = getClassIn();
+                if (classIn != null && obj.hasFlag(BitFlag.PRIVATE) && (obj.getVarThisFlag() == Var.NOT_THIS || !classIn.getDefinedParams().contains(obj.getAccessedObject()))) {
+                    throw new CompileException("The field `" + name + "` is private", nameNode);
+                }
+                
+                return obj;
+            } else {
+                throw new CompileException("Variable `" + name + "` is not defined in this scope", nameNode);
+            }
         } else {
-            throw new CompileException("Variable `" + name + "` is not defined in this scope", nameNode);
+            return handleNextExpressionChildObject(nameNode, null);
         }
     }
     
