@@ -137,7 +137,11 @@ public enum OPCode {
     
     public static boolean doesModify(OPCode op) {
         return op == SET  || op == ADDE || op == SUBE || op == MULE || op == DIVE
-                || op == MODE || op == ANDE || op == BORE || op == XORE || op == PADD || op == PSUB;
+                || op == MODE || op == ANDE || op == BORE || op == XORE || isPrefixIncDec(op);
+    }
+    
+    public static boolean isPrefixIncDec(OPCode op) {
+        return op == PADD || op == PSUB;
     }
     
     public static boolean isBitwise(OPCode op) {

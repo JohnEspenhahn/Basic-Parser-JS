@@ -209,6 +209,14 @@ public abstract class BasicObject implements IIntermediate, ITypeable {
     }
     
     /**
+     * Only Prefix OPCode expressions should return true
+     * @return True if Prefix OPCode object
+     */
+    public boolean isPrefixIncDec() {
+        return false;
+    }
+    
+    /**
      * Expression objects, such as OPObject, should return true.
      * Used for checking the groupings of some statements
      * @return True if this object is an expression

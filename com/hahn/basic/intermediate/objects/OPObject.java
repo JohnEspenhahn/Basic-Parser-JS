@@ -61,6 +61,11 @@ public class OPObject extends BasicObject {
     }
     
     @Override
+    public boolean isPrefixIncDec() {
+        return OPCode.isPrefixIncDec(opcode);
+    }
+    
+    @Override
     public boolean canUpdateLiteral(Frame frame, OPCode op) {
         return hasLiteral() && getP1().canUpdateLiteral(frame, op);
     }

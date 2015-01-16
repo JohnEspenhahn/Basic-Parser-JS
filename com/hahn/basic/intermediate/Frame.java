@@ -29,6 +29,7 @@ import static com.hahn.basic.definition.EnumToken.QUESTION;
 import static com.hahn.basic.definition.EnumToken.RSHIFT;
 import static com.hahn.basic.definition.EnumToken.STRING;
 import static com.hahn.basic.definition.EnumToken.SUB;
+import static com.hahn.basic.definition.EnumToken.SUB_SUB;
 import static com.hahn.basic.definition.EnumToken.TRUE;
 import static com.hahn.basic.definition.EnumToken.XOR;
 
@@ -43,6 +44,7 @@ import com.hahn.basic.definition.EnumExpression;
 import com.hahn.basic.definition.EnumToken;
 import com.hahn.basic.intermediate.objects.AdvancedObject;
 import com.hahn.basic.intermediate.objects.BasicObject;
+import com.hahn.basic.intermediate.objects.ExpressionObject;
 import com.hahn.basic.intermediate.objects.FuncCallPointer;
 import com.hahn.basic.intermediate.objects.FuncPointer;
 import com.hahn.basic.intermediate.objects.LiteralBool;
@@ -1254,10 +1256,12 @@ public class Frame extends Statement {
         if (children.size() == 1 && children.get(0).getToken() == EnumExpression.STMT_EXPRS) {
             return handleExpression(children.get(0));
             
-        // Only other valid form is a ternary operation
+        // Only other valid form is a ternary operation and prefix-inc/dec
         } else {
             ExpressionStatement exp = handleExpression(child);
             if (exp.getObj().isTernary()) {
+                return exp;
+            } else if (exp.getObj().isPrefixIncDec()) {
                 return exp;
             } else {
                 throw new CompileException("Illegal left-hand side token `" + child + "`", child);
@@ -1315,8 +1319,9 @@ public class Frame extends Statement {
             // Skip ending parenthesis
             it.next();
             
-        } else if (token == NOT 
-                || (exp.getObj() == null && token == SUB)) {
+        } else if (token == NOT
+                // Prefix
+                || (exp.getObj() == null && (token == SUB || token == SUB_SUB))) {
             OPCode op = OPCode.fromSymbol(val);
             
             ExpressionStatement nextExp = LangCompiler.factory.ExpressionStatement(this, null);

@@ -5,7 +5,7 @@ import com.hahn.basic.parser.IEnumExpression;
 public enum EnumExpression implements IEnumExpression {   
     STMT_EXPRS  ("<CREATE>|<CREATE_ARR>|<CALL_FUNC>|<MODIFY>", false),
     FACTOR      ("<STMT_EXPRS>|<CAST>|<ANON_FUNC>|<FUNC_POINTER>|<ACCESS>|NULL|STRING|CHAR|HEX_INTEGER|INTEGER|FLOAT|TRUE|FALSE|OPEN_PRNTH<EXPRESSION>CLOSE_PRNTH"),
-    PREFIX_OP   ("NOT|SUB"),
+    PREFIX_OP   ("SUB_SUB|SUB|NOT"),
     PREFIX      ("?<PREFIX_OP> <FACTOR>"),
     PRODUCT     ("<PREFIX>{<MULT_DIV><PREFIX>}"),
     SUMMATION   ("<PRODUCT>{<ADD_SUB><PRODUCT>}"),
@@ -51,7 +51,7 @@ public enum EnumExpression implements IEnumExpression {
     
     CLASS       ("{<C_FLAG>} CLASS IDENTIFIER {<C_PARENT>} OPEN_BRACE {<CLASS_CNTNT>} CLOSE_BRACE", false),
     C_FLAG      ("ABSTRACT|FINAL", false),
-    C_PARENT    ("EXTENDS IDENTIFIER"),
+    C_PARENT    ("EXTENDS IDENTIFIER", false),
     
     IDENTIFIER  ("IDENTIFIER|THIS|SUPER"),
     ACCESS      ("<IDENTIFIER> ?<IN_ACCESS>", false),
@@ -61,7 +61,7 @@ public enum EnumExpression implements IEnumExpression {
     DEFINE      ("{<FLAG>} <TYPE> IDENTIFIER ?<DEF_MODIFY> {COMMA IDENTIFIER ?<DEF_MODIFY>}", false),
     DEF_MODIFY  ("ASSIGN <EXPRESSION>", false),
     
-    ADD2_SUB2   ("ADD ADD|SUB SUB", false),
+    ADD2_SUB2   ("ADD_ADD|SUB_SUB"),
     MODIFY      ("<ADD2_SUB2> <ACCESS>|<ACCESS> <ADD2_SUB2>|<ACCESS><ASSIGN_OP><EXPRESSION>", false),
     ASSIGN_OP   ("ASSIGN|PLUS_EQU|SUB_EQU|MULT_EQU|DIV_EQU|AND_EQU|BOR_EQU|XOR_EQU"),
     
@@ -72,7 +72,7 @@ public enum EnumExpression implements IEnumExpression {
     /** Stuff that can be done within if(){} */
     BLOCK_CNTNT ("<DEFINE>EOL|<COMMAND>EOL|<EXPRESSION>EOL|<RETURN>|<IF_STMT>|<WHILE_STMT>|<FOR_STMT>|EOL", false),
     /** Stuff that can be done within class{} */
-    CLASS_CNTNT ("<DEF_FUNC>|<CONSTRUCTOR>|<DEFINE>EOL|EOL"),
+    CLASS_CNTNT ("<DEF_FUNC>|<CONSTRUCTOR>|<DEFINE>EOL|EOL", false),
     
     DIRECTIVE   ("HASH IDENTIFIER", false),
     START       ("<DIRECTIVE>$|<STRUCT>$|<CLASS>$|<BLOCK_CNTNT>$|<CLASS_CNTNT>$", false);

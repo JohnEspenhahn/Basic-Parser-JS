@@ -36,7 +36,9 @@ public enum EnumToken implements IEnumRegexToken {
     GTR_EQU     (">="      , Group.OP),
     LESS        ("<"       , Group.OP),
     GTR         (">"       , Group.OP),
+    ADD_ADD     ("\\+\\+"  , Group.OP),
     ADD         ("\\+"     , Group.OP),
+    SUB_SUB     ("\\-\\-"  , Group.OP),
     SUB         ("\\-"     , Group.OP),
     MULT        ("\\*"     , Group.OP),
     DIV         ("/"       , Group.OP),
@@ -81,7 +83,7 @@ public enum EnumToken implements IEnumRegexToken {
     SUPER       ("super"      , Group.IDENT),
     
     // Special reserved keywords
-    /** super     */__s__       ("__s__"      , Group.IDENT),
+    /** super     */__s__        ("__s__"      , Group.IDENT),
     /** construct */ __c__       ("__c__"      , Group.IDENT),
     /** extend    */ __e__       ("__e__"      , Group.IDENT),
     /** name      */ __n__       ("__n__"      , Group.IDENT),
