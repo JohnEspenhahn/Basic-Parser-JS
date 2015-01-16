@@ -1,9 +1,7 @@
 package com.hahn.basic.target.js.library;
 
 import com.hahn.basic.intermediate.library.base.Library;
-import com.hahn.basic.intermediate.objects.types.ClassType;
 import com.hahn.basic.intermediate.objects.types.Type;
-import com.hahn.basic.util.BitFlag;
 
 public class LibraryBuiltinJS extends Library {
     
@@ -19,12 +17,12 @@ public class LibraryBuiltinJS extends Library {
         Library.defineFunc("alert", "alert", Type.VOID, Type.NUMERIC);
         Library.defineFunc("alert", "alert", Type.VOID, Type.STRING);
         
-        Library.defineFunc("prompt", "prompt", Type.STRING, Type.STRING);
+        Library.defineFunc("puts", "console.log", Type.VOID, Type.OBJECT);
+        Library.defineFunc("puts", "console.log", Type.VOID, Type.NUMERIC);
+        Library.defineFunc("puts", "console.log", Type.VOID, Type.STRING);
+        Library.defineFunc("puts", "console.log", Type.VOID, Type.BOOL);
         
-        ClassType console = Library.defineClass("console", true);
-        Library.defineFunc(console, "log", "log", BitFlag.STATIC.b, Type.VOID, Type.OBJECT);
-        Library.defineFunc(console, "log", "log", BitFlag.STATIC.b, Type.VOID, Type.NUMERIC);
-        Library.defineFunc(console, "log", "log", BitFlag.STATIC.b, Type.VOID, Type.STRING);
+        Library.defineFunc("prompt", "prompt", Type.STRING, Type.STRING);
         
         Library.defineFunc("parseInt", "parseInt", Type.INT, Type.STRING);
         Library.defineFunc("parseFloat", "parseFloat", Type.FLOAT, Type.STRING);

@@ -11,4 +11,9 @@ public abstract class StringConst extends BasicObject {
 	public String getString() {
 	    return getName();
 	}
+	
+	@Override
+	public String toString() {
+	    return "\"" + getString() + "\"";
+	}
 }
