@@ -5,7 +5,7 @@ import com.hahn.basic.parser.IEnumExpression;
 public enum EnumExpression implements IEnumExpression {   
     STMT_EXPRS  ("<CREATE>|<CREATE_ARR>|<CALL_FUNC>|<MODIFY>", false),
     FACTOR      ("<STMT_EXPRS>|<CAST>|<ANON_FUNC>|<FUNC_POINTER>|<ACCESS>|NULL|STRING|CHAR|HEX_INTEGER|INTEGER|FLOAT|TRUE|FALSE|OPEN_PRNTH<EXPRESSION>CLOSE_PRNTH"),
-    PREFIX_OP   ("SUB_SUB|SUB|NOT"),
+    PREFIX_OP   ("ADD_ADD|SUB_SUB|ADD|SUB|NOT"),
     PREFIX      ("?<PREFIX_OP> <FACTOR>"),
     PRODUCT     ("<PREFIX>{<MULT_DIV><PREFIX>}"),
     SUMMATION   ("<PRODUCT>{<ADD_SUB><PRODUCT>}"),

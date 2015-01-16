@@ -54,7 +54,7 @@ public abstract class ClassObject extends BasicObject {
         
         @Override
         public StructParam getParam(String name, boolean requireUnique, boolean safe, Node throwNode) {
-            StructParam p = heldClass.getParam(name, requireUnique, safe, throwNode);
+            StructParam p = heldClass.getParam(name, requireUnique, requireUnique, safe, throwNode);
             
             if (!p.hasFlag(BitFlag.STATIC)) {
                 if (safe) return null;

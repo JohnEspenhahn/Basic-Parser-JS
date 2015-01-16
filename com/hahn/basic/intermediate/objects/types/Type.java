@@ -35,7 +35,7 @@ public class Type implements ITypeable {
     
     public static final ClassType  OBJECT = new ClassType("Object", STRUCT, BitFlag.ABSTRACT.b | BitFlag.SYSTEM.b, false),
                                    FUNC   = OBJECT.extendAs("func", BitFlag.FINAL.b | BitFlag.SYSTEM.b).setTypeParams(-1),
-                                   STRING = OBJECT.extendAs("string", BitFlag.FINAL.b | BitFlag.SYSTEM.b).systemParam("length", Type.INT).setTypeParams(0);
+                                   STRING = OBJECT.extendAs("String", BitFlag.FINAL.b | BitFlag.SYSTEM.b).setTypeParams(0);
     
     public static final int COUNT_PRIMATIVES = TYPES.size();
     

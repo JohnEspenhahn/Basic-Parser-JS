@@ -44,7 +44,6 @@ import com.hahn.basic.definition.EnumExpression;
 import com.hahn.basic.definition.EnumToken;
 import com.hahn.basic.intermediate.objects.AdvancedObject;
 import com.hahn.basic.intermediate.objects.BasicObject;
-import com.hahn.basic.intermediate.objects.ExpressionObject;
 import com.hahn.basic.intermediate.objects.FuncCallPointer;
 import com.hahn.basic.intermediate.objects.FuncPointer;
 import com.hahn.basic.intermediate.objects.LiteralBool;
@@ -1264,7 +1263,7 @@ public class Frame extends Statement {
             } else if (exp.getObj().isPrefixIncDec()) {
                 return exp;
             } else {
-                throw new CompileException("Illegal left-hand side token `" + child + "`", child);
+                throw new CompileException("Illegal left-hand side token `" + child.joinToString() + "`", child);
             }
         }
     }

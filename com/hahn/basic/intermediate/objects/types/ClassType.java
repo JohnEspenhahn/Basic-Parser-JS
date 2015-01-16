@@ -129,10 +129,12 @@ public class ClassType extends StructType {
      * parameter is already defined
      * @param name The name of the parameter to define
      * @param type The type of the parameter to define
+     * @param outName The name to output in the target language
+     * @param override If true will override a pre-existing parameter explicitly defined in this class
      * @return This
      */
-    protected ClassType systemParam(String name, Type type) {
-        super.addParam(new Node(null, null, name, -1, -1), type);
+    public ClassType systemParam(String name, Type type, String outName, boolean override) {
+        super.addParam(new Node(null, null, name, -1, -1), type, outName, override);
         return this;
     }
     

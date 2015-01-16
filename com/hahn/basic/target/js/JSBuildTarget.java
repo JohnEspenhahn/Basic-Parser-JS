@@ -72,7 +72,7 @@ public class JSBuildTarget extends LangBuildTarget {
 	public String endFuncArea() {
 	    StringBuilder endBuilder = new StringBuilder();
         
-        if (Type.getPublicTypes().size() != Type.COUNT_PRIMATIVES) {
+        if (Type.getPublicTypes().size() > Type.COUNT_PRIMATIVES) {
             /*
              * function construct(clazz, func_constructor) { 
              *     var instance = new clazz(); 

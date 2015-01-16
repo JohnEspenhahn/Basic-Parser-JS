@@ -57,7 +57,7 @@ public class StructType extends Type {
      * @return A new struct object
      */
     public StructType extendAs(String name, int flags) {
-        return this.extendAs(name, null, flags);
+        return extendAs(name, null, flags);
     }
     
     /**
@@ -77,7 +77,8 @@ public class StructType extends Type {
     public void loadParams(List<BasicObject> ps) {
         if (ps != null) {
             for (int i = 0; i < ps.size(); i++) {
-                this.addParam(ps.get(i), null);
+                BasicObject p = ps.get(i);
+                addParam(p, null, p.getName(), false);
             }
         }
     }
@@ -104,22 +105,26 @@ public class StructType extends Type {
      * Add a basic object as a struct param
      * @param nameNode The node with the name of the parameter
      * @param type The type of the parameter
+     * @param outName The name to output in the target language
+     * @param override If true will override a pre-existing param within this class
      * @return This
      * @throws CompileException If the variable is already defined
      */
-    public StructType addParam(Node nameNode, Type type) {
-        return addParam(new Param(nameNode.getValue(), type), nameNode);
+    public StructType addParam(Node nameNode, Type type, String outName, boolean override) {
+        return addParam(new Param(nameNode.getValue(), type), nameNode, outName, override);
     }
     
     /**
      * Add a basic object as a struct param
      * @param p The basic object to use when defining the struct param
      * @param node The node to throw an error at
+     * @param outName The name to output in the target language
+     * @param override If true will override a pre-existing param within this class
      * @return This
      * @throws CompileException If the variable is already defined
      */
-    public StructType addParam(BasicObject p, Node node) {
-        putParam(p, node);
+    public StructType addParam(BasicObject p, Node node, String outName, boolean override) {
+        putParam(p, node, outName, override);
         
         return this;
     }
@@ -132,8 +137,21 @@ public class StructType extends Type {
      * @throws CompileException If the variable is already defined
      */
     public StructParam putParam(BasicObject p, Node node) {
-        if (checkParamUnique(p.getName(), node) == null)   {
-            StructParam param = new StructParam(params.size(), p);
+        return putParam(p, node, p.getName(), false);
+    }
+    
+    /**
+     * Add a basic object as a struct param
+     * @param p The basic object to use when defining the struct param
+     * @param node The node to throw an error at if the parameter is already defined
+     * @param outName The name to output in the target language
+     * @param override If true will override a pre-existing param within this class
+     * @return The added struct param
+     * @throws CompileException If the variable is already defined
+     */
+    public StructParam putParam(BasicObject p, Node node, String outName, boolean override) {
+        if ((override && checkSuperParamUnique(p.getName(), node)) || checkParamUnique(p.getName(), node)) {
+            StructParam param = new StructParam(params.size(), p, outName);
             params.put(p.getName(), param);
            
             return param;
@@ -142,8 +160,13 @@ public class StructType extends Type {
         }
     }
     
-    private StructParam checkParamUnique(String name, Node node) {
-        return getParam(name, true, true, node);
+    private boolean checkSuperParamUnique(String name, Node node) {
+        StructParam p = getParam(name, false, true, true, node);
+        return (p == null || p == params.get(name));
+    }
+    
+    private boolean checkParamUnique(String name, Node node) {
+        return getParam(name, true, true, true, node) == null;
     }
     
     /**
@@ -152,7 +175,7 @@ public class StructType extends Type {
      * @return Then parameter found or null if it can't be retrieved
      */
     public StructParam getParamSafe(String name) {
-        return getParam(name, false, true, null);
+        return getParam(name, false, false, true, null);
     }
     
     /**
@@ -162,28 +185,29 @@ public class StructType extends Type {
      * @throw CompileException If the requested param is not defined
      */
     public StructParam getParam(Node nameNode) {
-        return getParam(nameNode.getValue(), false, false, nameNode);
+        return getParam(nameNode.getValue(), false, false, false, nameNode);
     }
     
     /**
      * Get a variable unique to this frame's instance
      * @param name The name of the variable
-     * @param requireUnique If true will throw uniqueness errors
+     * @param requireThisUnique If true will throw uniqueness error if explicitly defined in this class
+     * @param requireSuperUnique If true will throw uniqueness error if defined in a super class of this class
      * @param safe If false will throw additional errors
      * @param throwNode Throws uniqueness errors at this node
      * @return The variable found or null
      * @throws CompileException If requireUnique is true and the variable is already defined
      * @throws CompileException If safe is false and an error occurs
      */
-    public StructParam getParam(String name, boolean requireUnique, boolean safe, Node throwNode) {        
+    public StructParam getParam(String name, boolean requireThisUnique, boolean requireSuperUnique, boolean safe, Node throwNode) {        
         boolean fromParent = false;
         StructParam sVar = params.get(name);
-        if (sVar != null && requireUnique) {
+        if (sVar != null && requireThisUnique) {
             throw new CompileException("The instance variable `" + name + "` is already defined", throwNode);
         } else if (sVar == null && parent != null) {
             fromParent = true;
             sVar =  parent.getParamSafe(name);
-            if (sVar != null && requireUnique) {
+            if (sVar != null && requireSuperUnique) {
                 throw new CompileException("The instance variable `" + name + "` is already defined in a super class", throwNode);
             }
         }
@@ -210,19 +234,26 @@ public class StructType extends Type {
     public class StructParam extends Param {
         public final int idx;
         
-        public StructParam(int i, BasicObject p) {
+        private String outName;
+        
+        public StructParam(int i, BasicObject p, String outName) {
             super(p.getName(), p.getType(), p.getFlags());
             
             this.idx = i;
+            this.outName = outName;
         }
         
         public int getOffset() {
             return idx;
         }
+        
+        public String getOutName() {
+            return outName;
+        }
 
         @Override
         public String toTarget() {
-            return getName();
+            return getOutName();
         }
     }
 }

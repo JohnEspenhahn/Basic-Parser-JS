@@ -13,6 +13,8 @@ public class LibraryBuiltinJS extends Library {
     
     @Override
     public void define() {
+        Type.STRING.systemParam("length", Type.INT, "length", true);
+        
         Library.defineFunc("alert", "alert", Type.VOID, Type.OBJECT);
         Library.defineFunc("alert", "alert", Type.VOID, Type.NUMERIC);
         Library.defineFunc("alert", "alert", Type.VOID, Type.STRING);
