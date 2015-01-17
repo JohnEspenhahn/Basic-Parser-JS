@@ -45,6 +45,16 @@ public class FuncGroup implements Iterable<FuncHead> {
         return false;
     }
     
+    public void removeAllMatch(FuncHead func) {
+        Iterator<FuncHead> it = funcs.iterator();
+        while (it.hasNext()) {
+            FuncHead f = it.next();
+            if (f.matches(func.getParams())) {
+                it.remove();
+            }
+        }
+    }
+    
     public FuncHead get(ITypeable[] types) {
         for (FuncHead f: funcs) {
             if (f.matches(types)) {

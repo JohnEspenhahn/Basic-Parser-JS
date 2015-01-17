@@ -56,8 +56,12 @@ public abstract class Library {
         LangCompiler.defineFunc(inName, outName, rtnType, Util.toParams(types));
     }
     
-    public static void defineFunc(ClassType classIn, String inName, String outName, int flags, Type rtnType, Type... types) {
-        classIn.defineFunc(null, inName, outName, rtnType, Util.toParams(types)).setFlags(flags);
+    public static void defineFunc(ClassType classIn, boolean override, String inName, String outName, int flags, Type rtnType, Type... types) {
+        classIn.defineFunc(null, override, inName, outName, rtnType, Util.toParams(types)).setFlags(flags);
+    }
+    
+    public static void defineParam(ClassType classIn, String inName, String outName, Type type) {
+        classIn.systemParam(inName, type, outName, true);
     }
     
     public static ClassType defineClass(String name, boolean isFinal) {

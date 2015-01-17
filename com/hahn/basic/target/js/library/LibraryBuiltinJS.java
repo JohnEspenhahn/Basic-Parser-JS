@@ -11,7 +11,8 @@ public class LibraryBuiltinJS extends Library {
     
     @Override
     public void define() {
-        Type.STRING.systemParam("length", Type.INT, "length", true);
+        Library.defineFunc(Type.OBJECT, true, "toString", "toString", 0, Type.STRING);
+        Library.defineParam(Type.STRING, "length", "length", Type.INT);
         
         Library.defineFunc("alert", "alert", Type.VOID, Type.OBJECT);
         Library.defineFunc("alert", "alert", Type.VOID, Type.NUMERIC);
@@ -20,7 +21,6 @@ public class LibraryBuiltinJS extends Library {
         Library.defineClass("console", true);
         Library.defineFunc("puts", "console.log", Type.VOID, Type.OBJECT);
         Library.defineFunc("puts", "console.log", Type.VOID, Type.NUMERIC);
-        Library.defineFunc("puts", "console.log", Type.VOID, Type.STRING);
         Library.defineFunc("puts", "console.log", Type.VOID, Type.BOOL);
         
         Library.defineFunc("prompt", "prompt", Type.STRING, Type.STRING);

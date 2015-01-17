@@ -159,7 +159,11 @@ public class ClassType extends StructType {
     }
     
     public FuncHead defineFunc(Node head, String inName, String outName, Type rtnType, Param... params) {
-        return funcBridge.defineFunc(LangCompiler.getGlobalFrame(), head, inName, outName, rtnType, params);
+        return defineFunc(head, false, inName, outName, rtnType, params);
+    }
+    
+    public FuncHead defineFunc(Node head, boolean override, String inName, String outName, Type rtnType, Param... params) {
+        return funcBridge.defineFunc(LangCompiler.getGlobalFrame(), override, head, inName, outName, rtnType, params);
     }
     
     public Collection<FuncGroup> getDefinedFuncs() {

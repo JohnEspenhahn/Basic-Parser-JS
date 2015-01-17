@@ -25,7 +25,7 @@ public class FuncBridge {
         return funcs.values();
     }
     
-    public FuncHead defineFunc(Frame parent, Node head, String inName, String outName, Type rtnType, Param... params) {
+    public FuncHead defineFunc(Frame parent, boolean override, Node head, String inName, String outName, Type rtnType, Param... params) {
         FuncHead func = LangCompiler.factory.FuncHead(parent, classType, inName, outName, head, rtnType, params);
         
         FuncGroup group = funcs.get(inName);
@@ -34,9 +34,11 @@ public class FuncBridge {
             funcs.put(inName, group);
             
             return func;
-        } else if (group.isDefined(func)) {
+        } else if (!override && group.isDefined(func)) {
             throw new CompileException("The function `" + func.getName() + "` with those parameters is already defined", Main.getRow(), Main.getCol());
         } else {
+            if (override) group.removeAllMatch(func);
+            
             group.add(func);
             
             return func;

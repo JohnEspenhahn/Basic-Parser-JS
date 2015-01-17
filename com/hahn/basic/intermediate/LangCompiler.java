@@ -141,7 +141,7 @@ public class LangCompiler {
     }
     
     public static FuncHead defineFunc(Frame parent, Node head, String inName, String outName, Type rtnType, Param... params) {
-        return funcBridge.defineFunc(parent, head, inName, outName, rtnType, params);
+        return funcBridge.defineFunc(parent, false, head, inName, outName, rtnType, params);
     }
     
     public static FuncCallPair getFunc(BasicObject objIn, Node nameNode, ITypeable[] types) {
