@@ -5,6 +5,8 @@ import java.io.IOException;
 
 public abstract class LangBuildTarget {
     public abstract void init();
+    public abstract String getStart();
+    public abstract String getEnd();
     
     /**
      * The extension compiled output files standardly will

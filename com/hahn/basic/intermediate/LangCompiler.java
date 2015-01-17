@@ -48,6 +48,9 @@ public class LangCompiler {
         while (it.hasPrevious()) it.previous().reverseOptimize();
         while (it.hasNext()) it.next().forwardOptimize();
         
+        // Start builder text
+        builder.appendString(builder.getStart());
+        
         // Compile class area
         builder.appendString(builder.startClassArea());
         for (Type t: Type.getPublicTypes()) {
@@ -75,6 +78,8 @@ public class LangCompiler {
         for (Library lib: libs.values()) {
             builder.appendString(lib.toTarget());
         }
+        
+        builder.appendString(builder.getEnd());
         
         return builder;
     }

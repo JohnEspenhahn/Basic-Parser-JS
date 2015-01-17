@@ -34,6 +34,16 @@ public class JSBuildTarget extends LangBuildTarget {
 	}
 	
 	@Override
+	public String getStart() {
+	    return "<!DOCTYPE>\n<html>\n<head>\n";
+	}
+	
+	@Override
+	public String getEnd() {
+	    return "\n</head>\n</html>";
+	}
+	
+	@Override
 	public String getInputExtension() {
 	    return "b";
 	}

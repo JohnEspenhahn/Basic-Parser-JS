@@ -30,6 +30,7 @@ import static com.hahn.basic.definition.EnumToken.RSHIFT;
 import static com.hahn.basic.definition.EnumToken.STRING;
 import static com.hahn.basic.definition.EnumToken.SUB;
 import static com.hahn.basic.definition.EnumToken.SUB_SUB;
+import static com.hahn.basic.definition.EnumToken.ADD_ADD;
 import static com.hahn.basic.definition.EnumToken.TRUE;
 import static com.hahn.basic.definition.EnumToken.XOR;
 import static com.hahn.basic.definition.EnumToken.IDENTIFIER;
@@ -1329,7 +1330,7 @@ public class Frame extends Statement {
             
         } else if (token == NOT
                 // Prefix
-                || (exp.getObj() == null && (token == SUB || token == SUB_SUB))) {
+                || (exp.getObj() == null && (token == SUB || token == SUB_SUB || token == ADD_ADD))) {
             OPCode op = OPCode.fromSymbol(val);
             
             ExpressionStatement nextExp = LangCompiler.factory.ExpressionStatement(this, null);
