@@ -1,5 +1,6 @@
 package com.hahn.basic.util;
 
+import java.lang.reflect.Array;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -146,5 +147,13 @@ public class Util {
         str.append(pointer);
         
         return str.toString();
+    }
+    
+    @SuppressWarnings("unchecked")
+    public static <T> T[] createArray(int size, T defaultVal) {
+        T[] arr = (T[]) Array.newInstance(defaultVal.getClass(), size);
+        Arrays.fill(arr, defaultVal);
+        
+        return (T[]) arr;
     }
 }

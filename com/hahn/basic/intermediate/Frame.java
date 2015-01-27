@@ -1088,6 +1088,8 @@ public class Frame extends Statement {
     public BasicObject createInstance(Node head) {
     	List<Node> children = head.getAsChildren();
     	
+    	Node newNode = children.get(0);
+    	
     	Node typeNode = children.get(1);
         Type type = Type.fromNode(typeNode);
         if (!type.doesExtend(Type.STRUCT)) {
@@ -1096,10 +1098,60 @@ public class Frame extends Statement {
             throw new CompileException("Cannot create a new instance of abstract class `" + type + "`", typeNode);
         }
         
-        List<BasicObject> params = new ArrayList<BasicObject>();
-        getFuncCallParams(children.get(3), params);
+        // Standard definition
+        if (children.size() > 3) {
+            List<BasicObject> params = new ArrayList<BasicObject>();
+            getFuncCallParams(children.get(3), params);
+            
+            return LangCompiler.factory.NewInstance(type, typeNode, params);
+            
+        // Array definition with no dimension definition (ex) new int[]
+        } else if (type.doesExtend(Type.ARRAY) && type instanceof ParameterizedType<?>) {
+            ParameterizedType<?> pType = (ParameterizedType<?>) type;
+            
+            // Extract packaged information from array type definition
+            Type containedType = pType.getTypable(0).getType();
+            int dimensions = pType.numTypes();
+            
+            return LangCompiler.factory.NewArray(containedType, newNode, dimensions, new ArrayList<BasicObject>());
+        } else {
+            throw new CompileException("Illegal definition of type `" + type + "`. Missing parameters", typeNode);
+        }
+    }
+    
+    /**
+     * Create a new array instance based on node data
+     * @param head EnumExpression.CREATE_ARR
+     * @return Object instance
+     */
+    public BasicObject createArrayInstance(Node head) {
+        Iterator<Node> it = Util.getIterator(head);
+        Node newNode = it.next(); // Skip `new`
+        
+        // Get type
+        Node typeNode = it.next();
+        Type containedType = Type.fromNode(typeNode);
+        
+        int dimensions = 0;
+        List<BasicObject> dimValues = new ArrayList<BasicObject>();
+        
+        while (it.hasNext()) {
+            Node node = it.next();
+            if (node.getToken() == OPEN_SQR) {
+                dimensions += 1;
                 
-        return LangCompiler.factory.NewInstance(type, typeNode, params);
+                Node next = it.next();
+                if (next.getToken() == EnumExpression.EXPRESSION) {
+                    if (dimValues.size() + 1 < dimensions) {
+                        throw new CompileException("Illegal dimensions defined at index " + dimensions, newNode);
+                    }
+                    
+                    dimValues.add(handleExpression(next).getAsExpObj());
+                }
+            }
+        }
+        
+        return LangCompiler.factory.NewArray(containedType, newNode, dimensions, dimValues);
     }
     
     /**
@@ -1386,6 +1438,8 @@ public class Frame extends Statement {
                 return modifyVar(child);
             } else if (token == EnumExpression.CREATE) {
                 return createInstance(child);
+            } else if (token == EnumExpression.CREATE_ARR) {
+                return createArrayInstance(child);
             } else if (token == EnumExpression.CAST) {
                 return doCast(child, temp);
             } else if (token == EnumExpression.FUNC_POINTER) {

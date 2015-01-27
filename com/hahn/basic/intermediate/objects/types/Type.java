@@ -30,11 +30,11 @@ public class Type implements ITypeable {
                              /** NULL -> extends OBJECT */
                              NULL = new Type("null", false, true);
     
-    public static final StructType STRUCT = new StructType("struct", null, 0, true),
-                                   ARRAY  = new StructType("array", null, 0, true);
+    public static final StructType STRUCT = new StructType("struct", null, 0, true);
     
     public static final ClassType  OBJECT = new ClassType("Object", STRUCT, BitFlag.ABSTRACT.b | BitFlag.SYSTEM.b, false),
                                    FUNC   = OBJECT.extendAs("func", BitFlag.FINAL.b | BitFlag.SYSTEM.b).setTypeParams(-1),
+                                   ARRAY  = OBJECT.extendAs("Array", BitFlag.FINAL.b | BitFlag.SYSTEM.b).setTypeParams(-1),
                                    STRING = OBJECT.extendAs("String", BitFlag.FINAL.b | BitFlag.SYSTEM.b).setTypeParams(0);
     
     public static final int COUNT_PRIMATIVES = TYPES.size();
@@ -126,6 +126,10 @@ public class Type implements ITypeable {
         
         if (unsafe) throw new CompileException("Incompatible types `" + this + "` and `" + newType + "`", row, col);
         else return null;
+    }
+    
+    public boolean canAutocast(Type newType) {
+        return autocast(newType, -1, -1, false) != null;
     }
     
     /**
@@ -247,15 +251,21 @@ public class Type implements ITypeable {
         
         // Check for array definition
         if (child != null) {
+            int dimensions = 0;
+            
             do {
                 Enum<?> token = child.getToken();
                 
-                if (token == EnumToken.CLOSE_BRACE) {
+                if (token == EnumToken.CLOSE_SQR) {
                     continue;
-                } else if (token == EnumToken.OPEN_BRACE) {
-                    type = new ParameterizedType<Type>(Type.ARRAY, new Type[] { type });
+                } else if (token == EnumToken.OPEN_SQR) {
+                    dimensions += 1;
                 }
             } while (it.hasNext() && (child = it.next()) != null);
+            
+            if (dimensions > 0) {
+                type = new ParameterizedType<Type>(Type.ARRAY, Util.createArray(dimensions, type));
+            }
         }
         
         // Return

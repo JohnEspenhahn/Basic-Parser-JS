@@ -3,7 +3,7 @@ package com.hahn.basic.definition;
 import com.hahn.basic.parser.IEnumExpression;
 
 public enum EnumExpression implements IEnumExpression {   
-    STMT_EXPRS  ("<CREATE>|<CREATE_ARR>|<CALL_FUNC>|<MODIFY>", false),
+    STMT_EXPRS  ("<CREATE_ARR>|<CREATE>|<CALL_FUNC>|<MODIFY>", false),
     FACTOR      ("<STMT_EXPRS>|<CAST>|<ANON_FUNC>|<FUNC_POINTER>|<ACCESS>|NULL|CHAR|HEX_INTEGER|INTEGER|FLOAT|TRUE|FALSE|OPEN_PRNTH<EXPRESSION>CLOSE_PRNTH"),
     PREFIX_OP   ("ADD_ADD|SUB_SUB|ADD|SUB|NOT"),
     PREFIX      ("?<PREFIX_OP> <FACTOR>"),
@@ -19,8 +19,8 @@ public enum EnumExpression implements IEnumExpression {
     BITWISE     ("AND|BOR|XOR|RSHIFT|LSHIFT"),
     
     CAST        ("OPEN_PRNTH <TYPE>COLON<FACTOR> CLOSE_PRNTH", false),
-    CREATE      ("NEW <TYPE> OPEN_PRNTH ?<CALL_PARAMS> CLOSE_PRNTH", false), 
-    CREATE_ARR  ("NEW <TYPE> [ OPEN_BRACE ?<EXPRESSION> CLOSE_BRACE ]", false),
+    CREATE      ("NEW <TYPE> ( OPEN_PRNTH ?<CALL_PARAMS> CLOSE_PRNTH )", false), 
+    CREATE_ARR  ("NEW <TYPE> [ OPEN_SQR ?<EXPRESSION> CLOSE_SQR ]", false),
     
     WHILE_STMT  ("WHILE <CONDITIONAL>", false),
     
@@ -32,7 +32,7 @@ public enum EnumExpression implements IEnumExpression {
     FOR_DEF     ("<DEFINE>|<MODIFY>"),
     
     TYPE_ID     ("IDENTIFIER|FUNCTION"),
-    TYPE        ("<TYPE_ID> ?<PARAM_TYPES> { OPEN_BRACE CLOSE_BRACE }", false),
+    TYPE        ("<TYPE_ID> ?<PARAM_TYPES> { OPEN_SQR CLOSE_SQR }", false),
     PARAM_TYPES ("LESS ?<TYPE_LIST> (EOL <TYPE>) GTR", false),
     TYPE_LIST   ("<TYPE> {COMMA <TYPE>}", false),
     

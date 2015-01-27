@@ -1,22 +1,27 @@
 package com.hahn.basic.intermediate.objects;
 
+import java.util.List;
+
+import lombok.NonNull;
+
 import com.hahn.basic.intermediate.objects.types.ParameterizedType;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.parser.Node;
+import com.hahn.basic.util.Util;
 
 public abstract class NewArray extends BasicObject {
-    private BasicObject[] values;
+    private List<BasicObject> dimensionValues;
     private int dimensions;
     
-    public NewArray(Type containedType, Node node, int dimensions, BasicObject[] values) {
-        super("new Array<" + containedType + ">", new ParameterizedType<Type>(Type.ARRAY, new Type[] { containedType }));
+    public NewArray(Type containedType, Node node, int dimensions, @NonNull List<BasicObject> dimValues) {
+        super("new Array<" + containedType + ">", new ParameterizedType<Type>(Type.ARRAY, Util.createArray(dimensions, containedType)));
         
-        this.values = values;
+        this.dimensionValues = dimValues;        
         this.dimensions = dimensions;
     }
     
-    public BasicObject[] getValues() {
-        return values;
+    public List<BasicObject> getDimensionValues() {
+        return dimensionValues;
     }
     
     public int getDimensions() {

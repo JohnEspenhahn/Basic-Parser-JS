@@ -241,7 +241,7 @@ public class JSLangFactory implements ILangFactory {
     }
     
     @Override
-    public NewArray NewArray(Type containedType, Node node, int dimensions, BasicObject[] values) {
+    public NewArray NewArray(Type containedType, Node node, int dimensions, List<BasicObject> values) {
         return new JSNewArray(containedType, node, dimensions, values);
     }
     
