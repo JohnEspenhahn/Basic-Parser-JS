@@ -46,8 +46,14 @@ public class StructType extends Type {
     }
     
     @Override
-    public boolean doesExtend(Type t) {
-        return super.doesExtend(t) || (parent != null && parent.doesExtend(t));
+    public int getExtendDepth(Type t) {
+        if (parent != null) {
+            int parentExtendDepth = parent.getExtendDepth(t);
+            if (parentExtendDepth >= 0) return parentExtendDepth + 1;
+        }
+        
+        // Default
+        return super.getExtendDepth(t);
     }
     
     /**

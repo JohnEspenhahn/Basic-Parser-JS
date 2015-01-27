@@ -6,6 +6,7 @@ import com.hahn.basic.intermediate.FuncHead;
 import com.hahn.basic.intermediate.objects.types.ClassType;
 import com.hahn.basic.intermediate.objects.types.StructType;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
+import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.objects.types.StructType.StructParam;
 import com.hahn.basic.parser.Node;
 import com.hahn.basic.util.BitFlag;
@@ -19,6 +20,8 @@ public abstract class ClassObject extends BasicObject {
     
     interface StaticClassExcludes {
         StructType getAsStruct();
+        
+        boolean doesExtend(Type t);
         
         StructParam getParam(Node nameNode);
         StructParam getParamSafe(String name);

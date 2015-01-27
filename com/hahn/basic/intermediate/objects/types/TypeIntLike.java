@@ -7,7 +7,10 @@ public class TypeIntLike extends Type {
     }
     
     @Override
-    public boolean doesExtend(Type t) {
-        return t == Type.INT || t == Type.CHAR || t == Type.NUMERIC;
+    public int getExtendDepth(Type t) {
+        if (t == Type.INT) return 0;
+        else if (t == Type.CHAR) return 1;
+        else if (t == Type.NUMERIC) return 1;
+        else return -1;
     }
 }

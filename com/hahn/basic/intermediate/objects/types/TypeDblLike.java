@@ -7,7 +7,9 @@ public class TypeDblLike extends Type {
     }
     
     @Override
-    public boolean doesExtend(Type t) {
-        return t == Type.FLOAT || t == Type.NUMERIC;
+    public int getExtendDepth(Type t) {
+        if (t == Type.FLOAT) return 0;
+        else if (t == Type.NUMERIC) return 1;
+        else return -1;
     }
 }

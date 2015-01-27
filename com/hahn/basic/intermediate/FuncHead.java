@@ -1,5 +1,7 @@
 package com.hahn.basic.intermediate;
 
+import java.util.Arrays;
+
 import org.apache.commons.lang3.StringUtils;
 
 import com.hahn.basic.definition.EnumToken;
@@ -247,6 +249,35 @@ public abstract class FuncHead extends Frame {
         
         if (pIdx == params.length && tIdx == types.length) return true;
         else return false;
+    }
+    
+    public int getMatchDepth(ITypeable[] types) {
+        int[] depth = new int[types.length];
+        
+        int pIdx, tIdx;
+        for (pIdx = 0, tIdx = 0; pIdx < params.length && tIdx < types.length; pIdx++) {
+            Type expectedType = params[pIdx].getType();
+            Type givenType = types[tIdx].getType();
+            
+            int extendDepth;
+            if ((extendDepth = givenType.getExtendDepth(expectedType)) >= 0) {
+                depth[tIdx] = extendDepth;
+                tIdx += 1;
+                
+            } else if (isOptional[pIdx]) {
+                continue;
+                
+            } else {
+                return -1;
+            }
+        }
+        
+        while (pIdx < params.length && isOptional[pIdx]) {
+            pIdx += 1;
+        }
+        
+        if (pIdx == params.length && tIdx == types.length) return Arrays.stream(depth).sum();
+        else return -1;
     }
     
     public static String createFuncId(String name, ITypeable... objs) {

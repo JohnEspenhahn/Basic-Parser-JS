@@ -50,7 +50,7 @@ public class FuncBridge {
         if (group == null) {
             return null;
         } else {
-            return group.get(types);
+            return group.get(types, false);
         }
     }
     

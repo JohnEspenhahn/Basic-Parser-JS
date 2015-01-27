@@ -81,8 +81,21 @@ public class Type implements ITypeable {
      * @param t The given type
      * @return True if `t` extends this
      */
-    public boolean doesExtend(Type t) {
-        return this == Type.UNDEFINED || t == Type.UNDEFINED || this.equals(t);
+    public final boolean doesExtend(Type t) {
+        return getExtendDepth(t) >= 0;
+    }
+    
+    /**
+     * Check if the given type extends this type
+     * @param t The given type
+     * @return A value >= 0 if does extend, the large the number the further the abstraction
+     */
+    public int getExtendDepth(Type t) {
+        if (this == Type.UNDEFINED || t == Type.UNDEFINED || this.equals(t)) {
+            return 0;
+        } else {
+            return -1;
+        }
     }
     
     /**

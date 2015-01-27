@@ -100,23 +100,24 @@ public class ParameterizedType<T extends ITypeable> extends Type {
     }
     
     @Override
-    public boolean doesExtend(Type t) {
+    public int getExtendDepth(Type t) {
         if (t instanceof ParameterizedType) {
             ParameterizedType<?> p = (ParameterizedType<?>) t;
             
-            if (base.doesExtend(p.base) && getReturn().doesExtend(p.getReturn()) && types.length == p.types.length) {
+            int extendDepth = base.getExtendDepth(p.base);
+            if (extendDepth >= 0 && getReturn().canAutocast(p.getReturn()) && types.length == p.types.length) {
                 for (int i = 0; i < types.length; i++) {
-                    if (!getTypable(i).getType().equals(p.getTypable(i).getType())) {
-                        return false;
+                    if (!getTypable(i).getType().canAutocast(p.getTypable(i).getType())) {
+                        return -1;
                     }
                 }
                 
-                return true;
+                return extendDepth;
             } else {
-                return false;
+                return -1;
             }
         } else {
-            return base.doesExtend(t);
+            return base.getExtendDepth(t);
         }
     }
     

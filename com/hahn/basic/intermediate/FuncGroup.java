@@ -1,12 +1,14 @@
 package com.hahn.basic.intermediate;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
 import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.util.Util;
+import com.hahn.basic.util.exceptions.CompileException;
 
 public class FuncGroup implements Iterable<FuncHead> {
     private List<FuncHead> funcs;
@@ -36,13 +38,7 @@ public class FuncGroup implements Iterable<FuncHead> {
     }
     
     public boolean isDefined(FuncHead func) {
-        for (FuncHead f: funcs) {
-            if (f.matches(func.getParams())) {
-                return true;
-            }
-        }
-        
-        return false;
+        return get(Util.getTypes(func.getParams()), true) != null;
     }
     
     public void removeAllMatch(FuncHead func) {
@@ -55,14 +51,32 @@ public class FuncGroup implements Iterable<FuncHead> {
         }
     }
     
-    public FuncHead get(ITypeable[] types) {
-        for (FuncHead f: funcs) {
-            if (f.matches(types)) {
-                return f;
+    public FuncHead get(ITypeable[] types, boolean exact) {
+        int[] matchDepths = new int[funcs.size()];        
+        for (int i = 0; i < matchDepths.length; i++) {
+            FuncHead f = funcs.get(i);
+            
+            int depth = f.getMatchDepth(types);
+            if (!exact || depth == 0) matchDepths[i] = depth;
+            else matchDepths[i] = -1;
+        }
+        
+        int bestMatch = -1;
+        FuncHead func = null;
+        for (int i = 0; i < matchDepths.length; i++) {
+            int depth = matchDepths[i];
+            if (depth >= 0 && depth >= bestMatch) {
+                FuncHead tempFunc = funcs.get(i);
+                if (bestMatch == depth) {
+                    throw new CompileException("Ambiguous definition of `" + tempFunc.toString() + "`", tempFunc.row, -1);
+                } else {
+                    bestMatch = depth;
+                    func = tempFunc;
+                }
             }
         }
         
-        return null;
+        return func;
     }
     
     public List<FuncHead> getFuncs() {

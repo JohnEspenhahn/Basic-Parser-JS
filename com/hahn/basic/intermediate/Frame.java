@@ -500,7 +500,7 @@ public class Frame extends Statement {
         if (leaveLast && !it.hasNext()) {
             it.previous();
             
-            if (this instanceof FuncHead) {
+            if (this instanceof FuncHead && ((FuncHead) this).getClassIn() != null) {
                 return ((FuncHead) this).getClassIn().getImpliedThis();
             } else {
                 return null;
