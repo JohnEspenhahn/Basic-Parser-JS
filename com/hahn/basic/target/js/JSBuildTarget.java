@@ -106,6 +106,18 @@ public class JSBuildTarget extends LangBuildTarget {
              * }
              */
             endBuilder.append("function " + EnumToken.__e__ + "(d,b,p){for(p in b)if(b.hasOwnProperty(p))d[p]=b[p];function _(){this.constructor=d}_.prototype=b.prototype;d.prototype=new _}");
+            
+            /*
+             * function createArr(dim, sizes) {
+                    return (function f(arr, dim, sizes,i) {
+                            if(dim > 0)
+                                for(i = 0; i < sizes[0]; i++)
+                                    f(arr[i] = [] , dim - 1, sizes.splice(1));
+                            return arr;
+                        })([],dim-1,sizes); // Call function `f`
+                }
+             */
+            endBuilder.append("function " + EnumToken.__a__ + "(d,s){return(function f(a,d,s,i){if(d>0)for(i=0;i<s[0];i++)f(a[i]=[],d-1,s.splice(1));return a})([],d-1,s)}");
         }
         
         return endBuilder.toString();
