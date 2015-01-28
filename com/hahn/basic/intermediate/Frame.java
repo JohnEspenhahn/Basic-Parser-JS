@@ -1105,15 +1105,14 @@ public class Frame extends Statement {
             
             return LangCompiler.factory.NewInstance(type, typeNode, params);
             
-        // Array definition with no dimension definition (ex) new int[]
+        // TODO Needed? Array definition with no dimension definition (ex) new int[]
         } else if (type.doesExtend(Type.ARRAY) && type instanceof ParameterizedType<?>) {
             ParameterizedType<?> pType = (ParameterizedType<?>) type;
             
             // Extract packaged information from array type definition
-            Type containedType = pType.getTypable(0).getType();
             int dimensions = pType.numTypes();
             
-            return LangCompiler.factory.NewArray(containedType, newNode, dimensions, new ArrayList<BasicObject>());
+            return LangCompiler.factory.NewArray(newNode, dimensions, new ArrayList<BasicObject>());
         } else {
             throw new CompileException("Illegal definition of type `" + type + "`. Missing parameters", typeNode);
         }
@@ -1127,10 +1126,6 @@ public class Frame extends Statement {
     public BasicObject createArrayInstance(Node head) {
         Iterator<Node> it = Util.getIterator(head);
         Node newNode = it.next(); // Skip `new`
-        
-        // Get type
-        Node typeNode = it.next();
-        Type containedType = Type.fromNode(typeNode);
         
         int dimensions = 0;
         List<BasicObject> dimValues = new ArrayList<BasicObject>();
@@ -1151,7 +1146,7 @@ public class Frame extends Statement {
             }
         }
         
-        return LangCompiler.factory.NewArray(containedType, newNode, dimensions, dimValues);
+        return LangCompiler.factory.NewArray(newNode, dimensions, dimValues);
     }
     
     /**

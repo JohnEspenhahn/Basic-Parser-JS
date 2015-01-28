@@ -20,7 +20,7 @@ public enum EnumExpression implements IEnumExpression {
     
     CAST        ("OPEN_PRNTH <TYPE>COLON<FACTOR> CLOSE_PRNTH", false),
     CREATE      ("NEW <TYPE> ( OPEN_PRNTH ?<CALL_PARAMS> CLOSE_PRNTH )", false), 
-    CREATE_ARR  ("NEW <TYPE> [ OPEN_SQR ?<EXPRESSION> CLOSE_SQR ]", false),
+    CREATE_ARR  ("NEW [ OPEN_SQR ?<EXPRESSION> CLOSE_SQR ]", false),
     
     WHILE_STMT  ("WHILE <CONDITIONAL>", false),
     

@@ -20,9 +20,9 @@ public abstract class NewArray extends BasicObject {
     private int dimensions;
     private Node node;
     
-    public NewArray(Type containedType, Node node, int dimensions, @NonNull List<BasicObject> dimValues) {
-        super("new " + containedType + StringUtils.repeat("[]", dimensions), 
-                new ParameterizedType<Type>(Type.ARRAY, Util.createArray(dimensions, containedType)));
+    public NewArray(Node node, int dimensions, @NonNull List<BasicObject> dimValues) {
+        super("new " + StringUtils.repeat("[]", dimensions), 
+                new ParameterizedType<Type>(Type.ARRAY, Util.createArray(dimensions, Type.UNDEFINED)));
         
         this.dimensionValues = dimValues;        
         this.dimensions = dimensions;

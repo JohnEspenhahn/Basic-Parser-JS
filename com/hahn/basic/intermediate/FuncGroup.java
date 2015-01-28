@@ -60,11 +60,11 @@ public class FuncGroup implements Iterable<FuncHead> {
             else matchDepths[i] = -1;
         }
         
-        int bestMatch = -1;
+        int bestMatch = Integer.MAX_VALUE;
         FuncHead func = null;
         for (int i = 0; i < matchDepths.length; i++) {
             int depth = matchDepths[i];
-            if (depth >= 0 && depth >= bestMatch) {
+            if (depth >= 0 && depth < bestMatch) {
                 FuncHead tempFunc = funcs.get(i);
                 if (bestMatch == depth) {
                     throw new CompileException("Ambiguous definition of `" + tempFunc.toString() + "`", tempFunc.row, -1);

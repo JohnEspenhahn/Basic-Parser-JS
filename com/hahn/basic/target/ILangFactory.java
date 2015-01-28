@@ -74,7 +74,7 @@ public interface ILangFactory {
 	
 	public VarAccess VarAccess(Statement container, BasicObject var, BasicObject idx, Type type, int row, int col);
 	
-	public NewArray NewArray(Type containedType, Node node, int dimensions, List<BasicObject> values);
+	public NewArray NewArray(Node node, int dimensions, List<BasicObject> values);
 	public BasicObject NewInstance(Type type, Node typeNode, List<BasicObject> params);
 	
 	public ConditionalObject ConditionalObject(Statement container, OPCode op, BasicObject p1, Node p1Node, BasicObject p2, Node p2Node, BasicObject temp);

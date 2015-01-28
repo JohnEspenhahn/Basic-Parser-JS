@@ -92,7 +92,7 @@ public class JSBuildTarget extends LangBuildTarget {
              *     return instance;
              * }
              */
-            endBuilder.append("function " + EnumToken.__c__ + "(c,f,o){o=new c;if(f)o[f].apply(o,Array.prototype.slice.call(arguments,2));return o}");
+            endBuilder.append("function " + EnumToken.__c__ + "(c,f){var o=new c;if(f)o[f].apply(o,Array.prototype.slice.call(arguments,2));return o}");
             
             /*
              * function extends(child, parent) {
@@ -110,14 +110,14 @@ public class JSBuildTarget extends LangBuildTarget {
             /*
              * function createArr(dim, sizes) {
                     return (function f(arr, dim, sizes,i) {
-                            if(dim > 0)
+                            if(dim >= 0)
                                 for(i = 0; i < sizes[0]; i++)
-                                    f(arr[i] = [] , dim - 1, sizes.splice(1));
+                                    f(arr[i] = [] , dim - 1, sizes.slice(1));
                             return arr;
                         })([],dim-1,sizes); // Call function `f`
                 }
              */
-            endBuilder.append("function " + EnumToken.__a__ + "(d,s){return(function f(a,d,s,i){if(d>0)for(i=0;i<s[0];i++)f(a[i]=[],d-1,s.splice(1));return a})([],d-1,s)}");
+            endBuilder.append("function " + EnumToken.__a__ + "(d,s){return(function f(a,d,s,i){if(d>=0)for(i=0;i<s[0];i++)f(a[i]=[],d-1,s.slice(1));return a})([],d-1,s)}");
         }
         
         return endBuilder.toString();

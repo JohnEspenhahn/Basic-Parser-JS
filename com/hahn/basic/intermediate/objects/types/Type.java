@@ -136,6 +136,8 @@ public class Type implements ITypeable {
         else if (this.doesExtend(newType)) return newType;
         else if (this.doesExtend(INT) && newType.doesExtend(FLOAT)) return newType;
         else if (this.doesExtend(NULL) && newType.doesExtend(OBJECT)) return newType;
+        else if (this.doesExtend(NUMERIC) && newType.doesExtend(STRING)) return newType;
+        else if (newType.doesExtend(NUMERIC) && this.doesExtend(STRING)) return this;
         
         if (unsafe) throw new CompileException("Incompatible types `" + this + "` and `" + newType + "`", row, col);
         else return null;
@@ -165,6 +167,8 @@ public class Type implements ITypeable {
         else if (t2.doesExtend(INT) && t1.doesExtend(FLOAT)) return t1;
         else if (t1.doesExtend(NULL) && t2.doesExtend(OBJECT)) return t2;
         else if (t2.doesExtend(NULL) && t1.doesExtend(OBJECT)) return t1;
+        else if (t1.doesExtend(STRING) && t2.doesExtend(NUMERIC)) return t1;
+        else if (t2.doesExtend(STRING) && t1.doesExtend(NUMERIC)) return t2;
         
         if (unsafe) throw new CompileException("Incompatible types `" + t1 + "` and `" + t2 + "`", row, col);
         else return null;
