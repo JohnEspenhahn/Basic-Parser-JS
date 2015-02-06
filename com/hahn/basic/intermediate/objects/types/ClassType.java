@@ -129,7 +129,7 @@ public class ClassType extends StructType {
      * parameter is already defined
      * @param name The name of the parameter to define
      * @param type The type of the parameter to define
-     * @param outName The name to output in the target language
+     * @param outName The name to output in the target language or null for default
      * @param override If true will override a pre-existing parameter explicitly defined in this class
      * @return This
      */
@@ -162,7 +162,7 @@ public class ClassType extends StructType {
         return defineFunc(head, false, inName, outName, rtnType, params);
     }
     
-    public FuncHead defineFunc(Node head, boolean override, String inName, String outName, Type rtnType, Param... params) {
+    public FuncHead defineFunc(Node head, boolean override, String inName, String outName, Type rtnType, Param... params) {        
         return funcBridge.defineFunc(LangCompiler.getGlobalFrame(), override, head, inName, outName, rtnType, params);
     }
     

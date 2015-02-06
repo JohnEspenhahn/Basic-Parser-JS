@@ -84,7 +84,7 @@ public class StructType extends Type {
         if (ps != null) {
             for (int i = 0; i < ps.size(); i++) {
                 BasicObject p = ps.get(i);
-                addParam(p, null, p.getName(), false);
+                addParam(p, null, null, false);
             }
         }
     }
@@ -111,7 +111,7 @@ public class StructType extends Type {
      * Add a basic object as a struct param
      * @param nameNode The node with the name of the parameter
      * @param type The type of the parameter
-     * @param outName The name to output in the target language
+     * @param outName The name to output in the target language or null for default
      * @param override If true will override a pre-existing param within this class
      * @return This
      * @throws CompileException If the variable is already defined
@@ -124,12 +124,12 @@ public class StructType extends Type {
      * Add a basic object as a struct param
      * @param p The basic object to use when defining the struct param
      * @param node The node to throw an error at
-     * @param outName The name to output in the target language
+     * @param outName The name to output in the target language or null for default
      * @param override If true will override a pre-existing param within this class
      * @return This
      * @throws CompileException If the variable is already defined
      */
-    public StructType addParam(BasicObject p, Node node, String outName, boolean override) {
+    private StructType addParam(BasicObject p, Node node, String outName, boolean override) {        
         putParam(p, node, outName, override);
         
         return this;
@@ -143,21 +143,23 @@ public class StructType extends Type {
      * @throws CompileException If the variable is already defined
      */
     public StructParam putParam(BasicObject p, Node node) {
-        return putParam(p, node, p.getName(), false);
+        return putParam(p, node, null, false);
     }
     
     /**
      * Add a basic object as a struct param
      * @param p The basic object to use when defining the struct param
      * @param node The node to throw an error at if the parameter is already defined
-     * @param outName The name to output in the target language
+     * @param outName The name to output in the target language or null for default
      * @param override If true will override a pre-existing param within this class
      * @return The added struct param
      * @throws CompileException If the variable is already defined
      */
-    public StructParam putParam(BasicObject p, Node node, String outName, boolean override) {
+    private StructParam putParam(BasicObject p, Node node, String outName, boolean override) {
         if ((override && checkSuperParamUnique(p.getName(), node)) || checkParamUnique(p.getName(), node)) {
             StructParam param = new StructParam(params.size(), p, outName);
+            
+            // Store in hashmap with vanilla name
             params.put(p.getName(), param);
            
             return param;
@@ -166,13 +168,25 @@ public class StructType extends Type {
         }
     }
     
+    /**
+     * Check that the given variable with the given name is unique within all super structs
+     * @param name The name of the variable
+     * @param throwNode Throws uniqueness errors at this node
+     * @return True if is unique
+     */
     private boolean checkSuperParamUnique(String name, Node node) {
         StructParam p = getParam(name, false, true, true, node);
         return (p == null || p == params.get(name));
     }
     
-    private boolean checkParamUnique(String name, Node node) {
-        return getParam(name, true, true, true, node) == null;
+    /**
+     * Check that the given variable with the given name is unique within this struct and all super structs
+     * @param name The name of the variable 
+     * @param throwNode Throws uniqueness errors at this node
+     * @return True if is unique
+     */
+    private boolean checkParamUnique(String name, Node throwNode) {
+        return getParam(name, true, true, true, throwNode) == null;
     }
     
     /**
@@ -242,11 +256,26 @@ public class StructType extends Type {
         
         private String outName;
         
-        public StructParam(int i, BasicObject p, String outName) {
+        /**
+         * A structure param
+         * @param i The index in the structure
+         * @param p The defining BasicObject
+         * @param givenOutName The predefined output name or null for default name (see {@link getOutName()})
+         */
+        private StructParam(int i, BasicObject p, String givenOutName) {
             super(p.getName(), p.getType(), p.getFlags());
             
             this.idx = i;
-            this.outName = outName;
+            this.outName = getOutName(givenOutName);
+        }
+        
+        /**
+         * Get the proper output name
+         * @param givenOutName A given output name or null for default name ($ + {@link getName()})
+         * @return The proper output name
+         */
+        private String getOutName(String givenOutName) {
+            return (outName == null ? "$" + getName() : outName);
         }
         
         public int getOffset() {

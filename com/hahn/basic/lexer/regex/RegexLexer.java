@@ -12,6 +12,12 @@ import com.hahn.basic.lexer.ILexer;
 import com.hahn.basic.lexer.PackedToken;
 import com.hahn.basic.util.exceptions.LexException;
 
+/**
+ * Please use BasicLexer
+ * @author John Espenhahn
+ *
+ */
+@Deprecated
 public class RegexLexer implements ILexer {
     /** The pattern compiled from the provided tokens */
     private final Pattern LexRegex;
