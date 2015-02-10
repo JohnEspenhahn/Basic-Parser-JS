@@ -12,9 +12,11 @@ import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.target.ILangCommand;
 import com.hahn.basic.target.LangBuildTarget;
 import com.hahn.basic.target.js.library.LibraryBuiltinJS;
+import com.hahn.basic.target.js.library.LibraryJQuery;
 
 public class JSBuildTarget extends LangBuildTarget {
     public static final Library BuiltinJS = new LibraryBuiltinJS();
+    public static final Library JQuery = new LibraryJQuery();
     
 	StringBuilder builder;
 	SimpleRegisterFactory registerFactory;
@@ -39,18 +41,13 @@ public class JSBuildTarget extends LangBuildTarget {
 	}
 	
 	@Override
-	public String getEnd() {
-	    return "\n</head>\n</html>";
-	}
-	
-	@Override
 	public String getInputExtension() {
 	    return "b";
 	}
 	
 	@Override
 	public String getExtension() {
-	    return "js";
+	    return "html";
 	}
 	
 	@Override
@@ -69,17 +66,22 @@ public class JSBuildTarget extends LangBuildTarget {
 	}
 	
 	@Override
-	public String endCodeArea() {
+	public String getCodeEnd() {
 	    return (Main.PRETTY ? "\n" : ";");
 	}
 	
 	@Override
-	public String startClassArea() {
-	    return "";
+	public String getContentStart() {
+	    return "<script>";
 	}
 	
 	@Override
-	public String endFuncArea() {
+    public String getEnd() {
+        return "\n</script>\n</head>\n</html>";
+    }
+	
+	@Override
+	public String getContentEnd() {
 	    StringBuilder endBuilder = new StringBuilder();
         
         if (Type.getPublicTypes().size() > Type.COUNT_PRIMATIVES) {

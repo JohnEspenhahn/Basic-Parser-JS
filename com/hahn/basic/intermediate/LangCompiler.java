@@ -51,15 +51,20 @@ public class LangCompiler {
         // Start builder text
         builder.appendString(builder.getStart());
         
+        // Put library import strings
+        for (Library lib: libs.values()) {
+            builder.appendString(lib.toTarget());
+        }
+        
         // Compile class area
-        builder.appendString(builder.startClassArea());
+        builder.appendString(builder.getContentStart());
         for (Type t: Type.getPublicTypes()) {
             builder.appendString(t.toTarget());
         }
         
         // Convert to target
         builder.appendString(frame.toTarget());
-        builder.appendString(builder.endCodeArea());
+        builder.appendString(builder.getCodeEnd());
         
         // Compile functions
         for (FuncGroup funcGroup: funcBridge.getFuncs()) {
@@ -72,13 +77,7 @@ public class LangCompiler {
                 }
             }
         }
-        builder.appendString(builder.endFuncArea());
-        
-        // Put library import strings
-        for (Library lib: libs.values()) {
-            builder.appendString(lib.toTarget());
-        }
-        
+        builder.appendString(builder.getContentEnd());        
         builder.appendString(builder.getEnd());
         
         return builder;

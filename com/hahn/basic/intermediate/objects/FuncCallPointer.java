@@ -58,6 +58,8 @@ public abstract class FuncCallPointer extends FuncPointer {
             param.setInUse(this);
         }
         
+        if (objectIn != null) objectIn.setInUse(this);
+        
         checkFunction();
         returnType = returnType.autocast(func.getReturnType(), nameNode.getRow(), nameNode.getCol(), true);
         
@@ -66,6 +68,7 @@ public abstract class FuncCallPointer extends FuncPointer {
     
     @Override
     public void takeRegister(IIntermediate by) {
+        if (objectIn != null) objectIn.takeRegister(this);
         for (BasicObject param: getParams()) {
             param.takeRegister(this);
         }

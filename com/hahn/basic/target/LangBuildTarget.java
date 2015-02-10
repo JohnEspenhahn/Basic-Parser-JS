@@ -31,8 +31,8 @@ public abstract class LangBuildTarget {
     @Override
     public abstract String toString();
     
-    public abstract String endCodeArea();
+    public abstract String getCodeEnd();
     
-    public abstract String startClassArea();
-    public abstract String endFuncArea();
+    public abstract String getContentStart();
+    public abstract String getContentEnd();
 }

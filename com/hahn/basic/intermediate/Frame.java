@@ -449,8 +449,6 @@ public class Frame extends Statement {
                 addCode(doContinue(child));
             } else if (token == EnumToken.BREAK) {
                 addCode(doBreak(child));
-            } else if (token == EnumToken.IMPORT) {
-                doImport(child);
             } else if (token == EnumExpression.IF_STMT) {
                 addCode(ifStatement(child));
             } else if (token == EnumExpression.WHILE_STMT) {
@@ -459,6 +457,8 @@ public class Frame extends Statement {
                 addCode(forStatement(child));
             } else if (token == EnumExpression.DIRECTIVE) {
                 handleDirective(child);
+            } else if (token == EnumExpression.IMPORT) {
+                doImport(child);
             } else if (token == EnumExpression.EXPRESSION) {
                 addCode(handleStatementExpression(child));
             } else if (token == EnumToken.EOL || token == EnumToken.OPEN_BRACE || token == EnumToken.CLOSE_BRACE) {
@@ -474,8 +474,15 @@ public class Frame extends Statement {
      * @param head EnumToken.IMPORT
      */
     public void doImport(Node head) {
-        String name = head.getValue().replace("import ", "").trim();
-        LangCompiler.addLibrary(name);
+        List<Node> children = head.getAsChildren();
+        Node name = children.get(1);
+        
+        // Update location
+        Main.setLine(name.getRow(), name.getCol());
+        
+        // Parse the name of the library from the quoted string form
+        String str = name.getValue();
+        LangCompiler.addLibrary(str.substring(1, str.length() - 1));
     }
     
     /**
@@ -546,14 +553,39 @@ public class Frame extends Statement {
                 exp.setObj(LangCompiler.factory.VarAccess(exp, exp.getObj(), offset, arrType.getTypable(0).getType(), child.getRow(), child.getCol()), child);
             } else if (accessMarker == DOT && type.doesExtend(Type.STRUCT)) {               
                 Node nameNode = it.next();
+                Node prthNode = (it.hasNext() ? it.next() : null);
+                Node nextGroupNode = (it.hasNext() ? it.next() : null);
                 
-                if (leaveLast && !it.hasNext()) {
+                if (leaveLast && 
+                        (prthNode == null || (prthNode.getToken() == EnumExpression.PRNTH_PARAMS || nextGroupNode == null))) {
+                    // Go back
                     it.previous();
+                    if (prthNode != null) it.previous();
+                    if (nextGroupNode != null) it.previous();
+                    
                     break;
                 }
                 
-                StructParam sp = exp.getObj().getType().getAsStruct().getParam(nameNode);                
-                exp.setObj(LangCompiler.factory.VarAccess(exp, exp.getObj(), sp, sp.getType(), child.getRow(), child.getCol()), child);
+                // Unneeded
+                if (nextGroupNode != null) it.previous();
+                
+                // Function or variable
+                if (prthNode != null && prthNode.getToken() == EnumExpression.PRNTH_PARAMS) {
+                    Node node = prthNode.getAsChildren().get(1);
+                    List<BasicObject> params = new ArrayList<BasicObject>();
+                    if (node.getToken() == EnumExpression.CALL_PARAMS) {
+                        getFuncCallParams(node, params);
+                    }
+                    
+                    // Get FuncCall object
+                    BasicObject[] aParams = params.toArray(new BasicObject[params.size()]);
+                    exp.setObj(LangCompiler.factory.FuncCallPointer(nameNode, exp.getObj(), aParams), child);
+                } else {
+                    if (prthNode != null) it.previous();
+                    
+                    StructParam sp = exp.getObj().getType().getAsStruct().getParam(nameNode);                
+                    exp.setObj(LangCompiler.factory.VarAccess(exp, exp.getObj(), sp, sp.getType(), child.getRow(), child.getCol()), child);
+                }
             } else {
                 throw new CompileException("Illegal attempt to index var `" + exp.getObj() + "` of type `" + exp.getObj().getType() + "`", child);
             }
@@ -810,6 +842,9 @@ public class Frame extends Statement {
         Node nameNode = it.next();
         Node parentNode = null;
         int flags = 0;
+        
+        // Keep track of location
+        Main.setLine(nameNode.getRow(), nameNode.getCol());
         
         // Don't add class code if library
         if (Main.LIBRARY) {

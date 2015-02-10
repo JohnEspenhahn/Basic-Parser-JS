@@ -36,9 +36,6 @@ public enum EnumExpression implements IEnumExpression {
     PARAM_TYPES ("LESS ?<TYPE_LIST> (EOL <TYPE>) GTR", false),
     TYPE_LIST   ("<TYPE> {COMMA <TYPE>}", false),
     
-    CALL_FUNC   ("<ACCESS> OPEN_PRNTH ?<CALL_PARAMS> CLOSE_PRNTH", false),
-    CALL_PARAMS ("<EXPRESSION> {COMMA <EXPRESSION>}", false),
-    
     FUNC_POINTER("AND IDENTIFIER OPEN_PRNTH ?<TYPE_LIST> CLOSE_PRNTH", false),
     
     ANON_FUNC   ("FUNCTION ?<TYPE> OPEN_PRNTH ?<DEF_PARAMS> CLOSE_PRNTH <BLOCK>", false),
@@ -55,7 +52,11 @@ public enum EnumExpression implements IEnumExpression {
     
     IDENTIFIER  ("STRING|IDENTIFIER|THIS|SUPER"),
     ACCESS      ("<IDENTIFIER> ?<IN_ACCESS>", false),
-    IN_ACCESS   ("OPEN_SQR <EXPRESSION> CLOSE_SQR$|DOT IDENTIFIER$", false),
+    CALL_FUNC   ("<IDENTIFIER> OPEN_PRNTH ?<CALL_PARAMS> CLOSE_PRNTH ?<IN_ACCESS>", false),
+    
+    IN_ACCESS   ("OPEN_SQR <EXPRESSION> CLOSE_SQR$|DOT IDENTIFIER ?<PRNTH_PARAMS>$", false),
+    PRNTH_PARAMS("OPEN_PRNTH ?<CALL_PARAMS> CLOSE_PRNTH", false),
+    CALL_PARAMS ("<EXPRESSION> {COMMA <EXPRESSION>}", false),
     
     FLAG        ("CONST|PRIVATE|STATIC", false),
     DEFINE      ("{<FLAG>} <TYPE> IDENTIFIER ?<DEF_MODIFY> {COMMA IDENTIFIER ?<DEF_MODIFY>}", false),
@@ -74,8 +75,9 @@ public enum EnumExpression implements IEnumExpression {
     /** Stuff that can be done within class{} */
     CLASS_CNTNT ("<DEF_FUNC>|<CONSTRUCTOR>|<DEFINE>EOL|EOL", false),
     
+    IMPORT      ("IMPORT STRING EOL", false),
     DIRECTIVE   ("HASH IDENTIFIER", false),
-    START       ("<DIRECTIVE>$|<STRUCT>$|<CLASS>$|<BLOCK_CNTNT>$|<CLASS_CNTNT>$", false);
+    START       ("<DIRECTIVE>$|<IMPORT>$|<STRUCT>$|<CLASS>$|<BLOCK_CNTNT>$|<CLASS_CNTNT>$", false);
 
 
     private final String bnf;

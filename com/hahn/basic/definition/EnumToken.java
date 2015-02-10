@@ -54,8 +54,6 @@ public enum EnumToken implements IEnumRegexToken {
     CLOSE_BRACE ("\\}"     , Group.SEP),
     OPEN_SQR    ("\\["     , Group.SEP),
     CLOSE_SQR   ("\\]"     , Group.SEP),
-    GET         ("get"        , Group.IDENT),
-    SET         ("set"        , Group.IDENT),
     CONST       ("const"      , Group.IDENT),
     FINAL       ("final"      , Group.IDENT),
     PRIVATE     ("private"    , Group.IDENT),
