@@ -37,7 +37,7 @@ public class JSBuildTarget extends LangBuildTarget {
 	
 	@Override
 	public String getStart() {
-	    return "<!DOCTYPE>\n<html>\n<head>\n";
+	    return "<!DOCTYPE>\n<html>\n<body onload='main()'></body>\n<head>\n";
 	}
 	
 	@Override
@@ -72,17 +72,21 @@ public class JSBuildTarget extends LangBuildTarget {
 	
 	@Override
 	public String getContentStart() {
-	    return "<script>";
+	    JSPretty.addTab();
+	    return (Main.PRETTY ? "\n<script>\nfunction main() {\n" : "<script>function main(){");
 	}
 	
 	@Override
     public String getEnd() {
-        return "\n</script>\n</head>\n</html>";
+        return (Main.PRETTY ? "\n" : "") + "</script>\n</head>\n</html>";
     }
 	
 	@Override
 	public String getContentEnd() {
 	    StringBuilder endBuilder = new StringBuilder();
+	    
+	    JSPretty.removeTab();
+	    endBuilder.append(Main.PRETTY ? "}\n" : "}");
         
         if (Type.getPublicTypes().size() > Type.COUNT_PRIMATIVES) {
             /*
