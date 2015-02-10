@@ -75,7 +75,7 @@ public class ParameterizedType<T extends ITypeable> extends Type {
             return base.getName() 
                     + "<"
                     + (params.length > 0 ? Util.joinTypes(params, ',') : "") 
-                    + (returnType != Type.UNDEFINED || base.doesExtend(Type.FUNC) ? ";"+returnType.getType() : "")
+                    + (returnType != Type.UNDEFINED || base.doesExtend(Type.FUNCTION) ? ";"+returnType.getType() : "")
                     + ">";
         }
     }

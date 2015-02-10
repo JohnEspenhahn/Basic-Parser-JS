@@ -19,7 +19,7 @@ public abstract class FuncCallPointer extends FuncPointer {
      * @param params The provided parameters for the call
      */
     public FuncCallPointer(Node nameNode, BasicObject objectIn, BasicObject[] params) {
-        super(nameNode, objectIn, new ParameterizedType<ITypeable>(Type.FUNC, (ITypeable[]) params));
+        super(nameNode, objectIn, new ParameterizedType<ITypeable>(Type.FUNCTION, (ITypeable[]) params));
 
         this.returnType = Type.UNDEFINED;
     }

@@ -32,10 +32,10 @@ public class Type implements ITypeable {
     
     public static final StructType STRUCT = new StructType("struct", null, 0, true);
     
-    public static final ClassType  OBJECT = new ClassType("Object", STRUCT, BitFlag.ABSTRACT.b | BitFlag.SYSTEM.b, false),
-                                   FUNC   = OBJECT.extendAs("func", BitFlag.FINAL.b | BitFlag.SYSTEM.b).setTypeParams(-1),
-                                   ARRAY  = OBJECT.extendAs("Array", BitFlag.FINAL.b | BitFlag.SYSTEM.b).setTypeParams(-1),
-                                   STRING = OBJECT.extendAs("String", BitFlag.FINAL.b | BitFlag.SYSTEM.b).setTypeParams(0);
+    public static final ClassType  OBJECT   = new ClassType("Object", STRUCT, BitFlag.ABSTRACT.b | BitFlag.SYSTEM.b, false),
+                                   FUNCTION = OBJECT.extendAs("function", BitFlag.FINAL.b | BitFlag.SYSTEM.b).setTypeParams(-1),
+                                   ARRAY    = OBJECT.extendAs("Array", BitFlag.FINAL.b | BitFlag.SYSTEM.b).setTypeParams(-1),
+                                   STRING   = OBJECT.extendAs("String", BitFlag.FINAL.b | BitFlag.SYSTEM.b).setTypeParams(0);
     
     public static final int COUNT_PRIMATIVES = TYPES.size();
     
@@ -250,14 +250,14 @@ public class Type implements ITypeable {
                 }
                 
                 StructType mainType = type.getAsStruct();
-                type = ParameterizedType.getParameterizedType(mainType, child, mainType.doesExtend(Type.FUNC));
+                type = ParameterizedType.getParameterizedType(mainType, child, mainType.doesExtend(Type.FUNCTION));
                 
                 if (mainType.getTypeParams() != -1 && mainType.getTypeParams() != ((ParameterizedType<Type>) type).getTypes().length) {
                     throw new CompileException("Invalid number of parameters for type `" + mainType.toString() + "`. Expected " + mainType.getTypeParams() + " but got " + ((ParameterizedType<Type>) type).getTypes().length, head);
                 }
                 
                 // Go past PARAM_TYPES
-                child = it.next();
+                if (it.hasNext()) child = it.next();
             }
         }
         

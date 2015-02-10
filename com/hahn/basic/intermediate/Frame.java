@@ -1030,7 +1030,7 @@ public class Frame extends Statement {
         
         // Return
         if (!anonymous) return null;
-        else return LangCompiler.factory.FuncPointer(nameNode, null, new ParameterizedType<ITypeable>(Type.FUNC, (ITypeable[]) aParams, rtnType));
+        else return LangCompiler.factory.FuncPointer(nameNode, null, new ParameterizedType<ITypeable>(Type.FUNCTION, (ITypeable[]) aParams, rtnType));
     }
     
     /**
@@ -1103,13 +1103,13 @@ public class Frame extends Statement {
             if (token == EnumToken.IDENTIFIER) {
                 nameNode = node;
             } else if (token == EnumExpression.TYPE_LIST) {
-                types = ParameterizedType.getParameterizedType(Type.FUNC, node, false);
+                types = ParameterizedType.getParameterizedType(Type.FUNCTION, node, false);
             }
         }
         
         // If no types provided use default
         if (types == null) {
-            types = new ParameterizedType<ITypeable>(Type.FUNC);
+            types = new ParameterizedType<ITypeable>(Type.FUNCTION);
         }
         
         return LangCompiler.factory.FuncPointer(nameNode, objectIn, types);
