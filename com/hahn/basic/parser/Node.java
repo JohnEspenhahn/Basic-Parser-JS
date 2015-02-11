@@ -12,7 +12,7 @@ public class Node {
     private final Node parent;
     private final List<Node> children;
     
-    private String value;
+    private String value, originalText;
     private final Enum<?> token;
     
     private final int row, col;
@@ -29,7 +29,9 @@ public class Node {
         this.row = row;
         this.col = col;
         
-        this.value = value;
+        this.originalText = value;
+        this.value = (value != null ? value.trim() : null);
+        
         this.token = token;
         
         this.parent = parent;
@@ -64,6 +66,15 @@ public class Node {
     public void print() {
         for (Node child : children)
             child.printChildren(0);
+    }
+    
+    public void printFormattedInput() {
+        if (isTerminal()) {
+            System.out.print(originalText);
+        }
+        
+        for (Node child : children)
+            child.printFormattedInput();
     }
 
     private void printChildren(int space) {

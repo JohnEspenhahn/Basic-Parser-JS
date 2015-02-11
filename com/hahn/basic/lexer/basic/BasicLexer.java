@@ -22,7 +22,7 @@ import com.hahn.basic.util.exceptions.LexException;
  * 
  */
 public class BasicLexer implements ILexer {    
-    private int row, column;
+    private int row, column, matchStart;
     private final List<PackedToken> stream;
     
     /**
@@ -36,6 +36,7 @@ public class BasicLexer implements ILexer {
     public void reset() {
         this.row = 0;
         this.column = 0;
+        this.matchStart = 0;
         this.stream.clear();
     }
     
@@ -76,6 +77,13 @@ public class BasicLexer implements ILexer {
         return stream;
     }
     
+    private String getMatch(String line) {
+        String match = line.substring(matchStart, column);
+        matchStart = column;
+        
+        return match;
+    }
+    
     private void matchIdentifier(String line) {
         final int start = column;
         
@@ -83,15 +91,16 @@ public class BasicLexer implements ILexer {
             column += 1;
         } while (column < line.length() && continuesIdentifier(line.charAt(column)));
         
+        String match = getMatch(line);
         String identifier = line.substring(start, column);
         for (EnumToken t: EnumToken.Group.identifiers) {
             if (t.getString().equals(identifier)) {
-                stream.add(new PackedToken(t, identifier, row, start));
+                stream.add(new PackedToken(t, match, row, start));
                 return;
             }
         }
         
-        stream.add(new PackedToken(EnumToken.IDENTIFIER, identifier, row, start));
+        stream.add(new PackedToken(EnumToken.IDENTIFIER, match, row, start));
     }
     
     private void matchNumber(String line) {
@@ -111,8 +120,9 @@ public class BasicLexer implements ILexer {
             matchNumber(line, start, true);
         } else {
             Enum<?> token = (hex ? EnumToken.HEX_INTEGER : EnumToken.INTEGER);
-            String identifier = line.substring(start, column);
-            stream.add(new PackedToken(token, identifier, row, start));
+            
+            String match = getMatch(line);
+            stream.add(new PackedToken(token, match, row, start));
         }
     }
     
@@ -125,8 +135,8 @@ public class BasicLexer implements ILexer {
         if (c == '.') {
             throw new LexException(row, column);
         } else {
-            String identifier = line.substring(start, column);
-            stream.add(new PackedToken(EnumToken.FLOAT, identifier, row, start));
+            String match = getMatch(line);
+            stream.add(new PackedToken(EnumToken.FLOAT, match, row, start));
         }
     }
     
@@ -142,8 +152,8 @@ public class BasicLexer implements ILexer {
         if (column >= line.length() || line.charAt(column) != '\'') {
             throw new LexException(row, column);
         } else {
-            String identifier = line.substring(start, column);
-            stream.add(new PackedToken(EnumToken.CHAR, identifier, row, start));
+            String match = getMatch(line);
+            stream.add(new PackedToken(EnumToken.CHAR, match, row, start));
         }
     }
     
@@ -161,8 +171,8 @@ public class BasicLexer implements ILexer {
         } else {
             column += 1;
             
-            String identifier = line.substring(start, column);
-            stream.add(new PackedToken(EnumToken.STRING, identifier, row, start));
+            String match = getMatch(line);
+            stream.add(new PackedToken(EnumToken.STRING, match, row, start));
         }
     }
     
@@ -176,10 +186,11 @@ public class BasicLexer implements ILexer {
         
         // Trim the operator till we find a valid match or trim everything
         do {
+            String match = getMatch(line);
             String operator = line.substring(start, column);
             for (EnumToken t: EnumToken.Group.operators) {
                 if (t.getString().equals(operator)) {
-                    stream.add(new PackedToken(t, operator, row, start));
+                    stream.add(new PackedToken(t, match, row, start));
                     return;
                 }
             }
@@ -194,11 +205,12 @@ public class BasicLexer implements ILexer {
     private void matchSeparator(String line) {
         final int start = column;
         column += 1;
-        
+
+        String match = getMatch(line);
         String separator = line.substring(start, column);
         for (EnumToken t: EnumToken.Group.separators) {
             if (t.getString().equals(separator)) {
-                stream.add(new PackedToken(t, separator, row, start));
+                stream.add(new PackedToken(t, match, row, start));
                 return;
             }
         }
