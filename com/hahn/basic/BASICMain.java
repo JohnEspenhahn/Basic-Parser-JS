@@ -75,9 +75,7 @@ public class BASICMain extends Main {
         try {
             Node tree_head = parse();
             
-            if (tree_head != null) {
-                tree_head.printFormattedInput();
-                
+            if (tree_head != null) {                
                 // Print
                 if (DEBUG) {
                     tree_head.print();

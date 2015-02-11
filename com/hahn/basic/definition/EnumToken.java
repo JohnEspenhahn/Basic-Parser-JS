@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.hahn.basic.lexer.regex.IEnumRegexToken;
+import com.hahn.basic.viewer.TextColor;
 
 public enum EnumToken implements IEnumRegexToken {
     STRING      ("\".*?[^\\\\]\""            , Group.LIT),
@@ -90,7 +91,7 @@ public enum EnumToken implements IEnumRegexToken {
     
     IDENTIFIER  ("<<WORD>>"   , Group.IDENT);
 
-    
+    private final int group;
     private final String regex, str;
     private EnumToken(String r, int group) { 
         this.regex = r;
@@ -108,6 +109,7 @@ public enum EnumToken implements IEnumRegexToken {
         }
         
         this.str = builder.toString();
+        this.group = group;
         
         switch (group) {
         case Group.IDENT:
@@ -130,6 +132,23 @@ public enum EnumToken implements IEnumRegexToken {
     @Override
     public String getRegex() {
         return regex;
+    }
+    
+    public TextColor getDefaultColor() {
+        switch (group) {
+        case Group.IDENT:
+            if (this == IDENTIFIER) return TextColor.GREY;
+            else return TextColor.YELLOW;
+        case Group.LIT:
+            if (this == STRING) return TextColor.LIGHT_BLUE;
+            else return TextColor.GREY;
+        case Group.OP:
+            return TextColor.YELLOW;
+        case Group.SEP:
+            return TextColor.GREY;
+        default:
+            throw new RuntimeException("Unhandled EnumToken group `" + group + "`");   
+        }
     }
     
     /**

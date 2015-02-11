@@ -179,7 +179,7 @@ public abstract class Main {
                 
                 Main.LINES.add(line);
             }
-            Main.LINES.add("#eof"); // End of File
+            // Main.LINES.add("#eof"); // End of File
             
             handleFileInput();
             
@@ -228,7 +228,7 @@ public abstract class Main {
                             
                             Main.LINES.add(line);
                         }
-                        Main.LINES.add("#eof"); // End of File
+                        // Main.LINES.add("#eof"); // End of File
                         
                         scanner.close();
                         scanner = null;

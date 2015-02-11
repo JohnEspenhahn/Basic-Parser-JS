@@ -79,6 +79,7 @@ import com.hahn.basic.util.NestedListIterator;
 import com.hahn.basic.util.Util;
 import com.hahn.basic.util.exceptions.CompileException;
 import com.hahn.basic.util.exceptions.DuplicateDefinitionException;
+import com.hahn.basic.viewer.TextColor;
 
 public class Frame extends Statement {    
     private final Frame parent;
@@ -569,7 +570,7 @@ public class Frame extends Statement {
                 // Unneeded
                 if (nextGroupNode != null) it.previous();
                 
-                // Function or variable
+                // Function
                 if (prthNode != null && prthNode.getToken() == EnumExpression.PRNTH_PARAMS) {
                     Node node = prthNode.getAsChildren().get(1);
                     List<BasicObject> params = new ArrayList<BasicObject>();
@@ -580,8 +581,13 @@ public class Frame extends Statement {
                     // Get FuncCall object
                     BasicObject[] aParams = params.toArray(new BasicObject[params.size()]);
                     exp.setObj(LangCompiler.factory.FuncCallPointer(nameNode, exp.getObj(), aParams), child);
+                    
+                // Variable
                 } else {
                     if (prthNode != null) it.previous();
+                    
+                    // XXX Color
+                    nameNode.color = TextColor.LIGHT_BLUE;
                     
                     StructParam sp = exp.getObj().getType().getAsStruct().getParam(nameNode);                
                     exp.setObj(LangCompiler.factory.VarAccess(exp, exp.getObj(), sp, sp.getType(), child.getRow(), child.getCol()), child);

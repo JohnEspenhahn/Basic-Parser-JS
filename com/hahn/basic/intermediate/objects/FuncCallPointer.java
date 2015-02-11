@@ -8,6 +8,7 @@ import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.ParameterizedType;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.parser.Node;
+import com.hahn.basic.viewer.TextColor;
 
 public abstract class FuncCallPointer extends FuncPointer {
     private Type returnType;
@@ -21,6 +22,8 @@ public abstract class FuncCallPointer extends FuncPointer {
     public FuncCallPointer(Node nameNode, BasicObject objectIn, BasicObject[] params) {
         super(nameNode, objectIn, new ParameterizedType<ITypeable>(Type.FUNCTION, (ITypeable[]) params));
 
+        nameNode.color = TextColor.GREY;
+        
         this.returnType = Type.UNDEFINED;
     }
 

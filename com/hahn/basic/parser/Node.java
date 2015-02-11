@@ -3,17 +3,23 @@ package com.hahn.basic.parser;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.hahn.basic.definition.EnumExpression;
+import com.hahn.basic.definition.EnumToken;
 import com.hahn.basic.lexer.PackedToken;
+import com.hahn.basic.viewer.TextColor;
 
 public class Node {    
     private final Node parent;
     private final List<Node> children;
     
-    private String value, originalText;
+    private String value;
     private final Enum<?> token;
+    
+    private String originalText;
+    public TextColor color;
     
     private final int row, col;
 
@@ -29,9 +35,12 @@ public class Node {
         this.row = row;
         this.col = col;
         
+        // For rendering
         this.originalText = value;
-        this.value = (value != null ? value.trim() : null);
+        if (token instanceof EnumToken) this.color = ((EnumToken) token).getDefaultColor();
         
+        // For computations
+        this.value = (value != null ? value.trim() : null);        
         this.token = token;
         
         this.parent = parent;
@@ -68,13 +77,21 @@ public class Node {
             child.printChildren(0);
     }
     
-    public void printFormattedInput() {
-        if (isTerminal()) {
-            System.out.print(originalText);
+    public String getFormattedText() {
+        String str;
+        if (isTerminal() && children.size() == 0) {
+            return "<font color='" + color + "'>" + StringEscapeUtils.escapeHtml4(originalText) + "</font>";
+        } else if (isTerminal()) {
+            str = "<font color='" + color + "'>" + StringEscapeUtils.escapeHtml4(originalText) + "</font>";
+        } else {
+            str = "";
         }
         
-        for (Node child : children)
-            child.printFormattedInput();
+        for (Node child : children) {
+            if (child != this) str += child.getFormattedText();
+        }
+        
+        return str;
     }
 
     private void printChildren(int space) {

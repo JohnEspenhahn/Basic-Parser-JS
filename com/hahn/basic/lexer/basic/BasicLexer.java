@@ -46,6 +46,7 @@ public class BasicLexer implements ILexer {
         
         Iterator<String> it = input.iterator();
         for (row = 1; it.hasNext(); row++) {
+            matchStart = 0;
             String line = it.next();
             
             for (column = 0; column < line.length();) {
