@@ -177,7 +177,7 @@ public abstract class Main {
             while(scanner.hasNextLine()) {
                 String line = scanner.nextLine();
                 
-                Main.LINES.add(line);
+                Main.LINES.add(line + "\n");
             }
             // Main.LINES.add("#eof"); // End of File
             
@@ -226,7 +226,7 @@ public abstract class Main {
                         while(scanner.hasNextLine()) {
                             String line = scanner.nextLine();
                             
-                            Main.LINES.add(line);
+                            Main.LINES.add(line + "\n");
                         }
                         // Main.LINES.add("#eof"); // End of File
                         

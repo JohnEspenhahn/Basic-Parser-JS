@@ -18,7 +18,7 @@ public class Node {
     private String value;
     private final Enum<?> token;
     
-    private String originalText;
+    private String htmlText;
     public TextColor color;
     
     private final int row, col;
@@ -36,7 +36,7 @@ public class Node {
         this.col = col;
         
         // For rendering
-        this.originalText = value;
+        this.htmlText = (value != null ? StringEscapeUtils.escapeHtml4(value) : null);
         if (token instanceof EnumToken) this.color = ((EnumToken) token).getDefaultColor();
         
         // For computations
@@ -80,9 +80,9 @@ public class Node {
     public String getFormattedText() {
         String str;
         if (isTerminal() && children.size() == 0) {
-            return "<font color='" + color + "'>" + StringEscapeUtils.escapeHtml4(originalText) + "</font>";
+            return "<font color='" + color + "'>" + getInnerHTML() + "</font>";
         } else if (isTerminal()) {
-            str = "<font color='" + color + "'>" + StringEscapeUtils.escapeHtml4(originalText) + "</font>";
+            str = "<font color='" + color + "'>" + getInnerHTML() + "</font>";
         } else {
             str = "";
         }
@@ -92,6 +92,10 @@ public class Node {
         }
         
         return str;
+    }
+    
+    private String getInnerHTML() {
+        return htmlText;
     }
 
     private void printChildren(int space) {

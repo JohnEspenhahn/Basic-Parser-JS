@@ -2,8 +2,9 @@ package com.hahn.basic.lexer.basic;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
 
 import com.hahn.basic.definition.EnumToken;
 import com.hahn.basic.lexer.ILexer;
@@ -22,7 +23,7 @@ import com.hahn.basic.util.exceptions.LexException;
  * 
  */
 public class BasicLexer implements ILexer {    
-    private int row, column, matchStart;
+    private int row, index, matchStart, rowStart;
     private final List<PackedToken> stream;
     
     /**
@@ -35,7 +36,8 @@ public class BasicLexer implements ILexer {
     @Override
     public void reset() {
         this.row = 0;
-        this.column = 0;
+        this.index = 0;
+        this.rowStart = 0;
         this.matchStart = 0;
         this.stream.clear();
     }
@@ -44,180 +46,198 @@ public class BasicLexer implements ILexer {
     public List<PackedToken> lex(List<String> input) {
         stream.clear();
         
-        Iterator<String> it = input.iterator();
-        for (row = 1; it.hasNext(); row++) {
-            matchStart = 0;
-            String line = it.next();
+        String all = StringUtils.join(input, "");
+        
+        row = 1;
+        index = 0;
+        rowStart = 0;
+        matchStart = 0;        
+        while (index < all.length()) {
+            char c = all.charAt(index);
             
-            for (column = 0; column < line.length();) {
-                char c = line.charAt(column);
+            if (isWhitespace(c)) {
+                index += 1;
                 
-                if (isWhitespace(c)) {
-                    column += 1;
-                    continue;
-                } else if (isIdentifier(c)) {
-                    matchIdentifier(line);
-                } else if (isNumeric(c)) {
-                    matchNumber(line);
-                } else if (c == '.' && isNumeric(next(line))) {
-                    matchDouble(line, column);
-                } else if (c == '\'') {
-                    matchChar(line);
-                } else if (c == '"') {
-                    matchString(line);
-                } else if (isOperator(c)) {
-                    matchOperator(line);
-                } else if (isSeparator(c)) {
-                    matchSeparator(line);
-                } else {
-                    throw new LexException(row, column);
+                if (c == '\n') {
+                    row += 1;
+                    rowStart = index;
                 }
+                
+                continue;
+            } else if (isIdentifier(c)) {
+                matchIdentifier(all);
+            } else if (isNumeric(c)) {
+                matchNumber(all);
+            } else if (c == '.' && isNumeric(next(all))) {
+                matchDouble(all, index);
+            } else if (c == '\'') {
+                matchChar(all);
+            } else if (c == '"') {
+                matchString(all);
+            } else if (isOperator(c)) {
+                matchOperator(all);
+            } else if (isSeparator(c)) {
+                matchSeparator(all);
+            } else {
+                throw new LexException(getRow(), getColumn());
             }
         }
         
         return stream;
     }
     
+    private int getRow() {
+        return row;
+    }
+    
+    private int getColumn() {
+        return getColumn(index);
+    }
+    
+    private int getColumn(int idx) {
+        return idx - rowStart;
+    }
+    
     private String getMatch(String line) {
-        String match = line.substring(matchStart, column);
-        matchStart = column;
+        String match = line.substring(matchStart, index);
+        matchStart = index;
         
         return match;
     }
     
     private void matchIdentifier(String line) {
-        final int start = column;
+        final int startIdx = index;
         
         do {
-            column += 1;
-        } while (column < line.length() && continuesIdentifier(line.charAt(column)));
+            index += 1;
+        } while (index < line.length() && continuesIdentifier(line.charAt(index)));
         
         String match = getMatch(line);
-        String identifier = line.substring(start, column);
+        String identifier = line.substring(startIdx, index);
         for (EnumToken t: EnumToken.Group.identifiers) {
             if (t.getString().equals(identifier)) {
-                stream.add(new PackedToken(t, match, row, start));
+                stream.add(new PackedToken(t, match, getRow(), getColumn(startIdx)));
                 return;
             }
         }
         
-        stream.add(new PackedToken(EnumToken.IDENTIFIER, match, row, start));
+        stream.add(new PackedToken(EnumToken.IDENTIFIER, match, getRow(), getColumn(startIdx)));
     }
     
     private void matchNumber(String line) {
-        matchNumber(line, column, false);
+        matchNumber(line, index, false);
     }
     
-    private void matchNumber(String line, final int start, boolean hex) {
+    private void matchNumber(String line, final int startIdx, boolean hex) {
         char c = 0;
         do {
-            column += 1;
-        } while (column < line.length() && isNumeric(c = line.charAt(column)));
+            index += 1;
+        } while (index < line.length() && isNumeric(c = line.charAt(index)));
         
         if (c == '.') {
-            if (!hex) matchDouble(line, start);
-            else throw new LexException(row, column);
+            if (!hex) matchDouble(line, startIdx);
+            else throw new LexException(getRow(), getColumn());
         } else if (!hex && (c == 'x' || c == 'X')) {
-            matchNumber(line, start, true);
+            matchNumber(line, startIdx, true);
         } else {
             Enum<?> token = (hex ? EnumToken.HEX_INTEGER : EnumToken.INTEGER);
             
             String match = getMatch(line);
-            stream.add(new PackedToken(token, match, row, start));
+            stream.add(new PackedToken(token, match, getRow(), getColumn(startIdx)));
         }
     }
     
-    private void matchDouble(String line, final int start) {        
+    private void matchDouble(String line, final int startIdx) {        
         char c = 0;
         do {
-            column += 1;
-        } while (column < line.length() && isNumeric(c = line.charAt(column)));
+            index += 1;
+        } while (index < line.length() && isNumeric(c = line.charAt(index)));
         
         if (c == '.') {
-            throw new LexException(row, column);
+            throw new LexException(getRow(), getColumn());
         } else {
             String match = getMatch(line);
-            stream.add(new PackedToken(EnumToken.FLOAT, match, row, start));
+            stream.add(new PackedToken(EnumToken.FLOAT, match, getRow(), getColumn(startIdx)));
         }
     }
     
     private void matchChar(String line) {
-        final int start = column;
-        column += 1;
+        final int startIdx = index;
+        index += 1;
         
-        if (column < line.length() && line.charAt(column) == '\\') {
-            column += 1;
+        if (index < line.length() && line.charAt(index) == '\\') {
+            index += 1;
         }
         
-        column += 1;
-        if (column >= line.length() || line.charAt(column) != '\'') {
-            throw new LexException(row, column);
+        index += 1;
+        if (index >= line.length() || line.charAt(index) != '\'') {
+            throw new LexException(getRow(), getColumn());
         } else {
             String match = getMatch(line);
-            stream.add(new PackedToken(EnumToken.CHAR, match, row, start));
+            stream.add(new PackedToken(EnumToken.CHAR, match, getRow(), getColumn(startIdx)));
         }
     }
     
     private void matchString(String line) {
-        final int start = column;
+        final int startIdx = index;
         
         char c = 0;
         do {
-            if (c == '\\') column += 2;
-            else column += 1;
-        } while (column < line.length() && (c = line.charAt(column)) != '"');
+            if (c == '\\') index += 2;
+            else index += 1;
+        } while (index < line.length() && (c = line.charAt(index)) != '"');
         
         if (c != '"') {
-            throw new LexException(row, column);
+            throw new LexException(getRow(), getColumn());
         } else {
-            column += 1;
+            index += 1;
             
             String match = getMatch(line);
-            stream.add(new PackedToken(EnumToken.STRING, match, row, start));
+            stream.add(new PackedToken(EnumToken.STRING, match, getRow(), getColumn(startIdx)));
         }
     }
     
     private void matchOperator(String line) {
-        final int start = column;
+        final int startIdx = index;
         
         // Get fullest operator possible
         do {
-            column += 1;
-        } while (column < line.length() && isOperator(line.charAt(column)));
+            index += 1;
+        } while (index < line.length() && isOperator(line.charAt(index)));
         
         // Trim the operator till we find a valid match or trim everything
         do {
             String match = getMatch(line);
-            String operator = line.substring(start, column);
+            String operator = line.substring(startIdx, index);
             for (EnumToken t: EnumToken.Group.operators) {
                 if (t.getString().equals(operator)) {
-                    stream.add(new PackedToken(t, match, row, start));
+                    stream.add(new PackedToken(t, match, getRow(), getColumn(startIdx)));
                     return;
                 }
             }
             
-            column -= 1;
-        } while (column > start);
+            index -= 1;
+        } while (index > startIdx);
         
         // No match
-        throw new LexException(row, start);
+        throw new LexException(getRow(), getColumn(startIdx));
     }
     
     private void matchSeparator(String line) {
-        final int start = column;
-        column += 1;
+        final int startIdx = index;
+        index += 1;
 
         String match = getMatch(line);
-        String separator = line.substring(start, column);
+        String separator = line.substring(startIdx, index);
         for (EnumToken t: EnumToken.Group.separators) {
             if (t.getString().equals(separator)) {
-                stream.add(new PackedToken(t, match, row, start));
+                stream.add(new PackedToken(t, match, getRow(), getColumn(startIdx)));
                 return;
             }
         }
         
         // No match
-        throw new LexException(row, start);
+        throw new LexException(getRow(), getColumn(startIdx));
     }
     
     /**
@@ -229,7 +249,7 @@ public class BasicLexer implements ILexer {
      * @return The next character
      */
     private char next(String str) {
-        if (column + 1 < str.length()) return str.charAt(column + 1);
+        if (index + 1 < str.length()) return str.charAt(index + 1);
         else return 0;
     }
     

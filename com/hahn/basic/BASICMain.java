@@ -5,6 +5,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
+
 import com.hahn.basic.intermediate.LangCompiler;
 import com.hahn.basic.lexer.ILexer;
 import com.hahn.basic.lexer.PackedToken;
@@ -15,6 +18,7 @@ import com.hahn.basic.parser.Parser;
 import com.hahn.basic.target.ILangFactory;
 import com.hahn.basic.target.LangBuildTarget;
 import com.hahn.basic.util.exceptions.CompileException;
+import com.hahn.basic.viewer.Viewer;
 
 public class BASICMain extends Main {
     public static final String VERSION = "1.5.0";
@@ -63,6 +67,13 @@ public class BASICMain extends Main {
     
     @Override
     public void handleFileInput() {
+        Viewer.create();
+        Viewer.setText(
+                StringUtils.join(
+                    getLines().stream().map(s -> StringEscapeUtils.escapeHtml4(s)).iterator(), ""
+                )
+             );
+        
         lexLines();
         handleStream();
     }

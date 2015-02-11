@@ -81,7 +81,7 @@ public class LangCompiler {
         builder.appendString(builder.getContentEnd());        
         builder.appendString(builder.getEnd());
      
-        Viewer.create(h.getFormattedText());
+        Viewer.setText(h.getFormattedText());
         
         return builder;
     }
