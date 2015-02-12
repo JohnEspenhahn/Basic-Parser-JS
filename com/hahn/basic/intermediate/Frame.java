@@ -190,11 +190,11 @@ public class Frame extends Statement {
                 str.append(cs);
                 
                 boolean eol = !c.isBlock() && it.hasNext();
-                if (Main.PRETTY || eol) {
+                if (Main.getInstance().isPretty() || eol) {
                     str.append(LangCompiler.factory.getLangBuildTarget().getEOL());
                     
                     // Pretty print new line
-                    if (Main.PRETTY && eol) str.append('\n');
+                    if (Main.getInstance().isPretty() && eol) str.append('\n');
                 }
             }
         }
@@ -479,7 +479,7 @@ public class Frame extends Statement {
         Node name = children.get(1);
         
         // Update location
-        Main.setLine(name.getRow(), name.getCol());
+        Main.getInstance().setLine(name.getRow(), name.getCol());
         
         // Parse the name of the library from the quoted string form
         String str = name.getValue();
@@ -765,7 +765,7 @@ public class Frame extends Statement {
                 
                 // Make var available
                 if (struct == null) {
-                    Main.setLine(node.getRow(), node.getCol());
+                    Main.getInstance().setLine(node.getRow(), node.getCol());
                     addVar((AdvancedObject) obj);
                 }
             }
@@ -825,7 +825,7 @@ public class Frame extends Statement {
         it.next(); // skip 'struct'
         
         Node nameNode = it.next();
-        Main.setLine(nameNode.getRow(), nameNode.getCol());
+        Main.getInstance().setLine(nameNode.getRow(), nameNode.getCol());
         StructType struct = Type.STRUCT.extendAs(nameNode.getValue(), 0);
         
         while (it.hasNext()) {
@@ -850,10 +850,10 @@ public class Frame extends Statement {
         int flags = 0;
         
         // Keep track of location
-        Main.setLine(nameNode.getRow(), nameNode.getCol());
+        Main.getInstance().setLine(nameNode.getRow(), nameNode.getCol());
         
         // Don't add class code if library
-        if (Main.LIBRARY) {
+        if (Main.getInstance().isLibrary()) {
             flags |= BitFlag.SYSTEM.b;
         }
         
@@ -995,7 +995,7 @@ public class Frame extends Statement {
                     }
                 }
             } else if (token == EnumExpression.BLOCK) {
-                if (!Main.LIBRARY) body = child;
+                if (!Main.getInstance().isLibrary()) body = child;
                 else body = null;
             }
         }
@@ -1008,7 +1008,7 @@ public class Frame extends Statement {
         if (!anonymous) {
             // Named
             String name = nameNode.getValue();
-            Main.setLine(nameNode.getRow(), nameNode.getCol());
+            Main.getInstance().setLine(nameNode.getRow(), nameNode.getCol());
             
             if (classIn == null) {
                 func = LangCompiler.defineFunc(LangCompiler.getGlobalFrame(), body, name, null, rtnType, aParams);
@@ -1328,13 +1328,13 @@ public class Frame extends Statement {
         
         switch (directive) {
         case "library":
-            Main.LIBRARY = true;
+            Main.getInstance().setIsLibrary(true);
             break;
         case "end_library":
-            Main.LIBRARY = false;
+            Main.getInstance().setIsLibrary(false);
             break;
         case "eof":
-            Main.LIBRARY = false;
+            Main.getInstance().setIsLibrary(false);
             break;
         default:
             throw new CompileException("Unknown preprocessor directive `" + directive + "`", head);

@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.hahn.basic.Main;
 import com.hahn.basic.intermediate.objects.Param;
 import com.hahn.basic.intermediate.objects.types.ClassType;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
@@ -35,7 +34,7 @@ public class FuncBridge {
             
             return func;
         } else if (!override && group.isDefined(func)) {
-            throw new CompileException("The function `" + func.getName() + "` with those parameters is already defined", Main.getRow(), Main.getCol());
+            throw new CompileException("The function `" + func.getName() + "` with those parameters is already defined");
         } else {
             if (override) group.removeAllMatch(func);
             

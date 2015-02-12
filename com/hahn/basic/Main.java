@@ -20,16 +20,17 @@ import com.hahn.basic.util.EnumInputType;
 import com.hahn.basic.util.exceptions.CompileException;
 
 public abstract class Main {
-    private static int ROW, COLUMN;
-    private static Stack<Integer> ROWS = new Stack<Integer>(), COLUMNS = new Stack<Integer>();
-    private static List<String> LINES = new ArrayList<String>();
-    
-    public static boolean DEBUG = false; 
-    public static boolean PRETTY = false;
-    public static boolean LIBRARY = false;
+    private static Main instance;
     
     private static final String FILE_KEY = "file";
     private static final String DIR_KEY = "dir";
+    
+    private int row, col;
+    private Stack<Integer> rows = new Stack<Integer>(), columns = new Stack<Integer>();
+    private List<String> lines = new ArrayList<String>();
+    
+    private boolean debug = false, pretty = false, library = false;
+    
     private Map<String, String> values;
     
     private EnumInputType inputType;
@@ -46,8 +47,8 @@ public abstract class Main {
     
     public abstract void printShellTitle();
     
-    public abstract void handleTermInput();
-    public abstract void handleFileInput();
+    public abstract void reset();
+    public abstract void handleInput();
     
     public void setInputType(EnumInputType type) {
         if (this.inputType == null) this.inputType = type;
@@ -127,9 +128,9 @@ public abstract class Main {
             }
             
             if (input.equalsIgnoreCase("debug")) {
-                Main.toggleDebug();
+                toggleDebug();
             } else if (input.equalsIgnoreCase("pretty")) {
-                Main.togglePretty();
+                togglePretty();
             } else if (input.equalsIgnoreCase("help")) {
                 printShellHelp();
             } else if (input.equalsIgnoreCase("exit")) {
@@ -137,10 +138,11 @@ public abstract class Main {
             } else {
                 try {               
                     // Reset
-                    Main.LINES.clear();
-                    Main.LINES.add(input.trim());
+                    lines.clear();
+                    lines.add(input.trim());
                     
-                    handleTermInput();
+                    reset();                    
+                    handleInput();
                 } catch (CompileException e) {
                     printCompileException(e);
                 } catch (Exception e) {
@@ -177,13 +179,13 @@ public abstract class Main {
             while(scanner.hasNextLine()) {
                 String line = scanner.nextLine();
                 
-                Main.LINES.add(line + "\n");
+                lines.add(line + "\n");
             }
-            // Main.LINES.add("#eof"); // End of File
+            // lines.add("#eof"); // End of File
             
-            handleFileInput();
+            handleInput();
             
-            if (DEBUG) {
+            if (debug) {
                 System.out.println();
                 System.out.println("Done in " + (System.currentTimeMillis() - start) + "ms");
             }
@@ -226,16 +228,16 @@ public abstract class Main {
                         while(scanner.hasNextLine()) {
                             String line = scanner.nextLine();
                             
-                            Main.LINES.add(line + "\n");
+                            lines.add(line + "\n");
                         }
-                        // Main.LINES.add("#eof"); // End of File
+                        // lines.add("#eof"); // End of File
                         
                         scanner.close();
                         scanner = null;
                     }
                 }
                 
-                handleFileInput();
+                handleInput();
                 
                 System.out.println();
                 if (found == 0) {
@@ -261,94 +263,123 @@ public abstract class Main {
         }
     }
     
-    private static void resetFile() {
-        Main.LINES.clear();
-        Main.LIBRARY = false;
+    public void parseLinesFromString(String str) {
+        resetFile();
+        
+        String[] ls = str.split("\n");
+        for (String l: ls) {
+            lines.add(l + "\n");
+        }
     }
     
-    private static void toggleDebug() {
-        DEBUG = !DEBUG;
-        System.out.println("Debug = " + DEBUG);
+    private void resetFile() {
+        lines.clear();
+        library = false;
+    }
+    
+    private void toggleDebug() {
+        debug = !debug;
+        System.out.println("Debug = " + debug);
         System.out.println();
     }
     
-    private static void togglePretty() {
-        PRETTY = !PRETTY;
-        System.out.println("Pretty = " + PRETTY);
+    public boolean isDebugging() {
+        return debug;
+    }
+    
+    private void togglePretty() {
+        pretty = !pretty;
+        System.out.println("Pretty = " + pretty);
         System.out.println();
     }
     
-    public static void printCompileException(CompileException e) {
-        if (DEBUG) e.printStackTrace();
+    public boolean isPretty() {
+        return pretty;
+    }
+    
+    public void setIsLibrary(boolean l) {
+        this.library = l;
+    }
+    
+    public boolean isLibrary() {
+        return library;
+    }
+    
+    public void printCompileException(CompileException e) {
+        if (debug) e.printStackTrace();
         else System.out.println("ERROR: " + e.getMessage());
     }
     
-    public static List<String> getLines() {
-        return LINES;
+    public List<String> getLines() {
+        return lines;
     }
     
-    public static String getLineStr() {
+    public String getLineStr() {
         return getLineStr(getRow());
     }
     
-    public static String getLineStr(int line) {
-        return LINES.get(line - 1);
+    public String getLineStr(int line) {
+        return lines.get(line - 1);
     }
     
-    public static int getRow() {
-        return Main.ROW;
+    public int getRow() {
+        return row;
     }
     
-    public static int getCol() {
-        return Main.COLUMN;
+    public int getCol() {
+        return col;
     }
     
-    public static void setLine(int row) {
-        Main.setLine(row, -1);
+    public void setLine(int row) {
+        setLine(row, -1);
     }
     
-    public static void setLine(int row, int col) {
-        Main.ROW = row;
-        Main.COLUMN = col;
+    public void setLine(int row, int col) {
+        this.row = row;
+        this.col = col;
     }
     
-    public static void pushLine(int row, int col) {
-        Main.ROWS.push(Main.ROW);
-        Main.COLUMNS.push(Main.COLUMN);
+    public void pushLine(int row, int col) {
+        rows.push(this.row);
+        columns.push(this.col);
         
         setLine(row, col);
     }
     
-    public static void popLine() {
-        setLine(Main.ROWS.pop(), Main.COLUMNS.pop());
+    public void popLine() {
+        setLine(rows.pop(), columns.pop());
+    }
+    
+    public static Main getInstance() {
+        return instance;
     }
     
     public static void main(String[] args) {
         try {
-            Main main = new BASICMain(new JSLangFactory(), new BasicLexer(), EnumToken.class, EnumExpression.class);
+            instance = new BASICMain(new JSLangFactory(), new BasicLexer(), EnumToken.class, EnumExpression.class);
             
             String s;
             for (int i = 0; i < args.length; i++) {
                 s = args[i];
                 if (s.equals("--debug")) {
-                    Main.toggleDebug();
+                    instance.toggleDebug();
                 } else if (s.equals("--pretty")) {
-                    Main.togglePretty();
+                    instance.togglePretty();
                 } else if (s.equals("--gui") || s.equals("-g")) {
-                    main.setInputType(EnumInputType.GUI_FILE);
+                    instance.setInputType(EnumInputType.GUI_FILE);
                 } else if (s.equals("--shell") || s.equals("-s")) {
-                    main.setInputType(EnumInputType.SHELL);
+                    instance.setInputType(EnumInputType.SHELL);
                 } else if (s.equals("--file") || s.equals("-f")) {
-                    main.setInputType(EnumInputType.FILE);
+                    instance.setInputType(EnumInputType.FILE);
                     if (i+1 < args.length && !args[i+1].startsWith("-")) {
-                        main.setValue(FILE_KEY, args[++i]);
+                        instance.setValue(FILE_KEY, args[++i]);
                     } else {
                         throw new IllegalArgumentException("No file name provided after `" + s + "`");
                     }
                 } else if (s.equals("--dir") || s.equals("-d")) {
-                    main.setInputType(EnumInputType.DIR);
+                    instance.setInputType(EnumInputType.DIR);
                     if (i+1 < args.length && !args[i+1].startsWith("-")) {
-                        main.setValue(DIR_KEY, args[++i]);
+                        instance.setValue(DIR_KEY, args[++i]);
                     }
                 } else {
                     throw new IllegalArgumentException("Illegal command line parameter `" + s + "`");
@@ -356,7 +387,7 @@ public abstract class Main {
             }
             
             // Choose execution mode
-            main.run();
+            instance.run();
         } catch (IllegalArgumentException e) {
             System.err.println(e);
         } catch (Exception e) {

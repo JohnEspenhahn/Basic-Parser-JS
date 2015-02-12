@@ -122,7 +122,7 @@ public class RegexLexer implements ILexer {
                             
                         // Code
                         } else if (!comment) {
-                            stream.add(new PackedToken((Enum<?>) Tokens[g - 5], group, row, matcher.start()));
+                            stream.add(new PackedToken((Enum<?>) Tokens[g - 5], group, group, row, matcher.start()));
                         }
                         break;
                     }

@@ -17,7 +17,7 @@ import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.parser.Node;
 import com.hahn.basic.target.ILangFactory;
 import com.hahn.basic.target.LangBuildTarget;
-import com.hahn.basic.viewer.Viewer;
+import com.hahn.basic.viewer.ViewerBuilder;
 
 public class LangCompiler {    
     private static Map<String, Library> libs = new HashMap<String, Library>();
@@ -81,7 +81,7 @@ public class LangCompiler {
         builder.appendString(builder.getContentEnd());        
         builder.appendString(builder.getEnd());
      
-        Viewer.setText(h.getFormattedText());
+        ViewerBuilder.getViewer().setTextFromNode(h);
         
         return builder;
     }

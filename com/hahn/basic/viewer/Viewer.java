@@ -1,91 +1,235 @@
 package com.hahn.basic.viewer;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.JEditorPane;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
-import javax.swing.border.LineBorder;
+import javax.swing.UIManager;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.text.html.HTMLDocument;
 
-public class Viewer extends JPanel {
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
+
+import com.hahn.basic.Main;
+import com.hahn.basic.parser.Node;
+import com.sun.glass.events.KeyEvent;
+
+public class Viewer extends JPanel implements ActionListener, DocumentListener {
     private static final long serialVersionUID = 4757110261297031804L;
     
+    private static final int DELAY_TIME = 2500;
+    
     public static Color BACKGROUND = new Color(0xFDF6E3);
-    public static Font FONT = new Font("Serif", Font.PLAIN, 26);
+    public static Font FONT = new Font("Arial", Font.PLAIN, 20);
+    
+    private long lastTextChange;
+    private boolean changed;
+    
+    private Node node;
     
     JEditorPane textArea;
     JLabel status;
     
-    protected Viewer() {
-        this("");
+    JMenuItem save, open;
+    
+    protected Viewer(JFrame frame) {
+        this(frame, "");
     }
     
-    protected Viewer(String text) {        
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+    protected Viewer(JFrame frame, String text) {        
+        setLayout(new BorderLayout());
         setBackground(BACKGROUND);
+        
+        UIManager.put("Menu.font", FONT);
+        JMenuBar menuBar = new JMenuBar();
+        JMenu menu = new JMenu("File");
+        menuBar.add(menu);        
+        frame.setJMenuBar(menuBar);
+        
+        save = new JMenuItem("Save");
+        save.setMnemonic(KeyEvent.VK_S);
+        save.addActionListener(this);
+        menu.add(save);
+        
+        open = new JMenuItem("Open");
+        open.setMnemonic(KeyEvent.VK_O);
+        open.addActionListener(this);
+        menu.add(open);
         
         textArea = new JEditorPane();
         textArea.setContentType("text/html");
         textArea.setBackground(BACKGROUND);
         textArea.setDoubleBuffered(true);
-        textArea.setEditable(false);
+        textArea.getDocument().addDocumentListener(this);
         
-        String bodyRule = "body { font-family:"+FONT.getFamily() + ";" + "font-size:"+FONT.getSize()+"pt; }";
-        ((HTMLDocument) textArea.getDocument()).getStyleSheet().addRule(bodyRule);
-        
-        updateTextArea(text);
+        try {
+            ((HTMLDocument) textArea.getDocument()).getStyleSheet().addRule(
+                        StringUtils.join(Files.readAllLines(Paths.get("viewer.css"), StandardCharsets.UTF_8), "")
+                    );
+        } catch (IOException e) {
+            System.err.println("Failed to read 'viewer.css'!");
+        }
         
         JScrollPane scrollPane = new JScrollPane(textArea);
         scrollPane.setPreferredSize(new Dimension(640, 480));
         scrollPane.setMinimumSize(new Dimension(30, 30));
-        scrollPane.setBorder(new LineBorder(BACKGROUND, 1));
+        scrollPane.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, TextColor.GREY.asColor()));
         
         status = new JLabel();
         status.setFont(FONT);
-        status.setBackground(BACKGROUND);
-        status.setText("Status bar");
+        status.setPreferredSize(new Dimension(100, 30));
+        status.setMinimumSize(new Dimension(100, 30));
+        status.setForeground(TextColor.GREY.asColor());
         status.setHorizontalAlignment(SwingConstants.RIGHT);
+        status.setHorizontalTextPosition(SwingConstants.RIGHT);
+        status.setVerticalAlignment(SwingConstants.CENTER);
+        status.setVerticalTextPosition(SwingConstants.CENTER);
         
-        setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
-        add(scrollPane);
-        add(status);
-    }
-    
-    protected void updateTextArea(String text) {
-        textArea.setText("<html><pre>" + text + "</pre></html>");
-    }
-    
-    private static Viewer view;    
-    public static void create() {
-        if (view != null) System.err.println("Attempted to create viewer twice!");
+        add(scrollPane, BorderLayout.CENTER);
+        add(status, BorderLayout.PAGE_END);
         
-        //Create and set up the window.
-        JFrame frame = new JFrame("Editor");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
- 
-        //Add content to the window.
-        view = new Viewer();
-        frame.add(view);
- 
-        //Display the window.
-        frame.pack();
-        frame.setVisible(true);
-        frame.toFront();
+        (new Thread(new ViewerUpdateThread(this))).start();
     }
     
-    public static void setText(String text) {
-        if (view != null) {
-            view.updateTextArea(text);
-        } else {
-            System.err.println("Tried to set viewer text before it was created!");
+    public void setTextFromNode(Node node) {
+        if (node != null) {
+            this.node = node;
+            
+            this.lastTextChange = System.currentTimeMillis();
+            textArea.setText("<html><pre>" + node.getFormattedHTML() + "</pre></html>");
+            
+            this.changed = false;
         }
     }
+    
+    public void setStatus(String statusText) {
+        if (statusText != null) {
+            this.status.setText(statusText);
+        }
+    }
+    
+    public boolean needsUpdate() {
+        return this.changed && (System.currentTimeMillis() - this.lastTextChange > DELAY_TIME);
+    }
+    
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() == save) {
+            doSaveFile();
+        } else if (e.getSource() == open) {
+            doOpenFile();
+        }
+    }   
+    
+    @Override
+    public void insertUpdate(DocumentEvent e) {
+        markChanged();
+    }
+
+    @Override
+    public void removeUpdate(DocumentEvent e) {
+        markChanged();
+    }
+
+    @Override
+    public void changedUpdate(DocumentEvent e) { }
+    
+    private void markChanged() {
+        changed = true;
+        lastTextChange = System.currentTimeMillis();
+    }
+    
+    private void doSaveFile() {
+        JFileChooser chooser = new JFileChooser();
+        int result = chooser.showSaveDialog(null);
+        
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File f = chooser.getSelectedFile();
+            if (!f.exists() || f.isFile()) {
+                if (f.isFile()) {
+                    int replace = JOptionPane.showConfirmDialog(this, "The file '" + f.getName() + "' already exists. Replace it?", "Replace Existing File?", JOptionPane.YES_NO_OPTION);
+                    if (replace != JOptionPane.YES_OPTION) {
+                        JOptionPane.showMessageDialog(this, "Canceled");
+                        return;
+                    }
+                }
+                
+                FileOutputStream out = null;
+                try {
+                    f.delete();
+                    f.createNewFile();                    
+                    out = new FileOutputStream(f);
+                    if (node != null) out.write(node.getFormattedText().getBytes(Charset.defaultCharset()));
+                    
+                    JOptionPane.showMessageDialog(this, "Saved successfully");
+                } catch (Exception err) {
+                    err.printStackTrace();
+                } finally {
+                    if (out != null) { 
+                        try {
+                            out.close();
+                        } catch (IOException e1) {
+                            e1.printStackTrace();
+                        }
+                    }
+                }
+            } else {
+                JOptionPane.showMessageDialog(this, "Invalid file selected. Save canceled");
+            }
+        } else {
+            System.out.println("ERROR: Canceled by user");
+        }
+    }
+
+    private void doOpenFile() {
+        Main.getInstance().guiFileInput();
+    }
+    
+    public void update() {
+        changed = false;
+        
+        setStatus("Recompiling...");
+        
+        String text = textArea.getText();
+        int start = text.indexOf("<pre>");
+        int end = text.indexOf("</pre>");
+        
+        text = text.substring(start + 5, end);
+        text = text.replaceAll("<br>", "\n");
+        text = text.replaceAll("<.+?>", "");
+        text = StringEscapeUtils.unescapeHtml4(text);
+        
+        System.out.println(text);
+        
+        Main.getInstance().parseLinesFromString(text);
+        
+        Main.getInstance().reset();
+        Main.getInstance().handleInput();
+    }
+
+
 }

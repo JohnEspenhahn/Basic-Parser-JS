@@ -67,18 +67,18 @@ public class JSBuildTarget extends LangBuildTarget {
 	
 	@Override
 	public String getCodeEnd() {
-	    return (Main.PRETTY ? "\n" : ";");
+	    return (Main.getInstance().isPretty() ? "\n" : ";");
 	}
 	
 	@Override
 	public String getContentStart() {
 	    JSPretty.addTab();
-	    return (Main.PRETTY ? "\n<script>\nfunction main() {\n" : "<script>function main(){");
+	    return (Main.getInstance().isPretty() ? "\n<script>\nfunction main() {\n" : "<script>function main(){");
 	}
 	
 	@Override
     public String getEnd() {
-        return (Main.PRETTY ? "\n" : "") + "</script>\n</head>\n</html>";
+        return (Main.getInstance().isPretty() ? "\n" : "") + "</script>\n</head>\n</html>";
     }
 	
 	@Override
@@ -86,7 +86,7 @@ public class JSBuildTarget extends LangBuildTarget {
 	    StringBuilder endBuilder = new StringBuilder();
 	    
 	    JSPretty.removeTab();
-	    endBuilder.append(Main.PRETTY ? "}\n" : "}");
+	    endBuilder.append(Main.getInstance().isPretty() ? "}\n" : "}");
         
         if (Type.getPublicTypes().size() > Type.COUNT_PRIMATIVES) {
             /*

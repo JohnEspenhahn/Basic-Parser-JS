@@ -26,7 +26,7 @@ public class Util {
     }
     
     public static String getListSeperator() {
-        return (Main.PRETTY ? ", " : ",");
+        return (Main.getInstance().isPretty() ? ", " : ",");
     }
     
     public static String joinTypes(ITypeable[] arr, char seperator) {

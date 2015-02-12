@@ -5,9 +5,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 
-import org.apache.commons.lang3.StringEscapeUtils;
-import org.apache.commons.lang3.StringUtils;
-
 import com.hahn.basic.intermediate.LangCompiler;
 import com.hahn.basic.lexer.ILexer;
 import com.hahn.basic.lexer.PackedToken;
@@ -18,7 +15,7 @@ import com.hahn.basic.parser.Parser;
 import com.hahn.basic.target.ILangFactory;
 import com.hahn.basic.target.LangBuildTarget;
 import com.hahn.basic.util.exceptions.CompileException;
-import com.hahn.basic.viewer.Viewer;
+import com.hahn.basic.viewer.ViewerBuilder;
 
 public class BASICMain extends Main {
     public static final String VERSION = "1.5.0";
@@ -51,31 +48,29 @@ public class BASICMain extends Main {
     }
 
     @Override
-    public void handleTermInput() {
-        long start = System.currentTimeMillis();
-        
-        // Reset
+    public void reset() {
         lexer.reset();
-        
-        // Parse
-        lexLines();
-        handleStream();
-        
-        System.out.println();
-        System.out.println("Done in " + (System.currentTimeMillis() - start) + "ms");
     }
     
     @Override
-    public void handleFileInput() {
-        Viewer.create();
+    public void handleInput() {
+        long start = System.currentTimeMillis();
+        
+        ViewerBuilder.create();
+        
+        /*
         Viewer.setText(
                 StringUtils.join(
                     getLines().stream().map(s -> StringEscapeUtils.escapeHtml4(s)).iterator(), ""
                 )
              );
+         */
         
         lexLines();
         handleStream();
+        
+        System.out.println();
+        System.out.println("Done in " + (System.currentTimeMillis() - start) + "ms");
     }
     
     private void lexLines() {
@@ -88,7 +83,7 @@ public class BASICMain extends Main {
             
             if (tree_head != null) {                
                 // Print
-                if (DEBUG) {
+                if (isDebugging()) {
                     tree_head.print();
                     System.out.println();
                 }

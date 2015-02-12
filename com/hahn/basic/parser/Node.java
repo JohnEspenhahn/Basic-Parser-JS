@@ -18,7 +18,7 @@ public class Node {
     private String value;
     private final Enum<?> token;
     
-    private String htmlText;
+    private String text, htmlText;
     public TextColor color;
     
     private final int row, col;
@@ -36,12 +36,16 @@ public class Node {
         this.col = col;
         
         // For rendering
-        this.htmlText = (value != null ? StringEscapeUtils.escapeHtml4(value) : null);
-        if (token instanceof EnumToken) this.color = ((EnumToken) token).getDefaultColor();
+        if (value != null) {
+            this.text = value;
+            this.htmlText = StringEscapeUtils.escapeHtml4(value).replace("\n", "<br>");
+            
+            this.value = value.trim();
+        }
         
-        // For computations
-        this.value = (value != null ? value.trim() : null);        
         this.token = token;
+        if (token instanceof EnumToken) this.color = ((EnumToken) token).getDefaultColor();
+        else this.color = TextColor.GREY;
         
         this.parent = parent;
         this.children = new ArrayList<Node>();
@@ -77,12 +81,29 @@ public class Node {
             child.printChildren(0);
     }
     
+    public String getFormattedHTML() {
+        String str;
+        if (isTerminal() && children.size() == 0) {
+            return "<font color='" + color + "'>" + htmlText + "</font>";
+        } else if (isTerminal()) {
+            str = "<font color='" + color + "'>" + htmlText + "</font>";
+        } else {
+            str = "";
+        }
+        
+        for (Node child : children) {
+            if (child != this) str += child.getFormattedHTML();
+        }
+        
+        return str;
+    }
+    
     public String getFormattedText() {
         String str;
         if (isTerminal() && children.size() == 0) {
-            return "<font color='" + color + "'>" + getInnerHTML() + "</font>";
+            return text;
         } else if (isTerminal()) {
-            str = "<font color='" + color + "'>" + getInnerHTML() + "</font>";
+            str = text;
         } else {
             str = "";
         }
@@ -92,10 +113,6 @@ public class Node {
         }
         
         return str;
-    }
-    
-    private String getInnerHTML() {
-        return htmlText;
     }
 
     private void printChildren(int space) {

@@ -40,7 +40,7 @@ public class JSDefineVarStatement extends DefineVarStatement {
         StringBuilder str = new StringBuilder();
         for (DefinePair pair: pairs) {
             if (!pair.var.hasLiteral()) {
-                if (!first) str.append(Main.PRETTY ? "\n  , " : ",");
+                if (!first) str.append(Main.getInstance().isPretty() ? "\n  , " : ",");
                 else first = false;
                 
                 str.append(JSPretty.format("%s_=_%s", pair.var.toTarget(), pair.val.toTarget()));

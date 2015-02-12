@@ -10,7 +10,7 @@ public abstract class Compilable implements IIntermediate, ILangCommand {
     private final Frame frame;
 
     public Compilable(Frame f) {
-        this.row = Main.getRow();
+        this.row = Main.getInstance().getRow();
 
         this.frame = f;
     }

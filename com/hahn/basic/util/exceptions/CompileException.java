@@ -11,7 +11,7 @@ public class CompileException extends RuntimeException {
     final String message;
     
     public CompileException(String mss) {
-        this(mss, Main.getRow(), Main.getCol());
+        this(mss, Main.getInstance().getRow(), Main.getInstance().getCol());
     }
     
     public CompileException(String mss, Compilable c) {
@@ -23,11 +23,11 @@ public class CompileException extends RuntimeException {
     }
     
     public CompileException(String mss, String badLinePart) {
-        this(mss, Main.getRow(), Main.getLineStr().indexOf(badLinePart));
+        this(mss, Main.getInstance().getRow(), Main.getInstance().getLineStr().indexOf(badLinePart));
     }
     
     public CompileException(String mss, int row, int col) {
-        super(mss + " in line " + row + (col < 0 ? "" : "\n" + Main.getLineStr(row).replace('\t', ' ') + "\n" + Util.createArrow(' ', '^', col)));
+        super(mss + " in line " + row + (col < 0 ? "" : "\n" + Main.getInstance().getLineStr(row).replace('\t', ' ') + "\n" + Util.createArrow(' ', '^', col)));
         
         this.message = mss;
     }

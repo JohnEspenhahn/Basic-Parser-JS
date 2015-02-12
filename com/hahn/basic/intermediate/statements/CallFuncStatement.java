@@ -26,7 +26,7 @@ public abstract class CallFuncStatement extends Statement {
     
     @Override
     public final boolean reverseOptimize() {
-        Main.setLine(row);
+        Main.getInstance().setLine(row);
         
     	if (shouldCallFunction()) {    	    
 		    funcCallPointer.setInUse(this);
@@ -40,7 +40,7 @@ public abstract class CallFuncStatement extends Statement {
     
     @Override
     public final boolean forwardOptimize() {
-        Main.setLine(row);
+        Main.getInstance().setLine(row);
         funcCallPointer.takeRegister(this);
         
         return doForwardOptimize();
