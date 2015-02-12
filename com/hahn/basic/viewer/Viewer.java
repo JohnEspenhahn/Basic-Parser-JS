@@ -26,6 +26,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -115,14 +116,23 @@ public class Viewer extends JPanel implements ActionListener, DocumentListener {
         (new Thread(new ViewerUpdateThread(this))).start();
     }
     
-    public void setTextFromNode(Node node) {
-        if (node != null) {
-            this.node = node;
-            
-            this.lastTextChange = System.currentTimeMillis();
-            textArea.setText("<html><pre>" + node.getFormattedHTML() + "</pre></html>");
-            
-            this.changed = false;
+    public void setTextFromNode(Node n) {
+        if (n != null) {
+            SwingUtilities.invokeLater( new Runnable() {
+                public void run() {
+                    node = n;
+                    
+                    lastTextChange = System.currentTimeMillis();
+                    
+                    int carot = textArea.getCaretPosition();
+                    String html = n.getFormattedHTML();
+                    System.out.println(html);
+                    textArea.setText("<html><pre>" + html + "</pre></html>");
+                    textArea.setCaretPosition(carot);
+                    
+                    changed = false;
+                }
+            });
         }
     }
     
@@ -223,12 +233,11 @@ public class Viewer extends JPanel implements ActionListener, DocumentListener {
         text = text.replaceAll("<.+?>", "");
         text = StringEscapeUtils.unescapeHtml4(text);
         
-        System.out.println(text);
-        
-        Main.getInstance().parseLinesFromString(text);
-        
+        Main.getInstance().parseLinesFromString(text);        
         Main.getInstance().reset();
         Main.getInstance().handleInput();
+        
+        setStatus("");
     }
 
 

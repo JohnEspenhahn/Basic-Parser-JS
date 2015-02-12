@@ -84,9 +84,13 @@ public class Node {
     public String getFormattedHTML() {
         String str;
         if (isTerminal() && children.size() == 0) {
-            return "<font color='" + color + "'>" + htmlText + "</font>";
+            String trimmed = htmlText.trim();
+            String ident = "<font color='" + color + "'>" + trimmed + "</font>";
+            return htmlText.replace(trimmed, ident);
         } else if (isTerminal()) {
-            str = "<font color='" + color + "'>" + htmlText + "</font>";
+            String trimmed = htmlText.trim();
+            String ident = "<font color='" + color + "'>" + trimmed + "</font>";
+            str = htmlText.replace(trimmed, ident);
         } else {
             str = "";
         }
