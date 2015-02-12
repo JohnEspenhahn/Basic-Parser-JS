@@ -57,7 +57,9 @@ public class BasicLexer implements ILexer {
         while (index < line.length()) {
             char c = getChar();
             
-            if (isWhitespace(c)) {
+            if (c == '/') {
+                handleComment();
+            } else if (isWhitespace(c)) {
                 handleWhitespace(c);
             } else if (isIdentifier(c)) {
                 matchIdentifier();
@@ -113,6 +115,22 @@ public class BasicLexer implements ILexer {
         return line.substring(start, index);
     }
     
+    private void handleComment() {
+        final int startIdx = index;
+        
+        index += 1;        
+        char c = getChar();
+        if (c != '/') throw new LexException(getRow(), getColumn());
+        
+        while (c != '\n') {
+            index += 1;
+            c = getChar();
+        }
+        
+        String match = getMatch();
+        stream.add(new PackedToken(EnumToken.COMMENT, match, getRow(), getColumn(startIdx)));
+    }
+    
     private void handleWhitespace(char c) {
         index += 1;
         
@@ -133,12 +151,12 @@ public class BasicLexer implements ILexer {
         String identifier = substring(startIdx);
         for (EnumToken t: EnumToken.Group.identifiers) {
             if (t.getString().equals(identifier)) {
-                stream.add(new PackedToken(t, identifier, match, getRow(), getColumn(startIdx)));
+                stream.add(new PackedToken(t, match, getRow(), getColumn(startIdx)));
                 return;
             }
         }
         
-        stream.add(new PackedToken(EnumToken.IDENTIFIER, identifier, match, getRow(), getColumn(startIdx)));
+        stream.add(new PackedToken(EnumToken.IDENTIFIER, match, getRow(), getColumn(startIdx)));
     }
     
     private void matchNumber() {
@@ -160,8 +178,7 @@ public class BasicLexer implements ILexer {
             Enum<?> token = (hex ? EnumToken.HEX_INTEGER : EnumToken.INTEGER);
             
             String match = getMatch();
-            String numberVal = substring(startIdx);
-            stream.add(new PackedToken(token, numberVal, match, getRow(), getColumn(startIdx)));
+            stream.add(new PackedToken(token, match, getRow(), getColumn(startIdx)));
         }
     }
     
@@ -175,8 +192,7 @@ public class BasicLexer implements ILexer {
             throw new LexException(getRow(), getColumn());
         } else {
             String match = getMatch();
-            String floatVal = substring(startIdx);
-            stream.add(new PackedToken(EnumToken.FLOAT, floatVal, match, getRow(), getColumn(startIdx)));
+            stream.add(new PackedToken(EnumToken.FLOAT, match, getRow(), getColumn(startIdx)));
         }
     }
     
@@ -193,8 +209,7 @@ public class BasicLexer implements ILexer {
             throw new LexException(getRow(), getColumn());
         } else {
             String match = getMatch();
-            String charVal = substring(startIdx);
-            stream.add(new PackedToken(EnumToken.CHAR, charVal, match, getRow(), getColumn(startIdx)));
+            stream.add(new PackedToken(EnumToken.CHAR, match, getRow(), getColumn(startIdx)));
         }
     }
     
@@ -213,8 +228,7 @@ public class BasicLexer implements ILexer {
             index += 1;
             
             String match = getMatch();
-            String string = substring(startIdx);
-            stream.add(new PackedToken(EnumToken.STRING, string, match, getRow(), getColumn(startIdx)));
+            stream.add(new PackedToken(EnumToken.STRING, match, getRow(), getColumn(startIdx)));
         }
     }
     
@@ -232,7 +246,7 @@ public class BasicLexer implements ILexer {
             String operator = line.substring(startIdx, index);
             for (EnumToken t: EnumToken.Group.operators) {
                 if (t.getString().equals(operator)) {
-                    stream.add(new PackedToken(t, operator, match, getRow(), getColumn(startIdx)));
+                    stream.add(new PackedToken(t, match, getRow(), getColumn(startIdx)));
                     return;
                 }
             }
@@ -252,7 +266,7 @@ public class BasicLexer implements ILexer {
         String separator = line.substring(startIdx, index);
         for (EnumToken t: EnumToken.Group.separators) {
             if (t.getString().equals(separator)) {
-                stream.add(new PackedToken(t, separator, match, getRow(), getColumn(startIdx)));
+                stream.add(new PackedToken(t, match, getRow(), getColumn(startIdx)));
                 return;
             }
         }

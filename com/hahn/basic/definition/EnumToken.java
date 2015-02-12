@@ -81,6 +81,8 @@ public enum EnumToken implements IEnumRegexToken {
     THIS        ("this"       , Group.IDENT),
     SUPER       ("super"      , Group.IDENT),
     
+    COMMENT     ("\\\\[^\n]+" , Group.CMNT),
+    
     // Special reserved keywords
     /** super     */ __s__       ("__s__"      , Group.IDENT),
     /** construct */ __c__       ("__c__"      , Group.IDENT),
@@ -124,6 +126,8 @@ public enum EnumToken implements IEnumRegexToken {
         case Group.SEP:
             Group.separators.add(this);
             break;
+        case Group.CMNT:
+            break;
         default:
             throw new RuntimeException("Unhandled EnumToken group `" + group + "`");            
         }
@@ -146,6 +150,8 @@ public enum EnumToken implements IEnumRegexToken {
             return TextColor.YELLOW;
         case Group.SEP:
             return TextColor.GREY;
+        case Group.CMNT:
+            return TextColor.GREEN;
         default:
             throw new RuntimeException("Unhandled EnumToken group `" + group + "`");   
         }
@@ -169,6 +175,8 @@ public enum EnumToken implements IEnumRegexToken {
         public static final int OP    = 3;
         /** Separator (non-grouping) */
         public static final int SEP   = 4;
+        /** Comment */
+        public static final int CMNT  = 5;
         
         public static final List<EnumToken> identifiers = new ArrayList<EnumToken>();
         public static final List<EnumToken> literals    = new ArrayList<EnumToken>();

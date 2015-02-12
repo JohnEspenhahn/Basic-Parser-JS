@@ -17,11 +17,11 @@ abstract class IParser {
         this.EnumExpressions = enumExpressions;
     }
     
-    public Class<? extends IEnumRegexToken> getTokenClass() {
+    public final Class<? extends IEnumRegexToken> getTokenClass() {
         return EnumTokens;
     }
     
-    public Class<? extends IEnumExpression> getExpressionClass() {
+    public final Class<? extends IEnumExpression> getExpressionClass() {
         return EnumExpressions;
     }
     

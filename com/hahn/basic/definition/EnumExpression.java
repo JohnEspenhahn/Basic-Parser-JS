@@ -71,9 +71,9 @@ public enum EnumExpression implements IEnumExpression {
     
     BLOCK       ("OPEN_BRACE {<BLOCK_CNTNT>} CLOSE_BRACE|<BLOCK_CNTNT>", false),
     /** Stuff that can be done within if(){} */
-    BLOCK_CNTNT ("<DEFINE>EOL|<COMMAND>EOL|<EXPRESSION>EOL|<RETURN>|<IF_STMT>|<WHILE_STMT>|<FOR_STMT>|EOL", false),
+    BLOCK_CNTNT ("COMMENT|<DEFINE>EOL|<COMMAND>EOL|<EXPRESSION>EOL|<RETURN>|<IF_STMT>|<WHILE_STMT>|<FOR_STMT>|EOL", false),
     /** Stuff that can be done within class{} */
-    CLASS_CNTNT ("<DEF_FUNC>|<CONSTRUCTOR>|<DEFINE>EOL|EOL", false),
+    CLASS_CNTNT ("COMMENT|<DEF_FUNC>|<CONSTRUCTOR>|<DEFINE>EOL|EOL", false),
     
     IMPORT      ("IMPORT STRING EOL", false),
     DIRECTIVE   ("HASH IDENTIFIER", false),

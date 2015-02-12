@@ -462,7 +462,7 @@ public class Frame extends Statement {
                 doImport(child);
             } else if (token == EnumExpression.EXPRESSION) {
                 addCode(handleStatementExpression(child));
-            } else if (token == EnumToken.EOL || token == EnumToken.OPEN_BRACE || token == EnumToken.CLOSE_BRACE) {
+            } else if (token == EnumToken.COMMENT || token == EnumToken.EOL || token == EnumToken.OPEN_BRACE || token == EnumToken.CLOSE_BRACE) {
                 continue;
             } else {
                 throw new CompileException("Illegal left-hand side token `" + child + "`", child);
@@ -910,7 +910,7 @@ public class Frame extends Statement {
                 defineConstructor(child, classIn);
             } else if (token == EnumExpression.DEFINE) {
                 defineVar(child, classIn, true);
-            } else if (token == EnumToken.EOL) {
+            } else if (token == EnumToken.COMMENT || token == EnumToken.EOL) {
                 continue;
             } else if (token == EnumToken.CLOSE_BRACE) {
                 break;

@@ -7,7 +7,8 @@ public enum TextColor {
     LIGHT_BLUE(0x268BD2),
     YELLOW(0xB58900),
     BLACK(0x002B36),
-    GREY(0x586E75);
+    GREY(0x586E75),
+    GREEN(0x859900);
     
     private int hex;
     private Color color;
