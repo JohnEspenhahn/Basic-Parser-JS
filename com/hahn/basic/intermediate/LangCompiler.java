@@ -80,8 +80,6 @@ public class LangCompiler {
         }
         builder.appendString(builder.getContentEnd());        
         builder.appendString(builder.getEnd());
-     
-        ViewerBuilder.getViewer().setTextFromNode(h);
         
         return builder;
     }

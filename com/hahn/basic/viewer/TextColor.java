@@ -8,7 +8,8 @@ public enum TextColor {
     YELLOW(0xB58900),
     BLACK(0x002B36),
     GREY(0x586E75),
-    GREEN(0x859900);
+    GREEN(0x859900),
+    ERROR_RED(0xDC322F);
     
     private int hex;
     private Color color;

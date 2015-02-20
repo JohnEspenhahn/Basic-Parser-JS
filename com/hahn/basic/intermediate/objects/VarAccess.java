@@ -134,7 +134,7 @@ public abstract class VarAccess extends BasicObject {
      */
     
     public boolean isVarSuper() {
-        return var.isVarSuper();
+        return var.isVarSuper(); // Because of special case this should be right
     }
     
     public int getVarThisFlag() {

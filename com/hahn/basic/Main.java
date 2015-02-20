@@ -156,8 +156,9 @@ public abstract class Main {
     
     public void guiFileInput() {        
         JFileChooser chooser = new JFileChooser();
-        int result = chooser.showOpenDialog(null);
+        chooser.grabFocus();
         
+        int result = chooser.showOpenDialog(null);        
         if (result == JFileChooser.APPROVE_OPTION) {
             fileInput(chooser.getSelectedFile());
         } else {
@@ -277,7 +278,7 @@ public abstract class Main {
         library = false;
     }
     
-    private void toggleDebug() {
+    public void toggleDebug() {
         debug = !debug;
         System.out.println("Debug = " + debug);
         System.out.println();
@@ -287,7 +288,7 @@ public abstract class Main {
         return debug;
     }
     
-    private void togglePretty() {
+    public void togglePretty() {
         pretty = !pretty;
         System.out.println("Pretty = " + pretty);
         System.out.println();

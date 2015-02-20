@@ -399,8 +399,16 @@ public class Frame extends Statement {
             // Found
             if (obj != null) {
                 ClassType classIn = getClassIn();
-                if (classIn != null && obj.hasFlag(BitFlag.PRIVATE) && (obj.getVarThisFlag() == Var.NOT_THIS || !classIn.getDefinedParams().contains(obj.getAccessedObject()))) {
-                    throw new CompileException("The field `" + name + "` is private", nameNode);
+                if (classIn != null) {
+                    if (obj.getAccessedObject().getVarThisFlag() == Var.NOT_THIS) {
+                        nameNode.setColor(TextColor.LIGHT_BLUE);
+                    }
+                    
+                    boolean farAccess = (obj.getVarThisFlag() == Var.NOT_THIS
+                                    || !classIn.getDefinedParams().contains(obj.getAccessedObject()));
+                    if (obj.hasFlag(BitFlag.PRIVATE) && farAccess) {                        
+                        throw new CompileException("The field `" + name + "` is private", nameNode);
+                    }
                 }
                 
                 return obj;
@@ -586,8 +594,7 @@ public class Frame extends Statement {
                 } else {
                     if (prthNode != null) it.previous();
                     
-                    // XXX Color
-                    nameNode.color = TextColor.LIGHT_BLUE;
+                    nameNode.setColor(TextColor.LIGHT_BLUE);
                     
                     StructParam sp = exp.getObj().getType().getAsStruct().getParam(nameNode);                
                     exp.setObj(LangCompiler.factory.VarAccess(exp, exp.getObj(), sp, sp.getType(), child.getRow(), child.getCol()), child);
@@ -717,6 +724,8 @@ public class Frame extends Statement {
                 // Create var
                 final BasicObject obj;
                 if (struct != null) {
+                    node.setColor(TextColor.LIGHT_BLUE);
+                    
                     obj = struct.putParam(new Param(name, type, flags), node);
                 } else {
                     obj = LangCompiler.factory.VarLocal(this, name, type, flags);

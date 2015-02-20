@@ -56,6 +56,7 @@ public class Viewer extends JPanel implements ActionListener, DocumentListener {
     JLabel status;
     
     JMenuItem save, open;
+    JMenuItem debug, pretty;
     
     protected Viewer(JFrame frame) {
         this(frame, "");
@@ -67,19 +68,29 @@ public class Viewer extends JPanel implements ActionListener, DocumentListener {
         
         UIManager.put("Menu.font", FONT);
         JMenuBar menuBar = new JMenuBar();
-        JMenu menu = new JMenu("File");
-        menuBar.add(menu);        
+        JMenu fileMenu = new JMenu("File");
+        JMenu optionsMenu = new JMenu("Options");
+        menuBar.add(fileMenu);     
+        menuBar.add(optionsMenu);
         frame.setJMenuBar(menuBar);
         
         save = new JMenuItem("Save");
         save.setMnemonic(KeyEvent.VK_S);
         save.addActionListener(this);
-        menu.add(save);
+        fileMenu.add(save);
         
         open = new JMenuItem("Open");
         open.setMnemonic(KeyEvent.VK_O);
         open.addActionListener(this);
-        menu.add(open);
+        fileMenu.add(open);
+        
+        debug = new JMenuItem("Toggle Debug");
+        debug.addActionListener(this);
+        optionsMenu.add(debug);
+        
+        pretty = new JMenuItem("Toggle Pretty Print");
+        pretty.addActionListener(this);
+        optionsMenu.add(pretty);
         
         textArea = new JEditorPane();
         textArea.setContentType("text/html");
@@ -126,7 +137,6 @@ public class Viewer extends JPanel implements ActionListener, DocumentListener {
                     
                     int carot = textArea.getCaretPosition();
                     String html = n.getFormattedHTML();
-                    System.out.println(html);
                     textArea.setText("<html><pre>" + html + "</pre></html>");
                     textArea.setCaretPosition(carot);
                     
@@ -148,10 +158,15 @@ public class Viewer extends JPanel implements ActionListener, DocumentListener {
     
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == save) {
+        Object source = e.getSource();
+        if (source == save) {
             doSaveFile();
-        } else if (e.getSource() == open) {
+        } else if (source == open) {
             doOpenFile();
+        } else if (source == debug) {
+            Main.getInstance().toggleDebug();
+        } else if (source == pretty) {
+            Main.getInstance().togglePretty();
         }
     }   
     

@@ -19,7 +19,9 @@ public class Node {
     private final Enum<?> token;
     
     private String text, htmlText;
-    public TextColor color;
+    
+    private TextColor color;
+    private String hoverText;
     
     private final int row, col;
 
@@ -42,6 +44,8 @@ public class Node {
             
             this.value = value.trim();
         }
+        
+        this.hoverText = "";
         
         this.token = token;
         if (token instanceof EnumToken) this.color = ((EnumToken) token).getDefaultColor();
@@ -75,6 +79,16 @@ public class Node {
     public void setValue(String val) {
         this.value = val;
     }
+    
+    public void setColor(TextColor c) {
+        this.color = c;
+        this.hoverText = "";
+    }
+    
+    public void setErrorText(String text) {
+        this.color = TextColor.ERROR_RED;
+        this.hoverText = (text == null ? "" : text);
+    }
 
     public void print() {
         for (Node child : children)
@@ -85,11 +99,11 @@ public class Node {
         String str;
         if (isTerminal() && children.size() == 0) {
             String trimmed = htmlText.trim();
-            String ident = "<font color='" + color + "'>" + trimmed + "</font>";
+            String ident = "<font color='" + color + "'><span title='" + hoverText + "'>" + trimmed + "</span></font>";
             return htmlText.replace(trimmed, ident);
         } else if (isTerminal()) {
             String trimmed = htmlText.trim();
-            String ident = "<font color='" + color + "'>" + trimmed + "</font>";
+            String ident = "<font color='" + color + "'><span title='" + hoverText + "'>" + trimmed + "</span></font>";
             str = htmlText.replace(trimmed, ident);
         } else {
             str = "";

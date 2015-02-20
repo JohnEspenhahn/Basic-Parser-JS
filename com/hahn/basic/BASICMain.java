@@ -78,8 +78,9 @@ public class BASICMain extends Main {
     }
 
     private void handleStream() {
+        Node tree_head = null;
         try {
-            Node tree_head = parse();
+            tree_head = parse();
             
             if (tree_head != null) {                
                 // Print
@@ -98,6 +99,10 @@ public class BASICMain extends Main {
             e.printStackTrace();
         } finally {
             stream = null;
+        }
+        
+        if (tree_head != null) {
+            ViewerBuilder.getViewer().setTextFromNode(tree_head);
         }
     }
 

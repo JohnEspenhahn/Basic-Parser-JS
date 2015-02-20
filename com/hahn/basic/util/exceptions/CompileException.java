@@ -20,6 +20,8 @@ public class CompileException extends RuntimeException {
     
     public CompileException(String mss, Node node) {
         this(mss, node.getRow(), node.getCol());
+        
+        node.setErrorText(mss);
     }
     
     public CompileException(String mss, String badLinePart) {

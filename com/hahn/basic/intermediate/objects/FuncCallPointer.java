@@ -22,7 +22,7 @@ public abstract class FuncCallPointer extends FuncPointer {
     public FuncCallPointer(Node nameNode, BasicObject objectIn, BasicObject[] params) {
         super(nameNode, objectIn, new ParameterizedType<ITypeable>(Type.FUNCTION, (ITypeable[]) params));
 
-        nameNode.color = TextColor.GREY;
+        nameNode.setColor(TextColor.GREY);
         
         this.returnType = Type.UNDEFINED;
     }
