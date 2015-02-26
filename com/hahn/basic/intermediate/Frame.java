@@ -36,6 +36,7 @@ import static com.hahn.basic.definition.EnumToken.XOR;
 import static com.hahn.basic.definition.EnumToken.IDENTIFIER;
 import static com.hahn.basic.definition.EnumToken.THIS;
 import static com.hahn.basic.definition.EnumToken.SUPER;
+import static com.hahn.basic.definition.EnumToken.REGEX;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -79,7 +80,7 @@ import com.hahn.basic.util.NestedListIterator;
 import com.hahn.basic.util.Util;
 import com.hahn.basic.util.exceptions.CompileException;
 import com.hahn.basic.util.exceptions.DuplicateDefinitionException;
-import com.hahn.basic.viewer.TextColor;
+import com.hahn.basic.viewer.util.TextColor;
 
 public class Frame extends Statement {    
     private final Frame parent;
@@ -398,15 +399,10 @@ public class Frame extends Statement {
             
             // Found
             if (obj != null) {
-                ClassType classIn = getClassIn();
-                if (classIn != null) {
-                    if (obj.getAccessedObject().getVarThisFlag() == Var.NOT_THIS) {
-                        nameNode.setColor(TextColor.LIGHT_BLUE);
-                    }
-                    
-                    boolean farAccess = (obj.getVarThisFlag() == Var.NOT_THIS
-                                    || !classIn.getDefinedParams().contains(obj.getAccessedObject()));
-                    if (obj.hasFlag(BitFlag.PRIVATE) && farAccess) {                        
+                if (obj.getVarThisFlag() != Var.NOT_THIS) {
+                    nameNode.setColor(TextColor.LIGHT_BLUE);
+                } else if (obj.getVarThisFlag() == Var.NOT_THIS && obj != obj.getAccessedObject()) {
+                    if (obj.getAccessedObject().hasFlag(BitFlag.PRIVATE)) {
                         throw new CompileException("The field `" + name + "` is private", nameNode);
                     }
                 }
@@ -596,8 +592,12 @@ public class Frame extends Statement {
                     
                     nameNode.setColor(TextColor.LIGHT_BLUE);
                     
-                    StructParam sp = exp.getObj().getType().getAsStruct().getParam(nameNode);                
+                    StructParam sp = exp.getObj().getType().getAsStruct().getParam(nameNode);               
                     exp.setObj(LangCompiler.factory.VarAccess(exp, exp.getObj(), sp, sp.getType(), child.getRow(), child.getCol()), child);
+                    
+                    if (sp.hasFlag(BitFlag.PRIVATE)) {
+                        throw new CompileException("The field `" + nameNode.getValue() + "` is private", nameNode);
+                    }
                 }
             } else {
                 throw new CompileException("Illegal attempt to index var `" + exp.getObj() + "` of type `" + exp.getObj().getType() + "`", child);
@@ -1473,6 +1473,8 @@ public class Frame extends Statement {
                 return new LiteralBool(false);
             } else if (token == STRING) {
                 return LangCompiler.getString(val.substring(1, val.length() - 1));
+            } else if (token == REGEX) {
+                return LangCompiler.getRegex(val.substring(1, val.length() - 1));
             } else if (token == NULL) {
                 return LiteralNum.NULL;
             }

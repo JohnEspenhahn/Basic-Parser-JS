@@ -50,7 +50,7 @@ public enum EnumExpression implements IEnumExpression {
     C_FLAG      ("ABSTRACT|FINAL", false),
     C_PARENT    ("EXTENDS IDENTIFIER", false),
     
-    IDENTIFIER  ("STRING|IDENTIFIER|THIS|SUPER"),
+    IDENTIFIER  ("STRING|REGEX|IDENTIFIER|THIS|SUPER"),
     ACCESS      ("<IDENTIFIER> ?<IN_ACCESS>", false),
     CALL_FUNC   ("<IDENTIFIER> OPEN_PRNTH ?<CALL_PARAMS> CLOSE_PRNTH ?<IN_ACCESS>", false),
     

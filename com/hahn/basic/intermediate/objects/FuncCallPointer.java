@@ -8,7 +8,7 @@ import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.ParameterizedType;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.parser.Node;
-import com.hahn.basic.viewer.TextColor;
+import com.hahn.basic.viewer.util.TextColor;
 
 public abstract class FuncCallPointer extends FuncPointer {
     private Type returnType;

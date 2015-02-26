@@ -20,8 +20,6 @@ public class CompileException extends RuntimeException {
     
     public CompileException(String mss, Node node) {
         this(mss, node.getRow(), node.getCol());
-        
-        node.setErrorText(mss);
     }
     
     public CompileException(String mss, String badLinePart) {
@@ -32,5 +30,6 @@ public class CompileException extends RuntimeException {
         super(mss + " in line " + row + (col < 0 ? "" : "\n" + Main.getInstance().getLineStr(row).replace('\t', ' ') + "\n" + Util.createArrow(' ', '^', col)));
         
         this.message = mss;
+        Main.getInstance().setLineError(row, this);
     }
 }

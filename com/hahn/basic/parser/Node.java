@@ -9,7 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import com.hahn.basic.definition.EnumExpression;
 import com.hahn.basic.definition.EnumToken;
 import com.hahn.basic.lexer.PackedToken;
-import com.hahn.basic.viewer.TextColor;
+import com.hahn.basic.viewer.util.TextColor;
 
 public class Node {    
     private final Node parent;
@@ -21,7 +21,7 @@ public class Node {
     private String text, htmlText;
     
     private TextColor color;
-    private String hoverText;
+    private String errorText;
     
     private final int row, col;
 
@@ -40,12 +40,12 @@ public class Node {
         // For rendering
         if (value != null) {
             this.text = value;
-            this.htmlText = StringEscapeUtils.escapeHtml4(value).replace("\n", "<br>");
+            this.htmlText = StringEscapeUtils.escapeHtml4(value); // .replace("\n", "<br>\n");
             
             this.value = value.trim();
         }
         
-        this.hoverText = "";
+        this.errorText = "";
         
         this.token = token;
         if (token instanceof EnumToken) this.color = ((EnumToken) token).getDefaultColor();
@@ -82,12 +82,14 @@ public class Node {
     
     public void setColor(TextColor c) {
         this.color = c;
-        this.hoverText = "";
     }
     
     public void setErrorText(String text) {
-        this.color = TextColor.ERROR_RED;
-        this.hoverText = (text == null ? "" : text);
+        this.errorText = (text == null ? "" : text);
+    }
+    
+    public boolean hasError() {
+        return (errorText != null && errorText.length() > 0);
     }
 
     public void print() {
@@ -99,11 +101,11 @@ public class Node {
         String str;
         if (isTerminal() && children.size() == 0) {
             String trimmed = htmlText.trim();
-            String ident = "<font color='" + color + "'><span title='" + hoverText + "'>" + trimmed + "</span></font>";
+            String ident = "<font color='" + color + "' class='" + (hasError() ? "err" : "") + "'>" + trimmed + "</font>";
             return htmlText.replace(trimmed, ident);
         } else if (isTerminal()) {
             String trimmed = htmlText.trim();
-            String ident = "<font color='" + color + "'><span title='" + hoverText + "'>" + trimmed + "</span></font>";
+            String ident = "<font color='" + color + "' class='" + (hasError() ? "err" : "") + "'>" + trimmed + "</font>";
             str = htmlText.replace(trimmed, ident);
         } else {
             str = "";

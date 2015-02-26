@@ -4,10 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.hahn.basic.lexer.regex.IEnumRegexToken;
-import com.hahn.basic.viewer.TextColor;
+import com.hahn.basic.viewer.util.TextColor;
 
 public enum EnumToken implements IEnumRegexToken {
     STRING      ("\".*?[^\\\\]\""            , Group.LIT),
+    REGEX       ("/.*?/"                     , Group.LIT),
     HEX_INTEGER ("0x[0-9A-Fa-f]+"            , Group.LIT),
     FLOAT       ("[0-9]+\\.[0-9]*|\\.[0-9]+" , Group.LIT),
     INTEGER     ("[0-9]+"                    , Group.LIT), // [0-9]+\\.?[0-9]*
@@ -67,7 +68,7 @@ public enum EnumToken implements IEnumRegexToken {
     CONTINUE    ("continue"   , Group.IDENT),
     BREAK       ("break"      , Group.IDENT),
     RETURN      ("return"     , Group.IDENT),
-    FUNCTION    ("func"       , Group.IDENT),
+    FUNCTION    ("function"   , Group.IDENT),
     STRUCT      ("struct"     , Group.IDENT),
     TRUE        ("true"       , Group.IDENT),
     FALSE       ("false"      , Group.IDENT),
@@ -145,6 +146,7 @@ public enum EnumToken implements IEnumRegexToken {
             else return TextColor.YELLOW;
         case Group.LIT:
             if (this == STRING) return TextColor.LIGHT_BLUE;
+            else if (this == REGEX) return TextColor.LIGHT_BLUE;
             else return TextColor.GREY;
         case Group.OP:
             return TextColor.YELLOW;

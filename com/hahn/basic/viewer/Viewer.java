@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -30,14 +31,18 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.text.Style;
+import javax.swing.text.StyleConstants;
 import javax.swing.text.html.HTMLDocument;
+import javax.swing.text.html.StyleSheet;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.hahn.basic.Main;
 import com.hahn.basic.parser.Node;
-import com.sun.glass.events.KeyEvent;
+import com.hahn.basic.viewer.util.TextColor;
+import com.hahn.basic.viewer.util.TextLineNumber;
 
 public class Viewer extends JPanel implements ActionListener, DocumentListener {
     private static final long serialVersionUID = 4757110261297031804L;
@@ -46,6 +51,8 @@ public class Viewer extends JPanel implements ActionListener, DocumentListener {
     
     public static Color BACKGROUND = new Color(0xFDF6E3);
     public static Font FONT = new Font("Arial", Font.PLAIN, 20);
+    public static Dimension MIN_SIZE = new Dimension(30, 30);
+    public static Dimension PREF_SIZE = new Dimension(640, 480);
     
     private long lastTextChange;
     private boolean changed;
@@ -55,7 +62,7 @@ public class Viewer extends JPanel implements ActionListener, DocumentListener {
     JEditorPane textArea;
     JLabel status;
     
-    JMenuItem save, open;
+    JMenuItem save, saveAs, open;
     JMenuItem debug, pretty;
     
     protected Viewer(JFrame frame) {
@@ -79,6 +86,10 @@ public class Viewer extends JPanel implements ActionListener, DocumentListener {
         save.addActionListener(this);
         fileMenu.add(save);
         
+        saveAs = new JMenuItem("Save As");
+        saveAs.addActionListener(this);
+        fileMenu.add(saveAs);
+        
         open = new JMenuItem("Open");
         open.setMnemonic(KeyEvent.VK_O);
         open.addActionListener(this);
@@ -95,21 +106,37 @@ public class Viewer extends JPanel implements ActionListener, DocumentListener {
         textArea = new JEditorPane();
         textArea.setContentType("text/html");
         textArea.setBackground(BACKGROUND);
+        textArea.setPreferredSize(PREF_SIZE);
+        textArea.setMinimumSize(MIN_SIZE);
         textArea.setDoubleBuffered(true);
         textArea.getDocument().addDocumentListener(this);
         
         try {
-            ((HTMLDocument) textArea.getDocument()).getStyleSheet().addRule(
-                        StringUtils.join(Files.readAllLines(Paths.get("viewer.css"), StandardCharsets.UTF_8), "")
-                    );
+            StyleSheet ss = ((HTMLDocument) textArea.getDocument()).getStyleSheet(); 
+            ss.addRule(StringUtils.join(Files.readAllLines(Paths.get("viewer.css"), StandardCharsets.UTF_8), ""));
+            
+            Style s = ss.getRule("body");
+            Float lineSpacing = (Float) s.getAttribute(StyleConstants.LineSpacing);
+            String fontFamily = (String) s.getAttribute(StyleConstants.FontFamily);
+            Integer fontSize = (Integer) s.getAttribute(StyleConstants.FontSize);
+            Color foreground = (Color) s.getAttribute(StyleConstants.Foreground);
+            
+            textArea.setFont(new Font(fontFamily, Font.PLAIN, fontSize));
+            textArea.setForeground(foreground);
+            
+            textArea.getDocument().putProperty(StyleConstants.LineSpacing, (lineSpacing != null ? lineSpacing : 0));
         } catch (IOException e) {
             System.err.println("Failed to read 'viewer.css'!");
         }
         
+        TextLineNumber tln = new TextLineNumber(textArea);
+        tln.setCurrentLineForeground(getForeground());
+        
         JScrollPane scrollPane = new JScrollPane(textArea);
-        scrollPane.setPreferredSize(new Dimension(640, 480));
-        scrollPane.setMinimumSize(new Dimension(30, 30));
+        scrollPane.setPreferredSize(PREF_SIZE);
+        scrollPane.setMinimumSize(MIN_SIZE);
         scrollPane.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, TextColor.GREY.asColor()));
+        scrollPane.setRowHeaderView( tln );
         
         status = new JLabel();
         status.setFont(FONT);
@@ -152,21 +179,25 @@ public class Viewer extends JPanel implements ActionListener, DocumentListener {
         }
     }
     
-    public boolean needsUpdate() {
+    public boolean needsUpdate() {       
         return this.changed && (System.currentTimeMillis() - this.lastTextChange > DELAY_TIME);
     }
     
     @Override
     public void actionPerformed(ActionEvent e) {
         Object source = e.getSource();
-        if (source == save) {
+        if (source == saveAs) {
+            doSaveAsFile();
+        } else if (source == save) {
             doSaveFile();
         } else if (source == open) {
             doOpenFile();
         } else if (source == debug) {
             Main.getInstance().toggleDebug();
+            markChanged();
         } else if (source == pretty) {
             Main.getInstance().togglePretty();
+            markChanged();
         }
     }   
     
@@ -184,49 +215,60 @@ public class Viewer extends JPanel implements ActionListener, DocumentListener {
     public void changedUpdate(DocumentEvent e) { }
     
     private void markChanged() {
+        setStatus("");
+        
         changed = true;
         lastTextChange = System.currentTimeMillis();
     }
     
     private void doSaveFile() {
+        File f = Main.getInstance().getInputFile();
+        if (f != null) saveToFile(f);
+        else doSaveAsFile();
+    }
+    
+    private void doSaveAsFile() {
         JFileChooser chooser = new JFileChooser();
         int result = chooser.showSaveDialog(null);
         
         if (result == JFileChooser.APPROVE_OPTION) {
-            File f = chooser.getSelectedFile();
-            if (!f.exists() || f.isFile()) {
-                if (f.isFile()) {
-                    int replace = JOptionPane.showConfirmDialog(this, "The file '" + f.getName() + "' already exists. Replace it?", "Replace Existing File?", JOptionPane.YES_NO_OPTION);
-                    if (replace != JOptionPane.YES_OPTION) {
-                        JOptionPane.showMessageDialog(this, "Canceled");
-                        return;
-                    }
-                }
-                
-                FileOutputStream out = null;
-                try {
-                    f.delete();
-                    f.createNewFile();                    
-                    out = new FileOutputStream(f);
-                    if (node != null) out.write(node.getFormattedText().getBytes(Charset.defaultCharset()));
-                    
-                    JOptionPane.showMessageDialog(this, "Saved successfully");
-                } catch (Exception err) {
-                    err.printStackTrace();
-                } finally {
-                    if (out != null) { 
-                        try {
-                            out.close();
-                        } catch (IOException e1) {
-                            e1.printStackTrace();
-                        }
-                    }
-                }
-            } else {
-                JOptionPane.showMessageDialog(this, "Invalid file selected. Save canceled");
-            }
+            saveToFile(chooser.getSelectedFile());
         } else {
             System.out.println("ERROR: Canceled by user");
+        }
+    }
+    
+    private void saveToFile(File f) {
+        if (!f.exists() || f.isFile()) {
+            if (f.isFile()) {
+                int replace = JOptionPane.showConfirmDialog(this, "The file '" + f.getName() + "' already exists. Replace it?", "Replace Existing File?", JOptionPane.YES_NO_OPTION);
+                if (replace != JOptionPane.YES_OPTION) {
+                    JOptionPane.showMessageDialog(this, "Canceled");
+                    return;
+                }
+            }
+            
+            FileOutputStream out = null;
+            try {
+                f.delete();
+                f.createNewFile();                    
+                out = new FileOutputStream(f);
+                if (node != null) out.write(node.getFormattedText().getBytes(Charset.defaultCharset()));
+                
+                JOptionPane.showMessageDialog(this, "Saved successfully");
+            } catch (Exception err) {
+                err.printStackTrace();
+            } finally {
+                if (out != null) { 
+                    try {
+                        out.close();
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
+                }
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Invalid file selected. Save canceled");
         }
     }
 
@@ -252,7 +294,7 @@ public class Viewer extends JPanel implements ActionListener, DocumentListener {
         Main.getInstance().reset();
         Main.getInstance().handleInput();
         
-        setStatus("");
+        setStatus("Compiled");
     }
 
 

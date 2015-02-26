@@ -1,4 +1,4 @@
-package com.hahn.basic.viewer;
+package com.hahn.basic.viewer.util;
 
 import java.awt.Color;
 
@@ -9,7 +9,11 @@ public enum TextColor {
     BLACK(0x002B36),
     GREY(0x586E75),
     GREEN(0x859900),
-    ERROR_RED(0xDC322F);
+    RED(0xDC322F),
+    VIOLET(0x6C71C4),
+    MAGENTA(0xD33682),
+    ORANGE(0xCB4B16),
+    CYAN(0x2AA198);
     
     private int hex;
     private Color color;

@@ -121,7 +121,7 @@ public class JSPretty {
                 
                 if (require_brace) {
                     JSPretty.setTabs(getTabs() - 1);
-                    str.append(Main.getInstance().isPretty() ? "\n" + getIndent() + "}" : "}");
+                    str.append(Main.getInstance().isPretty() ? "\n" + getIndent() + "}\n" : "}");
                 } else {
                     JSPretty.setTabs(oldIndent);
                 }

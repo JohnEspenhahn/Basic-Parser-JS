@@ -27,6 +27,8 @@ public abstract class Main {
     
     private int row, col;
     private Stack<Integer> rows = new Stack<Integer>(), columns = new Stack<Integer>();
+    
+    private Map<Integer, CompileException> errors = new HashMap<Integer, CompileException>();
     private List<String> lines = new ArrayList<String>();
     
     private boolean debug = false, pretty = false, library = false;
@@ -66,6 +68,14 @@ public abstract class Main {
     
     public File getTargetFile() {
         return new File(inputFile.getAbsolutePath() + "." + getLangBuildTarget().getExtension());
+    }
+    
+    public File getInputFile() {
+        return new File(inputFile.getAbsolutePath() + "." + getLangBuildTarget().getInputExtension());
+    }
+    
+    public EnumInputType getInputType() {
+        return inputType;
     }
     
     public void run() {
@@ -139,6 +149,7 @@ public abstract class Main {
                 try {               
                     // Reset
                     lines.clear();
+                    errors.clear();
                     lines.add(input.trim());
                     
                     reset();                    
@@ -200,8 +211,6 @@ public abstract class Main {
             if (scanner != null) {
                 scanner.close();
             }
-            
-            inputFile = null;
         }
     }
     
@@ -256,8 +265,6 @@ public abstract class Main {
                 if (scanner != null) {
                     scanner.close();
                 }
-                
-                inputFile = null;
             }
         } else {
             throw new IllegalArgumentException("The given directory path is not a directory");
@@ -275,6 +282,7 @@ public abstract class Main {
     
     private void resetFile() {
         lines.clear();
+        errors.clear();
         library = false;
     }
     
@@ -311,7 +319,7 @@ public abstract class Main {
         else System.out.println("ERROR: " + e.getMessage());
     }
     
-    public List<String> getLines() {
+    protected List<String> getLines() {
         return lines;
     }
     
@@ -338,6 +346,10 @@ public abstract class Main {
     public void setLine(int row, int col) {
         this.row = row;
         this.col = col;
+    }
+    
+    public void setLineError(int row, CompileException e) {
+        errors.put(row, e);
     }
     
     public void pushLine(int row, int col) {

@@ -57,7 +57,7 @@ public class BasicLexer implements ILexer {
         while (index < line.length()) {
             char c = getChar();
             
-            if (c == '/') {
+            if (c == '/' && next() == '/') {
                 handleComment();
             } else if (isWhitespace(c)) {
                 handleWhitespace(c);
@@ -71,6 +71,8 @@ public class BasicLexer implements ILexer {
                 matchChar();
             } else if (c == '"') {
                 matchString();
+            } else if (c == '/') {
+                matchRegex();
             } else if (isOperator(c)) {
                 matchOperator();
             } else if (isSeparator(c)) {
@@ -229,6 +231,24 @@ public class BasicLexer implements ILexer {
             
             String match = getMatch();
             stream.add(new PackedToken(EnumToken.STRING, match, getRow(), getColumn(startIdx)));
+        }
+    }
+    
+    private void matchRegex() {
+        final int startIdx = index;
+        
+        char c = 0;
+        do {
+            index += 1;
+        } while (index < line.length() && (c = getChar()) != '/');
+        
+        if (c != '/') {
+            throw new LexException(getRow(), getColumn());
+        } else {
+            index += 1;
+            
+            String match = getMatch();
+            stream.add(new PackedToken(EnumToken.REGEX, match, getRow(), getColumn(startIdx)));
         }
     }
     

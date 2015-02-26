@@ -17,7 +17,6 @@ import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.parser.Node;
 import com.hahn.basic.target.ILangFactory;
 import com.hahn.basic.target.LangBuildTarget;
-import com.hahn.basic.viewer.ViewerBuilder;
 
 public class LangCompiler {    
     private static Map<String, Library> libs = new HashMap<String, Library>();
@@ -134,6 +133,15 @@ public class LangCompiler {
     		
     		return strConst;
     	}
+    }
+    
+    /**
+     * Convert a regex to a string constant
+     * @param str The string to get (does not need inner parenthesis)
+     * @return StringConst
+     */
+    public static StringConst getRegex(String str) {
+       return getString(str.replace("\\", "\\\\"));
     }
     
     public static FuncHead defineFunc(String inName, String outName, Type rtnType, Param... params) {

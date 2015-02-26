@@ -56,7 +56,7 @@ public class BASICMain extends Main {
     public void handleInput() {
         long start = System.currentTimeMillis();
         
-        ViewerBuilder.create();
+        if (showViewer()) ViewerBuilder.create();
         
         /*
         Viewer.setText(
@@ -101,8 +101,18 @@ public class BASICMain extends Main {
             stream = null;
         }
         
-        if (tree_head != null) {
+        if (tree_head != null && showViewer()) {
             ViewerBuilder.getViewer().setTextFromNode(tree_head);
+        }
+    }
+    
+    public boolean showViewer() {
+        switch (getInputType()) {
+        case FILE:
+        case GUI_FILE:
+            return true;
+        default:
+            return false;
         }
     }
 
