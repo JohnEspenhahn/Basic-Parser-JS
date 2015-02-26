@@ -1,4 +1,5 @@
 package com.hahn.basic.viewer.util;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -7,9 +8,13 @@ import java.awt.Graphics;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -37,9 +42,9 @@ import javax.swing.text.Utilities;
  *  This class was designed to be used as a component added to the row header
  *  of a JScrollPane.
  */
-public class TextLineNumber extends JPanel implements CaretListener, DocumentListener, PropertyChangeListener {
-    private static final long serialVersionUID = 5691335305677522475L;
-    
+public class TextLineNumber extends JPanel
+    implements CaretListener, DocumentListener, PropertyChangeListener, MouseMotionListener
+{
     public final static float LEFT = 0.0f;
     public final static float CENTER = 0.5f;
     public final static float RIGHT = 1.0f;
@@ -68,6 +73,9 @@ public class TextLineNumber extends JPanel implements CaretListener, DocumentLis
     private int lastLine;
 
     private HashMap<String, FontMetrics> fonts;
+    private HashMap<String, String> lineErrors;
+    private List<LineNumber> lineNumberRects;
+    private LineNumber hoveringOver;
 
     /**
      *  Create a line number component for a text component. This minimum
@@ -90,13 +98,17 @@ public class TextLineNumber extends JPanel implements CaretListener, DocumentLis
     public TextLineNumber(JTextComponent component, int minimumDisplayDigits)
     {
         this.component = component;
-
+        this.lineErrors = new HashMap<String, String>();
+        this.lineNumberRects = new ArrayList<LineNumber>();
+        
         setFont( component.getFont() );
 
         setBorderGap( 5 );
         setCurrentLineForeground( Color.RED );
         setDigitAlignment( RIGHT );
         setMinimumDisplayDigits( minimumDisplayDigits );
+        
+        addMouseMotionListener(this);
 
         component.getDocument().addDocumentListener(this);
         component.addCaretListener( this );
@@ -219,6 +231,14 @@ public class TextLineNumber extends JPanel implements CaretListener, DocumentLis
         this.minimumDisplayDigits = minimumDisplayDigits;
         setPreferredWidth();
     }
+    
+    public void putLineError(int line, String mss) {
+        lineErrors.put(String.valueOf(line), mss);
+    }
+    
+    public void clearLineErrors() {
+        lineErrors.clear();
+    }
 
     /**
      *  Calculate the width needed to display the maximum line number
@@ -265,16 +285,12 @@ public class TextLineNumber extends JPanel implements CaretListener, DocumentLis
         Rectangle clip = g.getClipBounds();
         int rowStartOffset = component.viewToModel( new Point(0, clip.y) );
         int endOffset = component.viewToModel( new Point(0, clip.y + clip.height) );
-
+        
+        lineNumberRects.clear();
         while (rowStartOffset <= endOffset)
         {
             try
             {
-                if (isCurrentLine(rowStartOffset))
-                    g.setColor( getCurrentLineForeground() );
-                else
-                    g.setColor( getForeground() );
-
                 //  Get the line number as a string and then determine the
                 //  "X" and "Y" offsets for drawing the string.
 
@@ -282,13 +298,39 @@ public class TextLineNumber extends JPanel implements CaretListener, DocumentLis
                 int stringWidth = fontMetrics.stringWidth( lineNumber );
                 int x = getOffsetX(availableWidth, stringWidth) + insets.left;
                 int y = getOffsetY(rowStartOffset, fontMetrics);
+                
+                if (lineErrors.containsKey(lineNumber))
+                    g.setColor( TextColor.RED.getColor() );
+                else if (isCurrentLine(rowStartOffset))
+                    g.setColor( getCurrentLineForeground() );
+                else
+                    g.setColor( getForeground() );
+                
                 g.drawString(lineNumber, x, y);
-
+                
+                int ascent = fontMetrics.getAscent();
+                LineNumber ln = new LineNumber(lineNumber, x, y - ascent, stringWidth, ascent);
+                // g.drawRect(ln.x, ln.y, ln.width, ln.height);
+                lineNumberRects.add(ln);
+                
                 //  Move to the next row
 
                 rowStartOffset = Utilities.getRowEnd(component, rowStartOffset) + 1;
             }
             catch(Exception e) {break;}
+        }
+        
+        // Draw hover text
+        if (hoveringOver != null) {
+            String err = lineErrors.get(hoveringOver.getLine());
+            if (err != null) {
+                setToolTipText(err);
+                // g.drawString(err, hoveringOver.x + hoveringOver.width / 2, hoveringOver.y);
+            } else {
+                setToolTipText(null);
+            }
+        } else {
+            setToolTipText(null);
         }
     }
 
@@ -340,8 +382,46 @@ public class TextLineNumber extends JPanel implements CaretListener, DocumentLis
         //  Get the bounding rectangle of the row
 
         Rectangle r = component.modelToView( rowStartOffset );
+        int lineHeight = fontMetrics.getHeight();
         int y = r.y + r.height;
-        int descent = fontMetrics.getHeight();
+        int descent = 0;
+
+        //  The text needs to be positioned above the bottom of the bounding
+        //  rectangle based on the descent of the font(s) contained on the row.
+
+        if (r.height == lineHeight)  // default font is being used
+        {
+            descent = fontMetrics.getDescent();
+        }
+        else  // We need to check all the attributes for font changes
+        {
+            if (fonts == null)
+                fonts = new HashMap<String, FontMetrics>();
+
+            Element root = component.getDocument().getDefaultRootElement();
+            int index = root.getElementIndex( rowStartOffset );
+            Element line = root.getElement( index );
+
+            for (int i = 0; i < line.getElementCount(); i++)
+            {
+                Element child = line.getElement(i);
+                AttributeSet as = child.getAttributes();
+                String fontFamily = (String)as.getAttribute(StyleConstants.FontFamily);
+                Integer fontSize = (Integer)as.getAttribute(StyleConstants.FontSize);
+                String key = fontFamily + fontSize;
+
+                FontMetrics fm = fonts.get( key );
+
+                if (fm == null)
+                {
+                    Font font = new Font(fontFamily, Font.PLAIN, fontSize);
+                    fm = component.getFontMetrics( font );
+                    fonts.put(key, fm);
+                }
+
+                descent = Math.max(descent, fm.getDescent());
+            }
+        }
 
         return y - descent;
     }
@@ -438,6 +518,46 @@ public class TextLineNumber extends JPanel implements CaretListener, DocumentLis
             {
                 repaint();
             }
+        }
+    }
+
+    @Override
+    public void mouseDragged(MouseEvent e) { }
+
+    @Override
+    public void mouseMoved(MouseEvent e) {
+        Point p = e.getPoint();
+        
+        hoveringOver = null;
+        for (LineNumber l: lineNumberRects) {
+            if (l.contains(p)) {
+                hoveringOver = l;                
+                break;
+            }
+        }
+        
+        // Repaint
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                repaint();
+            }
+        });
+    }
+    
+    static class LineNumber extends Rectangle {
+        private static final long serialVersionUID = 83259440633339810L;
+        
+        private String line;
+        
+        public LineNumber(String line, int x, int y, int width, int height) {
+            super(x, y, width, height);
+            
+            this.line = line;
+        }
+        
+        public String getLine() {
+            return line;
         }
     }
 }

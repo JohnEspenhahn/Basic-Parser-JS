@@ -2,6 +2,8 @@ package com.hahn.basic.viewer;
 
 import javax.swing.JFrame;
 
+import com.hahn.basic.Main;
+
 public final class ViewerBuilder {
     
     private static Viewer view;
@@ -27,6 +29,18 @@ public final class ViewerBuilder {
         if (view == null) ViewerBuilder.create();
         
         return view;
+    }
+    
+    public static void putLineError(int line, String mss) {
+        if (view != null) {
+            view.putLineError(line, mss);
+        }
+    }
+    
+    public static void clearLineErrors() {
+        if (view != null) {
+            view.clearLineErrors();
+        }
     }
     
 }

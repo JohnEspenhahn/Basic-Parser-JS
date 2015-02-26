@@ -134,7 +134,7 @@ public class ClassType extends StructType {
      * @return This
      */
     public ClassType systemParam(String name, Type type, String outName, boolean override) {
-        super.addParam(new Node(null, null, name, -1, -1), type, outName, override);
+        super.addParam(new Node(null, null, name, -1, -1, -1), type, outName, override);
         return this;
     }
     

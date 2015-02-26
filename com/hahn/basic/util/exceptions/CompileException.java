@@ -8,6 +8,7 @@ import com.hahn.basic.util.Util;
 public class CompileException extends RuntimeException {
     private static final long serialVersionUID = 4974149633641094015L;
     
+    final int row;
     final String message;
     
     public CompileException(String mss) {
@@ -29,7 +30,16 @@ public class CompileException extends RuntimeException {
     public CompileException(String mss, int row, int col) {
         super(mss + " in line " + row + (col < 0 ? "" : "\n" + Main.getInstance().getLineStr(row).replace('\t', ' ') + "\n" + Util.createArrow(' ', '^', col)));
         
+        this.row = row;
         this.message = mss;
-        Main.getInstance().setLineError(row, this);
+        Main.getInstance().putLineError(this);
+    }
+    
+    public int getRow() {
+        return row;
+    }
+    
+    public String getTooltipMessage() {
+        return message;
     }
 }

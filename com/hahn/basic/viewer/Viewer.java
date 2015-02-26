@@ -1,7 +1,6 @@
 package com.hahn.basic.viewer;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -11,12 +10,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 import javax.swing.BorderFactory;
-import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -26,18 +21,13 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.text.Style;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.html.HTMLDocument;
-import javax.swing.text.html.StyleSheet;
-
-import org.apache.commons.lang3.StringEscapeUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import com.hahn.basic.Main;
 import com.hahn.basic.parser.Node;
@@ -49,8 +39,8 @@ public class Viewer extends JPanel implements ActionListener, DocumentListener {
     
     private static final int DELAY_TIME = 2500;
     
-    public static Color BACKGROUND = new Color(0xFDF6E3);
-    public static Font FONT = new Font("Arial", Font.PLAIN, 20);
+    public static Font FONT = new Font("Serif", Font.PLAIN, 24);
+    public static Font UI_FONT = new Font("Arial", Font.PLAIN, 20);
     public static Dimension MIN_SIZE = new Dimension(30, 30);
     public static Dimension PREF_SIZE = new Dimension(640, 480);
     
@@ -59,7 +49,8 @@ public class Viewer extends JPanel implements ActionListener, DocumentListener {
     
     private Node node;
     
-    JEditorPane textArea;
+    TextLineNumber tln;
+    JTextPane textArea;
     JLabel status;
     
     JMenuItem save, saveAs, open;
@@ -71,9 +62,12 @@ public class Viewer extends JPanel implements ActionListener, DocumentListener {
     
     protected Viewer(JFrame frame, String text) {        
         setLayout(new BorderLayout());
-        setBackground(BACKGROUND);
+        setBackground(TextColor.PALE.getColor());
         
-        UIManager.put("Menu.font", FONT);
+        ToolTipManager.sharedInstance().setInitialDelay(100);
+        ToolTipManager.sharedInstance().setDismissDelay(10000);
+        
+        UIManager.put("Menu.font", UI_FONT);
         JMenuBar menuBar = new JMenuBar();
         JMenu fileMenu = new JMenu("File");
         JMenu optionsMenu = new JMenu("Options");
@@ -103,46 +97,30 @@ public class Viewer extends JPanel implements ActionListener, DocumentListener {
         pretty.addActionListener(this);
         optionsMenu.add(pretty);
         
-        textArea = new JEditorPane();
-        textArea.setContentType("text/html");
-        textArea.setBackground(BACKGROUND);
+        textArea = new JTextPane();
+        textArea.setBackground(TextColor.PALE.getColor());
+        textArea.setForeground(TextColor.GREY.getColor());
+        textArea.setFont(FONT);
         textArea.setPreferredSize(PREF_SIZE);
         textArea.setMinimumSize(MIN_SIZE);
         textArea.setDoubleBuffered(true);
         textArea.getDocument().addDocumentListener(this);
         
-        try {
-            StyleSheet ss = ((HTMLDocument) textArea.getDocument()).getStyleSheet(); 
-            ss.addRule(StringUtils.join(Files.readAllLines(Paths.get("viewer.css"), StandardCharsets.UTF_8), ""));
-            
-            Style s = ss.getRule("body");
-            Float lineSpacing = (Float) s.getAttribute(StyleConstants.LineSpacing);
-            String fontFamily = (String) s.getAttribute(StyleConstants.FontFamily);
-            Integer fontSize = (Integer) s.getAttribute(StyleConstants.FontSize);
-            Color foreground = (Color) s.getAttribute(StyleConstants.Foreground);
-            
-            textArea.setFont(new Font(fontFamily, Font.PLAIN, fontSize));
-            textArea.setForeground(foreground);
-            
-            textArea.getDocument().putProperty(StyleConstants.LineSpacing, (lineSpacing != null ? lineSpacing : 0));
-        } catch (IOException e) {
-            System.err.println("Failed to read 'viewer.css'!");
-        }
-        
-        TextLineNumber tln = new TextLineNumber(textArea);
-        tln.setCurrentLineForeground(getForeground());
+        tln = new TextLineNumber(textArea);
+        tln.setForeground(textArea.getForeground());
+        tln.setCurrentLineForeground(TextColor.BLACK.getColor());
         
         JScrollPane scrollPane = new JScrollPane(textArea);
         scrollPane.setPreferredSize(PREF_SIZE);
         scrollPane.setMinimumSize(MIN_SIZE);
-        scrollPane.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, TextColor.GREY.asColor()));
+        scrollPane.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, TextColor.GREY.getColor()));
         scrollPane.setRowHeaderView( tln );
         
         status = new JLabel();
-        status.setFont(FONT);
+        status.setFont(UI_FONT);
         status.setPreferredSize(new Dimension(100, 30));
         status.setMinimumSize(new Dimension(100, 30));
-        status.setForeground(TextColor.GREY.asColor());
+        status.setForeground(TextColor.GREY.getColor());
         status.setHorizontalAlignment(SwingConstants.RIGHT);
         status.setHorizontalTextPosition(SwingConstants.RIGHT);
         status.setVerticalAlignment(SwingConstants.CENTER);
@@ -162,10 +140,14 @@ public class Viewer extends JPanel implements ActionListener, DocumentListener {
                     
                     lastTextChange = System.currentTimeMillis();
                     
+                    textArea.setText(n.getFormattedText());
+                    
                     int carot = textArea.getCaretPosition();
-                    String html = n.getFormattedHTML();
-                    textArea.setText("<html><pre>" + html + "</pre></html>");
+                    int maxPosition = textArea.getText().length();
+                    if (carot >= maxPosition) carot = maxPosition;
                     textArea.setCaretPosition(carot);
+                    
+                    n.colorTextArea(textArea.getStyledDocument());
                     
                     changed = false;
                 }
@@ -281,15 +263,7 @@ public class Viewer extends JPanel implements ActionListener, DocumentListener {
         
         setStatus("Recompiling...");
         
-        String text = textArea.getText();
-        int start = text.indexOf("<pre>");
-        int end = text.indexOf("</pre>");
-        
-        text = text.substring(start + 5, end);
-        text = text.replaceAll("<br>", "\n");
-        text = text.replaceAll("<.+?>", "");
-        text = StringEscapeUtils.unescapeHtml4(text);
-        
+        String text = textArea.getText();        
         Main.getInstance().parseLinesFromString(text);        
         Main.getInstance().reset();
         Main.getInstance().handleInput();
@@ -297,5 +271,12 @@ public class Viewer extends JPanel implements ActionListener, DocumentListener {
         setStatus("Compiled");
     }
 
+    public void putLineError(int line, String mss) {
+        tln.putLineError(line, mss);
+    }
+    
+    public void clearLineErrors() {
+        tln.clearLineErrors();
+    }
 
 }

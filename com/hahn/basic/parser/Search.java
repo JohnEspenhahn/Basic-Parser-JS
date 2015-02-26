@@ -67,7 +67,7 @@ class Search extends IParser {
             if (this.temp_node != null && this.temp_node.getRow() == startToken.row && this.temp_node.getCol() == startToken.col) {
                 this.temp_node.clearChildren();
             } else {
-                this.temp_node = new Node(Owner.getNode(), (Enum<?>) ParentExpression, startToken.row, startToken.col);
+                this.temp_node = new Node(Owner.getNode(), (Enum<?>) ParentExpression, startToken.idx, startToken.row, startToken.col);
             }
         } else { 
             this.temp_node = null;

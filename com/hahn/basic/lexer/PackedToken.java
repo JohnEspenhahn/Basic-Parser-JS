@@ -5,12 +5,13 @@ public class PackedToken {
     public final Enum<?> token;
     public final String value;
     
-    public final int row, col;
+    public final int idx, row, col;
 
-    public PackedToken(Enum<?> token, String val, int row, int col) {
+    public PackedToken(Enum<?> token, String val, int idx, int row, int col) {
         this.token = token;
         this.value = val;
         
+        this.idx = idx;
         this.row = row;
         this.col = col;
     }

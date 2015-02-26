@@ -78,6 +78,7 @@ public class RegexLexer implements ILexer {
     public List<PackedToken> lex(List<String> input) {
         List<PackedToken> stream = new ArrayList<PackedToken>();
         
+        int idx = 0;
         Iterator<String> it = input.iterator();
         for (int row = 1; it.hasNext(); row++) {
             String line = it.next();
@@ -122,12 +123,15 @@ public class RegexLexer implements ILexer {
                             
                         // Code
                         } else if (!comment) {
-                            stream.add(new PackedToken((Enum<?>) Tokens[g - 5], group, row, matcher.start()));
+                            int col = matcher.start();
+                            stream.add(new PackedToken((Enum<?>) Tokens[g - 5], group, idx + col, row, col));
                         }
                         break;
                     }
                 }
             }
+            
+            idx += line.length();
     
             // Ensure full match
             if (lastEnd != line.length()) {

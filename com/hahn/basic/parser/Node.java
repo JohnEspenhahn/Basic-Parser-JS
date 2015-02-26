@@ -3,7 +3,8 @@ package com.hahn.basic.parser;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.StringEscapeUtils;
+import javax.swing.text.StyledDocument;
+
 import org.apache.commons.lang3.StringUtils;
 
 import com.hahn.basic.definition.EnumExpression;
@@ -18,30 +19,29 @@ public class Node {
     private String value;
     private final Enum<?> token;
     
-    private String text, htmlText;
+    private String text;
     
     private TextColor color;
     private String errorText;
     
-    private final int row, col;
+    private final int idx, row, col;
 
     public Node(Node parent, PackedToken packedToken) {
-        this(parent, (Enum<?>) packedToken.token, packedToken.value, packedToken.row, packedToken.col);
+        this(parent, (Enum<?>) packedToken.token, packedToken.value, packedToken.idx, packedToken.row, packedToken.col);
     }
 
-    public Node(Node parent, Enum<?> token, int row, int col) {
-        this(parent, token, null, row, col);
+    public Node(Node parent, Enum<?> token, int idx, int row, int col) {
+        this(parent, token, null, idx, row, col);
     }
     
-    public Node(Node parent, Enum<?> token, String value, int row, int col) {
+    public Node(Node parent, Enum<?> token, String value, int idx, int row, int col) {
+        this.idx = idx;
         this.row = row;
         this.col = col;
         
         // For rendering
         if (value != null) {
-            this.text = value;
-            this.htmlText = StringEscapeUtils.escapeHtml4(value); // .replace("\n", "<br>\n");
-            
+            this.text = value;            
             this.value = value.trim();
         }
         
@@ -56,11 +56,20 @@ public class Node {
     }
 
     private Node() {
-        this(null, EnumExpression.START, 0, 0);
+        this(null, EnumExpression.START, 0, 0, 0);
     }
 
     public static Node newTopNode() {
         return new Node();
+    }
+    
+    public int getIdx() {
+        return idx;
+    }
+    
+    public int getLength() {
+        if (value != null) return value.length();
+        else return 0;
     }
     
     public int getRow() {
@@ -69,6 +78,10 @@ public class Node {
     
     public int getCol() {
         return col;
+    }
+    
+    public TextColor getColor() {
+        return color;
     }
     
     /**
@@ -97,27 +110,6 @@ public class Node {
             child.printChildren(0);
     }
     
-    public String getFormattedHTML() {
-        String str;
-        if (isTerminal() && children.size() == 0) {
-            String trimmed = htmlText.trim();
-            String ident = "<font color='" + color + "' class='" + (hasError() ? "err" : "") + "'>" + trimmed + "</font>";
-            return htmlText.replace(trimmed, ident);
-        } else if (isTerminal()) {
-            String trimmed = htmlText.trim();
-            String ident = "<font color='" + color + "' class='" + (hasError() ? "err" : "") + "'>" + trimmed + "</font>";
-            str = htmlText.replace(trimmed, ident);
-        } else {
-            str = "";
-        }
-        
-        for (Node child : children) {
-            if (child != this) str += child.getFormattedHTML();
-        }
-        
-        return str;
-    }
-    
     public String getFormattedText() {
         String str;
         if (isTerminal() && children.size() == 0) {
@@ -135,6 +127,16 @@ public class Node {
         return str;
     }
 
+    public void colorTextArea(StyledDocument doc) {
+        if (isTerminal()) {
+            doc.setCharacterAttributes(getIdx(), getLength(), color.getAttribute(), false);
+        } else {
+            for (Node child : children) {
+                child.colorTextArea(doc);
+            }
+        }
+    }
+    
     private void printChildren(int space) {
         for (int i = 0; i < space; i++)
             System.out.print("  ");

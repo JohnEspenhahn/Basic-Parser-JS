@@ -18,6 +18,7 @@ import com.hahn.basic.target.LangBuildTarget;
 import com.hahn.basic.target.js.JSLangFactory;
 import com.hahn.basic.util.EnumInputType;
 import com.hahn.basic.util.exceptions.CompileException;
+import com.hahn.basic.viewer.ViewerBuilder;
 
 public abstract class Main {
     private static Main instance;
@@ -28,7 +29,6 @@ public abstract class Main {
     private int row, col;
     private Stack<Integer> rows = new Stack<Integer>(), columns = new Stack<Integer>();
     
-    private Map<Integer, CompileException> errors = new HashMap<Integer, CompileException>();
     private List<String> lines = new ArrayList<String>();
     
     private boolean debug = false, pretty = false, library = false;
@@ -149,7 +149,7 @@ public abstract class Main {
                 try {               
                     // Reset
                     lines.clear();
-                    errors.clear();
+                    clearLineErrors();
                     lines.add(input.trim());
                     
                     reset();                    
@@ -282,7 +282,7 @@ public abstract class Main {
     
     private void resetFile() {
         lines.clear();
-        errors.clear();
+        clearLineErrors();
         library = false;
     }
     
@@ -348,8 +348,12 @@ public abstract class Main {
         this.col = col;
     }
     
-    public void setLineError(int row, CompileException e) {
-        errors.put(row, e);
+    public void putLineError(CompileException e) {
+        ViewerBuilder.putLineError(e.getRow(), e.getTooltipMessage());
+    }
+    
+    public void clearLineErrors() {
+        ViewerBuilder.clearLineErrors();
     }
     
     public void pushLine(int row, int col) {
