@@ -71,7 +71,7 @@ public abstract class Main {
     }
     
     public File getInputFile() {
-        return new File(inputFile.getAbsolutePath() + "." + getLangBuildTarget().getInputExtension());
+        return inputFile;
     }
     
     public EnumInputType getInputType() {

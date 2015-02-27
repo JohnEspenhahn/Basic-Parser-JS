@@ -206,7 +206,7 @@ public abstract class FuncHead extends Frame {
     
     @Override
     public String toString() {
-        return String.format("%s %s(%s) { %s }", getReturnType(), getName(), StringUtils.join(params, ", "), super.toString()); 
+        return String.format("%s%s %s(%s)", BitFlag.asString(flags), getReturnType(), getName(), StringUtils.join(params, ", ")); 
     }
     
     @Override

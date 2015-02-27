@@ -25,4 +25,14 @@ public enum BitFlag {
     public static int valueOf(Node node) {
         return BitFlag.valueOf(node.getAsChildren().get(0).getValue().toUpperCase()).b;
     }
+    
+    public static String asString(int flag) {
+        String str = "";
+        for (BitFlag f: BitFlag.values()) {
+            if ((f.b & flag) != 0) {
+                str += f.name().toLowerCase() + " ";
+            }
+        }
+        return str;
+    }
 }

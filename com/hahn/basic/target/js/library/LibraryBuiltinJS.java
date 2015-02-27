@@ -41,6 +41,6 @@ public class LibraryBuiltinJS extends Library {
     
     @Override
     public String toTarget() {
-        return "<script>String.fromObject=function(s){return ''+s}String.prototype.matches=function(s){s=this.match(s);return s!=null&&s[0]==this}</script>";
+        return "<script>String.fromObject=function(s){return ''+s};String.prototype.matches=function(s){s=this.match(s);return s!=null&&s[0]==this}</script>";
     }
 }

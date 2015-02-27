@@ -178,7 +178,7 @@ public class ClassType extends StructType {
      * @throw CompileException If the requested function is not defined
      */
     public FuncHead getFunc(BasicObject objIn, Node nameNode, ITypeable[] types) {
-        return getFunc(objIn, nameNode, types, false);
+        return getFunc(objIn, nameNode, types, false, false);
     }
     
     /**
@@ -186,27 +186,28 @@ public class ClassType extends StructType {
      * @param objIn The object the function is in or null
      * @param nameNode The node that contains the requested name
      * @param safe If false can throw an exception
+     * @param shallow If true only search this class, not super
      * @return The function; or, if `safe` is true and there is an error, null
      * @throw CompileException If `safe` is false and the function is not defined
      */
-    public FuncHead getFunc(BasicObject objIn, Node nameNode, ITypeable[] types, boolean safe) {
+    public FuncHead getFunc(BasicObject objIn, Node nameNode, ITypeable[] types, boolean safe, boolean shallow) {
         boolean findingConstructor = Util.isConstructorName(nameNode.getValue());
         
         String name = nameNode.getValue();
         FuncHead func = funcBridge.getFunc(name, types);
         if (func != null) {
-            return func;
-        } else if (getParent() instanceof ClassType) {
-            func = ((ClassType) getParent()).getFunc(objIn, nameNode, types, true);
+            return getValidFuncAccess(objIn, nameNode, func, safe);
+        } else if (!shallow && getParent() instanceof ClassType) {
+            func = ((ClassType) getParent()).getFunc(objIn, nameNode, types, true, shallow);
             if (func != null) {
                 if (func.hasFlag(BitFlag.PRIVATE)) {
                     if (!safe) {
-                        throw new CompileException("The function `" + name + "(" + Util.joinTypes(types, ',') + ")` is private");
+                        throw new CompileException("The function `" + func + "` is private");
                     } else {
                         return null;
                     }
                 } else {
-                    return func;
+                    return getValidFuncAccess(objIn, nameNode, func, safe);
                 }
             }
         } 
@@ -214,9 +215,27 @@ public class ClassType extends StructType {
         // If reached this point then not found
         if (!safe) {
             if (findingConstructor) throw new CompileException("Unknown contructor with parameters `(" + Util.joinTypes(types, ',') + ")` in " + this, nameNode);
-            else throw new CompileException("Unknown function `" + name + "(" + Util.joinTypes(types, ',') + ")` in " + this, nameNode);
+            else throw new CompileException("Unknown function `" + func + "` in " + this, nameNode);
         } else {
             return null;
+        }
+    }
+    
+    /**
+     * Validate accessing the function through valid means
+     * @param objIn The object the function is in or null
+     * @param nameNode The node that contains the requested name
+     * @param func The function being accessed
+     * @param safe If false can throw an exception
+     * @return The function; or, if `safe` is true and there is an error, null
+     * @throw CompileException If `safe` is false and the function is not defined
+     */
+    private FuncHead getValidFuncAccess(BasicObject objIn, Node nameNode, FuncHead func, boolean safe) {
+        if (func.hasFlag(BitFlag.STATIC) && !objIn.isClassObject()) {
+            if (!safe) throw new CompileException("Must access function `" + func + "` directly through its defining class");
+            else return null;
+        } else {
+            return func;
         }
     }
     

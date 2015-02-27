@@ -140,6 +140,7 @@ public class JSLangFactory implements ILangFactory {
         }
         
         // TODO class static frame
+        builder.append(JSPretty.format(0, "%b^", c.getStaticFrame()));
         
         for (FuncGroup funcGroup: c.getDefinedFuncs()) {
             for (FuncHead func: funcGroup) {
@@ -147,7 +148,11 @@ public class JSLangFactory implements ILangFactory {
                     func.reverseOptimize();
                     func.forwardOptimize();
                     
-                    builder.append(JSPretty.format(0, "%s.prototype.%s_=_%s;^", localName, func.getFuncId(), func.toFuncAreaTarget()));
+                    if (func.hasFlag(BitFlag.STATIC)) {
+                        builder.append(JSPretty.format(0, "%s.%s_=_%s;^", localName, func.getFuncId(), func.toFuncAreaTarget()));
+                    } else {
+                        builder.append(JSPretty.format(0, "%s.prototype.%s_=_%s;^", localName, func.getFuncId(), func.toFuncAreaTarget()));
+                    }
                 }
             }
         }

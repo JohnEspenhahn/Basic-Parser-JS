@@ -263,6 +263,13 @@ public abstract class BasicObject implements IIntermediate, ITypeable {
     }
     
     /**
+     * @return True if this is an instance of ClassObject
+     */
+    public boolean isClassObject() {
+        return false;
+    }
+    
+    /**
      * @return The creatable version of this
      */
     public BasicObject getForCreateVar() {

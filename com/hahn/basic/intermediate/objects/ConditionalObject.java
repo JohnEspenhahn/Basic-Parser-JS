@@ -20,7 +20,7 @@ public abstract class ConditionalObject extends OPObject {
      * @param p2Node Used when throwing errors related to p2
      * @param temp The temporary object that can be used when compiling this
      */
-    public ConditionalObject(Statement container, OPCode op, @NonNull BasicObject p1, Node p1Node, @NonNull BasicObject p2, Node p2Node, BasicObject temp) {
+    public ConditionalObject(Statement container, OPCode op, BasicObject p1, Node p1Node, @NonNull BasicObject p2, Node p2Node, BasicObject temp) {
         super(container, op, p1, p1Node, p2, p2Node);
         
         this.temp = temp;

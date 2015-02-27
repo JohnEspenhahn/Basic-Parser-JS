@@ -11,7 +11,7 @@ import com.hahn.basic.util.exceptions.CompileException;
 
 public abstract class ArithmeticObject extends OPObject {
     
-    public ArithmeticObject(Statement container, OPCode op, @NonNull BasicObject p1, @NonNull Node p1Node, @NonNull BasicObject p2, Node p2Node) {
+    public ArithmeticObject(Statement container, OPCode op, BasicObject p1, Node p1Node, @NonNull BasicObject p2, Node p2Node) {
         super(container, op, p1, p1Node, p2, p2Node);
     }
     

@@ -2,8 +2,6 @@ package com.hahn.basic.viewer;
 
 import javax.swing.JFrame;
 
-import com.hahn.basic.Main;
-
 public final class ViewerBuilder {
     
     private static Viewer view;
