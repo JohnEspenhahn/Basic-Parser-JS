@@ -311,7 +311,7 @@ public class TextLineNumber extends JPanel
                 g.drawString(lineNumber, x, y);
                 
                 int ascent = fontMetrics.getAscent();
-                LineNumber ln = new LineNumber(lineNumber, x, y - ascent, stringWidth, ascent);
+                LineNumber ln = new LineNumber(lineNumber, x-1, y - ascent, stringWidth, ascent);
                 // g.drawRect(ln.x, ln.y, ln.width, ln.height);
                 lineNumberRects.add(ln);
                 

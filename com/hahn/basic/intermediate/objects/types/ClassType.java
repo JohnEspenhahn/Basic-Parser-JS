@@ -215,7 +215,7 @@ public class ClassType extends StructType {
         // If reached this point then not found
         if (!safe) {
             if (findingConstructor) throw new CompileException("Unknown contructor with parameters `(" + Util.joinTypes(types, ',') + ")` in " + this, nameNode);
-            else throw new CompileException("Unknown function `" + func + "` in " + this, nameNode);
+            else throw new CompileException("Unknown function `" + name + "(" + Util.joinTypes(types, ',') + ")` in " + this, nameNode);
         } else {
             return null;
         }

@@ -11,7 +11,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
-import javax.swing.BorderFactory;
+import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -21,6 +21,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
@@ -28,6 +29,12 @@ import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.text.html.HTMLDocument;
+
+import jsyntaxpane.DefaultSyntaxKit;
+import jsyntaxpane.SyntaxDocument;
+import jsyntaxpane.syntaxkits.JavaScriptSyntaxKit;
+import jsyntaxpane.util.Configuration;
 
 import com.hahn.basic.Main;
 import com.hahn.basic.parser.Node;
@@ -51,6 +58,7 @@ public class Viewer extends JPanel implements ActionListener, DocumentListener {
     
     TextLineNumber tln;
     JTextPane textArea;
+    JEditorPane jsArea;
     JLabel status;
     
     JMenuItem save, saveAs, open;
@@ -97,24 +105,13 @@ public class Viewer extends JPanel implements ActionListener, DocumentListener {
         pretty.addActionListener(this);
         optionsMenu.add(pretty);
         
-        textArea = new JTextPane();
-        textArea.setBackground(TextColor.PALE.getColor());
-        textArea.setForeground(TextColor.GREY.getColor());
-        textArea.setFont(FONT);
-        textArea.setPreferredSize(PREF_SIZE);
-        textArea.setMinimumSize(MIN_SIZE);
-        textArea.setDoubleBuffered(true);
-        textArea.getDocument().addDocumentListener(this);
+        JTabbedPane tabbedPane = new JTabbedPane();
+        tabbedPane.setBackground(TextColor.PALE.getColor());
+        tabbedPane.setForeground(TextColor.GREY.getColor());
+        // tabbedPane.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, TextColor.GREY.getColor()));
         
-        tln = new TextLineNumber(textArea);
-        tln.setForeground(textArea.getForeground());
-        tln.setCurrentLineForeground(TextColor.BLACK.getColor());
-        
-        JScrollPane scrollPane = new JScrollPane(textArea);
-        scrollPane.setPreferredSize(PREF_SIZE);
-        scrollPane.setMinimumSize(MIN_SIZE);
-        scrollPane.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, TextColor.GREY.getColor()));
-        scrollPane.setRowHeaderView( tln );
+        createViewer(tabbedPane);
+        createJSViewer(tabbedPane);
         
         status = new JLabel();
         status.setFont(UI_FONT);
@@ -126,10 +123,63 @@ public class Viewer extends JPanel implements ActionListener, DocumentListener {
         status.setVerticalAlignment(SwingConstants.CENTER);
         status.setVerticalTextPosition(SwingConstants.CENTER);
         
-        add(scrollPane, BorderLayout.CENTER);
+        add(tabbedPane, BorderLayout.CENTER);
         add(status, BorderLayout.PAGE_END);
         
         (new Thread(new ViewerUpdateThread(this))).start();
+    }
+    
+    private void createViewer(JTabbedPane tabbedPane) {
+        textArea = new JTextPane();
+        textArea.setBackground(tabbedPane.getBackground());
+        textArea.setForeground(tabbedPane.getForeground());
+        textArea.setFont(FONT);
+        textArea.setPreferredSize(PREF_SIZE);
+        textArea.setMinimumSize(MIN_SIZE);
+        textArea.setDoubleBuffered(true);
+        textArea.getDocument().addDocumentListener(this);
+        
+        JScrollPane scrollPane = new JScrollPane(textArea);
+        scrollPane.setPreferredSize(PREF_SIZE);
+        scrollPane.setMinimumSize(MIN_SIZE);
+        
+        tln = new TextLineNumber(textArea);
+        tln.setForeground(textArea.getForeground());
+        tln.setCurrentLineForeground(TextColor.BLACK.getColor());
+        scrollPane.setRowHeaderView(tln);
+        
+        tabbedPane.addTab("Editor", scrollPane);
+    }
+    
+    private void createJSViewer(JTabbedPane tabbedPane) {        
+        Configuration config = DefaultSyntaxKit.getConfig(JavaScriptSyntaxKit.class);
+        config.put("Components", "jsyntaxpane.components.PairsMarker");
+        config.put("PopupMenu", "cut-to-clipboard, copy-to-clipboard, -, find, find-next, goto-line, jump-to-pair");
+        config.put("DefaultFont", String.format("%s-%s-%s", FONT.getFamily(), "PLAIN", FONT.getSize()));
+        
+        DefaultSyntaxKit.initKit();
+        
+        jsArea = new JEditorPane();
+        jsArea.setBackground(tabbedPane.getBackground());
+        jsArea.setForeground(tabbedPane.getForeground());
+        jsArea.setFont(FONT);
+        jsArea.setPreferredSize(PREF_SIZE);
+        jsArea.setMinimumSize(MIN_SIZE);
+        jsArea.setDoubleBuffered(true);
+        jsArea.setEditable(false);
+        
+        JScrollPane scrollPane = new JScrollPane(jsArea);
+        scrollPane.setPreferredSize(PREF_SIZE);
+        scrollPane.setMinimumSize(MIN_SIZE);
+        
+        jsArea.setContentType("text/javascript");
+        
+        TextLineNumber jsTln = new TextLineNumber(jsArea);
+        jsTln.setForeground(jsArea.getForeground());
+        jsTln.setCurrentLineForeground(TextColor.BLACK.getColor());
+        scrollPane.setRowHeaderView(jsTln);
+        
+        tabbedPane.addTab("Target", scrollPane);
     }
     
     public void setTextFromNode(Node n) {
@@ -148,6 +198,9 @@ public class Viewer extends JPanel implements ActionListener, DocumentListener {
                     textArea.setCaretPosition(carot);
                     
                     n.colorTextArea(textArea.getStyledDocument());
+                    
+                    // XXX JS Target code
+                    jsArea.setText(Main.getInstance().getLangBuildTarget().toString());
                     
                     changed = false;
                 }

@@ -275,7 +275,7 @@ public class StructType extends Type {
          * @return The proper output name
          */
         private String getOutName(String givenOutName) {
-            return (outName == null ? "$" + getName() : outName);
+            return (givenOutName == null ? "$" + getName() : givenOutName);
         }
         
         public int getOffset() {

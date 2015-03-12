@@ -14,21 +14,28 @@ public class LibraryJQuery extends Library {
     
     @Override
     public void define() {        
-        ClassType dom = Library.defineClass("Doc", true);
-        Library.defineFunc(dom, true, "get", "$", BitFlag.STATIC.b, dom, Type.STRING);
-        Library.defineFunc(dom, true, "getHTML", "html", 0, Type.STRING);
-        Library.defineFunc(dom, true, "setHTML", "html", 0, Type.VOID, Type.STRING);
+        ClassType doc = Library.defineClass("Doc", true);
+        ClassType arrDoc = Library.defineClass("ArrDoc", true);
+        ClassType docEvent = Library.defineClass("DocEvent", true);
         
-        Library.defineFunc(dom, true, "getValue", "val", 0, Type.STRING);
-        Library.defineFunc(dom, true, "setValue", "val", 0, Type.VOID, Type.STRING);
+        Library.defineFunc(doc, true, "get", "$", BitFlag.STATIC.b, doc, Type.STRING);
+        Library.defineFunc(doc, true, "wrap", "$", BitFlag.STATIC.b, doc, arrDoc);
         
-        ClassType event = Library.defineClass("DocEvent", true);
-        Library.defineParam(event, "target", "target", dom);
-        Library.defineParam(event, "mouseX", "pageX", Type.INT);
-        Library.defineParam(event, "mouseY", "pageY", Type.INT);
-        Library.defineParam(event, "which", "which", Type.CHAR);
+        Library.defineFunc(doc, true, "getHTML", "html", 0, Type.STRING);
+        Library.defineFunc(doc, true, "setHTML", "html", 0, Type.VOID, Type.STRING);
         
-        Library.defineFunc(dom, true, "onChange", "change", 0, Type.VOID, new ParameterizedType<Type>(Type.FUNCTION, new Type[] { event }, Type.VOID));
+        Library.defineFunc(doc, true, "getValue", "val", 0, Type.STRING);
+        Library.defineFunc(doc, true, "setValue", "val", 0, Type.VOID, Type.STRING);
+        
+        Library.defineParam(arrDoc, "value", "value", Type.STRING);
+        Library.defineParam(arrDoc, "html", "innerHTML", Type.STRING);
+        
+        Library.defineParam(docEvent, "target", "target", arrDoc);
+        Library.defineParam(docEvent, "mouseX", "pageX", Type.INT);
+        Library.defineParam(docEvent, "mouseY", "pageY", Type.INT);
+        Library.defineParam(docEvent, "which", "which", Type.CHAR);
+        
+        Library.defineFunc(doc, true, "onChange", "change", 0, Type.VOID, new ParameterizedType<Type>(Type.FUNCTION, new Type[] { docEvent }, Type.VOID));
     }
     
     @Override
