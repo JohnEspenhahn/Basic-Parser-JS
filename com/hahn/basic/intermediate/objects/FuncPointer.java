@@ -127,10 +127,18 @@ public abstract class FuncPointer extends BasicObject {
      * Store reference to the actual function head
      * @param func The function head this points to
      */
-    protected void setFunction(FuncHead func) {
+    public void setFunction(FuncHead func) {
         this.func = func;
         
         if (func != null) setPTypeReturn(func.getReturnType());
+    }
+    
+    /**
+     * Gets the reference to the actual function head. Null until after
+     * reverse optimize or until after being explicitly set by setFunction()
+     */
+    public FuncHead getFunction() {
+        return func;
     }
     
     @Override

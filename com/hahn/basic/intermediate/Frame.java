@@ -71,6 +71,7 @@ import com.hahn.basic.intermediate.statements.DefineVarStatement;
 import com.hahn.basic.intermediate.statements.DefineVarStatement.DefinePair;
 import com.hahn.basic.intermediate.statements.EndLoopStatement;
 import com.hahn.basic.intermediate.statements.ExpressionStatement;
+import com.hahn.basic.intermediate.statements.FuncDefStatement;
 import com.hahn.basic.intermediate.statements.IfStatement.Conditional;
 import com.hahn.basic.intermediate.statements.ParamDefaultValStatement;
 import com.hahn.basic.intermediate.statements.Statement;
@@ -92,14 +93,21 @@ public class Frame extends Statement {
     // For optimization
     private List<AdvancedObject> inUseVars;
     
-    private EndLoopStatement endLoop;
+    /** For loops and functions (recursion) */
+    protected EndLoopStatement endLoop;
     private boolean hasReturn;
     
     public Frame(Frame parent, Node head) {
     	this(parent, head, false);
     }
     
-    public Frame(Frame parent, Node head, boolean loop) {
+    /**
+     * Create a new frame
+     * @param parent The parent frame
+     * @param head The frame head
+     * @param loopable True if frame can be looped (ex: for loop, function).
+     */
+    public Frame(Frame parent, Node head, boolean loopable) {
         super(null);
         
         this.parent = parent;
@@ -111,8 +119,8 @@ public class Frame extends Statement {
         // For optimization
         this.inUseVars = new ArrayList<AdvancedObject>();
         
-        // Special loop handling
-        if (loop) { this.endLoop = new EndLoopStatement(this); }
+        // Special loop handling. Functions are loopable because of recursion 
+        if (loopable) { this.endLoop = new EndLoopStatement(this); }
     }
     
     @Override
@@ -141,7 +149,7 @@ public class Frame extends Statement {
     }
     
     public Frame getLoop() {
-        if (endLoop != null) {
+        if (endLoop != null && !(this instanceof FuncHead)) {
             return this;
         } else if (parent != null) {
             return parent.getLoop();
@@ -932,9 +940,10 @@ public class Frame extends Statement {
     /**
      * Defines a function in the global frame
      * @param head EnumExpression.DEF_FUNC
+     * @return Statement to help do optimization of function at the correct time
      */
-    public void defineFunc(Node head) {
-        doDefineFunc(head, null, false);
+    public FuncDefStatement defineFunc(Node head) {
+        return doDefineFunc(head, null, false);
     }
     
     /**
@@ -943,7 +952,7 @@ public class Frame extends Statement {
      * @return Pointer to the anonymous function
      */
     public FuncPointer defineAnonFunc(Node head) {
-        return doDefineFunc(head, null, true);
+        return doDefineFunc(head, null, true).getFuncPointer();
     }
     
     /**
@@ -952,7 +961,7 @@ public class Frame extends Statement {
      * @param classIn The class to define the function in
      */
     public FuncPointer defineClassFunc(Node head, ClassType classIn) {
-        return doDefineFunc(head, classIn, false);
+        return doDefineFunc(head, classIn, false).getFuncPointer();
     }
     
     public FuncPointer defineConstructor(Node head, ClassType classIn) {
@@ -961,7 +970,7 @@ public class Frame extends Statement {
         return defineClassFunc(head, classIn);
     }
     
-    public FuncPointer doDefineFunc(Node head, ClassType classIn, boolean anonymous) {
+    public FuncDefStatement doDefineFunc(Node head, ClassType classIn, boolean anonymous) {
         Iterator<Node> it = Util.getIterator(head);
         
         Type rtnType = Type.VOID;
@@ -1044,8 +1053,7 @@ public class Frame extends Statement {
         }
         
         // Return
-        if (!anonymous) return null;
-        else return LangCompiler.factory.FuncPointer(nameNode, null, new ParameterizedType<ITypeable>(Type.FUNCTION, (ITypeable[]) aParams, rtnType));
+        return LangCompiler.factory.FuncDefStatement(this, nameNode, func);
     }
     
     /**

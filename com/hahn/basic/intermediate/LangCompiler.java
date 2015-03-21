@@ -17,6 +17,7 @@ import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.parser.Node;
 import com.hahn.basic.target.ILangFactory;
 import com.hahn.basic.target.LangBuildTarget;
+import com.hahn.basic.target.js.JSPretty;
 
 public class LangCompiler {    
     private static Map<String, Library> libs = new HashMap<String, Library>();
@@ -39,16 +40,45 @@ public class LangCompiler {
         LangBuildTarget builder = factory.getLangBuildTarget(); 
         builder.init();
         
-        // Optimize
+        frame.addTargetCode();
+        
+        ListIterator<Type> classIt = Type.getPublicTypes().listIterator(Type.getPublicTypes().size());
+        
+        ////////////////////////
+        // Reverse optimize
+        ////////////////////////
+        for (FuncGroup funcGroup: funcBridge.getFuncs()) {
+            for (FuncHead func: funcGroup) {
+                if (func.hasFrameHead()) {
+                    func.addTargetCode();
+                    func.reverseOptimize();
+                }
+            }
+        }
+
+        while (classIt.hasPrevious()) classIt.previous().reverseOptimize();
+        
+        // TODO make sure var used in function is defined before function call
         frame.reverseOptimize();
+        
+        ////////////////////////
+        // Forward optimize
+        ////////////////////////
         frame.forwardOptimize();
         
-        // Optimize classes
-        ListIterator<Type> it = Type.getPublicTypes().listIterator(Type.getPublicTypes().size());
-        while (it.hasPrevious()) it.previous().reverseOptimize();
-        while (it.hasNext()) it.next().forwardOptimize();
+        for (FuncGroup funcGroup: funcBridge.getFuncs()) {
+            for (FuncHead func: funcGroup) {
+                if (func.hasFrameHead()) {
+                    func.forwardOptimize();
+                }
+            }
+        }
         
+        while (classIt.hasNext()) classIt.next().forwardOptimize();
+        
+        ////////////////////////
         // Start builder text
+        ////////////////////////
         builder.appendString(builder.getStart());
         
         // Put library import strings
@@ -62,21 +92,20 @@ public class LangCompiler {
             builder.appendString(t.toTarget());
         }
         
-        // Convert to target
+        // Convert code to target
         builder.appendString(frame.toTarget());
         builder.appendString(builder.getCodeEnd());
         
-        // Compile functions
+        // Convert functions to target
         for (FuncGroup funcGroup: funcBridge.getFuncs()) {
             for (FuncHead func: funcGroup) {
-                if (func.hasFrameHead()) {
-                    func.reverseOptimize();
-                    func.forwardOptimize();
-                    
+                if (func.hasFrameHead()) {                    
                     builder.appendString(func.toFuncAreaTarget());
+                    builder.appendString(JSPretty.format("^"));
                 }
             }
         }
+        
         builder.appendString(builder.getContentEnd());        
         builder.appendString(builder.getEnd());
         

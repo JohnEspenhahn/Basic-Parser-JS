@@ -40,11 +40,7 @@ public abstract class Statement extends Compilable {
         targetCode.addFirst(c);
     }
     
-    /**
-     * Called from reverseOptimize. Add target code to be handled. 
-     * Should NOT do any optimization 
-     */
-    protected void addTargetCode() { }
+    public void addTargetCode() { }
     
     /**
      * Do reverse optimization of the target code
@@ -53,8 +49,6 @@ public abstract class Statement extends Compilable {
      */
     public void reverseOptimizeTargetCode() {
         if (useAddTargetCode()) {
-            addTargetCode();
-            
             Iterator<Compilable> it = targetCode.descendingIterator();
             Compilable a = null, b = null;
             while (it.hasNext()) {

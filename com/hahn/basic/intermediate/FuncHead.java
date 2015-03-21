@@ -1,6 +1,7 @@
 package com.hahn.basic.intermediate;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -44,7 +45,7 @@ public abstract class FuncHead extends Frame {
      * @param params The parameters for the function
      */
     public FuncHead(Frame parent, ClassType classIn, String inName, String outName, Node funcHeadNode, Type rtn, Param... params) {
-        super(parent, funcHeadNode); // TODO nest anon func
+        super(parent, funcHeadNode, true); // TODO nest anon func
         
         if (outName != null) {
             this.funcId = outName;
@@ -131,6 +132,15 @@ public abstract class FuncHead extends Frame {
     @Override
     public boolean hasReturn() {
         return this.allChildrenReturn || super.hasReturn();
+    }
+    
+    /**
+     * Get all the variables used in this function that
+     * were defined externally
+     * @return List of variables
+     */
+    public List<BasicObject> getVarsDefExternal() {
+        return endLoop.getVars();
     }
     
     @Override

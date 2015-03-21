@@ -32,6 +32,7 @@ import com.hahn.basic.intermediate.statements.Compilable;
 import com.hahn.basic.intermediate.statements.DefineVarStatement;
 import com.hahn.basic.intermediate.statements.ExpressionStatement;
 import com.hahn.basic.intermediate.statements.ForStatement;
+import com.hahn.basic.intermediate.statements.FuncDefStatement;
 import com.hahn.basic.intermediate.statements.IfStatement;
 import com.hahn.basic.intermediate.statements.IfStatement.Conditional;
 import com.hahn.basic.intermediate.statements.ParamDefaultValStatement;
@@ -100,6 +101,7 @@ public interface ILangFactory {
 	public DefineVarStatement DefineVarStatement(Statement container, boolean ignoreTypeCheck);
 	public ParamDefaultValStatement ParamDefaultValStatement(FuncHead func, boolean ignoreTypeCheck);
 	
+	public FuncDefStatement FuncDefStatement(Frame frame, Node nameNode, FuncHead func);
 	public CallFuncStatement CallFuncStatement(Statement container, FuncCallPointer funcCallPointer);
     public CallFuncStatement DefaultCallFuncStatement(Statement container, FuncCallPointer funcCallPointer);
 }

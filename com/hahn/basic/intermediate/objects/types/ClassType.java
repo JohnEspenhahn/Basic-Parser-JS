@@ -3,6 +3,7 @@ package com.hahn.basic.intermediate.objects.types;
 import java.util.Collection;
 import java.util.List;
 
+import com.hahn.basic.definition.EnumToken;
 import com.hahn.basic.intermediate.Frame;
 import com.hahn.basic.intermediate.FuncBridge;
 import com.hahn.basic.intermediate.FuncGroup;
@@ -239,14 +240,39 @@ public class ClassType extends StructType {
         }
     }
     
+    @Override
     public void reverseOptimize() {
+        for (FuncGroup group: getDefinedFuncs()) {
+            for (FuncHead func: group) {
+                if (func.hasFrameHead()) {
+                    func.addTargetCode();
+                    func.reverseOptimize();
+                }
+            }
+        }
+        
+        initFrame.addTargetCode();
         initFrame.reverseOptimize();
+        
+        if (funcBridge.getFuncGroup(Util.getConstructorName()) == null) {
+            // TODO define default constructor
+        }
     }
     
+    @Override
     public void forwardOptimize() {
         initFrame.forwardOptimize();
+        
+        for (FuncGroup group: getDefinedFuncs()) {
+            for (FuncHead func: group) {
+                if (func.hasFrameHead()) {
+                    func.forwardOptimize();
+                }
+            }
+        }
     }
     
+    @Override
     public String toTarget() {
         if (hasFlag(BitFlag.SYSTEM)) return "";
         else return LangCompiler.factory.createClass(this);

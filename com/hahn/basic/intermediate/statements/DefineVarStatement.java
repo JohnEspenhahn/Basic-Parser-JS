@@ -1,6 +1,7 @@
 package com.hahn.basic.intermediate.statements;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -112,10 +113,7 @@ public abstract class DefineVarStatement extends Statement {
                 pair.val.getType().autocast(pair.var.getType(), pair.node.getRow(), pair.node.getCol(), true);
             }
             
-            pair.var.removeInUse();            
-            if (pair.var.getUses() == 1) {
-                it.remove();
-            }
+            pair.var.removeInUse();
         }
         
         return (definepairs.size() == 0);
@@ -125,9 +123,16 @@ public abstract class DefineVarStatement extends Statement {
     public boolean forwardOptimize() {
         Main.getInstance().setLine(row);
         
-        for (DefinePair pair: definepairs) {
+        Iterator<DefinePair> it = definepairs.iterator();
+        while (it.hasNext()) {
+            DefinePair pair = it.next();
             BasicObject var = pair.var;
             BasicObject val = pair.val;
+            
+            if (var.getUses() == 1) {
+                it.remove();
+                continue;
+            }
             
             // Check registers
             val.takeRegister(this);            
@@ -145,7 +150,7 @@ public abstract class DefineVarStatement extends Statement {
             }
         }
         
-        return false;
+        return (definepairs.size() == 0);
     }
     
     @Override

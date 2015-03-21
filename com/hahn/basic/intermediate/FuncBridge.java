@@ -45,12 +45,16 @@ public class FuncBridge {
     }
     
     public FuncHead getFunc(String name, ITypeable[] types) {
-        FuncGroup group = funcs.get(name);
+        FuncGroup group = getFuncGroup(name);
         if (group == null) {
             return null;
         } else {
             return group.get(types, false);
         }
+    }
+    
+    public FuncGroup getFuncGroup(String name) {
+        return funcs.get(name);
     }
     
 }

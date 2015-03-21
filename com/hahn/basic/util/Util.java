@@ -21,8 +21,12 @@ import com.hahn.basic.parser.Node;
 
 public class Util {
     
+    public static String getConstructorName() {
+        return EnumToken.CONSTRUCTOR.toString();
+    }
+    
     public static boolean isConstructorName(String name) {
-        return name.equals(EnumToken.CONSTRUCTOR.toString());
+        return name.equals(getConstructorName());
     }
     
     public static String getListSeperator() {

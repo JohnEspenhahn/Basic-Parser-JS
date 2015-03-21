@@ -37,7 +37,7 @@ public class JSBuildTarget extends LangBuildTarget {
 	
 	@Override
 	public String getStart() {
-	    return "<!DOCTYPE>\n<html>\n<body onload='main()'></body>\n<head>\n";
+	    return "<!DOCTYPE html>\n<html>\n<body onload='main()'></body>\n<head>\n";
 	}
 	
 	@Override

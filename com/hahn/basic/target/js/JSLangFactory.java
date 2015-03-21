@@ -40,6 +40,7 @@ import com.hahn.basic.intermediate.statements.Compilable;
 import com.hahn.basic.intermediate.statements.DefineVarStatement;
 import com.hahn.basic.intermediate.statements.ExpressionStatement;
 import com.hahn.basic.intermediate.statements.ForStatement;
+import com.hahn.basic.intermediate.statements.FuncDefStatement;
 import com.hahn.basic.intermediate.statements.IfStatement;
 import com.hahn.basic.intermediate.statements.IfStatement.Conditional;
 import com.hahn.basic.intermediate.statements.ParamDefaultValStatement;
@@ -140,14 +141,14 @@ public class JSLangFactory implements ILangFactory {
         }
         
         // TODO class static frame
-        builder.append(JSPretty.format(0, "%b^", c.getStaticFrame()));
+        if (c.getStaticFrame().getTargetCode().size() > 0) {
+            builder.append(JSPretty.format(0, "%b^", c.getStaticFrame()));
+        }
         
+        // Add functions
         for (FuncGroup funcGroup: c.getDefinedFuncs()) {
             for (FuncHead func: funcGroup) {
-                if (func.hasFrameHead()) {
-                    func.reverseOptimize();
-                    func.forwardOptimize();
-                    
+                if (func.hasFrameHead()) {                    
                     if (func.hasFlag(BitFlag.STATIC)) {
                         builder.append(JSPretty.format(0, "%s.%s_=_%s;^", localName, func.getFuncId(), func.toFuncAreaTarget()));
                     } else {
@@ -318,6 +319,11 @@ public class JSLangFactory implements ILangFactory {
     @Override
     public ForStatement ForStatement(Statement container, Node define, Node condition, List<Node> modification, Node body) {
         return new JSForStatement(container, define, condition, modification, body);
+    }
+    
+    @Override
+    public FuncDefStatement FuncDefStatement(Frame frame, Node nameNode, FuncHead func) {
+        return new FuncDefStatement(frame, nameNode, func);
     }
     
     @Override

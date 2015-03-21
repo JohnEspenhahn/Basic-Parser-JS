@@ -11,12 +11,12 @@ public class EndLoopStatement extends Statement {
      * List of all vars using in this block, but not created within it.
      * Used so last use not tracked as within that block
      */
-    private List<BasicObject> objs;
+    private List<BasicObject> vars;
     
     public EndLoopStatement(Statement s) {
         super(s);
         
-        objs = new ArrayList<BasicObject>();
+        vars = new ArrayList<BasicObject>();
     }
     
     /**
@@ -25,9 +25,13 @@ public class EndLoopStatement extends Statement {
      * @param o The object to add
      */
     public void addVar(BasicObject o) {
-        if (!objs.contains(o)) {
-            objs.add(o);
+        if (!vars.contains(o)) {
+            vars.add(o);
         }
+    }
+    
+    public List<BasicObject> getVars() {
+        return vars;
     }
     
     @Override
@@ -37,7 +41,7 @@ public class EndLoopStatement extends Statement {
     
     @Override
     public boolean reverseOptimize() {
-        ListIterator<BasicObject> it = objs.listIterator(objs.size());
+        ListIterator<BasicObject> it = vars.listIterator(vars.size());
         while (it.hasPrevious()) {
             BasicObject obj = it.previous();
             obj.setInUse(this);
@@ -48,7 +52,7 @@ public class EndLoopStatement extends Statement {
     
     @Override
     public boolean forwardOptimize() {
-        for (BasicObject obj: objs) {
+        for (BasicObject obj: vars) {
             obj.takeRegister(this);
         }
         
@@ -62,6 +66,6 @@ public class EndLoopStatement extends Statement {
 
     @Override
     public String toString() {
-        return "use " + objs;
+        return "use " + vars;
     }  
 }
