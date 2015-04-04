@@ -8,7 +8,6 @@ import com.hahn.basic.viewer.util.TextColor;
 
 public enum EnumToken implements IEnumRegexToken {
     STRING      ("\".*?[^\\\\]\""            , Group.LIT),
-    REGEX       ("/.*?/"                     , Group.LIT),
     HEX_INTEGER ("0x[0-9A-Fa-f]+"            , Group.LIT),
     FLOAT       ("[0-9]+\\.[0-9]*|\\.[0-9]+" , Group.LIT),
     INTEGER     ("[0-9]+"                    , Group.LIT), // [0-9]+\\.?[0-9]*
@@ -85,14 +84,17 @@ public enum EnumToken implements IEnumRegexToken {
     COMMENT     ("\\\\[^\n]+" , Group.CMNT),
     
     // Special reserved keywords
-    /** super     */ __s__       ("__s__"      , Group.IDENT),
-    /** construct */ __c__       ("__c__"      , Group.IDENT),
-    /** extend    */ __e__       ("__e__"      , Group.IDENT),
-    /** name      */ __n__       ("__n__"      , Group.IDENT),
-    /** new arr   */ __a__       ("__a__"      , Group.IDENT),
+    /** super     */ ___s       ("___s"      , Group.IDENT),
+    /** construct */ ___c       ("___c"      , Group.IDENT),
+    /** extend    */ ___e       ("___e"      , Group.IDENT),
+    /** name      */ ___n       ("___n"      , Group.IDENT),
+    /** new arr   */ ___a       ("___a"      , Group.IDENT),
+    /** int div   */ ___d       ("___d"      , Group.IDENT),
+    /** int mod   */ ___m       ("___m"      , Group.IDENT),
     // End special reserved keywords
     
-    IDENTIFIER  ("<<WORD>>"   , Group.IDENT);
+    IDENTIFIER  ("<<WORD>>"   , Group.IDENT),
+    OTHER       ("."          , Group.CMNT);
 
     private final int group;
     private final String regex, str;
@@ -139,6 +141,7 @@ public enum EnumToken implements IEnumRegexToken {
         return regex;
     }
     
+    @Override
     public TextColor getDefaultColor() {
         switch (group) {
         case Group.IDENT:
@@ -146,7 +149,6 @@ public enum EnumToken implements IEnumRegexToken {
             else return TextColor.YELLOW;
         case Group.LIT:
             if (this == STRING) return TextColor.LIGHT_BLUE;
-            else if (this == REGEX) return TextColor.LIGHT_BLUE;
             else return TextColor.GREY;
         case Group.OP:
             return TextColor.YELLOW;

@@ -1,6 +1,7 @@
 package com.hahn.basic.definition;
 
 import com.hahn.basic.parser.IEnumExpression;
+import com.hahn.basic.viewer.util.TextColor;
 
 public enum EnumExpression implements IEnumExpression {   
     STMT_EXPRS  ("<CREATE_ARR>|<CREATE>|<CALL_FUNC>|<MODIFY>|<ACCESS>", false),
@@ -50,7 +51,9 @@ public enum EnumExpression implements IEnumExpression {
     C_FLAG      ("ABSTRACT|FINAL", false),
     C_PARENT    ("EXTENDS IDENTIFIER", false),
     
-    IDENTIFIER  ("STRING|REGEX|IDENTIFIER|THIS|SUPER"),
+    REGEX       ("DIV * DIV", false),
+    
+    IDENTIFIER  ("STRING|<REGEX>|IDENTIFIER|THIS|SUPER"),
     ACCESS      ("<IDENTIFIER> ?<IN_ACCESS>", false),
     CALL_FUNC   ("<IDENTIFIER> OPEN_PRNTH ?<CALL_PARAMS> CLOSE_PRNTH ?<IN_ACCESS>", false),
     
@@ -94,19 +97,33 @@ public enum EnumExpression implements IEnumExpression {
         this(bnf, true);
     }
 
+    @Override
     public void setSubExpressions(Enum<?>[][] se) {
         this.subexpressions = se;
     }
     
+    @Override
     public Enum<?>[][] getSubExpressions() {
         return subexpressions;
     }
     
+    @Override
     public String getBNFString() {
         return bnf;
     }
     
+    @Override
     public boolean canFlatten() {
         return canFlatten;
+    }
+    
+    @Override
+    public TextColor getDefaultColor() {
+        switch (this) {
+        case REGEX:
+            return EnumToken.STRING.getDefaultColor();
+        default:
+            return null;
+        }
     }
 }

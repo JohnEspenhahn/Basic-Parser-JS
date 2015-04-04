@@ -1,13 +1,16 @@
 package com.hahn.basic.target.js.library;
 
+import java.io.File;
+
 import com.hahn.basic.intermediate.library.base.Library;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.util.BitFlag;
+import com.hahn.basic.util.IOUtil;
 
-public class LibraryBuiltinJS extends Library {
+public class LibraryJS extends Library {
     
-    public LibraryBuiltinJS() {
-        super("BuiltinJS");
+    public LibraryJS() {
+        super("JS");
     }
     
     @Override
@@ -27,6 +30,7 @@ public class LibraryBuiltinJS extends Library {
         Library.defineFunc("alert", "alert", Type.VOID, Type.OBJECT);
         Library.defineFunc("alert", "alert", Type.VOID, Type.NUMERIC);
         Library.defineFunc("alert", "alert", Type.VOID, Type.STRING);
+        Library.defineFunc("alert", "alert", Type.VOID, Type.BOOL);
         
         Library.defineClass("console", true);
         Library.defineFunc("puts", "console.log", Type.VOID, Type.OBJECT);
@@ -41,6 +45,6 @@ public class LibraryBuiltinJS extends Library {
     
     @Override
     public String toTarget() {
-        return "<script>String.fromObject=function(s){return ''+s};String.prototype.matches=function(s){s=this.match(s);return s!=null&&s[0]==this}</script>";
+        return IOUtil.loadScript(new File("lib/js/js.js.min"));
     }
 }

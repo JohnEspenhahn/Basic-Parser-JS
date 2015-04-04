@@ -6,7 +6,7 @@ import com.hahn.basic.intermediate.objects.VarSuper;
 import com.hahn.basic.intermediate.objects.types.ClassType;
 
 public class JSVarSuper extends VarSuper {
-    public static final String IDENTIFIER = EnumToken.__s__ + ".prototype";
+    public static final String IDENTIFIER = EnumToken.___s + ".prototype";
     
     public JSVarSuper(Frame frame, ClassType type) {
         super(frame, type);

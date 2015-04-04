@@ -9,7 +9,7 @@ import com.hahn.basic.util.FlagMap;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
 class BNFParser {
-    private static Pattern BNF_PATTERN = Pattern.compile("(<[_a-zA-Z][_a-zA-Z0-9]*>)|([_a-zA-Z][_a-zA-Z0-9]*)|\\s+|\\$|\\?|\\(|\\)|\\[|\\]|\\{|\\}|\\|");
+    private static Pattern BNF_PATTERN = Pattern.compile("(<[_a-zA-Z][_a-zA-Z0-9]*>)|([_a-zA-Z][_a-zA-Z0-9]*)|\\s+|\\$|\\?|\\(|\\)|\\[|\\]|\\{|\\}|\\||\\*");
 
     private final Class<? extends Enum> Tokens, Expressions;
     
@@ -53,6 +53,10 @@ class BNFParser {
                     break;
                 case "?":
                     subexpression.add(EnumOption.OPTIONAL);
+                    doSetFlag(Flag.REQUIRES_NEXT);
+                    break;
+                case "*":
+                    subexpression.add(EnumOption.LAZY_MATCH);
                     doSetFlag(Flag.REQUIRES_NEXT);
                     break;
                 case "{":

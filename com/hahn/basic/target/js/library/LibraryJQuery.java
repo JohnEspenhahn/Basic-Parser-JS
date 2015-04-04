@@ -62,7 +62,7 @@ public class LibraryJQuery extends Library {
     
     @Override
     public String toTarget() {
-        return "<script src='https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script><script>window.Doc=window</script>";
+        return "<script src='https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script><script>this.Doc=this</script>";
     }
     
 }

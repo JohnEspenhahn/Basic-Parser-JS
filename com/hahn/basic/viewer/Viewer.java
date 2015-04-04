@@ -190,7 +190,7 @@ public class Viewer extends JPanel implements ActionListener, DocumentListener {
                     
                     lastTextChange = System.currentTimeMillis();
                     
-                    textArea.setText(n.getFormattedText());
+                    textArea.setText(n.getFullText());
                     
                     int carot = textArea.getCaretPosition();
                     int maxPosition = textArea.getText().length();
@@ -288,7 +288,7 @@ public class Viewer extends JPanel implements ActionListener, DocumentListener {
                 f.delete();
                 f.createNewFile();                    
                 out = new FileOutputStream(f);
-                if (node != null) out.write(node.getFormattedText().getBytes(Charset.defaultCharset()));
+                if (node != null) out.write(node.getFullText().getBytes(Charset.defaultCharset()));
                 
                 JOptionPane.showMessageDialog(this, "Saved successfully");
             } catch (Exception err) {

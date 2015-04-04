@@ -304,9 +304,9 @@ public abstract class FuncHead extends Frame {
     }
     
     public static String toHumanReadable(BasicObject objectIn, String name, ITypeable[] types, Type returnType) {
-        String funcName = (objectIn != null ? objectIn.getName() + "::" : "");
+        String funcName = (objectIn != null ? objectIn.getName() + "." : "");
         
-        funcName += name + "<";
+        funcName += name + "(";
         for (int i = 0; i < types.length; i++) {
             funcName += types[i].getType();
             if (i + 1 < types.length) {
@@ -314,6 +314,6 @@ public abstract class FuncHead extends Frame {
             }
         }
         
-        return funcName + ";" + returnType + ">";
+        return funcName + ")"; 
     }
 }

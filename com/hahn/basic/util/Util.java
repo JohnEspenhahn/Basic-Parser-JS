@@ -18,7 +18,6 @@ import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.parser.Node;
 
-
 public class Util {
     
     public static String getConstructorName() {
@@ -113,6 +112,11 @@ public class Util {
         return arr;
     }
     
+    /**
+     * Get an iterator of the node's children
+     * @param n The node
+     * @return An iterator of the node's children
+     */
     public static Iterator<Node> getIterator(Node n) {
         return n.getAsChildren().iterator();
     }
@@ -160,4 +164,5 @@ public class Util {
         
         return (T[]) arr;
     }
+    
 }

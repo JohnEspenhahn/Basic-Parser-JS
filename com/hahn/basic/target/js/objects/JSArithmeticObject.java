@@ -1,5 +1,6 @@
 package com.hahn.basic.target.js.objects;
 
+import com.hahn.basic.definition.EnumToken;
 import com.hahn.basic.intermediate.objects.ArithmeticObject;
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.types.Type;
@@ -23,12 +24,43 @@ public class JSArithmeticObject extends ArithmeticObject {
     @Override
     public String doToTarget() {
         // Special conditions for javascript integer division
-        if (getType().doesExtend(Type.INT) && getOP() == OPCode.DIV || getOP() == OPCode.MOD) {
-            return JSPretty.format("%s_%s_%s|0",
-                    getP1().isGrouped() ? "("+getP1().toTarget()+")" : getP1().toTarget(),
-                    getOP().getSymbol(), 
-                    getP2().isGrouped() ? "("+getP2().toTarget()+")" : getP2().toTarget()
-                   );
+        boolean isInt = getType().doesExtend(Type.INT);
+        if (isInt) {
+            switch (getOP()) {
+            case DIV:
+                return JSPretty.format("%s(%s,%s)|0",
+                        EnumToken.___d,
+                        getP1().isGrouped() ? "("+getP1().toTarget()+")" : getP1().toTarget(),
+                        getOP().getSymbol(), 
+                        getP2().isGrouped() ? "("+getP2().toTarget()+")" : getP2().toTarget()
+                       );
+            case MOD:
+                return JSPretty.format("%s(%s,%s)|0",
+                        EnumToken.___m,
+                        getP1().isGrouped() ? "("+getP1().toTarget()+")" : getP1().toTarget(),
+                        getOP().getSymbol(), 
+                        getP2().isGrouped() ? "("+getP2().toTarget()+")" : getP2().toTarget()
+                       );
+            default:
+            }
+        } else {
+            switch (getOP()) {
+            case DIV:
+                return JSPretty.format("%s(%s,%s)",
+                        EnumToken.___d,
+                        getP1().isGrouped() ? "("+getP1().toTarget()+")" : getP1().toTarget(),
+                        getOP().getSymbol(), 
+                        getP2().isGrouped() ? "("+getP2().toTarget()+")" : getP2().toTarget()
+                       );
+            case MOD:
+                return JSPretty.format("%s(%s,%s)",
+                        EnumToken.___m,
+                        getP1().isGrouped() ? "("+getP1().toTarget()+")" : getP1().toTarget(),
+                        getOP().getSymbol(), 
+                        getP2().isGrouped() ? "("+getP2().toTarget()+")" : getP2().toTarget()
+                       );
+            default:
+            }
         }
         
         // Default format

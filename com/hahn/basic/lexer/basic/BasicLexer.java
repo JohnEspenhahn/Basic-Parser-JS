@@ -71,14 +71,12 @@ public class BasicLexer implements ILexer {
                 matchChar();
             } else if (c == '"') {
                 matchString();
-            } else if (c == '/') {
-                matchRegex();
             } else if (isOperator(c)) {
                 matchOperator();
             } else if (isSeparator(c)) {
                 matchSeparator();
             } else {
-                throw new LexException(getRow(), getColumn());
+                matchOther();
             }
         }
         
@@ -234,24 +232,6 @@ public class BasicLexer implements ILexer {
         }
     }
     
-    private void matchRegex() {
-        final int startIdx = index;
-        
-        char c = 0;
-        do {
-            index += 1;
-        } while (index < line.length() && (c = getChar()) != '/');
-        
-        if (c != '/') {
-            throw new LexException(getRow(), getColumn());
-        } else {
-            index += 1;
-            
-            String match = getMatch();
-            stream.add(new PackedToken(EnumToken.REGEX, match, startIdx, getRow(), getColumn(startIdx)));
-        }
-    }
-    
     private void matchOperator() {
         final int startIdx = index;
         
@@ -262,11 +242,10 @@ public class BasicLexer implements ILexer {
         
         // Trim the operator till we find a valid match or trim everything
         do {
-            String match = getMatch();
-            String operator = line.substring(startIdx, index);
+            String operator = substring(startIdx);
             for (EnumToken t: EnumToken.Group.operators) {
                 if (t.getString().equals(operator)) {
-                    stream.add(new PackedToken(t, match, startIdx, getRow(), getColumn(startIdx)));
+                    stream.add(new PackedToken(t, getMatch(), startIdx, getRow(), getColumn(startIdx)));
                     return;
                 }
             }
@@ -282,17 +261,24 @@ public class BasicLexer implements ILexer {
         final int startIdx = index;
         index += 1;
 
-        String match = getMatch();
-        String separator = line.substring(startIdx, index);
+        String separator = substring(startIdx);
         for (EnumToken t: EnumToken.Group.separators) {
             if (t.getString().equals(separator)) {
-                stream.add(new PackedToken(t, match, startIdx, getRow(), getColumn(startIdx)));
+                stream.add(new PackedToken(t, getMatch(), startIdx, getRow(), getColumn(startIdx)));
                 return;
             }
         }
         
         // No match
         throw new LexException(getRow(), getColumn(startIdx));
+    }
+    
+    private void matchOther() {
+        final int startIdx = index;
+        index += 1;
+
+        String match = getMatch();
+        stream.add(new PackedToken(EnumToken.OTHER, match, startIdx, getRow(), getColumn(startIdx)));
     }
     
     /**

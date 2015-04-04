@@ -18,7 +18,7 @@ class Search extends IParser {
     private Node temp_node;
     
     private int stream_offset;
-    private int furthest_idx;
+    private int farthest_idx;
     
     private Enum<?>[] subexp;
     private int subexp_start, subexp_end;
@@ -52,7 +52,7 @@ class Search extends IParser {
     private void initSubExp(Enum<?>[] subexp, int subexpStart, int subexpEnd) {
         this.subexp = subexp;
         this.subexp_start = subexpStart;
-        this.subexp_end = subexpEnd;
+        this.subexp_end = Math.min(subexpEnd, subexp.length);
         
         reset();
     }
@@ -88,16 +88,18 @@ class Search extends IParser {
     }
     
     private void checkFurthest() {
-        if (getFurthest() > Owner.getFurthest()) {
-            Owner.setFurthest(getFurthest());
-        } else if (getStreamIdx() > Owner.getFurthest()) {
-            Owner.setFurthest(getStreamIdx());
+        if (getFarthest() > Owner.getFarthest()) {
+            Owner.setFarthest(getFarthest());
+        } else if (getStreamIdx() > Owner.getFarthest()) {
+            Owner.setFarthest(getStreamIdx());
         }
     }
 
     private boolean match() {
-        for (subexp_idx = subexp_start, stream_offset = 0; subexp_idx < subexp_end && subexp_idx < subexp.length; subexp_idx++) {
-            Enum<?> obj = subexp[subexp_idx];
+        resetStreamOffset();
+        resetExpressionIdx();
+        for (; getExpressionIdx() < getExpressionEndIdx(); addToExpressionIdx(1)) {
+            Enum<?> obj = getExpressionToken();
 
             if (obj instanceof EnumOption) {
                 // Handle option, fail if required
@@ -114,15 +116,15 @@ class Search extends IParser {
                 }
             } else {
                 // End of stream without end of expression
-                return Flags.isMarked(EnumOption.OPTIONAL) && atEnd(subexp_idx + 1);
+                return Flags.isMarked(EnumOption.OPTIONAL) && atEnd(1);
             }
         }
 
-        return atEnd(subexp_idx);
+        return atEnd(0);
     }
     
-    private boolean atEnd(int idx) {
-        return (idx >= subexp_end || idx >= subexp.length);
+    private boolean atEnd(int additionalOffset) {
+        return (getExpressionIdx() + additionalOffset >= getExpressionEndIdx());
     }
 
     private boolean objectsDoMatch(Enum<?> expObj, PackedToken streamToken) {
@@ -138,7 +140,7 @@ class Search extends IParser {
     private boolean verifyMatch(Enum<?> expObj, PackedToken streamToken) {
         if (expObj instanceof IEnumRegexToken) {
             if (expObj == streamToken.token) {
-                stream_offset += 1;
+                addToStreamIdx(1);
                 temp_node.addChild(new Node(temp_node, streamToken));
                 return true;
             } else {
@@ -162,6 +164,8 @@ class Search extends IParser {
             doBlockSearch(EnumOption.BLOCK_OPTIONAL_END, false);
         } else if (o == EnumOption.FULL_LOOP) {
             Search.doExpressionSearch(this, ParentExpression, false);
+        } else if (o == EnumOption.LAZY_MATCH) {
+            return doLazyMatch();
         }
 
         return true;
@@ -169,7 +173,8 @@ class Search extends IParser {
     
     private boolean doBlockSearch(EnumOption endToken, boolean loop) {
         boolean matched = false;
-        int startIdx = subexp_idx + 1, endIdx = findNextToken(endToken);
+        int startIdx = getExpressionIdx() + 1, endIdx = findNextExpressionToken(endToken);
+        if (endIdx < startIdx) return false;
         
         Search search = new Search(this, ParentExpression);
         while (search.doSubExpressionSearch(subexp, startIdx, endIdx, false)) {
@@ -178,8 +183,42 @@ class Search extends IParser {
             if (!loop) break;
         }
         
-        this.subexp_idx = endIdx;
+        addToExpressionIdx(endIdx - startIdx);
         return matched;
+    }
+    
+    private boolean doLazyMatch() {
+        addToExpressionIdx(1);
+        Enum<?> endToken = getExpressionToken();
+        
+        // Check if can match
+        boolean matched = false;
+        int endStreamIdx = getStreamIdx() + 1;
+        while (endStreamIdx < Stream.length) {
+            PackedToken streamToken = Stream[endStreamIdx];
+            endStreamIdx += 1;
+            
+            if (streamToken.token == endToken) {
+                matched = true;
+                break;
+            }
+        }
+        
+        if (matched) {
+            addToExpressionIdx(1);
+           
+            // Actually add the lazy matched tokens
+            while (getStreamIdx() < endStreamIdx) {
+                PackedToken streamToken = Stream[getStreamIdx()];
+                temp_node.addChild(new Node(temp_node, streamToken));
+                
+                addToStreamIdx(1);
+            }
+            
+            return true;
+        } else {
+            return false;
+        }
     }
     
     private void finish(boolean addSelf) {
@@ -191,16 +230,53 @@ class Search extends IParser {
         Owner.addToStreamIdx(stream_offset);
     }
 
-    public int findNextToken(Enum<?> token) {
+    /**
+     * Find the next token equal to the given on in the current subexpression
+     * @param token The token to find
+     * @return The index of the next token in the subexpression or -1 if not found
+     */
+    public int findNextExpressionToken(Enum<?> token) {
         for (int i = subexp_idx; i < subexp.length; i++) {
             if (subexp[i] == token) return i;
         }
 
-        return 0;
+        return -1;
     }
     
+    /**
+     * Get current index being looked at in the subexpression
+     * @return The index within the subexpression
+     */
     public int getExpressionIdx() {
         return subexp_idx;
+    }
+    
+    public int getExpressionEndIdx() {
+        return subexp_end;
+    }
+    
+    /**
+     * Get the token currently being looked at in the subexpression
+     * @return The token being looked at
+     */
+    public Enum<?> getExpressionToken() {
+        return subexp[getExpressionIdx()];
+    }
+    
+    /**
+     * Shift the current index being looked at in the subexpression
+     * @param amnt The amount to add to the subexpression index
+     */
+    public void addToExpressionIdx(int amnt) {
+        subexp_idx += amnt;
+    }
+    
+    public void setExpressionIdx(int idx) {
+        subexp_idx = idx;
+    }
+    
+    public void resetExpressionIdx() {
+        setExpressionIdx(subexp_start);
     }
 
     @Override
@@ -211,6 +287,13 @@ class Search extends IParser {
     @Override
     public PackedToken[] getStream() {
         return Stream;
+    }
+
+    /**
+     * Reset the offset to the stream contributed by this search
+     */
+    public void resetStreamOffset() {
+        this.stream_offset = 0;
     }
 
     @Override
@@ -224,12 +307,12 @@ class Search extends IParser {
     }
     
     @Override
-    public int getFurthest() {
-        return furthest_idx;
+    public int getFarthest() {
+        return farthest_idx;
     }
     
     @Override
-    public void setFurthest(int amnt) {
-        this.furthest_idx = amnt;
+    public void setFarthest(int amnt) {
+        this.farthest_idx = amnt;
     }
 }

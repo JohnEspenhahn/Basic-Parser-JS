@@ -87,12 +87,12 @@ public class Parser extends IParser {
     }
     
     @Override
-    public int getFurthest() {
+    public int getFarthest() {
         return furthest_idx;
     }
     
     @Override
-    public void setFurthest(int amnt) {
+    public void setFarthest(int amnt) {
         if (amnt >= stream.length) {
             this.furthest_idx = stream.length - 1;
         } else {

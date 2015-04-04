@@ -1,6 +1,6 @@
 package com.hahn.basic.parser;
 
-public interface IEnumExpression {
+public interface IEnumExpression extends IEnumToken {
     public void setSubExpressions(Enum<?>[][] se);
     public Enum<?>[][] getSubExpressions();    
     public String getBNFString();    

@@ -17,7 +17,7 @@ public class JSNewArray extends NewArray {
     @Override
     public String toTarget() {
         StringBuilder builder = new StringBuilder();
-        builder.append(EnumToken.__a__);
+        builder.append(EnumToken.___a);
         builder.append("(");
         builder.append(getDimensions());
         

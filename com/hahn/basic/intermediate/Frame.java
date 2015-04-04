@@ -1,6 +1,7 @@
 package com.hahn.basic.intermediate;
 
 import static com.hahn.basic.definition.EnumToken.ADD;
+import static com.hahn.basic.definition.EnumToken.ADD_ADD;
 import static com.hahn.basic.definition.EnumToken.AND;
 import static com.hahn.basic.definition.EnumToken.BOOL_AND;
 import static com.hahn.basic.definition.EnumToken.BOOL_OR;
@@ -14,6 +15,7 @@ import static com.hahn.basic.definition.EnumToken.FLOAT;
 import static com.hahn.basic.definition.EnumToken.GTR;
 import static com.hahn.basic.definition.EnumToken.GTR_EQU;
 import static com.hahn.basic.definition.EnumToken.HEX_INTEGER;
+import static com.hahn.basic.definition.EnumToken.IDENTIFIER;
 import static com.hahn.basic.definition.EnumToken.INTEGER;
 import static com.hahn.basic.definition.EnumToken.LESS;
 import static com.hahn.basic.definition.EnumToken.LESS_EQU;
@@ -30,13 +32,10 @@ import static com.hahn.basic.definition.EnumToken.RSHIFT;
 import static com.hahn.basic.definition.EnumToken.STRING;
 import static com.hahn.basic.definition.EnumToken.SUB;
 import static com.hahn.basic.definition.EnumToken.SUB_SUB;
-import static com.hahn.basic.definition.EnumToken.ADD_ADD;
+import static com.hahn.basic.definition.EnumToken.SUPER;
+import static com.hahn.basic.definition.EnumToken.THIS;
 import static com.hahn.basic.definition.EnumToken.TRUE;
 import static com.hahn.basic.definition.EnumToken.XOR;
-import static com.hahn.basic.definition.EnumToken.IDENTIFIER;
-import static com.hahn.basic.definition.EnumToken.THIS;
-import static com.hahn.basic.definition.EnumToken.SUPER;
-import static com.hahn.basic.definition.EnumToken.REGEX;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -1359,6 +1358,30 @@ public class Frame extends Statement {
     }
     
     /**
+     * Parse a regex expression
+     * @param head EnumExpression.REGEX
+     * @return
+     */
+    private BasicObject parseRegex(Node head) {
+        Iterator<Node> it = Util.getIterator(head);
+        it.next(); // Skip open '/'
+        
+        Node n = it.next();
+        String regex = "";
+        while (n.getToken() != EnumToken.DIV) {
+            regex += n.getValue();
+            
+            if (it.hasNext()) {
+                n = it.next();
+            } else {
+                break;
+            }
+        }
+        
+        return LangCompiler.getRegex(regex);
+    }
+    
+    /**
      * Handle an expression as a statement rather than an object
      * @param child EnumExpression.EXPRESSION
      * @return ExpressionStatement
@@ -1481,14 +1504,14 @@ public class Frame extends Statement {
                 return new LiteralBool(false);
             } else if (token == STRING) {
                 return LangCompiler.getString(val.substring(1, val.length() - 1));
-            } else if (token == REGEX) {
-                return LangCompiler.getRegex(val.substring(1, val.length() - 1));
             } else if (token == NULL) {
                 return LiteralNum.NULL;
             }
         } else {
             if (token == EnumExpression.ACCESS) {
                 return accessVar(child);
+            } else if (token == EnumExpression.REGEX) {
+                return parseRegex(child);
             } else if (token == EnumExpression.MODIFY) {
                 return modifyVar(child);
             } else if (token == EnumExpression.CREATE) {

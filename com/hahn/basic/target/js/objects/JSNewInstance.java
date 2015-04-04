@@ -20,9 +20,9 @@ public class JSNewInstance extends NewInstance {
     public String toTarget() {
         if (getType() instanceof ClassType) {
             if (getParams().length == 0) { // Constructor with no params
-                return String.format("%s(%s,'%s')", EnumToken.__c__, getType().getName(), getConstructor().getFuncId());
+                return String.format("%s(%s,'%s')", EnumToken.___c, getType().getName(), getConstructor().getFuncId());
             } else { // Constructor with params
-                return String.format("%s(%s,'%s',%s)", EnumToken.__c__, getType().getName(), getConstructor().getFuncId(), Util.toTarget(getParams()));
+                return String.format("%s(%s,'%s',%s)", EnumToken.___c, getType().getName(), getConstructor().getFuncId(), Util.toTarget(getParams()));
             }
         } else if (getType().doesExtend(Type.STRUCT)) {
             return "{}";

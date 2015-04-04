@@ -58,7 +58,6 @@ public class LangCompiler {
 
         while (classIt.hasPrevious()) classIt.previous().reverseOptimize();
         
-        // TODO make sure var used in function is defined before function call
         frame.reverseOptimize();
         
         ////////////////////////

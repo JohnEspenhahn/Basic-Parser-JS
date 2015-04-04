@@ -8,7 +8,6 @@ import javax.swing.text.StyledDocument;
 import org.apache.commons.lang3.StringUtils;
 
 import com.hahn.basic.definition.EnumExpression;
-import com.hahn.basic.definition.EnumToken;
 import com.hahn.basic.lexer.PackedToken;
 import com.hahn.basic.viewer.util.TextColor;
 
@@ -48,7 +47,7 @@ public class Node {
         this.errorText = "";
         
         this.token = token;
-        if (token instanceof EnumToken) this.color = ((EnumToken) token).getDefaultColor();
+        if (token instanceof IEnumToken) this.color = ((IEnumToken) token).getDefaultColor();
         else this.color = TextColor.GREY;
         
         this.parent = parent;
@@ -68,8 +67,7 @@ public class Node {
     }
     
     public int getLength() {
-        if (value != null) return value.length();
-        else return 0;
+        return getFullText().length();
     }
     
     public int getRow() {
@@ -97,8 +95,8 @@ public class Node {
         this.color = c;
     }
     
-    public void setErrorText(String text) {
-        this.errorText = (text == null ? "" : text);
+    public void setErrorText(String errTxt) {
+        this.errorText = (errTxt == null ? "" : errTxt);
     }
     
     public boolean hasError() {
@@ -110,25 +108,17 @@ public class Node {
             child.printChildren(0);
     }
     
-    public String getFormattedText() {
-        String str;
-        if (isTerminal() && children.size() == 0) {
-            return text;
-        } else if (isTerminal()) {
-            str = text;
-        } else {
-            str = "";
-        }
-        
+    public String getFullText() {
+        String str = (text == null ? "" : text);        
         for (Node child : children) {
-            if (child != this) str += child.getFormattedText();
+            if (child != this) str += child.getFullText();
         }
         
         return str;
     }
 
     public void colorTextArea(StyledDocument doc) {
-        if (isTerminal()) {
+        if (color != null) {
             doc.setCharacterAttributes(getIdx(), getLength(), color.getAttribute(), false);
         } else {
             for (Node child : children) {

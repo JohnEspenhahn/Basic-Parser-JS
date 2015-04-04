@@ -3,7 +3,6 @@ package com.hahn.basic.intermediate.objects.types;
 import java.util.Collection;
 import java.util.List;
 
-import com.hahn.basic.definition.EnumToken;
 import com.hahn.basic.intermediate.Frame;
 import com.hahn.basic.intermediate.FuncBridge;
 import com.hahn.basic.intermediate.FuncGroup;

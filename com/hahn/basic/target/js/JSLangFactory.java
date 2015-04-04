@@ -102,7 +102,7 @@ public class JSLangFactory implements ILangFactory {
         boolean isChild = (c.getParent() instanceof ClassType);
         
         StringBuilder builder = new StringBuilder();
-        builder.append(JSPretty.format(0, "var %s_=_(function(%s)_{^", c.getName(), (isChild ? EnumToken.__s__ : "")));
+        builder.append(JSPretty.format(0, "var %s_=_(function(%s)_{^", c.getName(), (isChild ? EnumToken.___s : "")));
         
         JSPretty.addTab();
         
@@ -112,10 +112,10 @@ public class JSLangFactory implements ILangFactory {
         
         // Get short local name
         String localName = c.getName();
-        if (localName.length() > EnumToken.__n__.toString().length()) localName = EnumToken.__n__.toString();
+        if (localName.length() > EnumToken.___n.toString().length()) localName = EnumToken.___n.toString();
         
         // Extend super
-        if (isChild) builder.append(JSPretty.format(0, "%s(%s,%s);^", EnumToken.__e__, localName, c.getParent().getName()));
+        if (isChild) builder.append(JSPretty.format(0, "%s(%s,%s);^", EnumToken.___e, localName, c.getParent().getName()));
         
         // Main constructor
         builder.append(JSPretty.format(0, "function %s()_{^", localName));
@@ -123,11 +123,11 @@ public class JSLangFactory implements ILangFactory {
         // Call super constructor and, if needed, add init frame
         if (!c.getInitFrame().isEmpty()) {
             JSPretty.addTab();
-            builder.append(JSPretty.format(0, "%s.call(this);^", EnumToken.__s__));
+            builder.append(JSPretty.format(0, "%s.call(this);^", EnumToken.___s));
             builder.append(JSPretty.format(-1, "%s", c.getInitFrame()));
             JSPretty.removeTab();
         } else {
-            builder.append(JSPretty.format(1, "%s.call(this)<;>", EnumToken.__s__));
+            builder.append(JSPretty.format(1, "%s.call(this)<;>", EnumToken.___s));
         }
         
         builder.append(JSPretty.format(0, "^"));

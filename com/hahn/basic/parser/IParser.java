@@ -25,12 +25,39 @@ abstract class IParser {
         return EnumExpressions;
     }
     
+    /**
+     * Get the input stream
+     * @return The input stream
+     */
     public abstract PackedToken[] getStream();
+    
+    /** 
+     * Get the current index being looked at in the input stream
+     * @return The current index looking at in the stream 
+     */
     public abstract int getStreamIdx();
+    
+    /**
+     * Shift the current index being looked at in the input stream
+     * @param amnt The amount to add to the stream index
+     */
     public abstract void addToStreamIdx(int amnt);
     
-    public abstract void setFurthest(int amnt);
-    public abstract int getFurthest();
+    /**
+     * Keep track of the farthest distance advanced in the stream
+     * @param amnt The farthest distance advanced in the stream
+     */
+    public abstract void setFarthest(int amnt);
     
+    /**
+     * Get the farthest distance advanced in the stream
+     * @return The farthest distance advanced in the stream
+     */
+    public abstract int getFarthest();
+    
+    /**
+     * Get the main node of this parser
+     * @return The main node of this parser
+     */
     public abstract Node getNode();
 }

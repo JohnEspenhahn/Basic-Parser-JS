@@ -12,7 +12,8 @@ as string not in triangular braces references a token.
 
 +--------------------+-------+
 | Expression loop    | $     |
-| NEXT is optional   | ?     |
+| X is optional      | ? X   |
+| Lazy match till X  | * X
 | Match 0 or 1 times | (...) |
 | Match 0+ times     | {...} |
 | Match 1+ times     | [...] |
