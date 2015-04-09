@@ -23,10 +23,12 @@ public abstract class ForStatement extends Statement {
         
         this.outerFrame  = new Frame(getFrame(), null);
         this.modifyFrame = new Frame(outerFrame, null);
+        
         this.innerFrame  = new Frame(outerFrame, body, true);
         
         this.define = outerFrame.defineVar(define);
         this.condition = outerFrame.handleExpression(condition);
+        this.innerFrame.addTargetCode();
         
         for (Node modify: modification) {
             this.modifyFrame.addCode(modifyFrame.modifyVar(modify).getAsExp(modifyFrame));

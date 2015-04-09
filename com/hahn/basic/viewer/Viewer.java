@@ -38,6 +38,7 @@ import jsyntaxpane.util.Configuration;
 
 import com.hahn.basic.Main;
 import com.hahn.basic.parser.Node;
+import com.hahn.basic.util.exceptions.LexException;
 import com.hahn.basic.viewer.util.TextColor;
 import com.hahn.basic.viewer.util.TextLineNumber;
 
@@ -319,7 +320,12 @@ public class Viewer extends JPanel implements ActionListener, DocumentListener {
         String text = textArea.getText();        
         Main.getInstance().parseLinesFromString(text);        
         Main.getInstance().reset();
-        Main.getInstance().handleInput();
+        
+        try {
+            Main.getInstance().handleInput();
+        } catch (LexException e) {
+            
+        }
         
         setStatus("Compiled");
     }

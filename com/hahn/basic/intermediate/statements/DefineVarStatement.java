@@ -129,7 +129,8 @@ public abstract class DefineVarStatement extends Statement {
             BasicObject var = pair.var;
             BasicObject val = pair.val;
             
-            if (var.getUses() == 1) {
+            // TODO handling of literals not used
+            if (var.hasLiteral() && var.getUses() == 1) {
                 it.remove();
                 continue;
             }

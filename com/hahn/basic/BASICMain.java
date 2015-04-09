@@ -15,6 +15,7 @@ import com.hahn.basic.parser.Parser;
 import com.hahn.basic.target.ILangFactory;
 import com.hahn.basic.target.LangBuildTarget;
 import com.hahn.basic.util.exceptions.CompileException;
+import com.hahn.basic.util.exceptions.LexException;
 import com.hahn.basic.viewer.ViewerBuilder;
 
 public class BASICMain extends Main {
@@ -74,7 +75,12 @@ public class BASICMain extends Main {
     }
     
     private void lexLines() {
-        stream = lexer.lex(getLines());
+        try {
+            stream = null; // reset
+            stream = lexer.lex(getLines());
+        } catch (LexException e) {
+            e.printStackTrace();
+        }
     }
 
     private void handleStream() {

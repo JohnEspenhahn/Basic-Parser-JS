@@ -58,6 +58,7 @@ public class LibraryJQuery extends Library {
         
         // Doc.onChange
         Library.defineFunc(doc, true, "onChange", "change", 0, Type.VOID, new ParameterizedType<Type>(Type.FUNCTION, new Type[] { docEvent }, Type.VOID));
+        Library.defineFunc(doc, true, "onChange", "change", 0, Type.VOID);
     }
     
     @Override

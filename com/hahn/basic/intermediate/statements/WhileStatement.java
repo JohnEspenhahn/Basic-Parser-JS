@@ -11,7 +11,9 @@ public abstract class WhileStatement extends Statement {
         super(container);
         
         this.outerFrame = new Frame(getFrame(), null);
+        
         this.innerFrame = new Frame(outerFrame, body, true);
+        this.innerFrame.addTargetCode();
         
         this.condition = outerFrame.handleExpression(condition);
     }
