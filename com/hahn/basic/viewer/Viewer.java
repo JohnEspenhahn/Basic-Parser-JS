@@ -29,10 +29,8 @@ import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.text.html.HTMLDocument;
 
 import jsyntaxpane.DefaultSyntaxKit;
-import jsyntaxpane.SyntaxDocument;
 import jsyntaxpane.syntaxkits.JavaScriptSyntaxKit;
 import jsyntaxpane.util.Configuration;
 

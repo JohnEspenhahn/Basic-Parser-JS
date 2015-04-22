@@ -48,6 +48,9 @@ public interface ILangFactory {
 	public int getAvailableRegisters();
 	public IRegister getNextRegister(AdvancedObject objFor);
 	
+	// OP Codes
+	public String getTargetOPSymbol(OPCode code);
+	
 	// Types
     public String createClass(ClassType c);
 	

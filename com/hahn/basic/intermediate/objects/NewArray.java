@@ -37,8 +37,8 @@ public abstract class NewArray extends BasicObject {
             BasicObject obj = it.previous();
             obj.setInUse(this);
             
-            if (!obj.getType().doesExtend(Type.INT)) {
-                throw new CompileException("Illegal type for array initialization. Expected int but got `" + obj.getType() + "` at dimension " + dimension, node);
+            if (!obj.getType().doesExtend(Type.REAL)) {
+                throw new CompileException("Illegal type for array initialization. Expected real but got `" + obj.getType() + "` at dimension " + dimension, node);
             }
             
             dimension -= 1;

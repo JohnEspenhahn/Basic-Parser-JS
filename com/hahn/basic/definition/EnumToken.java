@@ -7,11 +7,10 @@ import com.hahn.basic.lexer.regex.IEnumRegexToken;
 import com.hahn.basic.viewer.util.TextColor;
 
 public enum EnumToken implements IEnumRegexToken {
-    STRING      ("\".*?[^\\\\]\""            , Group.LIT),
-    HEX_INTEGER ("0x[0-9A-Fa-f]+"            , Group.LIT),
-    FLOAT       ("[0-9]+\\.[0-9]*|\\.[0-9]+" , Group.LIT),
-    INTEGER     ("[0-9]+"                    , Group.LIT), // [0-9]+\\.?[0-9]*
-    CHAR        ("'\\?.'"                    , Group.LIT),
+    STRING      ("\".*?[^\\\\]\""           , Group.LIT),
+    HEX_INT     ("0x[0-9A-Fa-f]+"           , Group.LIT),
+    REAL        ("[0-9]+\\.[0-9]*|\\.[0-9]+" , Group.LIT),
+    CHAR        ("'\\?.'"                   , Group.LIT),
     EQUALS      ("=="      , Group.OP),
     PLUS_EQU    ("\\+="    , Group.OP),
     SUB_EQU     ("\\-="    , Group.OP),
@@ -28,6 +27,7 @@ public enum EnumToken implements IEnumRegexToken {
     QUESTION    ("\\?"     , Group.OP),
     AND         ("&"       , Group.OP),
     NOT         ("!"       , Group.OP),
+    TILDE       ("~"       , Group.OP),
     RSHIFT      (">>"      , Group.OP),
     LSHIFT      ("<<"      , Group.OP),
     BOR         ("\\|"     , Group.OP),
@@ -47,6 +47,7 @@ public enum EnumToken implements IEnumRegexToken {
     DBL_COLON   ("\\:\\:"  , Group.OP),
     COLON       ("\\:"     , Group.OP),
     HASH        ("#"       , Group.OP),
+    AT          ("@"       , Group.OP),
     COMMA       (","       , Group.SEP),
     EOL         (";"       , Group.SEP),
     OPEN_PRNTH  ("\\("     , Group.SEP), 
@@ -89,8 +90,7 @@ public enum EnumToken implements IEnumRegexToken {
     /** extend    */ ___e       ("___e"      , Group.IDENT),
     /** name      */ ___n       ("___n"      , Group.IDENT),
     /** new arr   */ ___a       ("___a"      , Group.IDENT),
-    /** int div   */ ___d       ("___d"      , Group.IDENT),
-    /** int mod   */ ___m       ("___m"      , Group.IDENT),
+    /** set arr   */ ___u       ("___u"      , Group.IDENT),
     // End special reserved keywords
     
     IDENTIFIER  ("<<WORD>>"   , Group.IDENT),

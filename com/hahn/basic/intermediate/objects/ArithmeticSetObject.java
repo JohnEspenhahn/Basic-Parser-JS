@@ -1,6 +1,7 @@
 package com.hahn.basic.intermediate.objects;
 
 import com.hahn.basic.intermediate.IIntermediate;
+import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.opcode.OPCode;
 import com.hahn.basic.intermediate.statements.Statement;
 import com.hahn.basic.parser.Node;
@@ -22,7 +23,16 @@ public abstract class ArithmeticSetObject extends ArithmeticObject {
             throw new CompileException("Can not modify the constant variable `" + getP1() + "`");
         }
         
-        setType(getP2().getType().autocast(getP1().getType(), getP2Node().getRow(), getP2Node().getCol(), true));
+        // The type of the variable being set
+        Type targetType = getP1().getType();
+        // The type of the variable to assign
+        Type givenType = getP2().getType();
+        
+        // The type that the target and given want to merge to
+        Type mergedType = Type.merge(targetType, givenType, getP2Node().getRow(), getP2Node().getCol(), true);
+        
+        // Ensure the type being merged to can be assigned to the target
+        setType(mergedType.autocast(targetType, getP2Node().getRow(), getP2Node().getCol(), true));
         
         return false;
     }

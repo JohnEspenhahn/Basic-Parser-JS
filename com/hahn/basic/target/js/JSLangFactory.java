@@ -98,6 +98,16 @@ public class JSLangFactory implements ILangFactory {
     }
     
     @Override
+    public String getTargetOPSymbol(OPCode code) {
+        switch (code) {
+        case INT:
+            return "~~";
+        default:
+            return code.symbol;
+        }
+    }
+    
+    @Override
     public String createClass(ClassType c) {
         boolean isChild = (c.getParent() instanceof ClassType);
         

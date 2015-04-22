@@ -11,12 +11,11 @@ import static com.hahn.basic.definition.EnumToken.DIV;
 import static com.hahn.basic.definition.EnumToken.DOT;
 import static com.hahn.basic.definition.EnumToken.EQUALS;
 import static com.hahn.basic.definition.EnumToken.FALSE;
-import static com.hahn.basic.definition.EnumToken.FLOAT;
 import static com.hahn.basic.definition.EnumToken.GTR;
 import static com.hahn.basic.definition.EnumToken.GTR_EQU;
-import static com.hahn.basic.definition.EnumToken.HEX_INTEGER;
+import static com.hahn.basic.definition.EnumToken.HASH;
+import static com.hahn.basic.definition.EnumToken.HEX_INT;
 import static com.hahn.basic.definition.EnumToken.IDENTIFIER;
-import static com.hahn.basic.definition.EnumToken.INTEGER;
 import static com.hahn.basic.definition.EnumToken.LESS;
 import static com.hahn.basic.definition.EnumToken.LESS_EQU;
 import static com.hahn.basic.definition.EnumToken.LSHIFT;
@@ -28,12 +27,14 @@ import static com.hahn.basic.definition.EnumToken.NULL;
 import static com.hahn.basic.definition.EnumToken.OPEN_PRNTH;
 import static com.hahn.basic.definition.EnumToken.OPEN_SQR;
 import static com.hahn.basic.definition.EnumToken.QUESTION;
+import static com.hahn.basic.definition.EnumToken.REAL;
 import static com.hahn.basic.definition.EnumToken.RSHIFT;
 import static com.hahn.basic.definition.EnumToken.STRING;
 import static com.hahn.basic.definition.EnumToken.SUB;
 import static com.hahn.basic.definition.EnumToken.SUB_SUB;
 import static com.hahn.basic.definition.EnumToken.SUPER;
 import static com.hahn.basic.definition.EnumToken.THIS;
+import static com.hahn.basic.definition.EnumToken.TILDE;
 import static com.hahn.basic.definition.EnumToken.TRUE;
 import static com.hahn.basic.definition.EnumToken.XOR;
 
@@ -1456,9 +1457,8 @@ public class Frame extends Statement {
             // Skip ending parenthesis
             it.next();
             
-        } else if (token == NOT
-                // Prefix
-                || (exp.getObj() == null && (token == SUB || token == SUB_SUB || token == ADD_ADD))) {
+        } else if (token == NOT || token == HASH || token == TILDE || token == SUB_SUB || token == ADD_ADD
+                        /* Prefix */ || (exp.getObj() == null && token == SUB)) {
             OPCode op = OPCode.fromSymbol(val);
             
             ExpressionStatement nextExp = LangCompiler.factory.ExpressionStatement(this, null);
@@ -1494,9 +1494,9 @@ public class Frame extends Statement {
         
         if (child.isTerminal()) {
             String val = child.getValue();
-            if (token == INTEGER || token == HEX_INTEGER || token == CHAR) {
+            if (token == HEX_INT || token == CHAR) {
                 return Util.parseInt(child);
-            } else if (token == FLOAT ){
+            } else if (token == REAL){
                 return Util.parseFloat(child);
             } else if (token == TRUE) {
                 return new LiteralBool(true);

@@ -175,7 +175,7 @@ public class BasicLexer implements ILexer {
         } else if (!hex && (c == 'x' || c == 'X')) {
             matchNumber(startIdx, true);
         } else {
-            Enum<?> token = (hex ? EnumToken.HEX_INTEGER : EnumToken.INTEGER);
+            Enum<?> token = (hex ? EnumToken.HEX_INT : EnumToken.REAL);
             
             String match = getMatch();
             stream.add(new PackedToken(token, match, startIdx, getRow(), getColumn(startIdx)));
@@ -192,7 +192,7 @@ public class BasicLexer implements ILexer {
             throw new LexException(getRow(), getColumn());
         } else {
             String match = getMatch();
-            stream.add(new PackedToken(EnumToken.FLOAT, match, startIdx, getRow(), getColumn(startIdx)));
+            stream.add(new PackedToken(EnumToken.REAL, match, startIdx, getRow(), getColumn(startIdx)));
         }
     }
     

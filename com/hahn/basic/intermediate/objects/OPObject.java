@@ -2,6 +2,7 @@ package com.hahn.basic.intermediate.objects;
 
 import com.hahn.basic.intermediate.Frame;
 import com.hahn.basic.intermediate.IIntermediate;
+import com.hahn.basic.intermediate.LangCompiler;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.opcode.OPCode;
 import com.hahn.basic.intermediate.statements.Statement;
@@ -125,6 +126,10 @@ public class OPObject extends BasicObject {
         opcode = o;
     }
     
+    public String getTargetOPSymbol() {
+        return LangCompiler.factory.getTargetOPSymbol(getOP());
+    }
+    
     @Override
     public boolean setInUse(IIntermediate by) {        
         // Set in use
@@ -133,7 +138,7 @@ public class OPObject extends BasicObject {
         
         // Special case to prevent "++1"
         if ((opcode == OPCode.PADD || opcode == OPCode.PSUB) && !p1.isVar()) {
-            throw new CompileException("Illegal left-side argument `" + p1 + "` with operator `" + opcode.getSymbol() + "`");
+            throw new CompileException("Illegal left-side argument `" + p1 + "` with operator `" + opcode.symbol + "`");
         }
         
         // Type check
@@ -155,8 +160,8 @@ public class OPObject extends BasicObject {
         
         // Check literals
         if (p1.hasLiteral() && OPCode.canChangeLiteral(getOP())) {
-            if (p2 != null && p1.canUpdateLiteral(getFrame(), getOP()) && p2.hasLiteral()
-                    && p1.updateLiteral(opcode, p2.getLiteral())) {
+            Literal p2Literal = (p2 == null ? null : p2.getLiteral());
+            if (p1.canUpdateLiteral(getFrame(), getOP()) && p1.updateLiteral(opcode, p2Literal)) {
                 this.isLiteral = true;
             } else {
                 p1.setLiteral(null);
@@ -177,12 +182,12 @@ public class OPObject extends BasicObject {
         if (getP2() != null) {
             return JSPretty.format("%s_%s_%s",
                     getP1().isGrouped() ? "("+getP1().toTarget()+")" : getP1().toTarget(),
-                    getOP().getSymbol(), 
+                    getTargetOPSymbol(), 
                     getP2().isGrouped() ? "("+getP2().toTarget()+")" : getP2().toTarget()
                    );
         } else {
             return JSPretty.format("%s%s",
-                    getOP().getSymbol(),
+                    getTargetOPSymbol(),
                     getP1().isExpression() ? "("+getP1().toTarget()+")" : getP1().toTarget()
                    );
         }

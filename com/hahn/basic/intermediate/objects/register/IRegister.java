@@ -6,7 +6,7 @@ import com.hahn.basic.intermediate.objects.types.Type;
 public abstract class IRegister extends BasicObject {
     
     public IRegister(String name) {
-        super(name, Type.INT);
+        super(name, Type.REAL);
     }
 
     public abstract boolean isOnStack();

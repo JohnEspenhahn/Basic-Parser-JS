@@ -5,8 +5,8 @@ import com.hahn.basic.viewer.util.TextColor;
 
 public enum EnumExpression implements IEnumExpression {   
     STMT_EXPRS  ("<CREATE_ARR>|<CREATE>|<CALL_FUNC>|<MODIFY>|<ACCESS>", false),
-    FACTOR      ("<STMT_EXPRS>|<CAST>|<ANON_FUNC>|<FUNC_POINTER>|NULL|CHAR|HEX_INTEGER|INTEGER|FLOAT|TRUE|FALSE|OPEN_PRNTH<EXPRESSION>CLOSE_PRNTH"),
-    PREFIX_OP   ("ADD_ADD|SUB_SUB|ADD|SUB|NOT"),
+    FACTOR      ("<STMT_EXPRS>|<CAST>|<ANON_FUNC>|<FUNC_POINTER>|NULL|CHAR|HEX_INT|REAL|TRUE|FALSE|OPEN_PRNTH<EXPRESSION>CLOSE_PRNTH"),
+    PREFIX_OP   ("ADD_ADD|SUB_SUB|SUB|NOT|TILDE|HASH"),
     PREFIX      ("?<PREFIX_OP> <FACTOR>"),
     PRODUCT     ("<PREFIX>{<MULT_DIV><PREFIX>}"),
     SUMMATION   ("<PRODUCT>{<ADD_SUB><PRODUCT>}"),
@@ -79,7 +79,7 @@ public enum EnumExpression implements IEnumExpression {
     CLASS_CNTNT ("COMMENT|<DEF_FUNC>|<CONSTRUCTOR>|<DEFINE>EOL|EOL", false),
     
     IMPORT      ("IMPORT STRING EOL", false),
-    DIRECTIVE   ("HASH IDENTIFIER", false),
+    DIRECTIVE   ("AT IDENTIFIER", false),
     START       ("<DIRECTIVE>$|<IMPORT>$|<STRUCT>$|<CLASS>$|<BLOCK_CNTNT>$|<CLASS_CNTNT>$", false);
 
 

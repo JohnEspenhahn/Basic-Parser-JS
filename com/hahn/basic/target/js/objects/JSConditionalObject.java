@@ -17,7 +17,7 @@ public class JSConditionalObject extends ConditionalObject {
     public String doToTarget() {
         return JSPretty.format("%s_%s_%s",
                 getP1().isGrouped() ? "("+getP1().toTarget()+")" : getP1().toTarget(),
-                getOP().getSymbol(), 
+                getTargetOPSymbol(),
                 getP2().isGrouped() ? "("+getP2().toTarget()+")" : getP2().toTarget()
                );
     }

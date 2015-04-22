@@ -125,7 +125,7 @@ public class Util {
         if (n.getValue().startsWith("0x")) {
             return new LiteralNum(Integer.valueOf(n.getValue().substring(2), 16));
         } else if (n.getValue().startsWith("'")) {
-            return new LiteralNum((char) n.getValue().charAt(1));
+            return new LiteralNum(n.getValue().charAt(1));
         } else {
             return new LiteralNum(Integer.valueOf(n.getValue()));
         }

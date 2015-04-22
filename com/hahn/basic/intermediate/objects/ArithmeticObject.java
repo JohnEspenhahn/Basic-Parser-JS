@@ -19,13 +19,15 @@ public abstract class ArithmeticObject extends OPObject {
     public boolean setInUse(IIntermediate by) {
         super.setInUse(by);
         
-        if (getP1().getType().autocast(getOP().type1, getP1Node().getRow(), getP1Node().getCol(), false) == null) {
-            throw new CompileException("Expected type `" + getOP().type1 + "` but got `" + getP1().getType() + "` with operator `" + getOP().getSymbol() + "`", getP1Node());
-        } else if (getP2().getType().autocast(getOP().type2, getP1Node().getRow(), getP1Node().getCol(), false) == null) {
-            throw new CompileException("Expected type `" + getOP().type2 + "` but got `" + getP2().getType() + "` with operator `" + getOP().getSymbol() + "`", getP2Node());
+        Type p1Type = getP1().getType();
+        Type p2Type = getP2().getType();
+        if (p1Type.autocast(getOP().type1, getP1Node().getRow(), getP1Node().getCol(), false) == null) {
+            throw new CompileException("Expected type `" + getOP().type1 + "` but got `" + p1Type + "` with operator `" + getOP().symbol + "`", getP1Node());
+        } else if (p2Type.autocast(getOP().type2, getP1Node().getRow(), getP1Node().getCol(), false) == null) {
+            throw new CompileException("Expected type `" + getOP().type2 + "` but got `" + p2Type + "` with operator `" + getOP().symbol + "`", getP2Node());
         }
         
-        setType(Type.merge(getP1().getType(), getP2().getType(), getP2Node().getRow(), getP2Node().getCol(), true));
+        setType(Type.merge(p1Type, p2Type, getP2Node().getRow(), getP2Node().getCol(), true));
         
         return false;
     }

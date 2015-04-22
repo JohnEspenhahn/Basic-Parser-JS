@@ -87,6 +87,9 @@ public abstract class BasicObject implements IIntermediate, ITypeable {
      * ------------------------------- Literal Management -------------------------------
      */
     
+    /**
+     * @return The literal or null if has none
+     */
     public Literal getLiteral() {
         return null;
     }
@@ -133,7 +136,7 @@ public abstract class BasicObject implements IIntermediate, ITypeable {
     /**
      * If is a literal, modify it
      * @param op The operation to preform on the literal
-     * @param lit The value to use in update
+     * @param lit The value to use in update. Can be null
      * @return True if should remove the containing op command
      */
     public boolean updateLiteral(OPCode op, Literal lit) {

@@ -26,11 +26,11 @@ public class PostfixOPObject extends OPObject {
     
     @Override
     public String toString() {
-        return String.format("%s%s", getParam().getName(), getOP().getSymbol());
+        return String.format("%s%s", getParam().getName(), getOP().symbol);
     }
 
     @Override
     public String doToTarget() {
-        return String.format("%s%s", getParam().toTarget(), getOP().getSymbol());
+        return String.format("%s%s", getParam().toTarget(), getTargetOPSymbol());
     }
 }

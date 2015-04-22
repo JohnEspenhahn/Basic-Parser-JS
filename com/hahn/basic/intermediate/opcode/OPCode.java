@@ -1,8 +1,8 @@
 package com.hahn.basic.intermediate.opcode;
 
-import static com.hahn.basic.intermediate.objects.types.Type.INT;
 import static com.hahn.basic.intermediate.objects.types.Type.BOOL;
-import static com.hahn.basic.intermediate.objects.types.Type.NUMERIC;
+import static com.hahn.basic.intermediate.objects.types.Type.REAL;
+import static com.hahn.basic.intermediate.objects.types.Type.REALSTR;
 import static com.hahn.basic.intermediate.objects.types.Type.UNDEFINED;
 
 import com.hahn.basic.intermediate.objects.types.Type;
@@ -12,46 +12,35 @@ public enum OPCode {
     SAND("&&", BOOL, BOOL, 0b000000, 0, 0),
     SBOR("||", BOOL, BOOL, 0b000000, 0, 0),
     
-    ADD ("+" , NUMERIC, NUMERIC,  0b101101, 4, 6),
-    ADDE("+=", NUMERIC, NUMERIC,  0b101101, 4, 6),
-    PADD("++", NUMERIC, null   ,  0b000000, 0, 0),
-    SUB ("-" , NUMERIC, NUMERIC,  0b101110, 4, 6),
-    SUBE("-=", NUMERIC, NUMERIC,  0b101110, 4, 6),
-    PSUB("--", NUMERIC, null   ,  0b000000, 0, 0),
-    MUL ("*" , NUMERIC, NUMERIC,  0b101111, 4, 6),
-    MULE("*=", NUMERIC, NUMERIC,  0b101111, 4, 6),
-    DIV ("/" , NUMERIC, NUMERIC,  0b110001, 4, 6),
-    DIVE("/=", NUMERIC, NUMERIC,  0b110001, 4, 6),
-    MOD ("%" , NUMERIC, NUMERIC,  0b110010, 4, 6),
-    MODE("%=", NUMERIC, NUMERIC,  0b110010, 4, 6),
-    SHR (">>", INT, INT,  0b111000, 4, 6),
-    SHL ("<<", INT, INT,  0b111010, 4, 6),
-    AND ("&" , INT, INT,  0b110101, 4, 6),
-    ANDE("&=", INT, INT,  0b110101, 4, 6),
-    BOR ("|" , INT, INT,  0b110110, 4, 6),
-    BORE("|=", INT, INT,  0b110110, 4, 6),
-    XOR ("^" , INT, INT,  0b110111, 4, 6),
-    XORE("^=", INT, INT,  0b110111, 4, 6),
+    ADD ("+" , REALSTR, REALSTR,  0b101101, 4, 6),
+    ADDE("+=", REALSTR, REALSTR,  0b101101, 4, 6),
+    PADD("++", REAL   , null   ,  0b000000, 0, 0),
+    SUB ("-" , REAL   , REAL   ,  0b101110, 4, 6),
+    SUBE("-=", REAL   , REAL   ,  0b101110, 4, 6),
+    PSUB("--", REAL   , null   ,  0b000000, 0, 0),
+    MUL ("*" , REAL   , REAL   ,  0b101111, 4, 6),
+    MULE("*=", REAL   , REAL   ,  0b101111, 4, 6),
+    DIV ("/" , REAL   , REAL   ,  0b110001, 4, 6),
+    DIVE("/=", REAL   , REAL   ,  0b110001, 4, 6),
+    MOD ("%" , REAL   , REAL   ,  0b110010, 4, 6),
+    MODE("%=", REAL   , REAL   ,  0b110010, 4, 6),
+    BNOT("~" , REAL   , null   ,  0b000000, 0, 0),
+    INT ("#" , REAL   , null   ,  0b000000, 0, 0),
+    SHR (">>", REAL   , REAL   ,  0b111000, 4, 6),
+    SHL ("<<", REAL   , REAL   ,  0b111010, 4, 6),
+    AND ("&" , REAL   , REAL   ,  0b110101, 4, 6),
+    ANDE("&=", REAL   , REAL   ,  0b110101, 4, 6),
+    BOR ("|" , REAL   , REAL   ,  0b110110, 4, 6),
+    BORE("|=", REAL   , REAL   ,  0b110110, 4, 6),
+    XOR ("^" , REAL   , REAL   ,  0b110111, 4, 6),
+    XORE("^=", REAL   , REAL   ,  0b110111, 4, 6),
     SET ("=" , UNDEFINED, UNDEFINED,  0b0010  , 6, 6),
     IFE ("==", UNDEFINED, UNDEFINED,  0b100010, 4, 6),
     IFN ("!=", UNDEFINED, UNDEFINED,  0b100011, 4, 6),
-    IFP (">=", NUMERIC , NUMERIC, 0b100100, 4, 6),
-    IFG (">" , NUMERIC , NUMERIC, 0b100101, 4, 6),
-    IFM ("<=", NUMERIC , NUMERIC, 0b100111, 4, 6),
-    IFL ("<" , NUMERIC , NUMERIC, 0b101000, 4, 6),
-    IFA (      NUMERIC , NUMERIC, 0b100110, 4, 6),
-    IFU (      NUMERIC , NUMERIC, 0b101001, 4, 6),
-    SPA (INT, 0b0001101011, 6, 0),
-    JSR (INT, 0b0001000000, 6, 0),
-    MOV (INT, 0b0001001101, 6, 0),
-    HSG (INT, 0b0001100011, 6, 0),
-    HWI (INT, 0b0001011011, 6, 0),
-    RFI (INT, 0b0001010101, 6, 0),
-    IAS (INT, 0b0001010000, 6, 0),
-    BRK (null, 0b0000100000011100, 0, 0),
-    HNG (null, 0b0000100000001000, 0, 0),
-    POPA(null, 0b0000100000001100, 0, 0),
-    PUSHA(null,0b0000100000001011, 0, 0);
+    IFP (">=", REAL    , REAL   , 0b100100, 4, 6),
+    IFG (">" , REAL    , REAL   , 0b100101, 4, 6),
+    IFM ("<=", REAL    , REAL   , 0b100111, 4, 6),
+    IFL ("<" , REAL    , REAL   , 0b101000, 4, 6);
 
     
     /* Types of the parameters */
@@ -82,10 +71,6 @@ public enum OPCode {
     
     public String getName() {
         return name();
-    }
-    
-    public String getSymbol() {
-        return symbol;
     }
     
     public Type getType1() {
@@ -145,7 +130,7 @@ public enum OPCode {
     }
     
     public static boolean isBitwise(OPCode op) {
-        return (op == AND || op == BOR || op == XOR || op == SHR || op == SHL);
+        return (op == AND || op == BOR || op == XOR || op == SHR || op == SHL || op == BNOT || op == INT);
     }
     
     public static boolean isSimpleArithmetic(OPCode op) {

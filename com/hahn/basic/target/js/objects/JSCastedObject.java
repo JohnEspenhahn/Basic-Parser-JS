@@ -10,22 +10,4 @@ public class JSCastedObject extends CastedObject {
         super(obj, type, row, col);
     }
     
-    private boolean needsIntCast() {
-        return getType().doesExtend(Type.INT) && !getHeldObject().getType().doesExtend(Type.INT);
-    }
-    
-    @Override
-    public boolean isGrouped() {
-        return needsIntCast() || super.isGrouped();
-    }
-    
-    @Override
-    public String toTarget() {
-        // Special int cast
-        if (needsIntCast()) {
-            return super.toTarget() + "|0";
-        } else {
-            return super.toTarget();
-        }
-    }
 }

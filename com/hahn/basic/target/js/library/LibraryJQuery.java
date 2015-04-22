@@ -42,17 +42,17 @@ public class LibraryJQuery extends Library {
 
         // DocEvent
         Library.defineParam(docEvent, "target", "target", arrDoc);
-        Library.defineParam(docEvent, "mouseX", "pageX", Type.INT);
-        Library.defineParam(docEvent, "mouseY", "pageY", Type.INT);
-        Library.defineParam(docEvent, "which", "which", Type.CHAR);
+        Library.defineParam(docEvent, "mouseX", "pageX", Type.REAL);
+        Library.defineParam(docEvent, "mouseY", "pageY", Type.REAL);
+        Library.defineParam(docEvent, "which", "which", Type.REAL);
         
         // Context
         Library.defineParam(context, "fill", "fillStyle", Type.STRING);
         Library.defineParam(context, "stroke", "strokeStyle", Type.STRING);
         Library.defineFunc(context, true, "beginPath", "beginPath", 0, Type.VOID);
         Library.defineFunc(context, true, "closePath", "closePath", 0, Type.VOID);
-        Library.defineFunc(context, true, "moveTo", "moveTo", 0, Type.VOID, new Type[] { Type.INT, Type.INT });
-        Library.defineFunc(context, true, "lineTo", "lineTo", 0, Type.VOID, new Type[] { Type.INT, Type.INT });
+        Library.defineFunc(context, true, "moveTo", "moveTo", 0, Type.VOID, new Type[] { Type.REAL, Type.REAL });
+        Library.defineFunc(context, true, "lineTo", "lineTo", 0, Type.VOID, new Type[] { Type.REAL, Type.REAL });
         Library.defineFunc(context, true, "fill", "fill", 0, Type.VOID);
         Library.defineFunc(context, true, "stroke", "stroke", 0, Type.VOID);
         
