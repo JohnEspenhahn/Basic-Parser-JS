@@ -822,11 +822,13 @@ public class Frame extends Statement {
         if (children.size() > 1) {
             Node resultNode = children.get(1);
             result = handleExpression(resultNode).getAsExpObj();
-            
-            Type newType = result.getType().autocast(func.getReturnType(), resultNode.getRow(), resultNode.getCol(), false);
-            if (newType == null) {
-                throw new CompileException("Invalid return type. Expected `" + func.getReturnType() + "` but got `" + result.getType() + "`", resultNode);
-            }
+        } else {
+            result = LiteralNum.VOID;
+        }
+        
+        Type newType = result.getType().autocast(func.getReturnType(), head.getRow(), head.getCol(), false);
+        if (newType == null) {
+            throw new CompileException("Invalid return type. Expected `" + func.getReturnType() + "` but got `" + result.getType() + "`", head);
         }
         
         // Return

@@ -29,6 +29,7 @@ public class LiteralNum extends Literal {
     public static final LiteralNum ZERO = new LiteralNum(0);
     public static final LiteralNum ONE  = new LiteralNum(1);
     
+    public static final LiteralNum VOID = new LiteralNum(0, Type.VOID);
     public static final LiteralNum NULL  = new LiteralNum(1, Type.UNDEFINED);
     public static final LiteralNum UNDEFINED  = new LiteralNum(0, Type.UNDEFINED);
     

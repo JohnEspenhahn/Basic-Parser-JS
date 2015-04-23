@@ -91,6 +91,7 @@ public enum EnumToken implements IEnumRegexToken {
     /** name      */ ___n       ("___n"      , Group.IDENT),
     /** new arr   */ ___a       ("___a"      , Group.IDENT),
     /** set arr   */ ___u       ("___u"      , Group.IDENT),
+    /** run exc.  */ ___r       ("___r"      , Group.IDENT),
     // End special reserved keywords
     
     IDENTIFIER  ("<<WORD>>"   , Group.IDENT),

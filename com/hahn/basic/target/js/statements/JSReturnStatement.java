@@ -22,7 +22,9 @@ public class JSReturnStatement extends ReturnStatement {
     public boolean doReverseOptimize() {
         Main.getInstance().setLine(row);
         
-        getResult().setInUse(this);
+        if (getResult() != null) {
+            getResult().setInUse(this);
+        }
         
         return false;
     }
@@ -31,14 +33,20 @@ public class JSReturnStatement extends ReturnStatement {
     public boolean doForwardOptimize() {
         Main.getInstance().setLine(row);
         
-        getResult().takeRegister(this);
+        if (getResult() != null) {
+            getResult().takeRegister(this);
+        }
         
         return false;
     }
     
     @Override
     public String toTarget() {
-        return JSPretty.format(0, "return %s", getResult());
+        if (getResult() != null) {
+            return JSPretty.format(0, "return %s", getResult());
+        } else {
+            return "return";
+        }
     }
     
 }

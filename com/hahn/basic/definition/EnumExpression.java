@@ -70,11 +70,11 @@ public enum EnumExpression implements IEnumExpression {
     ASSIGN_OP   ("ASSIGN|PLUS_EQU|SUB_EQU|MULT_EQU|DIV_EQU|AND_EQU|BOR_EQU|XOR_EQU"),
     
     COMMAND     ("CONTINUE|BREAK|IMPORT"),
-    RETURN      ("RETURN ?<EXPRESSION> EOL", false),
+    RETURN      ("RETURN ?<EXPRESSION>", false),
     
     BLOCK       ("OPEN_BRACE {<BLOCK_CNTNT>} CLOSE_BRACE|<BLOCK_CNTNT>", false),
     /** Stuff that can be done within if(){} */
-    BLOCK_CNTNT ("COMMENT|<DEFINE>EOL|<COMMAND>EOL|<EXPRESSION>EOL|<RETURN>|<IF_STMT>|<WHILE_STMT>|<FOR_STMT>|EOL", false),
+    BLOCK_CNTNT ("COMMENT|<DEFINE>EOL|<COMMAND>EOL|<EXPRESSION>EOL|<RETURN>EOL|<IF_STMT>|<WHILE_STMT>|<FOR_STMT>|EOL", false),
     /** Stuff that can be done within class{} */
     CLASS_CNTNT ("COMMENT|<DEF_FUNC>|<CONSTRUCTOR>|<DEFINE>EOL|EOL", false),
     
