@@ -2,9 +2,7 @@ package com.hahn.basic.target.js;
 
 import java.util.List;
 
-import com.hahn.basic.definition.EnumToken;
 import com.hahn.basic.intermediate.Frame;
-import com.hahn.basic.intermediate.FuncGroup;
 import com.hahn.basic.intermediate.FuncHead;
 import com.hahn.basic.intermediate.objects.AdvancedObject;
 import com.hahn.basic.intermediate.objects.ArithmeticObject;
@@ -12,10 +10,10 @@ import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.CastedObject;
 import com.hahn.basic.intermediate.objects.ClassObject;
 import com.hahn.basic.intermediate.objects.ConditionalObject;
+import com.hahn.basic.intermediate.objects.EmptyArray;
 import com.hahn.basic.intermediate.objects.ExpressionObject;
 import com.hahn.basic.intermediate.objects.FuncCallPointer;
 import com.hahn.basic.intermediate.objects.FuncPointer;
-import com.hahn.basic.intermediate.objects.NewArray;
 import com.hahn.basic.intermediate.objects.OPObject;
 import com.hahn.basic.intermediate.objects.Param;
 import com.hahn.basic.intermediate.objects.PostfixOPObject;
@@ -32,10 +30,10 @@ import com.hahn.basic.intermediate.objects.types.ClassType;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.ParameterizedType;
 import com.hahn.basic.intermediate.objects.types.StructType;
-import com.hahn.basic.intermediate.objects.types.StructType.StructParam;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.opcode.OPCode;
 import com.hahn.basic.intermediate.statements.CallFuncStatement;
+import com.hahn.basic.intermediate.statements.ClassDefinition;
 import com.hahn.basic.intermediate.statements.Compilable;
 import com.hahn.basic.intermediate.statements.DefineVarStatement;
 import com.hahn.basic.intermediate.statements.ExpressionStatement;
@@ -56,15 +54,16 @@ import com.hahn.basic.target.js.objects.JSCastedObject;
 import com.hahn.basic.target.js.objects.JSClassObject;
 import com.hahn.basic.target.js.objects.JSConditionalObject;
 import com.hahn.basic.target.js.objects.JSDefaultStruct;
+import com.hahn.basic.target.js.objects.JSEmptyArray;
 import com.hahn.basic.target.js.objects.JSExpressionObject;
 import com.hahn.basic.target.js.objects.JSFuncCallPointer;
 import com.hahn.basic.target.js.objects.JSFuncPointer;
-import com.hahn.basic.target.js.objects.JSNewArray;
 import com.hahn.basic.target.js.objects.JSNewInstance;
 import com.hahn.basic.target.js.objects.JSStringConst;
 import com.hahn.basic.target.js.objects.JSTernaryObject;
 import com.hahn.basic.target.js.objects.JSVarAccess;
 import com.hahn.basic.target.js.objects.JSVarSuper;
+import com.hahn.basic.target.js.objects.types.JSClassDefinition;
 import com.hahn.basic.target.js.statements.JSBreakStatement;
 import com.hahn.basic.target.js.statements.JSCallFuncStatement;
 import com.hahn.basic.target.js.statements.JSContinueStatement;
@@ -76,7 +75,6 @@ import com.hahn.basic.target.js.statements.JSIfStatement;
 import com.hahn.basic.target.js.statements.JSParamDefaultValStatement;
 import com.hahn.basic.target.js.statements.JSReturnStatement;
 import com.hahn.basic.target.js.statements.JSWhileStatement;
-import com.hahn.basic.util.BitFlag;
 import com.hahn.basic.util.exceptions.UnimplementedException;
 
 public class JSLangFactory implements ILangFactory {
@@ -108,72 +106,8 @@ public class JSLangFactory implements ILangFactory {
     }
     
     @Override
-    public String createClass(ClassType c) {
-        boolean isChild = (c.getParent() instanceof ClassType);
-        
-        StringBuilder builder = new StringBuilder();
-        builder.append(JSPretty.format(0, "var %s_=_(function(%s)_{^", c.getName(), (isChild ? EnumToken.___s : "")));
-        
-        JSPretty.addTab();
-        
-        ///////////////////////
-        // Extend
-        //////////////////////
-        
-        // Get short local name
-        String localName = c.getName();
-        if (localName.length() > EnumToken.___n.toString().length()) localName = EnumToken.___n.toString();
-        
-        // Extend super
-        if (isChild) builder.append(JSPretty.format(0, "%s(%s,%s);^", EnumToken.___e, localName, c.getParent().getName()));
-        
-        // Main constructor
-        builder.append(JSPretty.format(0, "function %s()_{^", localName));
-        
-        // Call super constructor and, if needed, add init frame
-        if (!c.getInitFrame().isEmpty()) {
-            JSPretty.addTab();
-            builder.append(JSPretty.format(0, "%s.call(this);^", EnumToken.___s));
-            builder.append(JSPretty.format(-1, "%s", c.getInitFrame()));
-            JSPretty.removeTab();
-        } else {
-            builder.append(JSPretty.format(1, "%s.call(this)<;>", EnumToken.___s));
-        }
-        
-        builder.append(JSPretty.format(0, "^"));
-        builder.append(JSPretty.format(0, "}^"));
-        
-        // Define class's static parameters
-        for (StructParam param: c.getDefinedParams()) {
-            if (param.hasFlag(BitFlag.STATIC)) {
-                builder.append(JSPretty.format(0, "%s.%s_=_undefined;^", localName, param.getName()));
-            }
-        }
-        
-        // TODO class static frame
-        if (c.getStaticFrame().getTargetCode().size() > 0) {
-            builder.append(JSPretty.format(0, "%b^", c.getStaticFrame()));
-        }
-        
-        // Add functions
-        for (FuncGroup funcGroup: c.getDefinedFuncs()) {
-            for (FuncHead func: funcGroup) {
-                if (func.hasFrameHead()) {                    
-                    if (func.hasFlag(BitFlag.STATIC)) {
-                        builder.append(JSPretty.format(0, "%s.%s_=_%s;^", localName, func.getFuncId(), func.toFuncAreaTarget()));
-                    } else {
-                        builder.append(JSPretty.format(0, "%s.prototype.%s_=_%s;^", localName, func.getFuncId(), func.toFuncAreaTarget()));
-                    }
-                }
-            }
-        }
-        
-        builder.append(JSPretty.format(0, "return %s<;^>", localName));        
-        
-        JSPretty.removeTab();
-        
-        builder.append(JSPretty.format(0, "})(%s);^", (isChild ? c.getParent().getName() : "")));
-        return builder.toString();
+    public ClassDefinition ClassDefinition(Statement container, ClassType type) {
+        return new JSClassDefinition(container, type);
     }
     
     @Override
@@ -257,8 +191,8 @@ public class JSLangFactory implements ILangFactory {
     }
     
     @Override
-    public NewArray NewArray(Node node, int dimensions, List<BasicObject> values) {
-        return new JSNewArray(node, dimensions, values);
+    public EmptyArray EmptyArray(Node node, Type type, List<BasicObject> dimensionSizes) {
+        return new JSEmptyArray(node, type, dimensionSizes);
     }
     
     @Override

@@ -90,7 +90,8 @@ public enum EnumToken implements IEnumRegexToken {
     /** extend    */ ___e       ("___e"      , Group.IDENT),
     /** name      */ ___n       ("___n"      , Group.IDENT),
     /** new arr   */ ___a       ("___a"      , Group.IDENT),
-    /** set arr   */ ___u       ("___u"      , Group.IDENT),
+    /** update arr*/ ___u       ("___u"      , Group.IDENT),
+    /** get arr   */ ___g       ("___g"      , Group.IDENT),
     /** run exc.  */ ___r       ("___r"      , Group.IDENT),
     // End special reserved keywords
     

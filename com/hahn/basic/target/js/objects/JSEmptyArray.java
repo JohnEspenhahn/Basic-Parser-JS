@@ -4,28 +4,32 @@ import java.util.List;
 
 import com.hahn.basic.definition.EnumToken;
 import com.hahn.basic.intermediate.objects.BasicObject;
-import com.hahn.basic.intermediate.objects.NewArray;
+import com.hahn.basic.intermediate.objects.EmptyArray;
+import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.parser.Node;
 import com.hahn.basic.util.Util;
 
-public class JSNewArray extends NewArray {
-    
-    public JSNewArray(Node node, int dimensions, List<BasicObject> values) {
-        super(node, dimensions, values);
+public class JSEmptyArray extends EmptyArray {
+
+    public JSEmptyArray(Node node, Type type, List<BasicObject> dimensionSizes) {
+        super(node, type, dimensionSizes);
     }
-    
+
     @Override
     public String toTarget() {
         StringBuilder builder = new StringBuilder();
         builder.append(EnumToken.___a);
         builder.append("(");
-        builder.append(getDimensions());
         
         // If size is defined for at least one dimension
-        if (getDimensionValues().size() > 0) {
-            builder.append(",[");
-            builder.append(Util.toTarget(getDimensionValues(), ","));
-            builder.append("]");
+        builder.append("[");
+        builder.append(Util.toTarget(getDimensionSizes(), ","));
+        builder.append("]");
+        
+        if (getType().doesExtend(Type.OBJECT)) {
+            builder.append(",null");
+        } else {
+            builder.append(",0");
         }
         
         builder.append(")");

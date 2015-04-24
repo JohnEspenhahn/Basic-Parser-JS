@@ -271,9 +271,4 @@ public class ClassType extends StructType {
         }
     }
     
-    @Override
-    public String toTarget() {
-        if (hasFlag(BitFlag.SYSTEM)) return "";
-        else return LangCompiler.factory.createClass(this);
-    }
 }

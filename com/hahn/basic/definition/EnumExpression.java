@@ -4,7 +4,7 @@ import com.hahn.basic.parser.IEnumExpression;
 import com.hahn.basic.viewer.util.TextColor;
 
 public enum EnumExpression implements IEnumExpression {   
-    STMT_EXPRS  ("<CREATE_ARR>|<CREATE>|<CALL_FUNC>|<MODIFY>|<ACCESS>", false),
+    STMT_EXPRS  ("<CREATE_ARR>|<CREATE_EARR>|<CREATE>|<CALL_FUNC>|<MODIFY>|<ACCESS>", false),
     FACTOR      ("<STMT_EXPRS>|<CAST>|<ANON_FUNC>|<FUNC_POINTER>|NULL|CHAR|HEX_INT|REAL|TRUE|FALSE|OPEN_PRNTH<EXPRESSION>CLOSE_PRNTH"),
     PREFIX_OP   ("ADD_ADD|SUB_SUB|SUB|NOT|TILDE|HASH"),
     PREFIX      ("?<PREFIX_OP> <FACTOR>"),
@@ -21,7 +21,8 @@ public enum EnumExpression implements IEnumExpression {
     
     CAST        ("OPEN_PRNTH <TYPE>COLON<FACTOR> CLOSE_PRNTH", false),
     CREATE      ("NEW <TYPE> ( OPEN_PRNTH ?<CALL_PARAMS> CLOSE_PRNTH )", false), 
-    CREATE_ARR  ("NEW [ OPEN_SQR ?<EXPRESSION> CLOSE_SQR ]", false),
+    CREATE_ARR  ("OPEN_SQR ?<EXPRESSION> CLOSE_SQR", false),
+    CREATE_EARR ("<TYPE> [ OPEN_SQR ?<EXPRESSION> CLOSE_SQR ]", false),
     
     WHILE_STMT  ("WHILE <CONDITIONAL>", false),
     
@@ -62,7 +63,7 @@ public enum EnumExpression implements IEnumExpression {
     CALL_PARAMS ("<EXPRESSION> {COMMA <EXPRESSION>}", false),
     
     FLAG        ("CONST|PRIVATE|STATIC", false),
-    DEFINE      ("{<FLAG>} <TYPE> IDENTIFIER ?<DEF_MODIFY> {COMMA IDENTIFIER ?<DEF_MODIFY>}", false),
+    DEFINE      ("{<FLAG>} <TYPE> IDENTIFIER ?<DEF_MODIFY> {COMMA IDENTIFIER ?<DEF_MODIFY>}|{<FLAG>} <CREATE_EARR> IDENTIFIER {COMMA <CREATE_EARR> IDENTIFIER}", false),
     DEF_MODIFY  ("ASSIGN <EXPRESSION>", false),
     
     ADD2_SUB2   ("ADD_ADD|SUB_SUB"),

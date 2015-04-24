@@ -10,10 +10,10 @@ import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.CastedObject;
 import com.hahn.basic.intermediate.objects.ClassObject;
 import com.hahn.basic.intermediate.objects.ConditionalObject;
+import com.hahn.basic.intermediate.objects.EmptyArray;
 import com.hahn.basic.intermediate.objects.ExpressionObject;
 import com.hahn.basic.intermediate.objects.FuncCallPointer;
 import com.hahn.basic.intermediate.objects.FuncPointer;
-import com.hahn.basic.intermediate.objects.NewArray;
 import com.hahn.basic.intermediate.objects.OPObject;
 import com.hahn.basic.intermediate.objects.Param;
 import com.hahn.basic.intermediate.objects.StringConst;
@@ -28,6 +28,7 @@ import com.hahn.basic.intermediate.objects.types.StructType;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.opcode.OPCode;
 import com.hahn.basic.intermediate.statements.CallFuncStatement;
+import com.hahn.basic.intermediate.statements.ClassDefinition;
 import com.hahn.basic.intermediate.statements.Compilable;
 import com.hahn.basic.intermediate.statements.DefineVarStatement;
 import com.hahn.basic.intermediate.statements.ExpressionStatement;
@@ -51,8 +52,8 @@ public interface ILangFactory {
 	// OP Codes
 	public String getTargetOPSymbol(OPCode code);
 	
-	// Types
-    public String createClass(ClassType c);
+	// Type
+	public ClassDefinition ClassDefinition(Statement container, ClassType type);
 	
 	// Objects	
 	public BasicObject PushObject();
@@ -78,7 +79,8 @@ public interface ILangFactory {
 	
 	public VarAccess VarAccess(Statement container, BasicObject var, BasicObject idx, Type type, int row, int col);
 	
-	public NewArray NewArray(Node node, int dimensions, List<BasicObject> values);
+	public EmptyArray EmptyArray(Node node, Type type, List<BasicObject> dimensionSizes);
+	
 	public BasicObject NewInstance(Type type, Node typeNode, List<BasicObject> params);
 	
 	public ConditionalObject ConditionalObject(Statement container, OPCode op, BasicObject p1, Node p1Node, BasicObject p2, Node p2Node, BasicObject temp);

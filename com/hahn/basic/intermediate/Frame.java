@@ -49,6 +49,7 @@ import com.hahn.basic.definition.EnumExpression;
 import com.hahn.basic.definition.EnumToken;
 import com.hahn.basic.intermediate.objects.AdvancedObject;
 import com.hahn.basic.intermediate.objects.BasicObject;
+import com.hahn.basic.intermediate.objects.EmptyArray;
 import com.hahn.basic.intermediate.objects.FuncCallPointer;
 import com.hahn.basic.intermediate.objects.FuncPointer;
 import com.hahn.basic.intermediate.objects.LiteralBool;
@@ -66,6 +67,7 @@ import com.hahn.basic.intermediate.objects.types.StructType.StructParam;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.opcode.OPCode;
 import com.hahn.basic.intermediate.statements.CallFuncStatement;
+import com.hahn.basic.intermediate.statements.ClassDefinition;
 import com.hahn.basic.intermediate.statements.Compilable;
 import com.hahn.basic.intermediate.statements.DefineVarStatement;
 import com.hahn.basic.intermediate.statements.DefineVarStatement.DefinePair;
@@ -718,6 +720,9 @@ public class Frame extends Statement {
         Type type = Type.UNDEFINED;
         DefineVarStatement define = LangCompiler.factory.DefineVarStatement(this, false);
         
+        // For empty array creation
+        EmptyArray emptyArray = null;
+        
         while (it.hasNext()) {
             Node node = it.next();
             Enum<?> token = node.getToken();
@@ -726,58 +731,72 @@ public class Frame extends Statement {
                 flags |= BitFlag.valueOf(node);
             } else if (token == EnumExpression.TYPE) {
                 type = Type.fromNode(node);
+            } else if (token == EnumExpression.CREATE_EARR) {
+                emptyArray = createEmptyArray(node);
             } else if (token == EnumToken.IDENTIFIER) {
                 String name = node.getValue();
                 
                 // Create var
                 final BasicObject obj;
-                if (struct != null) {
+                if (struct != null) { // Instance var
                     node.setColor(TextColor.LIGHT_BLUE);
                     
                     obj = struct.putParam(new Param(name, type, flags), node);
-                } else {
+                } else { // Local var
                     obj = LangCompiler.factory.VarLocal(this, name, type, flags);
                 }
                 
                 // Modify var
+                BasicObject val = null;
+                Node mainNode = null, valNode = null;
+                
                 boolean hasInit = false;
-                if (it.hasNext()) {
+                if (emptyArray != null) {
+                    val = emptyArray;
+                    valNode = emptyArray.getNode();
+                    mainNode = emptyArray.getNode();
+                    
+                    // Reset
+                    emptyArray = null;
+                    
+                    hasInit = true;
+                } else if (it.hasNext()) {
                     Node nextHead = it.next();
                     Enum<?> nextToken = nextHead.getToken();
                     
-                    if (nextToken == EnumExpression.DEF_MODIFY) {
-                        if (!canInit) {
-                            throw new CompileException("Can not initialize `" + obj.getName() + "` here", nextHead);
-                        }
-                        
+                    if (nextToken == EnumExpression.DEF_MODIFY) {                        
                         List<Node> modify_children = nextHead.getAsChildren();
                         
-                        Node equNode = modify_children.get(0);
-                        Node expNode = modify_children.get(1);
+                        mainNode = nextHead;                        
+                        valNode = modify_children.get(1); // Value to assign                         
+                        val = handleExpression(valNode).getAsExpObj();
                         
-                        BasicObject o = handleExpression(expNode).getAsExpObj();
-                        
-                        if (struct instanceof ClassType) {
-                            defineClassVar((ClassType) struct, obj, node, o, expNode);
-                        }
-                        
-                        define.addVar(obj, o, equNode);                        
                         hasInit = true;
                     }
+                } else if (canInit) { // Default value
+                    mainNode = node;
+                    valNode = node;
+                    
+                    val = LiteralNum.UNDEFINED;
+                    if (type.doesExtend(Type.OBJECT)) val = LiteralNum.NULL;
+                    else if (type.doesExtend(Type.STRUCT)) val = LangCompiler.factory.DefaultStruct(type.getAsStruct());
+                    
+                    hasInit = true;
                 }
                 
-                // Default value
-                if (!hasInit && canInit) {
-                    BasicObject defaultVal = LiteralNum.UNDEFINED;
-                    if (type.doesExtend(Type.OBJECT)) defaultVal = LiteralNum.NULL;
-                    else if (type.doesExtend(Type.STRUCT)) defaultVal = LangCompiler.factory.DefaultStruct(type.getAsStruct());
-                    
-                    // Do set value
-                    if (struct instanceof ClassType) {
-                        defineClassVar((ClassType) struct, obj, node, defaultVal, node);
+                // Do the init
+                if (hasInit) {
+                    if (!canInit) {
+                        throw new CompileException("Can not initialize `" + obj.getName() + "` here", mainNode);
+                    } else if (val == null || valNode == null || mainNode == null) {
+                        throw new IllegalArgumentException();
                     }
                     
-                    define.addVar(obj, defaultVal, node);
+                    if (struct instanceof ClassType) {
+                        defineClassVar((ClassType) struct, obj, node, val, valNode);                    
+                    }
+                    
+                    define.addVar(obj, val, mainNode);  
                 }
                 
                 // Make var available
@@ -791,6 +810,39 @@ public class Frame extends Statement {
         define.setFlags(flags);
         
         return define;
+    }
+    
+    /**
+     * Parse an empty array definition
+     * @param head EnumExpression.CREATE_EARR
+     * @return An empty array object
+     */
+    public EmptyArray createEmptyArray(Node head) {
+        Iterator<Node> it = Util.getIterator(head);
+        
+        int dimensions = 0;
+        Type type = Type.fromNode(it.next());
+        
+        List<BasicObject> sizes = new ArrayList<BasicObject>();
+        
+        while (it.hasNext()) {
+            Node open_brace = it.next(); // Skip open brace
+            
+            dimensions += 1;
+            Node next = it.next(); // Might be close brace
+            if (next.getToken() == EnumExpression.EXPRESSION) {
+                sizes.add(handleExpression(it.next()).getAsExpObj());
+            
+                it.next(); // Skip close brace
+            } else if (dimensions == 1) {
+                throw new CompileException("Illegal array definition, must define size of first dimension", open_brace);
+            }
+        }
+        
+        // Change to array type
+        type = new ParameterizedType<Type>(Type.ARRAY, Util.createArray(dimensions, type));
+        
+        return LangCompiler.factory.EmptyArray(head, type, sizes);
     }
     
     private void defineClassVar(ClassType classIn, BasicObject var, Node varNode, BasicObject val, Node valNode) {
@@ -859,8 +911,9 @@ public class Frame extends Statement {
     /**
      * `Class` definition handler
      * @param head EnumExpression.CLASS
+     * @return ClassDefinition
      */
-    public void defineClass(Node head) {
+    public ClassDefinition defineClass(Node head) {
         Iterator<Node> it = Util.getIterator(head);
         it.next(); // skip 'class'
         
@@ -910,6 +963,8 @@ public class Frame extends Statement {
             
             // Handle class content
             handleClassContent(nameNode, classType, it);
+            
+            return LangCompiler.factory.ClassDefinition(this, classType);
         } else {
             if (parentNode == null) parentNode = head;
             throw new CompileException("Cannot extend the non-class type `" + parentType + "`", parentNode);
@@ -1148,8 +1203,6 @@ public class Frame extends Statement {
     public BasicObject createInstance(Node head) {
     	List<Node> children = head.getAsChildren();
     	
-    	Node newNode = children.get(0);
-    	
     	Node typeNode = children.get(1);
         Type type = Type.fromNode(typeNode);
         if (!type.doesExtend(Type.STRUCT)) {
@@ -1164,49 +1217,11 @@ public class Frame extends Statement {
             getFuncCallParams(children.get(3), params);
             
             return LangCompiler.factory.NewInstance(type, typeNode, params);
-            
-        // TODO Needed? Array definition with no dimension definition (ex) new int[]
-        } else if (type.doesExtend(Type.ARRAY) && type instanceof ParameterizedType<?>) {
-            ParameterizedType<?> pType = (ParameterizedType<?>) type;
-            
-            // Extract packaged information from array type definition
-            int dimensions = pType.numTypes();
-            
-            return LangCompiler.factory.NewArray(newNode, dimensions, new ArrayList<BasicObject>());
+        } else if (type.doesExtend(Type.ARRAY)) {
+            throw new CompileException("Illegal array definition, must define size of first dimension", typeNode);
         } else {
             throw new CompileException("Illegal definition of type `" + type + "`. Missing parameters", typeNode);
         }
-    }
-    
-    /**
-     * Create a new array instance based on node data
-     * @param head EnumExpression.CREATE_ARR
-     * @return Object instance
-     */
-    public BasicObject createArrayInstance(Node head) {
-        Iterator<Node> it = Util.getIterator(head);
-        Node newNode = it.next(); // Skip `new`
-        
-        int dimensions = 0;
-        List<BasicObject> dimValues = new ArrayList<BasicObject>();
-        
-        while (it.hasNext()) {
-            Node node = it.next();
-            if (node.getToken() == OPEN_SQR) {
-                dimensions += 1;
-                
-                Node next = it.next();
-                if (next.getToken() == EnumExpression.EXPRESSION) {
-                    if (dimValues.size() + 1 < dimensions) {
-                        throw new CompileException("Illegal dimensions defined at index " + dimensions, newNode);
-                    }
-                    
-                    dimValues.add(handleExpression(next).getAsExpObj());
-                }
-            }
-        }
-        
-        return LangCompiler.factory.NewArray(newNode, dimensions, dimValues);
     }
     
     /**
@@ -1518,8 +1533,8 @@ public class Frame extends Statement {
                 return modifyVar(child);
             } else if (token == EnumExpression.CREATE) {
                 return createInstance(child);
-            } else if (token == EnumExpression.CREATE_ARR) {
-                return createArrayInstance(child);
+            } else if (token == EnumExpression.CREATE_EARR) {
+                return createEmptyArray(child);
             } else if (token == EnumExpression.CAST) {
                 return doCast(child, temp);
             } else if (token == EnumExpression.FUNC_POINTER) {
