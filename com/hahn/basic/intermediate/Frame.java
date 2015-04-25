@@ -67,7 +67,6 @@ import com.hahn.basic.intermediate.objects.types.StructType.StructParam;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.opcode.OPCode;
 import com.hahn.basic.intermediate.statements.CallFuncStatement;
-import com.hahn.basic.intermediate.statements.ClassDefinition;
 import com.hahn.basic.intermediate.statements.Compilable;
 import com.hahn.basic.intermediate.statements.DefineVarStatement;
 import com.hahn.basic.intermediate.statements.DefineVarStatement.DefinePair;
@@ -897,7 +896,7 @@ public class Frame extends Statement {
         
         Node nameNode = it.next();
         Main.getInstance().setLine(nameNode.getRow(), nameNode.getCol());
-        StructType struct = Type.STRUCT.extendAs(nameNode.getValue(), 0);
+        StructType struct = Type.STRUCT.extendAs(this, nameNode.getValue(), 0);
         
         while (it.hasNext()) {
             Node next = it.next();
@@ -911,9 +910,8 @@ public class Frame extends Statement {
     /**
      * `Class` definition handler
      * @param head EnumExpression.CLASS
-     * @return ClassDefinition
      */
-    public ClassDefinition defineClass(Node head) {
+    public void defineClass(Node head) {
         Iterator<Node> it = Util.getIterator(head);
         it.next(); // skip 'class'
         
@@ -959,12 +957,10 @@ public class Frame extends Statement {
                 throw new CompileException("The class `" + nameNode + "` cannot extend the final class `" + parentType + "`", parentNode);
             }
             
-            ClassType classType = ((ClassType) parentType).extendAs(nameNode.getValue(), flags);
+            ClassType classType = ((ClassType) parentType).extendAs(this, nameNode.getValue(), flags);
             
             // Handle class content
             handleClassContent(nameNode, classType, it);
-            
-            return LangCompiler.factory.ClassDefinition(this, classType);
         } else {
             if (parentNode == null) parentNode = head;
             throw new CompileException("Cannot extend the non-class type `" + parentType + "`", parentNode);

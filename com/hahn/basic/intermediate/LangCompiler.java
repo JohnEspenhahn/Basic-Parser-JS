@@ -87,6 +87,9 @@ public class LangCompiler {
         
         // Compile class area
         builder.appendString(builder.getContentStart());
+        for (Type t: Type.getPublicTypes()) {
+            builder.appendString(t.toTarget());
+        }
         
         // Convert code to target
         builder.appendString(frame.toTarget());

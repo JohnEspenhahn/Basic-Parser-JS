@@ -65,6 +65,6 @@ public abstract class Library {
     }
     
     public static ClassType defineClass(String name, boolean isFinal) {
-        return Type.OBJECT.extendAs(name, BitFlag.SYSTEM.b | (isFinal ? BitFlag.FINAL.b : 0));
+        return Type.OBJECT.extendAs(null, name, BitFlag.SYSTEM.b | (isFinal ? BitFlag.FINAL.b : 0));
     }
 }

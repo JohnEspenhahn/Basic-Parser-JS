@@ -15,7 +15,7 @@ public class StaticClassTypeHolder extends ClassType implements StaticClassExclu
     private final ClassType heldClass;
     
     public StaticClassTypeHolder(ClassType classType) {
-        super(null, null, 0, true);
+        super(null, null, null, 0, true);
         
         this.heldClass = classType;
     }

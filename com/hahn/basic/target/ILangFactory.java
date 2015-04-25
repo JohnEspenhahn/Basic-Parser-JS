@@ -53,7 +53,7 @@ public interface ILangFactory {
 	public String getTargetOPSymbol(OPCode code);
 	
 	// Type
-	public ClassDefinition ClassDefinition(Statement container, ClassType type);
+	public ClassDefinition ClassDefinition(Frame containingFrame, ClassType type);
 	
 	// Objects	
 	public BasicObject PushObject();

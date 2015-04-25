@@ -12,21 +12,24 @@ import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.ClassObject;
 import com.hahn.basic.intermediate.objects.Param;
 import com.hahn.basic.intermediate.objects.Var;
+import com.hahn.basic.intermediate.statements.ClassDefinition;
 import com.hahn.basic.intermediate.statements.Statement;
 import com.hahn.basic.parser.Node;
 import com.hahn.basic.util.BitFlag;
 import com.hahn.basic.util.Util;
 import com.hahn.basic.util.exceptions.CompileException;
 
-public class ClassType extends StructType {
-    private ClassObject classObj;    
-    private Var varThis, varImpliedThis, varSuper;
-    
+public class ClassType extends StructType {    
     private FuncBridge funcBridge;
     private Frame initFrame;
     private Frame staticFrame;
     
-    public ClassType(String name, StructType parent, int flags, boolean isAbstract) {
+    private ClassObject classObj;    
+    private Var varThis, varImpliedThis, varSuper;
+    
+    private ClassDefinition def;
+    
+    public ClassType(Frame containingFrame, String name, StructType parent, int flags, boolean isAbstract) {
         super(name, parent, flags, isAbstract);
         
         if (name == null) return;
@@ -45,6 +48,8 @@ public class ClassType extends StructType {
         } else {
             this.varSuper = null;
         }
+        
+        this.def = LangCompiler.factory.ClassDefinition(containingFrame, this);
     }
     
     /**
@@ -105,13 +110,13 @@ public class ClassType extends StructType {
     }
     
     @Override
-    public ClassType extendAs(String name, int flags) {
-        return this.extendAs(name, null, flags);
+    public ClassType extendAs(Frame containingFrame, String name, int flags) {
+        return this.extendAs(containingFrame, name, null, flags);
     }
     
     @Override
-    public ClassType extendAs(String name, List<BasicObject> ps, int flags) {
-        ClassType newClass = new ClassType(name, this, flags, false);
+    public ClassType extendAs(Frame containingFrame, String name, List<BasicObject> ps, int flags) {
+        ClassType newClass = new ClassType(containingFrame, name, this, flags, false);
         newClass.loadParams(ps);
         
         return newClass;
@@ -168,6 +173,10 @@ public class ClassType extends StructType {
     
     public Collection<FuncGroup> getDefinedFuncs() {
         return funcBridge.getFuncs();
+    }
+    
+    public FuncHead getConstructor(ITypeable[] types) {
+        return funcBridge.getFunc(Util.getConstructorName(), types);
     }
     
     /**
@@ -253,8 +262,9 @@ public class ClassType extends StructType {
         initFrame.addTargetCode();
         initFrame.reverseOptimize();
         
+        // If no constructor, define default
         if (funcBridge.getFuncGroup(Util.getConstructorName()) == null) {
-            // TODO define default constructor
+            defineFunc(null, Util.getConstructorName(), null, Type.VOID, new Param[0]);
         }
     }
     
@@ -269,6 +279,11 @@ public class ClassType extends StructType {
                 }
             }
         }
+    }
+    
+    @Override
+    public String toTarget() {
+        return def.toTarget();
     }
     
 }

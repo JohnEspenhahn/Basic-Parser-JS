@@ -29,10 +29,10 @@ public class Type implements ITypeable {
     
     public static final StructType STRUCT = new StructType("struct", null, 0, true);
     
-    public static final ClassType  OBJECT   = new ClassType("Object", STRUCT, BitFlag.ABSTRACT.b | BitFlag.SYSTEM.b, false),
-                                   FUNCTION = OBJECT.extendAs("function", BitFlag.FINAL.b | BitFlag.SYSTEM.b).setTypeParams(-1),
-                                   ARRAY    = OBJECT.extendAs("Array", BitFlag.FINAL.b | BitFlag.SYSTEM.b).setTypeParams(-1),
-                                   STRING   = OBJECT.extendAs("String", BitFlag.FINAL.b | BitFlag.SYSTEM.b).setTypeParams(0);
+    public static final ClassType  OBJECT   = new ClassType(null, "Object", STRUCT, BitFlag.ABSTRACT.b | BitFlag.SYSTEM.b, false),
+                                   FUNCTION = OBJECT.extendAs(null, "function", BitFlag.FINAL.b | BitFlag.SYSTEM.b).setTypeParams(-1),
+                                   ARRAY    = OBJECT.extendAs(null, "Array", BitFlag.FINAL.b | BitFlag.SYSTEM.b).setTypeParams(-1),
+                                   STRING   = OBJECT.extendAs(null, "String", BitFlag.FINAL.b | BitFlag.SYSTEM.b).setTypeParams(0);
     
     public static final int COUNT_PRIMATIVES = TYPES.size();
     

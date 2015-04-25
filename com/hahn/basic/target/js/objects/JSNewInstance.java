@@ -6,6 +6,7 @@ import com.hahn.basic.definition.EnumToken;
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.NewInstance;
 import com.hahn.basic.intermediate.objects.types.ClassType;
+import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.parser.Node;
 import com.hahn.basic.util.Util;
@@ -20,7 +21,12 @@ public class JSNewInstance extends NewInstance {
     public String toTarget() {
         if (getType() instanceof ClassType) {
             if (getParams().length == 0) { // Constructor with no params
-                return String.format("%s(%s,'%s')", EnumToken.___c, getType().getName(), getConstructor().getFuncId());
+                // If no frame head then auto-generated default constructor
+                if (getConstructor().hasFrameHead()) {
+                    return String.format("%s(%s,'%s')", EnumToken.___c, getType().getName(), getConstructor().getFuncId());
+                } else {
+                    return String.format("%s(%s)", EnumToken.___c, getType().getName());
+                }
             } else { // Constructor with params
                 return String.format("%s(%s,'%s',%s)", EnumToken.___c, getType().getName(), getConstructor().getFuncId(), Util.toTarget(getParams()));
             }

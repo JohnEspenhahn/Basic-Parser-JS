@@ -1,0 +1,11 @@
+diff a/com/hahn/basic/intermediate/LangCompiler.java b/com/hahn/basic/intermediate/LangCompiler.java	(rejected hunks)
+@@ -87,9 +87,6 @@
+         
+         // Compile class area
+         builder.appendString(builder.getContentStart());
+-        for (Type t: Type.getPublicTypes()) {
+-            builder.appendString(t.toTarget());
+-        }
+         
+         // Convert code to target
+         builder.appendString(frame.toTarget());

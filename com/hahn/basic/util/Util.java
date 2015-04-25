@@ -10,6 +10,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 
 import com.hahn.basic.Main;
 import com.hahn.basic.definition.EnumToken;
+import com.hahn.basic.intermediate.FuncHead;
 import com.hahn.basic.intermediate.IIntermediate;
 import com.hahn.basic.intermediate.objects.AdvancedObject;
 import com.hahn.basic.intermediate.objects.LiteralNum;
@@ -21,11 +22,15 @@ import com.hahn.basic.parser.Node;
 public class Util {
     
     public static String getConstructorName() {
-        return EnumToken.CONSTRUCTOR.toString();
+        return EnumToken.CONSTRUCTOR.getString();
     }
     
     public static boolean isConstructorName(String name) {
         return name.equals(getConstructorName());
+    }
+    
+    public static boolean isDefaultConstructor(FuncHead func) {
+        return func.getParams().length == 0 && func.getName().equals(getConstructorName());
     }
     
     public static String getListSeperator() {

@@ -1,19 +1,19 @@
-package com.hahn.basic.target.js.objects.types;
+package com.hahn.basic.target.js.statements;
 
 import com.hahn.basic.definition.EnumToken;
+import com.hahn.basic.intermediate.Frame;
 import com.hahn.basic.intermediate.FuncGroup;
 import com.hahn.basic.intermediate.FuncHead;
 import com.hahn.basic.intermediate.objects.types.ClassType;
 import com.hahn.basic.intermediate.objects.types.StructType.StructParam;
 import com.hahn.basic.intermediate.statements.ClassDefinition;
-import com.hahn.basic.intermediate.statements.Statement;
 import com.hahn.basic.target.js.JSPretty;
 import com.hahn.basic.util.BitFlag;
 
 public class JSClassDefinition extends ClassDefinition {
     
-    public JSClassDefinition(Statement container, ClassType type) {
-        super(container, type);
+    public JSClassDefinition(Frame containingFrame, ClassType type) {
+        super(containingFrame, type);
     }
 
     @Override

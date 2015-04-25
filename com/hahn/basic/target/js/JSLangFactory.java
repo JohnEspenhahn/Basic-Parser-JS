@@ -63,9 +63,9 @@ import com.hahn.basic.target.js.objects.JSStringConst;
 import com.hahn.basic.target.js.objects.JSTernaryObject;
 import com.hahn.basic.target.js.objects.JSVarAccess;
 import com.hahn.basic.target.js.objects.JSVarSuper;
-import com.hahn.basic.target.js.objects.types.JSClassDefinition;
 import com.hahn.basic.target.js.statements.JSBreakStatement;
 import com.hahn.basic.target.js.statements.JSCallFuncStatement;
+import com.hahn.basic.target.js.statements.JSClassDefinition;
 import com.hahn.basic.target.js.statements.JSContinueStatement;
 import com.hahn.basic.target.js.statements.JSDefaultCallFuncStatement;
 import com.hahn.basic.target.js.statements.JSDefineVarStatement;
@@ -106,8 +106,8 @@ public class JSLangFactory implements ILangFactory {
     }
     
     @Override
-    public ClassDefinition ClassDefinition(Statement container, ClassType type) {
-        return new JSClassDefinition(container, type);
+    public ClassDefinition ClassDefinition(Frame containingFrame, ClassType type) {
+        return new JSClassDefinition(containingFrame, type);
     }
     
     @Override

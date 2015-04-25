@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.hahn.basic.intermediate.Frame;
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.Param;
 import com.hahn.basic.parser.Node;
@@ -58,22 +59,24 @@ public class StructType extends Type {
     
     /**
      * Extend this with no additional parameters
+     * @param containingFrame The frame that contains the new struct's definition or null if system class
      * @param name The name of the new struct
      * @param flags Flags for this structs
      * @return A new struct object
      */
-    public StructType extendAs(String name, int flags) {
-        return extendAs(name, null, flags);
+    public StructType extendAs(Frame containingFrame, String name, int flags) {
+        return extendAs(containingFrame, name, null, flags);
     }
     
     /**
      * Extend this
+     * @param containingFrame The frame that contains the new struct's definition
      * @param name The name of the new struct
      * @param ps The parameters added by this new struct
      * @param flags Flags for this struct
      * @return A new struct object
      */
-    public StructType extendAs(String name, List<BasicObject> ps, int flags) {
+    public StructType extendAs(Frame containingFrame, String name, List<BasicObject> ps, int flags) {
         StructType struct = new StructType(name, this, flags, false);
         struct.loadParams(ps);
         
