@@ -7,19 +7,31 @@ import java.util.ListIterator;
 import org.apache.commons.lang3.StringUtils;
 
 import com.hahn.basic.intermediate.IIntermediate;
+import com.hahn.basic.intermediate.objects.types.ParameterizedType;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.parser.Node;
+import com.hahn.basic.util.Util;
 import com.hahn.basic.util.exceptions.CompileException;
 
 public abstract class EmptyArray extends BasicObject {
     private Node node;
     private List<BasicObject> dimensionSizes;
     
-    public EmptyArray(Node node, Type type, List<BasicObject> dimensionSizes) {
+    /**
+     * Create an empty array defined at node `node` of type `type` (where `type` extends Array)
+     * @param node The node defining at
+     * @param type 
+     * @param dimensionSizes
+     */
+    public EmptyArray(Node node, ParameterizedType<Type> type, List<BasicObject> dimensionSizes) {
         super(type.toString() + StringUtils.repeat("[]", dimensionSizes.size()), type);
         
         this.node = node;
         this.dimensionSizes = dimensionSizes;
+    }
+    
+    public static ParameterizedType<Type> toArrayType(Type baseType, int dimensions) {
+        return new ParameterizedType<Type>(Type.ARRAY, Util.createArray(dimensions, baseType));
     }
     
     public Node getNode() {
@@ -32,6 +44,16 @@ public abstract class EmptyArray extends BasicObject {
     
     public List<BasicObject> getDimensionSizes() {
         return dimensionSizes;
+    }
+    
+    @Override
+    public void setType(Type t) {
+        throw new RuntimeException("Cann't change type of predefined array");
+    }
+    
+    @SuppressWarnings("unchecked")
+    public Type getBaseType() {
+        return ((ParameterizedType<Type>) getType()).getTypable(0);
     }
     
     @Override

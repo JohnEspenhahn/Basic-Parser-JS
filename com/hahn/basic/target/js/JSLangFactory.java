@@ -191,7 +191,7 @@ public class JSLangFactory implements ILangFactory {
     }
     
     @Override
-    public EmptyArray EmptyArray(Node node, Type type, List<BasicObject> dimensionSizes) {
+    public EmptyArray EmptyArray(Node node, ParameterizedType<Type> type, List<BasicObject> dimensionSizes) {
         return new JSEmptyArray(node, type, dimensionSizes);
     }
     

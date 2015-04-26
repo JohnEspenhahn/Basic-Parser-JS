@@ -25,6 +25,7 @@ import static com.hahn.basic.definition.EnumToken.NOT;
 import static com.hahn.basic.definition.EnumToken.NOTEQUAL;
 import static com.hahn.basic.definition.EnumToken.NULL;
 import static com.hahn.basic.definition.EnumToken.OPEN_PRNTH;
+import static com.hahn.basic.definition.EnumToken.CLOSE_PRNTH;
 import static com.hahn.basic.definition.EnumToken.OPEN_SQR;
 import static com.hahn.basic.definition.EnumToken.QUESTION;
 import static com.hahn.basic.definition.EnumToken.REAL;
@@ -37,6 +38,7 @@ import static com.hahn.basic.definition.EnumToken.THIS;
 import static com.hahn.basic.definition.EnumToken.TILDE;
 import static com.hahn.basic.definition.EnumToken.TRUE;
 import static com.hahn.basic.definition.EnumToken.XOR;
+import static com.hahn.basic.definition.EnumToken.COLON;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -82,6 +84,7 @@ import com.hahn.basic.util.NestedListIterator;
 import com.hahn.basic.util.Util;
 import com.hahn.basic.util.exceptions.CompileException;
 import com.hahn.basic.util.exceptions.DuplicateDefinitionException;
+import com.hahn.basic.util.exceptions.UnhandledNodeException;
 import com.hahn.basic.viewer.util.TextColor;
 
 public class Frame extends Statement {    
@@ -659,7 +662,7 @@ public class Frame extends Statement {
                 if (isPrefix) return prefixUpdateVar(var, varNode, OPCode.PSUB);
                 else return postfixUpdateVar(var, varNode, OPCode.PSUB);
            default:
-               throw new RuntimeException("Unhandled modify var '" + children.get(1).getValue() + "'");
+               throw new UnhandledNodeException(opNode);
         }
     }
     
@@ -818,30 +821,40 @@ public class Frame extends Statement {
      */
     public EmptyArray createEmptyArray(Node head) {
         Iterator<Node> it = Util.getIterator(head);
+        it.next(); // Skip 'new'
         
-        int dimensions = 0;
-        Type type = Type.fromNode(it.next());
+        Node typeNode = it.next();
+        Type type = Type.fromNode(typeNode);
+        
+        int dimensions = ParameterizedType.countParameterizedTypes(type);
+        if (dimensions > 0) {
+            throw new CompileException("Illegal array definition, must define size of first dimension", typeNode);
+        }
         
         List<BasicObject> sizes = new ArrayList<BasicObject>();
         
+        Node open_brace = null;
         while (it.hasNext()) {
-            Node open_brace = it.next(); // Skip open brace
-            
-            dimensions += 1;
-            Node next = it.next(); // Might be close brace
-            if (next.getToken() == EnumExpression.EXPRESSION) {
-                sizes.add(handleExpression(it.next()).getAsExpObj());
-            
-                it.next(); // Skip close brace
-            } else if (dimensions == 1) {
-                throw new CompileException("Illegal array definition, must define size of first dimension", open_brace);
+            Node node = it.next();
+            if (node.getToken() == EnumToken.OPEN_SQR) {
+                dimensions += 1;
+                open_brace = node;
+            } else if (node.getToken() == EnumToken.CLOSE_SQR) {
+                if (dimensions == 1 && sizes.size() == 0) {
+                    throw new CompileException("Illegal array definition, must define size of first dimension", open_brace);
+                }
+            } else if (node.getToken() == EnumExpression.EXPRESSION) {                
+                sizes.add(handleExpression(node).getAsExpObj());
+            } else {
+                throw new UnhandledNodeException(node);
             }
         }
         
-        // Change to array type
-        type = new ParameterizedType<Type>(Type.ARRAY, Util.createArray(dimensions, type));
+        if (sizes.size() == 0) {
+            throw new CompileException("Illegal array definition, must define size of first dimension", typeNode);
+        }
         
-        return LangCompiler.factory.EmptyArray(head, type, sizes);
+        return LangCompiler.factory.EmptyArray(head, EmptyArray.toArrayType(type, dimensions), sizes);
     }
     
     private void defineClassVar(ClassType classIn, BasicObject var, Node varNode, BasicObject val, Node valNode) {
@@ -944,7 +957,7 @@ public class Frame extends Statement {
                     if (parent == null) parentNode = cvalue;
                     else throw new CompileException("Can only extend one class", ckey);
                 } else {
-                    throw new RuntimeException("Unhandled class parent key `" + ckey + "`");
+                    throw new UnhandledNodeException(ckey);
                 }
             } else {
                 break;
@@ -985,7 +998,7 @@ public class Frame extends Statement {
             } else if (token == EnumToken.CLOSE_BRACE) {
                 break;
             } else {
-                throw new RuntimeException("Unhandled class content token `" + token + "`");
+                throw new UnhandledNodeException(child);
             }
         }
     }
@@ -1291,7 +1304,7 @@ public class Frame extends Statement {
                 } else if (token == EnumExpression.BLOCK) {
                     body = child;
                 } else {
-                    throw new RuntimeException("Unhandled expression '" + token + "' in for-loop definition");
+                    throw new UnhandledNodeException(child);
                 }
             }
         }
@@ -1331,17 +1344,20 @@ public class Frame extends Statement {
     private BasicObject doCast(Node head, BasicObject temp) {
         Iterator<Node> it = Util.getIterator(head);
         
+        Node typeNode = null;
         while (it.hasNext()) {
-            Node typeNode = it.next();
-            if (Type.isValidNode(typeNode)) {
-                Type type = Type.fromNode(typeNode);
-                
-                it.next(); // Skip colon
-                
-                ExpressionStatement nextExp = LangCompiler.factory.ExpressionStatement(this, null);
-                handleNextExpressionChild(it, nextExp, temp);
-                
-                return nextExp.getAsExpObj().castTo(type, typeNode.getRow(), typeNode.getCol());
+            Node node = it.next();
+            Enum<?> token = node.getToken();
+            
+            if (Type.isTypeNode(node)) {
+                typeNode = node;
+            } else if (token == COLON || token == OPEN_PRNTH || token == CLOSE_PRNTH) {
+                continue;
+            } else if (token == EnumExpression.EXPRESSION) {                
+                ExpressionStatement nextExp = handleExpression(it.next());                
+                return nextExp.getAsExpObj().castTo(Type.fromNode(node), typeNode.getRow(), typeNode.getCol());
+            } else {
+                throw new UnhandledNodeException(node);
             }
         }
         

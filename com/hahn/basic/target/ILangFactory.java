@@ -79,7 +79,7 @@ public interface ILangFactory {
 	
 	public VarAccess VarAccess(Statement container, BasicObject var, BasicObject idx, Type type, int row, int col);
 	
-	public EmptyArray EmptyArray(Node node, Type type, List<BasicObject> dimensionSizes);
+	public EmptyArray EmptyArray(Node node, ParameterizedType<Type> type, List<BasicObject> dimensionSizes);
 	
 	public BasicObject NewInstance(Type type, Node typeNode, List<BasicObject> params);
 	

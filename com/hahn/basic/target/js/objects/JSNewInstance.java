@@ -6,7 +6,6 @@ import com.hahn.basic.definition.EnumToken;
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.NewInstance;
 import com.hahn.basic.intermediate.objects.types.ClassType;
-import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.parser.Node;
 import com.hahn.basic.util.Util;

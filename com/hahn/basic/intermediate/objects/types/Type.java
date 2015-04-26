@@ -8,6 +8,7 @@ import lombok.NonNull;
 
 import com.hahn.basic.definition.EnumExpression;
 import com.hahn.basic.definition.EnumToken;
+import com.hahn.basic.intermediate.objects.EmptyArray;
 import com.hahn.basic.parser.Node;
 import com.hahn.basic.util.BitFlag;
 import com.hahn.basic.util.Util;
@@ -200,7 +201,7 @@ public class Type implements ITypeable {
      * @param node The node to check
      * @return True if a valid node to parse
      */
-    public static boolean isValidNode(Node node) {
+    public static boolean isTypeNode(Node node) {
         Enum<?> token = node.getToken();
         return token == EnumToken.IDENTIFIER || token == EnumExpression.TYPE;
     }
@@ -273,7 +274,7 @@ public class Type implements ITypeable {
             } while (it.hasNext() && (child = it.next()) != null);
             
             if (dimensions > 0) {
-                type = new ParameterizedType<Type>(Type.ARRAY, Util.createArray(dimensions, type));
+                type = EmptyArray.toArrayType(type, dimensions);
             }
         }
         

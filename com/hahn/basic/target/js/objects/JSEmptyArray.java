@@ -5,13 +5,14 @@ import java.util.List;
 import com.hahn.basic.definition.EnumToken;
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.EmptyArray;
+import com.hahn.basic.intermediate.objects.types.ParameterizedType;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.parser.Node;
 import com.hahn.basic.util.Util;
 
 public class JSEmptyArray extends EmptyArray {
 
-    public JSEmptyArray(Node node, Type type, List<BasicObject> dimensionSizes) {
+    public JSEmptyArray(Node node, ParameterizedType<Type> type, List<BasicObject> dimensionSizes) {
         super(node, type, dimensionSizes);
     }
 
@@ -26,7 +27,7 @@ public class JSEmptyArray extends EmptyArray {
         builder.append(Util.toTarget(getDimensionSizes(), ","));
         builder.append("]");
         
-        if (getType().doesExtend(Type.OBJECT)) {
+        if (getBaseType().doesExtend(Type.OBJECT)) {
             builder.append(",null");
         } else {
             builder.append(",0");

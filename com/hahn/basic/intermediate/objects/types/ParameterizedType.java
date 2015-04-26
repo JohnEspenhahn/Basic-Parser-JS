@@ -46,6 +46,24 @@ public class ParameterizedType<T extends ITypeable> extends Type {
         this(base, params, Type.UNDEFINED);
     }
     
+    @SuppressWarnings("unchecked")
+    public static Type tryToUnpack(Type type) {
+        if (type instanceof ParameterizedType) {
+            return ((ParameterizedType<ITypeable>) type).getTypable(0).getType();
+        } else {
+            return type;
+        }
+    }
+    
+    @SuppressWarnings("unchecked")
+    public static int countParameterizedTypes(Type type) {
+        if (type instanceof ParameterizedType) {
+            return ((ParameterizedType<ITypeable>) type).numTypes();
+        } else {
+            return 0;
+        }
+    }
+    
     /**
      * Create a new parameterized type with the given parameters and return type
      * @param base The base type of this
@@ -84,6 +102,9 @@ public class ParameterizedType<T extends ITypeable> extends Type {
         return base;
     }
     
+    /**
+     * @return The number of parameterized types
+     */
     public int numTypes() {
         return types.length;
     }
