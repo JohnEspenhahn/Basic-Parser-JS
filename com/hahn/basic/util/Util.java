@@ -162,12 +162,4 @@ public class Util {
         return str.toString();
     }
     
-    @SuppressWarnings("unchecked")
-    public static <T> T[] createArray(int size, T defaultVal) {
-        T[] arr = (T[]) Array.newInstance(defaultVal.getClass(), size);
-        Arrays.fill(arr, defaultVal);
-        
-        return (T[]) arr;
-    }
-    
 }

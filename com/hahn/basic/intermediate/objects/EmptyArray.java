@@ -10,7 +10,6 @@ import com.hahn.basic.intermediate.IIntermediate;
 import com.hahn.basic.intermediate.objects.types.ParameterizedType;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.parser.Node;
-import com.hahn.basic.util.Util;
 import com.hahn.basic.util.exceptions.CompileException;
 
 public abstract class EmptyArray extends BasicObject {
@@ -31,7 +30,14 @@ public abstract class EmptyArray extends BasicObject {
     }
     
     public static ParameterizedType<Type> toArrayType(Type baseType, int dimensions) {
-        return new ParameterizedType<Type>(Type.ARRAY, Util.createArray(dimensions, baseType));
+        Type[] parameterizedTypesArr = new Type[dimensions];
+        for (int i = 0; i < parameterizedTypesArr.length; i++) {
+            int iDim = dimensions - i - 1;
+            if (iDim > 0) parameterizedTypesArr[i] = toArrayType(baseType, iDim);
+            else parameterizedTypesArr[i] = baseType;
+        }
+        
+        return new ParameterizedType<Type>(Type.ARRAY, parameterizedTypesArr);
     }
     
     public Node getNode() {

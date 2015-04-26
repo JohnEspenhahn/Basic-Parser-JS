@@ -87,7 +87,7 @@ public class ParameterizedType<T extends ITypeable> extends Type {
      */
     private static String createName(StructType base, ITypeable[] params, Type returnType) {
         if (base == Type.ARRAY) {
-            return StringUtils.repeat("[]", params.length);
+            return params[0].getType().getName() + StringUtils.repeat("[]", params.length);
         } else {
             return base.getName() 
                     + "<"

@@ -1,5 +1,6 @@
 package com.hahn.basic.target.js.objects;
 
+import com.hahn.basic.definition.EnumToken;
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.VarAccess;
 import com.hahn.basic.intermediate.objects.types.StructType.StructParam;
@@ -17,7 +18,7 @@ public class JSVarAccess extends VarAccess {
         if (getIndex() instanceof StructParam) {
             return String.format("%s.%s", getVar().toTarget(), getIndex().toTarget());
         } else {
-            return String.format("%s[%s]", getVar().toTarget(), getIndex().toTarget());
+            return String.format("%s(%s,%s)", EnumToken.___g, getVar().toTarget(), getIndex().toTarget());
         }
     }
     
