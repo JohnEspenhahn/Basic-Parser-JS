@@ -28,20 +28,22 @@ public abstract class VarAccess extends BasicObject {
         this.var = var;
         this.index = index;
         
-        if (getIndex() instanceof StructParam) {
+        if (getAccessedAtIdx() instanceof StructParam) {
             this.accessed = var.getType().getAsStruct().getParamSafe(index.getName());
         }
         
-        if (getVar().isVarSuper()) {
+        if (getAccessedWithinVar().isVarSuper()) {
             throw new CompileException("Only functions are accessable via the 'super' keyword", row, col);
         }
     }
     
-    public BasicObject getVar() {
+    @Override
+    public BasicObject getAccessedWithinVar() {
         return var;
     }
     
-    public BasicObject getIndex() {
+    @Override
+    public BasicObject getAccessedAtIdx() {
         return index;
     }
     
@@ -115,16 +117,16 @@ public abstract class VarAccess extends BasicObject {
     
     @Override
     public boolean setInUse(IIntermediate by) {
-        getIndex().setInUse(this);
-        getVar().setInUse(this);
+        getAccessedAtIdx().setInUse(this);
+        getAccessedWithinVar().setInUse(this);
         
         return super.setInUse(this);
     }
     
     @Override
     public void takeRegister(IIntermediate by) {
-        getVar().takeRegister(this);
-        getIndex().takeRegister(this);
+        getAccessedWithinVar().takeRegister(this);
+        getAccessedAtIdx().takeRegister(this);
         
         super.takeRegister(this);
     }

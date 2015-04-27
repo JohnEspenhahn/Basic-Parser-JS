@@ -59,7 +59,8 @@ public abstract class EmptyArray extends BasicObject {
     
     @SuppressWarnings("unchecked")
     public Type getBaseType() {
-        return ((ParameterizedType<Type>) getType()).getTypable(0);
+        ParameterizedType<Type> t = ((ParameterizedType<Type>) getType());
+        return t.getTypable(dimensionSizes.size() - 1);
     }
     
     @Override

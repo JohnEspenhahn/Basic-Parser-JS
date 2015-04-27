@@ -287,6 +287,22 @@ public abstract class BasicObject implements IIntermediate, ITypeable {
     }
     
     /**
+     * Used by VarAccess
+     * @return The var being accessed within
+     */
+    public BasicObject getAccessedWithinVar() {
+        return null;
+    }
+    
+    /**
+     * Used by VarAccess
+     * @return The index of the variable being accessed within getVar()
+     */
+    public BasicObject getAccessedAtIdx() {
+        return null;
+    }
+    
+    /**
      * Get as an expression
      * @param container The container of the expression
      * @return ExpressionStatement

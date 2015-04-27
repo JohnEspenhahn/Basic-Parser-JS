@@ -15,10 +15,10 @@ public class JSVarAccess extends VarAccess {
     
     @Override
     public String toTarget() {
-        if (getIndex() instanceof StructParam) {
-            return String.format("%s.%s", getVar().toTarget(), getIndex().toTarget());
+        if (getAccessedAtIdx() instanceof StructParam) {
+            return String.format("%s.%s", getAccessedWithinVar().toTarget(), getAccessedAtIdx().toTarget());
         } else {
-            return String.format("%s(%s,%s)", EnumToken.___g, getVar().toTarget(), getIndex().toTarget());
+            return String.format("%s(%s,%s)", EnumToken.___g, getAccessedWithinVar().toTarget(), getAccessedAtIdx().toTarget());
         }
     }
     
