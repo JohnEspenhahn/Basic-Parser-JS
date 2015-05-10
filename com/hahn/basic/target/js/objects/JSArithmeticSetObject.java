@@ -1,6 +1,5 @@
 package com.hahn.basic.target.js.objects;
 
-import com.hahn.basic.definition.EnumToken;
 import com.hahn.basic.intermediate.objects.ArithmeticSetObject;
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.types.Type;
@@ -22,35 +21,45 @@ public class JSArithmeticSetObject extends ArithmeticSetObject {
                 && getP1().getAccessedWithinVar().getType().doesExtend(Type.ARRAY)) {
             BasicObject arr = getP1().getAccessedWithinVar();
             BasicObject idx = getP1().getAccessedAtIdx();
+            String action = null;
             switch (getOP()) {
             case SET:
-                return JSPretty.format("%s(%s,%s,%s)",
-                        EnumToken.___u,
-                        arr.toTarget(),
-                        idx.toTarget(),
-                        getP2().toTarget()
-                       );
+                action = "p"; // alias for put function
+                break;
             case ADDE:
+                action = "a"; // add function
+                break;
             case ANDE:
+                action = "n"; // and function
+                break;
             case BORE:
+                action = "b"; // bor function
+                break;
             case DIVE:
+                action = "d"; // div function
+                break;
             case MODE:
+                action = "o"; // mod function
+                break;
             case MULE:
+                action = "m"; // mul function
+                break;
             case SUBE:
+                action = "s"; // sub function
+                break;
             case XORE:
-                return JSPretty.format("%s(%s,%s,%s(%s,%s)%s%s)",
-                        EnumToken.___u,
-                        arr.toTarget(),
-                        idx.toTarget(),
-                        EnumToken.___g,
-                        arr.toTarget(),
-                        idx.toTarget(),
-                        getTargetOPSymbol(),
-                        getP2().toTarget()
-                       );
+                action = "x"; // xor function
+                break;
             default:
                 throw new RuntimeException("Unhandled arithmetic set condition");
             }
+            
+            return JSPretty.format("%s.%s(%s,%s)",
+                    arr.toTarget(),
+                    action,
+                    idx.toTarget(),
+                    getP2().toTarget()
+                   );
         } else {
             return JSPretty.format("%s_%s_%s",
                     getP1().isGrouped() ? "("+getP1().toTarget()+")" : getP1().toTarget(),

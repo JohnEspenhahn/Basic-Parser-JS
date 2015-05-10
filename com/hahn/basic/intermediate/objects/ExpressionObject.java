@@ -22,14 +22,6 @@ public abstract class ExpressionObject extends BasicObject {
         this.statement = s;
     }
     
-    public void setForcedGroup(boolean b) {
-        this.statement.setForcedGroup(b);
-    }
-    
-    public boolean isForcedGroup() {
-        return statement.isForcedGroup();
-    }
-    
     public ExpressionStatement getStatement() {
         return statement;
     }
@@ -40,7 +32,7 @@ public abstract class ExpressionObject extends BasicObject {
     
     @Override
     public boolean isGrouped() {
-        return super.isGrouped() || isForcedGroup();
+        return super.isGrouped() || getStatement().isGrouped();
     }
     
     @Override

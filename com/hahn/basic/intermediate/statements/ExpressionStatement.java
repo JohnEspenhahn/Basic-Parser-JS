@@ -23,12 +23,20 @@ public abstract class ExpressionStatement extends Statement {
         this.gotAsObject = false;
     }
     
+    /**
+     * Set to require grouping for circumstances not normally obvious (ex: random use of paranthesis)
+     * @param b The value to set `force grouping` to
+     */
     public void setForcedGroup(boolean b) {
         this.forcedGroup = b;
     }
     
-    public boolean isForcedGroup() {
-        return forcedGroup;
+    /**
+     * If true grouping is required for this expression statement. Either because it is being forced or the held object is grouped
+     * @return True if needs grouping
+     */
+    public boolean isGrouped() {
+        return forcedGroup || getObj().isGrouped();
     }
     
     public BasicObject getObj() {
