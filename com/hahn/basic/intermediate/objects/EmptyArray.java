@@ -4,8 +4,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
-import org.apache.commons.lang3.StringUtils;
-
 import com.hahn.basic.intermediate.IIntermediate;
 import com.hahn.basic.intermediate.objects.types.ParameterizedType;
 import com.hahn.basic.intermediate.objects.types.Type;
@@ -23,7 +21,7 @@ public abstract class EmptyArray extends BasicObject {
      * @param dimensionSizes
      */
     public EmptyArray(Node node, ParameterizedType<Type> type, List<BasicObject> dimensionSizes) {
-        super(type.toString() + StringUtils.repeat("[]", dimensionSizes.size()), type);
+        super(type.toString(), type);
         
         this.node = node;
         this.dimensionSizes = dimensionSizes;
