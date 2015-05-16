@@ -236,10 +236,25 @@ public class TextLineNumber extends JPanel
     
     public void putLineError(int line, String mss) {
         lineErrors.put(String.valueOf(line), mss);
+        
+        requestRepaint();
     }
     
     public void clearLineErrors() {
         lineErrors.clear();
+        
+        requestRepaint();
+    }
+    
+    private void requestRepaint() {
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                repaint();
+            }            
+        
+        });
     }
 
     /**

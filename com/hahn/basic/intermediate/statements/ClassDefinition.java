@@ -4,7 +4,6 @@ import com.hahn.basic.intermediate.Frame;
 import com.hahn.basic.intermediate.objects.types.ClassType;
 
 public abstract class ClassDefinition extends Statement {
-    
     private ClassType type;
     
     public ClassDefinition(Frame containingFrame, ClassType type) {
