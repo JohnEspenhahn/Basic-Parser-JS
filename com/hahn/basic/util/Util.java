@@ -38,12 +38,13 @@ public class Util {
     
     public static String joinTypes(ITypeable[] arr, char seperator) {
         StringBuffer result = new StringBuffer();
+        
+        boolean first = true;
         for (int i = 0; i < arr.length; i++) {
+           if (first) first = false;
+           else result.append(seperator);
+            
            result.append(arr[i].getType());
-           
-           if (i + 1 < arr.length) {
-               result.append(seperator);
-           }
         }
         
         return result.toString();

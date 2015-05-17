@@ -65,6 +65,14 @@ public class Type implements ITypeable {
         return name;
     }
     
+    /**
+     * The name to be used in function id (<>, [] are not allowed)
+     * @return Name formated for function id
+     */
+    public String getFuncIdName() {
+        return getName();
+    }
+    
     @Override
     public Type getType() {
         return this;

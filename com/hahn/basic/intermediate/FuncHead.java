@@ -294,7 +294,7 @@ public abstract class FuncHead extends Frame {
         if (name.equals(EnumToken.SUPER.getString())) name = EnumToken.CONSTRUCTOR.getString();
         
         String funcID = name + "__";
-        for (ITypeable o: objs) funcID += "_" + o.getType().getName();
+        for (ITypeable o: objs) funcID += "_" + o.getType().getFuncIdName();
         
         return funcID;
     }

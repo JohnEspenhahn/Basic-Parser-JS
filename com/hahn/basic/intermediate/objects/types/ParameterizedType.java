@@ -3,6 +3,7 @@ package com.hahn.basic.intermediate.objects.types;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -95,6 +96,11 @@ public class ParameterizedType<T extends ITypeable> extends Type {
                     + (returnType != Type.UNDEFINED || base.doesExtend(Type.FUNCTION) ? ";"+returnType.getType() : "")
                     + ">";
         }
+    }
+    
+    @Override
+    public String getFuncIdName() {
+        return base.getFuncIdName() + "$" + StringUtils.join(Stream.of(getTypes()).map(t -> t.getType().getFuncIdName()).iterator(), '$');
     }
     
     @Override
