@@ -6,6 +6,7 @@ import com.hahn.basic.intermediate.Frame;
 import com.hahn.basic.intermediate.FuncHead;
 import com.hahn.basic.intermediate.objects.AdvancedObject;
 import com.hahn.basic.intermediate.objects.ArithmeticObject;
+import com.hahn.basic.intermediate.objects.Array;
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.CastedObject;
 import com.hahn.basic.intermediate.objects.ClassObject;
@@ -50,6 +51,7 @@ import com.hahn.basic.target.ILangFactory;
 import com.hahn.basic.target.LangBuildTarget;
 import com.hahn.basic.target.js.objects.JSArithmeticObject;
 import com.hahn.basic.target.js.objects.JSArithmeticSetObject;
+import com.hahn.basic.target.js.objects.JSArray;
 import com.hahn.basic.target.js.objects.JSCastedObject;
 import com.hahn.basic.target.js.objects.JSClassObject;
 import com.hahn.basic.target.js.objects.JSConditionalObject;
@@ -193,6 +195,11 @@ public class JSLangFactory implements ILangFactory {
     @Override
     public EmptyArray EmptyArray(Node node, ParameterizedType<Type> type, List<BasicObject> dimensionSizes) {
         return new JSEmptyArray(node, type, dimensionSizes);
+    }
+    
+    @Override
+    public Array Array(List<BasicObject> values) {
+        return new JSArray(values);
     }
     
     @Override

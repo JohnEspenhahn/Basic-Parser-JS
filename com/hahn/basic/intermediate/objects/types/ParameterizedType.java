@@ -1,6 +1,7 @@
 package com.hahn.basic.intermediate.objects.types;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
@@ -21,7 +22,7 @@ import com.hahn.basic.util.exceptions.CompileException;
  * @param <T> Some ITypeable object to allow this to store
  * either abstract types of actual typed objects
  */
-public class ParameterizedType<T extends ITypeable> extends Type {
+public class ParameterizedType<T extends ITypeable> extends Type implements IParamHolding {
     public static final ParameterizedType<Type> STRING_ARRAY = new ParameterizedType<Type>(Type.ARRAY, new Type[] { Type.STRING });
     
     private final StructType base;
@@ -59,7 +60,7 @@ public class ParameterizedType<T extends ITypeable> extends Type {
     @SuppressWarnings("unchecked")
     public static int countParameterizedTypes(Type type) {
         if (type instanceof ParameterizedType) {
-            return ((ParameterizedType<ITypeable>) type).numTypes();
+            return ((ParameterizedType<ITypeable>) type).numTypeParams();
         } else {
             return 0;
         }
@@ -102,16 +103,23 @@ public class ParameterizedType<T extends ITypeable> extends Type {
     public String getFuncIdName() {
         return base.getFuncIdName() + "$" + StringUtils.join(Stream.of(getTypes()).map(t -> t.getType().getFuncIdName()).iterator(), '$');
     }
-    
+
+    /**
+     * @return The base type
+     */
     @Override
     public StructType getAsStruct() {
+        return getBase();
+    }
+    
+    public StructType getBase() {
         return base;
     }
     
     /**
      * @return The number of parameterized types
      */
-    public int numTypes() {
+    public int numTypeParams() {
         return types.length;
     }
     
@@ -150,6 +158,34 @@ public class ParameterizedType<T extends ITypeable> extends Type {
             }
         } else {
             return base.getExtendDepth(t);
+        }
+    }
+    
+    @Override
+    public Type getCommonType(Type other) {
+        if (other instanceof ParameterizedType && ((ParameterizedType<?>) other).getBase() == getBase()) {
+            @SuppressWarnings("unchecked")
+            ParameterizedType<ITypeable> pOther = (ParameterizedType<ITypeable>) other;
+            StructType base = getBase();
+            
+            if (this.numTypeParams() == pOther.numTypeParams()) {
+                Type[] params = new Type[numTypeParams()];
+                for (int i = 0; i < params.length; i++) {
+                    params[i] = this.getTypable(i).getType().getCommonType(pOther.getTypable(i).getType());
+                }
+                
+                return new ParameterizedType<Type>(base, params);
+            }
+        }
+        
+        Type commonBase = other.getCommonType(base);
+        if (commonBase instanceof StructType) {
+            int numParams = ((StructType) commonBase).numTypeParams();
+            Type[] params = new Type[numParams];
+            Arrays.fill(params, Type.OBJECT);
+            return new ParameterizedType<Type>((StructType) commonBase, params); 
+        } else {
+            return commonBase;
         }
     }
     

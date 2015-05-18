@@ -6,6 +6,7 @@ import com.hahn.basic.intermediate.Frame;
 import com.hahn.basic.intermediate.FuncHead;
 import com.hahn.basic.intermediate.objects.AdvancedObject;
 import com.hahn.basic.intermediate.objects.ArithmeticObject;
+import com.hahn.basic.intermediate.objects.Array;
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.CastedObject;
 import com.hahn.basic.intermediate.objects.ClassObject;
@@ -80,6 +81,7 @@ public interface ILangFactory {
 	public VarAccess VarAccess(Statement container, BasicObject var, BasicObject idx, Type type, int row, int col);
 	
 	public EmptyArray EmptyArray(Node node, ParameterizedType<Type> type, List<BasicObject> dimensionSizes);
+	public Array Array(List<BasicObject> values);
 	
 	public BasicObject NewInstance(Type type, Node typeNode, List<BasicObject> params);
 	

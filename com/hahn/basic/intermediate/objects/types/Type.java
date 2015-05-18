@@ -8,7 +8,7 @@ import lombok.NonNull;
 
 import com.hahn.basic.definition.EnumExpression;
 import com.hahn.basic.definition.EnumToken;
-import com.hahn.basic.intermediate.objects.EmptyArray;
+import com.hahn.basic.intermediate.objects.IArray;
 import com.hahn.basic.parser.Node;
 import com.hahn.basic.util.BitFlag;
 import com.hahn.basic.util.Util;
@@ -102,6 +102,12 @@ public class Type implements ITypeable {
         } else {
             return -1;
         }
+    }
+    
+    public Type getCommonType(Type other) {
+        if (this.doesExtend(other)) return other;
+        else if (other.doesExtend(this)) return this;
+        else return Type.OBJECT;
     }
     
     /**
@@ -246,15 +252,15 @@ public class Type implements ITypeable {
             child = it.next();
             if (child.getToken() == EnumExpression.PARAM_TYPES) {
                 // Check not allowed parameters
-                if (!(type instanceof StructType) || ((StructType) type).getTypeParams() == 0) {
+                if (!(type instanceof StructType) || ((StructType) type).numTypeParams() == 0) {
                     throw new CompileException("The type `" + type.toString() + "` can not be parameterized", nameNode);
                 }
                 
                 StructType mainType = type.getAsStruct();
                 type = ParameterizedType.getParameterizedType(mainType, child, mainType.doesExtend(Type.FUNCTION));
                 
-                if (mainType.getTypeParams() != -1 && mainType.getTypeParams() != ((ParameterizedType<Type>) type).getTypes().length) {
-                    throw new CompileException("Invalid number of parameters for type `" + mainType.toString() + "`. Expected " + mainType.getTypeParams() + " but got " + ((ParameterizedType<Type>) type).getTypes().length, head);
+                if (mainType.numTypeParams() != -1 && mainType.numTypeParams() != ((ParameterizedType<Type>) type).getTypes().length) {
+                    throw new CompileException("Invalid number of parameters for type `" + mainType.toString() + "`. Expected " + mainType.numTypeParams() + " but got " + ((ParameterizedType<Type>) type).getTypes().length, head);
                 }
                 
                 // Go past PARAM_TYPES
@@ -263,7 +269,7 @@ public class Type implements ITypeable {
         }
         
         // Check requires parameters
-        if (!isGettingMain && type instanceof StructType && ((StructType) type).getTypeParams() > 0) {
+        if (!isGettingMain && type instanceof StructType && ((StructType) type).numTypeParams() > 0) {
             throw new CompileException("The type `" + nameNode.getValue() + "` must be parameterized", nameNode);
         }
         
@@ -282,7 +288,7 @@ public class Type implements ITypeable {
             } while (it.hasNext() && (child = it.next()) != null);
             
             if (dimensions > 0) {
-                type = EmptyArray.toArrayType(type, dimensions);
+                type = IArray.toArrayType(type, dimensions);
             }
         }
         

@@ -5,45 +5,34 @@ import java.util.List;
 import java.util.ListIterator;
 
 import com.hahn.basic.intermediate.IIntermediate;
+import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.ParameterizedType;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.parser.Node;
 import com.hahn.basic.util.exceptions.CompileException;
 
-public abstract class EmptyArray extends BasicObject {
+public abstract class EmptyArray extends BasicObject implements IArray {
     private Node node;
     private List<BasicObject> dimensionSizes;
     
     /**
      * Create an empty array defined at node `node` of type `type` (where `type` extends Array)
      * @param node The node defining at
-     * @param type 
-     * @param dimensionSizes
+     * @param type The type of the array. Contains information about number of dimensions
+     * @param dimensionSizes Contain information about the size of the dimensions
+     * @throws IllegalArgumentException If type does not extend Array
      */
     public EmptyArray(Node node, ParameterizedType<Type> type, List<BasicObject> dimensionSizes) {
         super(type.toString(), type);
+        
+        if (!type.doesExtend(Type.ARRAY)) throw new IllegalArgumentException();
         
         this.node = node;
         this.dimensionSizes = dimensionSizes;
     }
     
-    public static ParameterizedType<Type> toArrayType(Type baseType, int dimensions) {
-        Type[] parameterizedTypesArr = new Type[dimensions];
-        for (int i = 0; i < parameterizedTypesArr.length; i++) {
-            int iDim = dimensions - i - 1;
-            if (iDim > 0) parameterizedTypesArr[i] = toArrayType(baseType, iDim);
-            else parameterizedTypesArr[i] = baseType;
-        }
-        
-        return new ParameterizedType<Type>(Type.ARRAY, parameterizedTypesArr);
-    }
-    
     public Node getNode() {
         return node;
-    }
-    
-    public int dimensions() {
-        return dimensionSizes.size();
     }
     
     public List<BasicObject> getDimensionSizes() {
@@ -51,26 +40,36 @@ public abstract class EmptyArray extends BasicObject {
     }
     
     @Override
+    @SuppressWarnings("unchecked")
+    public ParameterizedType<ITypeable> getType() {
+        return ((ParameterizedType<ITypeable>) super.getType());
+    }
+    
+    @Override
+    public Type getBaseType() {
+        return IArray.getBaseType(getType());
+    }
+    
+    @Override
+    public int dimensions() {
+        return getType().numTypeParams();
+    }
+    
+    @Override
     public void setType(Type t) {
         throw new RuntimeException("Cann't change type of predefined array");
     }
     
-    @SuppressWarnings("unchecked")
-    public Type getBaseType() {
-        ParameterizedType<Type> t = ((ParameterizedType<Type>) getType());
-        return t.getTypable(dimensionSizes.size() - 1);
-    }
-    
     @Override
     public boolean setInUse(IIntermediate by) {
-        int dimension = dimensions();
+        int dimension = getDimensionSizes().size();
         ListIterator<BasicObject> it = getDimensionSizes().listIterator(dimension);
         while (it.hasPrevious()) {
             BasicObject obj = it.previous();
             obj.setInUse(this);
             
             if (!obj.getType().doesExtend(Type.REAL)) {
-                throw new CompileException("Illegal type for array initialization. Expected real but got `" + obj.getType() + "` at dimension " + dimension, getNode());
+                throw new CompileException("Illegal type for array initialization. Expected `real` but got `" + obj.getType() + "` at dimension " + dimension, getNode());
             }
             
             dimension -= 1;

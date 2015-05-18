@@ -7,6 +7,10 @@ import static com.hahn.basic.definition.EnumToken.BOOL_AND;
 import static com.hahn.basic.definition.EnumToken.BOOL_OR;
 import static com.hahn.basic.definition.EnumToken.BOR;
 import static com.hahn.basic.definition.EnumToken.CHAR;
+import static com.hahn.basic.definition.EnumToken.CLOSE_PRNTH;
+import static com.hahn.basic.definition.EnumToken.CLOSE_SQR;
+import static com.hahn.basic.definition.EnumToken.COLON;
+import static com.hahn.basic.definition.EnumToken.COMMA;
 import static com.hahn.basic.definition.EnumToken.DIV;
 import static com.hahn.basic.definition.EnumToken.DOT;
 import static com.hahn.basic.definition.EnumToken.EQUALS;
@@ -25,7 +29,6 @@ import static com.hahn.basic.definition.EnumToken.NOT;
 import static com.hahn.basic.definition.EnumToken.NOTEQUAL;
 import static com.hahn.basic.definition.EnumToken.NULL;
 import static com.hahn.basic.definition.EnumToken.OPEN_PRNTH;
-import static com.hahn.basic.definition.EnumToken.CLOSE_PRNTH;
 import static com.hahn.basic.definition.EnumToken.OPEN_SQR;
 import static com.hahn.basic.definition.EnumToken.QUESTION;
 import static com.hahn.basic.definition.EnumToken.REAL;
@@ -38,7 +41,6 @@ import static com.hahn.basic.definition.EnumToken.THIS;
 import static com.hahn.basic.definition.EnumToken.TILDE;
 import static com.hahn.basic.definition.EnumToken.TRUE;
 import static com.hahn.basic.definition.EnumToken.XOR;
-import static com.hahn.basic.definition.EnumToken.COLON;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -50,10 +52,12 @@ import com.hahn.basic.Main;
 import com.hahn.basic.definition.EnumExpression;
 import com.hahn.basic.definition.EnumToken;
 import com.hahn.basic.intermediate.objects.AdvancedObject;
+import com.hahn.basic.intermediate.objects.Array;
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.EmptyArray;
 import com.hahn.basic.intermediate.objects.FuncCallPointer;
 import com.hahn.basic.intermediate.objects.FuncPointer;
+import com.hahn.basic.intermediate.objects.IArray;
 import com.hahn.basic.intermediate.objects.LiteralBool;
 import com.hahn.basic.intermediate.objects.LiteralNum;
 import com.hahn.basic.intermediate.objects.OPObject;
@@ -819,7 +823,7 @@ public class Frame extends Statement {
      * @param head EnumExpression.CREATE_EARR
      * @return An empty array object
      */
-    public EmptyArray createEmptyArray(Node head) {
+    private EmptyArray createEmptyArray(Node head) {
         Iterator<Node> it = Util.getIterator(head);
         it.next(); // Skip 'new'
         
@@ -854,7 +858,32 @@ public class Frame extends Statement {
             throw new CompileException("Illegal array definition, must define size of first dimension", typeNode);
         }
         
-        return LangCompiler.factory.EmptyArray(head, EmptyArray.toArrayType(type, dimensions), sizes);
+        return LangCompiler.factory.EmptyArray(head, IArray.toArrayType(type, dimensions), sizes);
+    }
+    
+    /**
+     * Parse an array definition
+     * @param head EnumExpression.CREATE_ARR
+     * @return An Array definition
+     */
+    private Array createArray(Node head) {
+        List<BasicObject> values = new ArrayList<BasicObject>();
+        
+        Iterator<Node> it = Util.getIterator(head);
+        while (it.hasNext()) {
+            Node node = it.next();
+            Enum<?> token = node.getToken();
+            
+            if (token == OPEN_SQR || token == CLOSE_SQR || token == COMMA) {
+                continue;
+            } else if (token == EnumExpression.EXPRESSION) {
+                values.add(handleExpression(node).getAsExpObj());
+            } else {
+                throw new RuntimeException("Unhandled node in create array: " + node);
+            }
+        }
+        
+        return LangCompiler.factory.Array(values);
     }
     
     private void defineClassVar(ClassType classIn, BasicObject var, Node varNode, BasicObject val, Node valNode) {
@@ -1547,6 +1576,8 @@ public class Frame extends Statement {
                 return createInstance(child);
             } else if (token == EnumExpression.CREATE_EARR) {
                 return createEmptyArray(child);
+            } else if (token == EnumExpression.CREATE_ARR) {
+                return createArray(child);
             } else if (token == EnumExpression.CAST) {
                 return doCast(child, temp);
             } else if (token == EnumExpression.FUNC_POINTER) {

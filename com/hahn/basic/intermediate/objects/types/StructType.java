@@ -1,7 +1,9 @@
 package com.hahn.basic.intermediate.objects.types;
 
+import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -12,8 +14,8 @@ import com.hahn.basic.parser.Node;
 import com.hahn.basic.util.BitFlag;
 import com.hahn.basic.util.exceptions.CompileException;
 
-public class StructType extends Type {    
-    private final StructType parent;
+public class StructType extends Type implements IParamHolding {    
+    private final ArrayDeque<StructType> extended;
     private final Map<String, StructParam> params;
 
     private int typeParams;
@@ -30,12 +32,22 @@ public class StructType extends Type {
         
         this.flags = flags;
         
-        this.parent = parent;
+        if (parent == null) {
+            this.extended = new ArrayDeque<StructType>();
+        } else {
+            this.extended = new ArrayDeque<StructType>(parent.getExtended());
+            this.extended.addLast(parent);
+        }
+        
         this.params = new HashMap<String, StructParam>();
     }
     
+    private ArrayDeque<StructType> getExtended() {
+        return extended;
+    }
+    
     public StructType getParent() {
-        return parent;
+        return (getExtended().size() == 0 ? null : getExtended().getLast());
     }
     
     public boolean hasFlag(BitFlag flag) {
@@ -48,6 +60,7 @@ public class StructType extends Type {
     
     @Override
     public int getExtendDepth(Type t) {
+        StructType parent = getParent();
         if (parent != null) {
             int parentExtendDepth = parent.getExtendDepth(t);
             if (parentExtendDepth >= 0) return parentExtendDepth + 1;
@@ -55,6 +68,32 @@ public class StructType extends Type {
         
         // Default
         return super.getExtendDepth(t);
+    }
+    
+    @Override
+    public Type getCommonType(Type other) {
+        if (!(other instanceof StructType)) {
+            if (this.doesExtend(other)) return other;
+            else if (other.doesExtend(this)) return this;
+            else return Type.OBJECT;
+        }
+        
+        Iterator<StructType> thisExtended  = this.getExtended().iterator();        
+        Iterator<StructType> otherExtended = ((StructType) other).getExtended().iterator();
+        
+        // TODO track shared interfaces
+        StructType leastCommonExtended = Type.OBJECT;
+        while (thisExtended.hasNext() && otherExtended.hasNext()) {
+            StructType t = thisExtended.next(),
+                       o = otherExtended.next();
+            
+            if (t == o) {
+                leastCommonExtended = t;
+            }
+        }
+        
+        return leastCommonExtended;
+        
     }
     
     /**
@@ -102,11 +141,7 @@ public class StructType extends Type {
         return this;
     }
     
-    /**
-     * Get the number of required type parameters
-     * @return The number of parameters or -1 for > 0
-     */
-    public int getTypeParams() {
+    public int numTypeParams() {
         return this.typeParams;
     }
     
@@ -227,9 +262,9 @@ public class StructType extends Type {
         StructParam sVar = params.get(name);
         if (sVar != null && requireThisUnique) {
             throw new CompileException("The instance variable `" + name + "` is already defined", throwNode);
-        } else if (sVar == null && parent != null) {
+        } else if (sVar == null && getParent() != null) {
             fromParent = true;
-            sVar =  parent.getParamSafe(name);
+            sVar =  getParent().getParamSafe(name);
             if (sVar != null && requireSuperUnique) {
                 throw new CompileException("The instance variable `" + name + "` is already defined in a super class", throwNode);
             }
