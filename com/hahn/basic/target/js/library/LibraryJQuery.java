@@ -33,12 +33,9 @@ public class LibraryJQuery extends Library {
         Library.defineFunc(doc, true, "getValue", "val", 0, Type.STRING);
         Library.defineFunc(doc, true, "setValue", "val", 0, Type.VOID, Type.STRING);
         
-        Library.defineFunc(doc, true, "getContext", "get(0).getContext", 0, context, Type.STRING);
-        
         // ArrDoc
         Library.defineParam(arrDoc, "value", "value", Type.STRING);
         Library.defineParam(arrDoc, "html", "innerHTML", Type.STRING);
-        Library.defineFunc(arrDoc, true, "getContext", "getContext", 0, context, Type.STRING);
 
         // DocEvent
         Library.defineParam(docEvent, "target", "target", arrDoc);

@@ -63,6 +63,7 @@ public class ViewerController implements ViewerListener {
     
     private void doTogglePretty(Viewer view) {
         Main.getInstance().togglePretty();
+        view.markChanged();
     }
     
     private void saveToFile(Viewer view, File f, boolean forceReplace) {

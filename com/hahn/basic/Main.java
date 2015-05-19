@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Stack;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.JFileChooser;
 
@@ -273,10 +275,18 @@ public abstract class Main {
     public void parseLinesFromString(String str) {
         resetFile();
         
-        String[] ls = str.split("\n");
-        for (int i = 0; i < ls.length; i++) {
-            String l = ls[i];
-            lines.add(l + (i + 1 < ls.length ? "\n" : ""));
+        Pattern p = Pattern.compile("\n");
+        Matcher m = p.matcher(str);
+        
+        int idx = 0;
+        while (m.find()) {
+            lines.add(str.substring(idx, m.end()));
+            idx = m.end();
+        }
+        
+        // Add last without new line
+        if (idx != str.length() - 1) {
+            lines.add(str.substring(idx));
         }
     }
     
