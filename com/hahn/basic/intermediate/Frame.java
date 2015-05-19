@@ -84,12 +84,13 @@ import com.hahn.basic.intermediate.statements.IfStatement.Conditional;
 import com.hahn.basic.intermediate.statements.ParamDefaultValStatement;
 import com.hahn.basic.intermediate.statements.Statement;
 import com.hahn.basic.parser.Node;
-import com.hahn.basic.util.BitFlag;
-import com.hahn.basic.util.NestedListIterator;
-import com.hahn.basic.util.Util;
+import com.hahn.basic.util.LiteralUtils;
+import com.hahn.basic.util.CompilerUtils;
 import com.hahn.basic.util.exceptions.CompileException;
 import com.hahn.basic.util.exceptions.DuplicateDefinitionException;
 import com.hahn.basic.util.exceptions.UnhandledNodeException;
+import com.hahn.basic.util.structures.BitFlag;
+import com.hahn.basic.util.structures.NestedListIterator;
 import com.hahn.basic.viewer.util.TextColor;
 
 public class Frame extends Statement {    
@@ -720,7 +721,7 @@ public class Frame extends Statement {
     }
     
     private DefineVarStatement defineVar(Node head, StructType struct, boolean canInit) {        
-        Iterator<Node> it = Util.getIterator(head);
+        Iterator<Node> it = CompilerUtils.getIterator(head);
         
         // Init var
         int flags = 0;
@@ -825,7 +826,7 @@ public class Frame extends Statement {
      * @return An empty array object
      */
     private EmptyArray createEmptyArray(Node head) {
-        Iterator<Node> it = Util.getIterator(head);
+        Iterator<Node> it = CompilerUtils.getIterator(head);
         it.next(); // Skip 'new'
         
         Node typeNode = it.next();
@@ -870,7 +871,7 @@ public class Frame extends Statement {
     private Array createArray(Node head) {
         List<BasicObject> values = new ArrayList<BasicObject>();
         
-        Iterator<Node> it = Util.getIterator(head);
+        Iterator<Node> it = CompilerUtils.getIterator(head);
         while (it.hasNext()) {
             Node node = it.next();
             Enum<?> token = node.getToken();
@@ -934,7 +935,7 @@ public class Frame extends Statement {
      * @param head EnumExpression.STRUCT
      */
     public void defineStruct(Node head) {
-        Iterator<Node> it = Util.getIterator(head);
+        Iterator<Node> it = CompilerUtils.getIterator(head);
         it.next(); // skip 'struct'
         
         Node nameNode = it.next();
@@ -955,7 +956,7 @@ public class Frame extends Statement {
      * @param head EnumExpression.CLASS
      */
     public void defineClass(Node head) {
-        Iterator<Node> it = Util.getIterator(head);
+        Iterator<Node> it = CompilerUtils.getIterator(head);
         it.next(); // skip 'class'
         
         Node nameNode = it.next();
@@ -1016,7 +1017,7 @@ public class Frame extends Statement {
             Enum<?> token = child.getToken();
             
             if (token == EnumExpression.CLASS_CNTNT) {
-                handleClassContent(nameNode, classIn, Util.getIterator(child));
+                handleClassContent(nameNode, classIn, CompilerUtils.getIterator(child));
             } else if (token == EnumExpression.DEF_FUNC) {
                 defineClassFunc(child, classIn);
             } else if (token == EnumExpression.CONSTRUCTOR) {
@@ -1067,7 +1068,7 @@ public class Frame extends Statement {
     }
     
     public FuncDefStatement doDefineFunc(Node head, ClassType classIn, boolean anonymous) {
-        Iterator<Node> it = Util.getIterator(head);
+        Iterator<Node> it = CompilerUtils.getIterator(head);
         
         Type rtnType = Type.VOID;
         Node nameNode = null;
@@ -1090,7 +1091,7 @@ public class Frame extends Statement {
             } else if (token == EnumToken.IDENTIFIER) {
                 nameNode = child;
             } else if (token == EnumExpression.DEF_PARAMS) {      
-                Iterator<Node> pIt = Util.getIterator(child);
+                Iterator<Node> pIt = CompilerUtils.getIterator(child);
                 
                 while (pIt.hasNext()) {
                     Node pNode = pIt.next();
@@ -1159,7 +1160,7 @@ public class Frame extends Statement {
      * and can extract the FuncCallPointer from
      */    
     public CallFuncStatement callFunc(Node head) {
-        Iterator<Node> it = Util.getIterator(head);
+        Iterator<Node> it = CompilerUtils.getIterator(head);
         
         // Determine function
         NestedListIterator<Node> accessIt = new NestedListIterator<Node>(it.next().getAsChildren());
@@ -1191,7 +1192,7 @@ public class Frame extends Statement {
     private void getFuncCallParams(Node head, List<BasicObject> params) {
         if (head.getToken() != EnumExpression.CALL_PARAMS) return;
         
-        Iterator<Node> it = Util.getIterator(head);
+        Iterator<Node> it = CompilerUtils.getIterator(head);
         while (it.hasNext()) {
             Node pNode = it.next();
             if (pNode.getToken() == EnumToken.COMMA) {
@@ -1210,7 +1211,7 @@ public class Frame extends Statement {
      * @return FuncPointer
      */
     private FuncPointer getFuncPointer(Node head, AdvancedObject objectIn) {
-        Iterator<Node> it = Util.getIterator(head);
+        Iterator<Node> it = CompilerUtils.getIterator(head);
         
         Node nameNode = null;
         ParameterizedType<ITypeable> types = null;
@@ -1269,7 +1270,7 @@ public class Frame extends Statement {
      * @return The IfStatement
      */
     public Compilable ifStatement(Node head) {
-        Iterator<Node> it = Util.getIterator(head);
+        Iterator<Node> it = CompilerUtils.getIterator(head);
         
         List<Conditional> conditionals = new ArrayList<Conditional>();
         while (it.hasNext()) {
@@ -1313,7 +1314,7 @@ public class Frame extends Statement {
      * @return The ForStatement
      */
     public Compilable forStatement(Node head) {
-        Iterator<Node> it = Util.getIterator(head);
+        Iterator<Node> it = CompilerUtils.getIterator(head);
         
         Node define = null, condition = null;
         List<Node> modification = new ArrayList<Node>();
@@ -1372,7 +1373,7 @@ public class Frame extends Statement {
      * @return ObjectHolder
      */
     private BasicObject doCast(Node head, BasicObject temp) {
-        Iterator<Node> it = Util.getIterator(head);
+        Iterator<Node> it = CompilerUtils.getIterator(head);
         
         Node typeNode = null;
         while (it.hasNext()) {
@@ -1423,7 +1424,7 @@ public class Frame extends Statement {
      * @return
      */
     private BasicObject parseRegex(Node head) {
-        Iterator<Node> it = Util.getIterator(head);
+        Iterator<Node> it = CompilerUtils.getIterator(head);
         it.next(); // Skip open '/'
         
         Node n = it.next();
@@ -1472,7 +1473,7 @@ public class Frame extends Statement {
      * @return An object with the result of the expression
      */    
     public ExpressionStatement handleExpression(Node head) {
-        return doHandleExpression(Util.getIterator(head));
+        return doHandleExpression(CompilerUtils.getIterator(head));
     }
     
     public ExpressionStatement doHandleExpression(Iterator<Node> it) {
@@ -1508,7 +1509,7 @@ public class Frame extends Statement {
             
         } else if (token == OPEN_PRNTH) {
             Node inPrnthNode = it.next();
-            ExpressionStatement nextExp = doHandleExpression(Util.getIterator(inPrnthNode));
+            ExpressionStatement nextExp = doHandleExpression(CompilerUtils.getIterator(inPrnthNode));
             nextExp.setForcedGroup(true);
             
             exp.setObj(nextExp, inPrnthNode);
@@ -1554,9 +1555,9 @@ public class Frame extends Statement {
         if (child.isTerminal()) {
             String val = child.getValue();
             if (token == HEX_INT || token == CHAR) {
-                return Util.parseInt(child);
+                return LiteralUtils.parseInt(child);
             } else if (token == REAL){
-                return Util.parseFloat(child);
+                return LiteralUtils.parseFloat(child);
             } else if (token == TRUE) {
                 return new LiteralBool(true);
             } else if (token == FALSE) {

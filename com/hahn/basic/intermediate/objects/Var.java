@@ -7,7 +7,7 @@ import com.hahn.basic.intermediate.Compiler;
 import com.hahn.basic.intermediate.objects.register.IRegister;
 import com.hahn.basic.intermediate.objects.register.StackRegister;
 import com.hahn.basic.intermediate.objects.types.Type;
-import com.hahn.basic.util.BitFlag;
+import com.hahn.basic.util.structures.BitFlag;
 
 public abstract class Var extends AdvancedObject {
     private int flags;

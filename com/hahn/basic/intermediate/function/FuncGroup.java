@@ -6,7 +6,8 @@ import java.util.List;
 
 import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.Type;
-import com.hahn.basic.util.Util;
+import com.hahn.basic.util.ConstructorUtils;
+import com.hahn.basic.util.TypeUtils;
 import com.hahn.basic.util.exceptions.CompileException;
 
 public class FuncGroup implements Iterable<FuncHead> {
@@ -37,7 +38,7 @@ public class FuncGroup implements Iterable<FuncHead> {
     }
     
     public boolean isDefined(FuncHead func) {
-        return get(Util.getTypes(func.getParams()), true) != null;
+        return get(TypeUtils.getTypes(func.getParams()), true) != null;
     }
     
     public void removeAllMatch(FuncHead func) {
@@ -88,6 +89,6 @@ public class FuncGroup implements Iterable<FuncHead> {
     }
 
     public boolean isConstructor() {
-        return Util.isConstructorName(getName());
+        return ConstructorUtils.isConstructorName(getName());
     }
 }

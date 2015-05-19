@@ -6,8 +6,8 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 import com.hahn.basic.definition.EnumToken;
-import com.hahn.basic.intermediate.Frame;
 import com.hahn.basic.intermediate.Compiler;
+import com.hahn.basic.intermediate.Frame;
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.FuncPointer;
 import com.hahn.basic.intermediate.objects.Param;
@@ -18,9 +18,9 @@ import com.hahn.basic.intermediate.objects.types.StructType.StructParam;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.statements.Compilable;
 import com.hahn.basic.parser.Node;
-import com.hahn.basic.util.BitFlag;
-import com.hahn.basic.util.Util;
+import com.hahn.basic.util.ConstructorUtils;
 import com.hahn.basic.util.exceptions.CompileException;
+import com.hahn.basic.util.structures.BitFlag;
 
 public abstract class FuncHead extends Frame {
     private int flags;
@@ -33,7 +33,6 @@ public abstract class FuncHead extends Frame {
     
     private final String funcId;    
     private final ClassType classIn;
-    private final boolean isConstructor;
     
     /**
      * A function head defines a function header
@@ -56,7 +55,6 @@ public abstract class FuncHead extends Frame {
         }
         
         this.classIn = classIn;
-        this.isConstructor = Util.isConstructorName(inName);
         
         this.flags = 0;
         this.name = inName;
@@ -103,7 +101,7 @@ public abstract class FuncHead extends Frame {
     }
     
     public boolean isConstructor() {
-        return isConstructor;
+        return ConstructorUtils.isConstructorName(getName());
     }
     
     /**

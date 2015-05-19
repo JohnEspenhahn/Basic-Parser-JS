@@ -5,7 +5,7 @@ class ViewerUpdateThread implements Runnable {
     
     Viewer viewer;
     
-    public ViewerUpdateThread(Viewer view) {
+    protected ViewerUpdateThread(Viewer view) {
         this.viewer = view;
     }
 

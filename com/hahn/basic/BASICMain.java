@@ -109,6 +109,8 @@ public class BASICMain extends Main {
         
         if (tree_head != null && showViewer()) {
             ViewerBuilder.getViewer().setTextFromNode(tree_head);
+        } else {
+            ViewerBuilder.getViewer().setErrorStatus();
         }
     }
     

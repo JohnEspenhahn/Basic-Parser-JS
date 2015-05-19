@@ -8,7 +8,7 @@ import com.hahn.basic.intermediate.objects.NewInstance;
 import com.hahn.basic.intermediate.objects.types.ClassType;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.parser.Node;
-import com.hahn.basic.util.Util;
+import com.hahn.basic.util.CompilerUtils;
 
 public class JSNewInstance extends NewInstance {
     
@@ -27,7 +27,7 @@ public class JSNewInstance extends NewInstance {
                     return String.format("%s(%s)", EnumToken.___c, getType().getName());
                 }
             } else { // Constructor with params
-                return String.format("%s(%s,'%s',%s)", EnumToken.___c, getType().getName(), getConstructor().getFuncId(), Util.toTarget(getParams()));
+                return String.format("%s(%s,'%s',%s)", EnumToken.___c, getType().getName(), getConstructor().getFuncId(), CompilerUtils.toTarget(getParams()));
             }
         } else if (getType().doesExtend(Type.STRUCT)) {
             return "{}";

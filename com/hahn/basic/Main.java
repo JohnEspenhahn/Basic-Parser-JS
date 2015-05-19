@@ -16,7 +16,6 @@ import com.hahn.basic.definition.EnumToken;
 import com.hahn.basic.lexer.basic.BasicLexer;
 import com.hahn.basic.target.OutputBuilder;
 import com.hahn.basic.target.js.JSCommandFactory;
-import com.hahn.basic.util.EnumInputType;
 import com.hahn.basic.util.exceptions.CompileException;
 import com.hahn.basic.viewer.ViewerBuilder;
 
@@ -191,7 +190,7 @@ public abstract class Main {
             while(scanner.hasNextLine()) {
                 String line = scanner.nextLine();
                 
-                lines.add(line + "\n");
+                lines.add(line + (scanner.hasNextLine() ? "\n" : ""));
             }
             // lines.add("#eof"); // End of File
             
@@ -238,7 +237,7 @@ public abstract class Main {
                         while(scanner.hasNextLine()) {
                             String line = scanner.nextLine();
                             
-                            lines.add(line + "\n");
+                            lines.add(line + (scanner.hasNextLine() ? "\n" : ""));
                         }
                         // lines.add("#eof"); // End of File
                         
@@ -275,8 +274,9 @@ public abstract class Main {
         resetFile();
         
         String[] ls = str.split("\n");
-        for (String l: ls) {
-            lines.add(l + "\n");
+        for (int i = 0; i < ls.length; i++) {
+            String l = ls[i];
+            lines.add(l + (i + 1 < ls.length ? "\n" : ""));
         }
     }
     
@@ -410,5 +410,9 @@ public abstract class Main {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }  
+    }
+    
+    public enum EnumInputType {
+        SHELL, GUI_FILE, FILE, DIR
+    }
 }

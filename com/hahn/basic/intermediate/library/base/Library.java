@@ -6,8 +6,8 @@ import java.util.Map;
 import com.hahn.basic.intermediate.Compiler;
 import com.hahn.basic.intermediate.objects.types.ClassType;
 import com.hahn.basic.intermediate.objects.types.Type;
-import com.hahn.basic.util.BitFlag;
-import com.hahn.basic.util.Util;
+import com.hahn.basic.util.TypeUtils;
+import com.hahn.basic.util.structures.BitFlag;
 
 public abstract class Library {
     private static final Map<String, Library> libraries = new HashMap<String, Library>();
@@ -53,11 +53,11 @@ public abstract class Library {
     }
     
     public static void defineFunc(String inName, String outName, Type rtnType, Type... types) {        
-        Compiler.defineFunc(inName, outName, rtnType, Util.toParams(types));
+        Compiler.defineFunc(inName, outName, rtnType, TypeUtils.toParams(types));
     }
     
     public static void defineFunc(ClassType classIn, boolean override, String inName, String outName, int flags, Type rtnType, Type... types) {
-        classIn.defineFunc(null, override, inName, outName, rtnType, Util.toParams(types)).setFlags(flags);
+        classIn.defineFunc(null, override, inName, outName, rtnType, TypeUtils.toParams(types)).setFlags(flags);
     }
     
     public static void defineParam(ClassType classIn, String inName, String outName, Type type) {

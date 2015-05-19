@@ -4,7 +4,7 @@ import com.hahn.basic.intermediate.library.base.Library;
 import com.hahn.basic.intermediate.objects.types.ClassType;
 import com.hahn.basic.intermediate.objects.types.ParameterizedType;
 import com.hahn.basic.intermediate.objects.types.Type;
-import com.hahn.basic.util.BitFlag;
+import com.hahn.basic.util.structures.BitFlag;
 
 public class LibraryJQuery extends Library {
     

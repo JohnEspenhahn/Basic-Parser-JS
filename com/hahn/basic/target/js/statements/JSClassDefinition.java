@@ -8,7 +8,7 @@ import com.hahn.basic.intermediate.objects.types.ClassType;
 import com.hahn.basic.intermediate.objects.types.StructType.StructParam;
 import com.hahn.basic.intermediate.statements.ClassDefinition;
 import com.hahn.basic.target.js.JSPretty;
-import com.hahn.basic.util.BitFlag;
+import com.hahn.basic.util.structures.BitFlag;
 
 public class JSClassDefinition extends ClassDefinition {
     

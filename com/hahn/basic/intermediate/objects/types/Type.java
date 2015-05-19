@@ -10,10 +10,10 @@ import com.hahn.basic.definition.EnumExpression;
 import com.hahn.basic.definition.EnumToken;
 import com.hahn.basic.intermediate.objects.IArray;
 import com.hahn.basic.parser.Node;
-import com.hahn.basic.util.BitFlag;
-import com.hahn.basic.util.Util;
+import com.hahn.basic.util.CompilerUtils;
 import com.hahn.basic.util.exceptions.CastException;
 import com.hahn.basic.util.exceptions.CompileException;
+import com.hahn.basic.util.structures.BitFlag;
 
 public class Type implements ITypeable {
     public static final int NO_MATCH = -0xffff;
@@ -241,7 +241,7 @@ public class Type implements ITypeable {
     public static Type fromNode(Node head, boolean isGettingMain) {
         if (head == null) return Type.UNDEFINED; 
         
-        Iterator<Node> it = Util.getIterator(head);
+        Iterator<Node> it = CompilerUtils.getIterator(head);
         
         Node nameNode = it.next();
         Type type = Type.fromName(nameNode.getValue());
@@ -303,7 +303,7 @@ public class Type implements ITypeable {
      * @throw CompileException If the node cannot be parsed to a valid type
      */
     public static Node getNameNode(@NonNull Node head) {
-        Iterator<Node> it = Util.getIterator(head);
+        Iterator<Node> it = CompilerUtils.getIterator(head);
         
         return it.next();
     }

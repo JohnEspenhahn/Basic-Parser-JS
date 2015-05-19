@@ -1,4 +1,4 @@
-package com.hahn.basic.util;
+package com.hahn.basic.util.structures;
 
 import com.hahn.basic.parser.Node;
 import com.hahn.basic.util.exceptions.CompileException;

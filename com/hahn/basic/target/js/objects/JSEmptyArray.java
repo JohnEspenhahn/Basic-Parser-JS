@@ -8,7 +8,7 @@ import com.hahn.basic.intermediate.objects.EmptyArray;
 import com.hahn.basic.intermediate.objects.types.ParameterizedType;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.parser.Node;
-import com.hahn.basic.util.Util;
+import com.hahn.basic.util.CompilerUtils;
 
 public class JSEmptyArray extends EmptyArray {
 
@@ -24,7 +24,7 @@ public class JSEmptyArray extends EmptyArray {
         
         // If size is defined for at least one dimension
         builder.append("[");
-        builder.append(Util.toTarget(getDimensionSizes(), ","));
+        builder.append(CompilerUtils.toTarget(getDimensionSizes(), ","));
         builder.append("]");
         
         if (getBaseType().doesExtend(Type.OBJECT)) {

@@ -3,8 +3,8 @@ package com.hahn.basic.intermediate.objects;
 import com.hahn.basic.intermediate.Frame;
 import com.hahn.basic.intermediate.objects.types.ClassType;
 import com.hahn.basic.intermediate.objects.types.Type;
-import com.hahn.basic.util.BitFlag;
 import com.hahn.basic.util.exceptions.CompileException;
+import com.hahn.basic.util.structures.BitFlag;
 
 public class VarThis extends Var {
     private static final int FLAGS = BitFlag.CONST.b;

@@ -11,8 +11,8 @@ import com.hahn.basic.intermediate.Frame;
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.Param;
 import com.hahn.basic.parser.Node;
-import com.hahn.basic.util.BitFlag;
 import com.hahn.basic.util.exceptions.CompileException;
+import com.hahn.basic.util.structures.BitFlag;
 
 public class StructType extends Type {    
     private final ArrayDeque<StructType> extended;

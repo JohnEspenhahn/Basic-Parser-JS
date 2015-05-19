@@ -1,7 +1,7 @@
 package com.hahn.basic.intermediate.objects;
 
 import com.hahn.basic.intermediate.objects.types.Type;
-import com.hahn.basic.util.BitFlag;
+import com.hahn.basic.util.structures.BitFlag;
 
 public class Param extends BasicObject {
     private int flags;

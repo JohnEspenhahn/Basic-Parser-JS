@@ -8,7 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import com.hahn.basic.Main;
 import com.hahn.basic.intermediate.Frame;
 import com.hahn.basic.intermediate.IIntermediate;
-import com.hahn.basic.util.Util;
+import com.hahn.basic.util.CompilerUtils;
 
 public class JSPretty {    
     private static int indent = 0;
@@ -132,9 +132,9 @@ public class JSPretty {
         // List
         case 'l':
             if (arg instanceof IIntermediate[]) {
-                str.append(Util.toTarget((IIntermediate[]) arg));
+                str.append(CompilerUtils.toTarget((IIntermediate[]) arg));
             } else if (arg instanceof Object[]) {
-                str.append(StringUtils.join((Object[]) arg, Util.getListSeperator()));
+                str.append(StringUtils.join((Object[]) arg, CompilerUtils.getListSeperator()));
             } else {
                 throw new IllegalArgumentException(arg + " is not an array and cannot be formatted with %l");
             }
@@ -144,9 +144,9 @@ public class JSPretty {
         case 'L':
             JSPretty.setTabs(0);
             if (arg instanceof IIntermediate[]) {
-                str.append(Util.toTarget((IIntermediate[]) arg));
+                str.append(CompilerUtils.toTarget((IIntermediate[]) arg));
             } else if (arg instanceof Object[]) {
-                str.append(StringUtils.join((Object[]) arg, Util.getListSeperator()));
+                str.append(StringUtils.join((Object[]) arg, CompilerUtils.getListSeperator()));
             } else {
                 throw new IllegalArgumentException(arg + " is not an array and cannot be formatted with %l");
             }

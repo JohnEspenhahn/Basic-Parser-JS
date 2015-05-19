@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.hahn.basic.util.FlagMap;
+import com.hahn.basic.util.structures.FlagMap;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
 class BNFParser {

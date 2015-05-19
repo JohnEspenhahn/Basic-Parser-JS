@@ -9,8 +9,8 @@ import com.hahn.basic.intermediate.statements.DefineVarStatement;
 import com.hahn.basic.intermediate.statements.Statement;
 import com.hahn.basic.parser.Node;
 import com.hahn.basic.target.js.JSPretty;
-import com.hahn.basic.util.BitFlag;
 import com.hahn.basic.util.exceptions.CompileException;
+import com.hahn.basic.util.structures.BitFlag;
 
 public class JSDefineVarStatement extends DefineVarStatement {
     

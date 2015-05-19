@@ -6,19 +6,15 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JEditorPane;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
@@ -37,8 +33,10 @@ import jsyntaxpane.util.Configuration;
 import com.hahn.basic.Main;
 import com.hahn.basic.parser.Node;
 import com.hahn.basic.util.exceptions.LexException;
+import com.hahn.basic.viewer.controller.ViewerController;
 import com.hahn.basic.viewer.util.TextColor;
 import com.hahn.basic.viewer.util.TextLineNumber;
+import com.hahn.basic.viewer.util.ViewerListener;
 
 public class Viewer extends JPanel implements ActionListener, DocumentListener {
     private static final long serialVersionUID = 4757110261297031804L;
@@ -50,10 +48,10 @@ public class Viewer extends JPanel implements ActionListener, DocumentListener {
     public static Dimension MIN_SIZE = new Dimension(30, 30);
     public static Dimension PREF_SIZE = new Dimension(640, 480);
     
+    private List<ViewerListener> viewerListeners;
+    
     private long lastTextChange;
     private boolean changed;
-    
-    private Node node;
     
     TextLineNumber tln;
     JTextPane textArea;
@@ -67,7 +65,9 @@ public class Viewer extends JPanel implements ActionListener, DocumentListener {
         this(frame, "");
     }
     
-    protected Viewer(JFrame frame, String text) {        
+    protected Viewer(JFrame frame, String text) {
+        this.viewerListeners = new ArrayList<ViewerListener>();
+        
         setLayout(new BorderLayout());
         setBackground(TextColor.PALE.getColor());
         
@@ -125,6 +125,8 @@ public class Viewer extends JPanel implements ActionListener, DocumentListener {
         add(tabbedPane, BorderLayout.CENTER);
         add(status, BorderLayout.PAGE_END);
         
+        addViewerListener(new ViewerController());
+        
         (new Thread(new ViewerUpdateThread(this))).start();
     }
     
@@ -181,17 +183,90 @@ public class Viewer extends JPanel implements ActionListener, DocumentListener {
         tabbedPane.addTab("Target", scrollPane);
     }
     
+    public String getSourceText() {
+        return textArea.getText();
+    }
+    
+    public String getTargetText() {
+        return jsArea.getText();
+    }
+    
+    protected boolean needsUpdate() {       
+        return this.changed && (System.currentTimeMillis() - this.lastTextChange > DELAY_TIME);
+    }
+    
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        ViewerListener.EnumAction action = null;
+        
+        Object source = e.getSource();
+        if (source == saveAs) {
+            action = ViewerListener.EnumAction.SAVE_AS;
+        } else if (source == save) {
+            action = ViewerListener.EnumAction.SAVE;
+        } else if (source == open) {
+            action = ViewerListener.EnumAction.OPEN;
+        } else if (source == debug) {
+            action = ViewerListener.EnumAction.TOGGLE_DEBUG;
+        } else if (source == pretty) {
+            action = ViewerListener.EnumAction.TOGGLE_PRETTY;
+        }
+        
+        if (action != null) {
+            for (ViewerListener listener: viewerListeners) {
+                listener.onViewerAction(this, action);
+            }
+        }
+    }
+    
+    @Override
+    public void insertUpdate(DocumentEvent e) {
+        markChanged();
+    }
+
+    @Override
+    public void removeUpdate(DocumentEvent e) {
+        markChanged();
+    }
+
+    @Override
+    public void changedUpdate(DocumentEvent e) { }
+    
+    public void markChanged() {
+        if (!changed) {
+            setStatus("");
+        }
+        
+        changed = true;
+        lastTextChange = System.currentTimeMillis();
+    }
+    
+    public void update() {        
+        setStatus("Recompiling...");
+        
+        String text = textArea.getText();        
+        Main.getInstance().parseLinesFromString(text);        
+        Main.getInstance().reset();
+        
+        try {
+            Main.getInstance().handleInput();
+            
+            setStatus("Compiled"); // setTextFromNode will be called eventually
+        } catch (LexException e) {
+            setErrorStatus();
+        }
+    }
+    
     public void setTextFromNode(Node n) {
         if (n != null) {
             SwingUtilities.invokeLater( new Runnable() {
                 public void run() {
-                    node = n;
-                    
                     lastTextChange = System.currentTimeMillis();
+                    
+                    int carot = textArea.getCaretPosition();
                     
                     textArea.setText(n.getFullText());
                     
-                    int carot = textArea.getCaretPosition();
                     int maxPosition = textArea.getText().length();
                     if (carot >= maxPosition) carot = maxPosition;
                     textArea.setCaretPosition(carot);
@@ -207,125 +282,16 @@ public class Viewer extends JPanel implements ActionListener, DocumentListener {
         }
     }
     
+    public void setErrorStatus() {
+        setStatus("Error");
+        
+        changed = false;
+    }
+    
     public void setStatus(String statusText) {
         if (statusText != null) {
             this.status.setText(statusText);
         }
-    }
-    
-    public boolean needsUpdate() {       
-        return this.changed && (System.currentTimeMillis() - this.lastTextChange > DELAY_TIME);
-    }
-    
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        Object source = e.getSource();
-        if (source == saveAs) {
-            doSaveAsFile();
-        } else if (source == save) {
-            doSaveFile();
-        } else if (source == open) {
-            doOpenFile();
-        } else if (source == debug) {
-            Main.getInstance().toggleDebug();
-            markChanged();
-        } else if (source == pretty) {
-            Main.getInstance().togglePretty();
-            markChanged();
-        }
-    }   
-    
-    @Override
-    public void insertUpdate(DocumentEvent e) {
-        markChanged();
-    }
-
-    @Override
-    public void removeUpdate(DocumentEvent e) {
-        markChanged();
-    }
-
-    @Override
-    public void changedUpdate(DocumentEvent e) { }
-    
-    private void markChanged() {
-        setStatus("");
-        
-        changed = true;
-        lastTextChange = System.currentTimeMillis();
-    }
-    
-    private void doSaveFile() {
-        File f = Main.getInstance().getInputFile();
-        if (f != null) saveToFile(f);
-        else doSaveAsFile();
-    }
-    
-    private void doSaveAsFile() {
-        JFileChooser chooser = new JFileChooser();
-        int result = chooser.showSaveDialog(null);
-        
-        if (result == JFileChooser.APPROVE_OPTION) {
-            saveToFile(chooser.getSelectedFile());
-        } else {
-            System.out.println("ERROR: Canceled by user");
-        }
-    }
-    
-    private void saveToFile(File f) {
-        if (!f.exists() || f.isFile()) {
-            if (f.isFile()) {
-                int replace = JOptionPane.showConfirmDialog(this, "The file '" + f.getName() + "' already exists. Replace it?", "Replace Existing File?", JOptionPane.YES_NO_OPTION);
-                if (replace != JOptionPane.YES_OPTION) {
-                    JOptionPane.showMessageDialog(this, "Canceled");
-                    return;
-                }
-            }
-            
-            FileOutputStream out = null;
-            try {
-                f.delete();
-                f.createNewFile();                    
-                out = new FileOutputStream(f);
-                if (node != null) out.write(node.getFullText().getBytes(Charset.defaultCharset()));
-                
-                JOptionPane.showMessageDialog(this, "Saved successfully");
-            } catch (Exception err) {
-                err.printStackTrace();
-            } finally {
-                if (out != null) { 
-                    try {
-                        out.close();
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
-                    }
-                }
-            }
-        } else {
-            JOptionPane.showMessageDialog(this, "Invalid file selected. Save canceled");
-        }
-    }
-
-    private void doOpenFile() {
-        Main.getInstance().guiFileInput();
-    }
-    
-    public void update() {
-        changed = false;
-        
-        setStatus("Recompiling...");
-        
-        String text = textArea.getText();        
-        Main.getInstance().parseLinesFromString(text);        
-        Main.getInstance().reset();
-        
-        try {
-            Main.getInstance().handleInput();
-        } catch (LexException e) {
-            
-        }
-        
-        setStatus("Compiled");
     }
 
     public void putLineError(int line, String mss) {
@@ -334,6 +300,14 @@ public class Viewer extends JPanel implements ActionListener, DocumentListener {
     
     public void clearLineErrors() {
         tln.clearLineErrors();
+    }
+    
+    public void addViewerListener(ViewerListener listener) {
+        this.viewerListeners.add(listener);
+    }
+    
+    public void removeViewerListener(ViewerListener listener) {
+        this.viewerListeners.remove(listener);
     }
 
 }

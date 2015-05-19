@@ -10,7 +10,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.hahn.basic.definition.EnumExpression;
 import com.hahn.basic.parser.Node;
-import com.hahn.basic.util.Util;
+import com.hahn.basic.util.TypeUtils;
+import com.hahn.basic.util.CompilerUtils;
 import com.hahn.basic.util.exceptions.CompileException;
 
 /**
@@ -93,7 +94,7 @@ public class ParameterizedType<T extends ITypeable> extends Type {
         } else {
             return base.getName() 
                     + "<"
-                    + (params.length > 0 ? Util.joinTypes(params, ',') : "") 
+                    + (params.length > 0 ? TypeUtils.joinTypes(params, ',') : "") 
                     + (returnType != Type.UNDEFINED || base.doesExtend(Type.FUNCTION) ? ";"+returnType.getType() : "")
                     + ">";
         }
@@ -200,7 +201,7 @@ public class ParameterizedType<T extends ITypeable> extends Type {
         Type returnType = Type.UNDEFINED;
         List<Type> params = null;
                
-        Iterator<Node> it = Util.getIterator(head);
+        Iterator<Node> it = CompilerUtils.getIterator(head);
         while (it.hasNext()) {
             Node node = it.next();
             Enum<?> t = node.getToken();
@@ -225,7 +226,7 @@ public class ParameterizedType<T extends ITypeable> extends Type {
     private static List<Type> getTypeList(Node head) {
         List<Type> types = new ArrayList<Type>();
         
-        Iterator<Node> it = Util.getIterator(head);
+        Iterator<Node> it = CompilerUtils.getIterator(head);
         while (it.hasNext()) {
             Node node = it.next();
             Enum<?> t = node.getToken();

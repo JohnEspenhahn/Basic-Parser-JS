@@ -87,8 +87,6 @@ public class JSCommandFactory implements CommandFactory {
     
     public JSCommandFactory() {
         registerFactory = new SimpleRegisterFactory();
-        
-        reset();
     }
     
     @Override

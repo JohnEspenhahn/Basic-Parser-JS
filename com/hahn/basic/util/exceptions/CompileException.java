@@ -3,7 +3,7 @@ package com.hahn.basic.util.exceptions;
 import com.hahn.basic.Main;
 import com.hahn.basic.intermediate.statements.Compilable;
 import com.hahn.basic.parser.Node;
-import com.hahn.basic.util.Util;
+import com.hahn.basic.util.CompilerUtils;
 
 public class CompileException extends RuntimeException {
     private static final long serialVersionUID = 4974149633641094015L;
@@ -28,7 +28,7 @@ public class CompileException extends RuntimeException {
     }
     
     public CompileException(String mss, int row, int col) {
-        super(mss + " in line " + row + (col < 0 ? "" : "\n" + Main.getInstance().getLineStr(row).replace('\t', ' ') + "\n" + Util.createArrow(' ', '^', col)));
+        super(mss + " in line " + row + (col < 0 ? "" : "\n" + Main.getInstance().getLineStr(row).replace('\t', ' ') + "\n" + CompilerUtils.createArrow(' ', '^', col)));
         
         this.row = row;
         this.col = col;

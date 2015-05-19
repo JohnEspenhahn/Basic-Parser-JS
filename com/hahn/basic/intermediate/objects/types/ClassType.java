@@ -3,8 +3,8 @@ package com.hahn.basic.intermediate.objects.types;
 import java.util.Collection;
 import java.util.List;
 
-import com.hahn.basic.intermediate.Frame;
 import com.hahn.basic.intermediate.Compiler;
+import com.hahn.basic.intermediate.Frame;
 import com.hahn.basic.intermediate.function.FuncBridge;
 import com.hahn.basic.intermediate.function.FuncGroup;
 import com.hahn.basic.intermediate.function.FuncHead;
@@ -15,9 +15,10 @@ import com.hahn.basic.intermediate.objects.Var;
 import com.hahn.basic.intermediate.statements.ClassDefinition;
 import com.hahn.basic.intermediate.statements.Statement;
 import com.hahn.basic.parser.Node;
-import com.hahn.basic.util.BitFlag;
-import com.hahn.basic.util.Util;
+import com.hahn.basic.util.ConstructorUtils;
+import com.hahn.basic.util.TypeUtils;
 import com.hahn.basic.util.exceptions.CompileException;
+import com.hahn.basic.util.structures.BitFlag;
 
 public class ClassType extends StructType {    
     private FuncBridge funcBridge;
@@ -62,7 +63,7 @@ public class ClassType extends StructType {
         for (FuncGroup funcs: parent.getDefinedFuncs()) {
             if (funcs.isConstructor()) {
                 for (FuncHead func: funcs.getFuncs()) {
-                    FuncHead superFunc = defineFunc(null, "super", null, func.getReturnType(), Util.toParams(func.getParams()));
+                    FuncHead superFunc = defineFunc(null, "super", null, func.getReturnType(), TypeUtils.toParams(func.getParams()));
                     superFunc.setFlags(BitFlag.PRIVATE.b);
                 }
                 
@@ -176,7 +177,7 @@ public class ClassType extends StructType {
     }
     
     public FuncHead getConstructor(ITypeable[] types) {
-        return funcBridge.getFunc(Util.getConstructorName(), types);
+        return funcBridge.getFunc(ConstructorUtils.getConstructorName(), types);
     }
     
     /**
@@ -200,7 +201,7 @@ public class ClassType extends StructType {
      * @throw CompileException If `safe` is false and the function is not defined
      */
     public FuncHead getFunc(BasicObject objIn, Node nameNode, ITypeable[] types, boolean safe, boolean shallow) {
-        boolean findingConstructor = Util.isConstructorName(nameNode.getValue());
+        final boolean isFindingConstructor = ConstructorUtils.isConstructorName(nameNode.getValue());
         
         String name = nameNode.getValue();
         FuncHead func = funcBridge.getFunc(name, types);
@@ -223,8 +224,8 @@ public class ClassType extends StructType {
         
         // If reached this point then not found
         if (!safe) {
-            if (findingConstructor) throw new CompileException("Unknown contructor with parameters `(" + Util.joinTypes(types, ',') + ")` in " + this, nameNode);
-            else throw new CompileException("Unknown function `" + name + "(" + Util.joinTypes(types, ',') + ")` in " + this, nameNode);
+            if (isFindingConstructor) throw new CompileException("Unknown contructor with parameters `(" + TypeUtils.joinTypes(types, ',') + ")` in " + this, nameNode);
+            else throw new CompileException("Unknown function `" + name + "(" + TypeUtils.joinTypes(types, ',') + ")` in " + this, nameNode);
         } else {
             return null;
         }
@@ -263,8 +264,8 @@ public class ClassType extends StructType {
         initFrame.reverseOptimize();
         
         // If no constructor, define default
-        if (funcBridge.getFuncGroup(Util.getConstructorName()) == null) {
-            defineFunc(null, Util.getConstructorName(), null, Type.VOID, new Param[0]);
+        if (funcBridge.getFuncGroup(ConstructorUtils.getConstructorName()) == null) {
+            defineFunc(null, ConstructorUtils.getConstructorName(), null, Type.VOID, new Param[0]);
         }
     }
     

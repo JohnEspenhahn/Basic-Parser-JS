@@ -4,7 +4,7 @@ import java.security.InvalidParameterException;
 
 import com.hahn.basic.lexer.PackedToken;
 import com.hahn.basic.lexer.regex.IEnumRegexToken;
-import com.hahn.basic.util.FlagMap;
+import com.hahn.basic.util.structures.FlagMap;
 
 class Search extends IParser {
     public final IParser Owner;

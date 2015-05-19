@@ -1,6 +1,6 @@
 package com.hahn.basic.intermediate.objects;
 
-import static com.hahn.basic.util.Util.toBool;
+import static com.hahn.basic.util.LiteralUtils.toBool;
 
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.opcode.OPCode;

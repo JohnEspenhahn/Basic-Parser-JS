@@ -80,6 +80,9 @@ public class BasicLexer implements ILexer {
             }
         }
         
+        // Handle extra end whitespace
+        stream.add(new PackedToken(EnumToken.COMMENT, getMatch(), matchStart, getRow(), getColumn(matchStart)));
+        
         return stream;
     }
     

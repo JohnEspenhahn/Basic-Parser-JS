@@ -5,7 +5,7 @@ import java.util.List;
 import com.hahn.basic.intermediate.objects.Array;
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.target.js.JSPretty;
-import com.hahn.basic.util.Util;
+import com.hahn.basic.util.CompilerUtils;
 
 public class JSArray extends Array {
     
@@ -15,7 +15,7 @@ public class JSArray extends Array {
     
     @Override
     public String toTarget() {
-        return JSPretty.format("[%s]", Util.toTarget(getValues().toArray(new BasicObject[getValues().size()]), ","));
+        return JSPretty.format("[%s]", CompilerUtils.toTarget(getValues().toArray(new BasicObject[getValues().size()]), ","));
     }
     
 }

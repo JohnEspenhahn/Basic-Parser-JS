@@ -1,4 +1,4 @@
-package com.hahn.basic.util;
+package com.hahn.basic.util.structures;
 
 import java.util.HashMap;
 import java.util.Map;

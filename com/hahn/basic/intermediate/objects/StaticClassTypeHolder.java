@@ -7,8 +7,8 @@ import com.hahn.basic.intermediate.objects.types.ClassType;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.StructType;
 import com.hahn.basic.parser.Node;
-import com.hahn.basic.util.BitFlag;
 import com.hahn.basic.util.exceptions.CompileException;
+import com.hahn.basic.util.structures.BitFlag;
 
 public class StaticClassTypeHolder extends ClassType implements StaticClassExcludes {
     @Delegate(excludes=StaticClassExcludes.class)

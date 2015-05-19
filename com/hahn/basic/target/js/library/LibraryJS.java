@@ -5,8 +5,8 @@ import java.io.File;
 import com.hahn.basic.intermediate.library.base.Library;
 import com.hahn.basic.intermediate.objects.types.ParameterizedType;
 import com.hahn.basic.intermediate.objects.types.Type;
-import com.hahn.basic.util.BitFlag;
 import com.hahn.basic.util.IOUtil;
+import com.hahn.basic.util.structures.BitFlag;
 
 public class LibraryJS extends Library {
     
