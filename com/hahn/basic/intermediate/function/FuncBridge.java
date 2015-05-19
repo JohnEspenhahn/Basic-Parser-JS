@@ -1,9 +1,11 @@
-package com.hahn.basic.intermediate;
+package com.hahn.basic.intermediate.function;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.hahn.basic.intermediate.Frame;
+import com.hahn.basic.intermediate.Compiler;
 import com.hahn.basic.intermediate.objects.Param;
 import com.hahn.basic.intermediate.objects.types.ClassType;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
@@ -25,7 +27,7 @@ public class FuncBridge {
     }
     
     public FuncHead defineFunc(Frame parent, boolean override, Node head, String inName, String outName, Type rtnType, Param... params) {
-        FuncHead func = LangCompiler.factory.FuncHead(parent, classType, inName, outName, head, rtnType, params);
+        FuncHead func = Compiler.factory.FuncHead(parent, classType, inName, outName, head, rtnType, params);
         
         FuncGroup group = funcs.get(inName);
         if (group == null) {

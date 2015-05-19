@@ -3,7 +3,7 @@ package com.hahn.basic.target.js;
 import java.util.List;
 
 import com.hahn.basic.intermediate.Frame;
-import com.hahn.basic.intermediate.FuncHead;
+import com.hahn.basic.intermediate.function.FuncHead;
 import com.hahn.basic.intermediate.objects.AdvancedObject;
 import com.hahn.basic.intermediate.objects.ArithmeticObject;
 import com.hahn.basic.intermediate.objects.Array;
@@ -27,6 +27,7 @@ import com.hahn.basic.intermediate.objects.VarLocal;
 import com.hahn.basic.intermediate.objects.VarParameter;
 import com.hahn.basic.intermediate.objects.VarThis;
 import com.hahn.basic.intermediate.objects.register.IRegister;
+import com.hahn.basic.intermediate.objects.register.SimpleRegisterFactory;
 import com.hahn.basic.intermediate.objects.types.ClassType;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.ParameterizedType;
@@ -46,9 +47,10 @@ import com.hahn.basic.intermediate.statements.ParamDefaultValStatement;
 import com.hahn.basic.intermediate.statements.Statement;
 import com.hahn.basic.intermediate.statements.WhileStatement;
 import com.hahn.basic.parser.Node;
-import com.hahn.basic.target.ILangCommand;
-import com.hahn.basic.target.ILangFactory;
-import com.hahn.basic.target.LangBuildTarget;
+import com.hahn.basic.target.OutputBuilder;
+import com.hahn.basic.target.Command;
+import com.hahn.basic.target.CommandFactory;
+import com.hahn.basic.target.js.function.JSFuncHead;
 import com.hahn.basic.target.js.objects.JSArithmeticObject;
 import com.hahn.basic.target.js.objects.JSArithmeticSetObject;
 import com.hahn.basic.target.js.objects.JSArray;
@@ -79,17 +81,35 @@ import com.hahn.basic.target.js.statements.JSReturnStatement;
 import com.hahn.basic.target.js.statements.JSWhileStatement;
 import com.hahn.basic.util.exceptions.UnimplementedException;
 
-public class JSLangFactory implements ILangFactory {
-    private static final JSBuildTarget build = new JSBuildTarget();
+public class JSCommandFactory implements CommandFactory {
+    private JSOutputBuilder build;    
+    private SimpleRegisterFactory registerFactory;
+    
+    public JSCommandFactory() {
+        registerFactory = new SimpleRegisterFactory();
+        
+        reset();
+    }
     
     @Override
-    public LangBuildTarget getLangBuildTarget() {
+    public void reset() {
+        build = new JSOutputBuilder();
+        registerFactory.reset();
+    }
+    
+    @Override
+    public OutputBuilder getBuildTarget() {
         return build;
     }
     
     @Override
+    public String getEOL() {
+        return ";";
+    }
+    
+    @Override
     public IRegister getNextRegister(AdvancedObject objFor) {
-        return build.registerFactory.getForObject(objFor);
+        return registerFactory.getForObject(objFor);
     }
     
     @Override
@@ -100,10 +120,8 @@ public class JSLangFactory implements ILangFactory {
     @Override
     public String getTargetOPSymbol(OPCode code) {
         switch (code) {
-        case INT:
-            return "~~";
-        default:
-            return code.symbol;
+            case INT: return "~~";
+            default: return code.symbol;
         }
     }
     
@@ -233,7 +251,7 @@ public class JSLangFactory implements ILangFactory {
     }
     
     @Override
-    public ILangCommand Import(String name) {
+    public Command Import(String name) {
         throw new UnimplementedException();
     }
     

@@ -4,6 +4,9 @@ import java.util.HashMap;
 import java.util.ListIterator;
 import java.util.Map;
 
+import com.hahn.basic.intermediate.function.FuncBridge;
+import com.hahn.basic.intermediate.function.FuncGroup;
+import com.hahn.basic.intermediate.function.FuncHead;
 import com.hahn.basic.intermediate.library.base.Library;
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.FuncCallPair;
@@ -15,21 +18,21 @@ import com.hahn.basic.intermediate.objects.types.ClassType;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.parser.Node;
-import com.hahn.basic.target.ILangFactory;
-import com.hahn.basic.target.LangBuildTarget;
+import com.hahn.basic.target.CommandFactory;
+import com.hahn.basic.target.OutputBuilder;
 import com.hahn.basic.target.js.JSPretty;
 
-public class LangCompiler {    
+public class Compiler {    
     private static Map<String, Library> libs = new HashMap<String, Library>();
     private static Map<String, Integer> labels = new HashMap<String, Integer>();
     private static Map<String, StringConst> strings = new HashMap<String, StringConst>();
     
-    public static ILangFactory factory;
+    public static CommandFactory factory;
     private static Frame globalFrame, frame;
     
     private static FuncBridge funcBridge;
 
-    public static LangBuildTarget compile(Node h, ILangFactory f) {
+    public static OutputBuilder compile(Node h, CommandFactory f) {
         globalFrame = frame = new Frame(null, h);
         factory = f;
         
@@ -37,8 +40,8 @@ public class LangCompiler {
         reset();
         
         // Init
-        LangBuildTarget builder = factory.getLangBuildTarget(); 
-        builder.init();
+        factory.reset();
+        OutputBuilder builder = factory.getBuildTarget();
         
         frame.addTargetCode();
         
@@ -156,7 +159,7 @@ public class LangCompiler {
     	if (var != null) {
     		return var;
     	} else {
-    		StringConst strConst = LangCompiler.factory.StringConst(str);
+    		StringConst strConst = Compiler.factory.StringConst(str);
     		strings.put(str, strConst);
     		
     		return strConst;
@@ -173,7 +176,7 @@ public class LangCompiler {
     }
     
     public static FuncHead defineFunc(String inName, String outName, Type rtnType, Param... params) {
-        return LangCompiler.defineFunc(getGlobalFrame(), null, inName, outName, rtnType, params);
+        return Compiler.defineFunc(getGlobalFrame(), null, inName, outName, rtnType, params);
     }
     
     public static FuncHead defineFunc(Frame parent, Node head, String inName, String outName, Type rtnType, Param... params) {

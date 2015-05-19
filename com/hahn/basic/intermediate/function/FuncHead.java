@@ -1,4 +1,4 @@
-package com.hahn.basic.intermediate;
+package com.hahn.basic.intermediate.function;
 
 import java.util.Arrays;
 import java.util.List;
@@ -6,6 +6,8 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 import com.hahn.basic.definition.EnumToken;
+import com.hahn.basic.intermediate.Frame;
+import com.hahn.basic.intermediate.Compiler;
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.FuncPointer;
 import com.hahn.basic.intermediate.objects.Param;
@@ -67,7 +69,7 @@ public abstract class FuncHead extends Frame {
         for (int i = 0; i < params.length; i++) {
             Param p = params[i];
             
-            Var var = LangCompiler.factory.VarParameter(this, p.getName(), p.getType(), p.getFlags());
+            Var var = Compiler.factory.VarParameter(this, p.getName(), p.getType(), p.getFlags());
             this.params[i] = var;
             this.isOptional[i] = false;
             
@@ -148,7 +150,7 @@ public abstract class FuncHead extends Frame {
         if (getClassIn() != null) {
             StructParam param = classIn.getParamSafe(name);
             if (param != null) { 
-                return LangCompiler.factory.VarAccess(this, getClassIn().getThis(), param, param.getType(), -1, -1);
+                return Compiler.factory.VarAccess(this, getClassIn().getThis(), param, param.getType(), -1, -1);
             }
         }
         

@@ -3,7 +3,7 @@ package com.hahn.basic.intermediate.objects;
 import java.util.List;
 
 import com.hahn.basic.intermediate.Frame;
-import com.hahn.basic.intermediate.LangCompiler;
+import com.hahn.basic.intermediate.Compiler;
 import com.hahn.basic.intermediate.objects.register.IRegister;
 import com.hahn.basic.intermediate.objects.register.StackRegister;
 import com.hahn.basic.intermediate.objects.types.Type;
@@ -41,7 +41,7 @@ public abstract class Var extends AdvancedObject {
     public void doTakeRegister(boolean lastUse) {
         if (!hasRegister()) {
             List<AdvancedObject> parallelObjs = getParallelObjs();
-            if (parallelObjs.size() < LangCompiler.factory.getAvailableRegisters() || getUses() >= parallelObjs.get(0).getUses()) {
+            if (parallelObjs.size() < Compiler.factory.getAvailableRegisters() || getUses() >= parallelObjs.get(0).getUses()) {
                 setRegister(getStandardRegister());
             } else {
                 setRegister(getStackRegister());
@@ -54,7 +54,7 @@ public abstract class Var extends AdvancedObject {
     }
     
     protected IRegister getStandardRegister() {
-        return LangCompiler.factory.getNextRegister(this);
+        return Compiler.factory.getNextRegister(this);
     }
     
     /**

@@ -14,8 +14,8 @@ import javax.swing.JFileChooser;
 import com.hahn.basic.definition.EnumExpression;
 import com.hahn.basic.definition.EnumToken;
 import com.hahn.basic.lexer.basic.BasicLexer;
-import com.hahn.basic.target.LangBuildTarget;
-import com.hahn.basic.target.js.JSLangFactory;
+import com.hahn.basic.target.OutputBuilder;
+import com.hahn.basic.target.js.JSCommandFactory;
 import com.hahn.basic.util.EnumInputType;
 import com.hahn.basic.util.exceptions.CompileException;
 import com.hahn.basic.viewer.ViewerBuilder;
@@ -45,7 +45,7 @@ public abstract class Main {
         this.values = new HashMap<String, String>();
     }
     
-    public abstract LangBuildTarget getLangBuildTarget();
+    public abstract OutputBuilder getLangBuildTarget();
     
     public abstract void printShellTitle();
     
@@ -67,7 +67,7 @@ public abstract class Main {
     }
     
     public File getTargetFile() {
-        return new File(inputFile.getAbsolutePath() + "." + getLangBuildTarget().getExtension());
+        return new File(inputFile.getAbsolutePath() + "." + getLangBuildTarget().getOutputExtension());
     }
     
     public File getInputFile() {
@@ -373,7 +373,7 @@ public abstract class Main {
     
     public static void main(String[] args) {
         try {
-            instance = new BASICMain(new JSLangFactory(), new BasicLexer(), EnumToken.class, EnumExpression.class);
+            instance = new BASICMain(new JSCommandFactory(), new BasicLexer(), EnumToken.class, EnumExpression.class);
             
             String s;
             for (int i = 0; i < args.length; i++) {

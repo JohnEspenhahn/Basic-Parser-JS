@@ -4,33 +4,23 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import com.hahn.basic.Main;
-import com.hahn.basic.intermediate.LangCompiler;
+import com.hahn.basic.intermediate.Compiler;
 import com.hahn.basic.intermediate.library.base.Library;
-import com.hahn.basic.intermediate.objects.register.SimpleRegisterFactory;
-import com.hahn.basic.target.ILangCommand;
-import com.hahn.basic.target.LangBuildTarget;
+import com.hahn.basic.target.OutputBuilder;
+import com.hahn.basic.target.Command;
 import com.hahn.basic.target.js.library.LibraryJQuery;
 import com.hahn.basic.target.js.library.LibraryJS;
 
-public class JSBuildTarget extends LangBuildTarget {
-    public static final Library JS = new LibraryJS();
-    public static final Library JQuery = new LibraryJQuery();
+public class JSOutputBuilder implements OutputBuilder {
+    public static final Library JS = new LibraryJS(),
+                                JQuery = new LibraryJQuery();
     
-	StringBuilder builder;
-	SimpleRegisterFactory registerFactory;
+	private StringBuilder builder;
 
-	public JSBuildTarget() {
+	public JSOutputBuilder() {
 		builder = new StringBuilder();
-		registerFactory = new SimpleRegisterFactory();
-	}
-	
-	@Override
-	public void init() {
-	    builder.setLength(0);
-	    
-	    registerFactory.reset();
-	    
-	    LangCompiler.addLibrary("JS");
+		
+		Compiler.addLibrary("JS");
 	}
 	
 	@Override
@@ -44,13 +34,8 @@ public class JSBuildTarget extends LangBuildTarget {
 	}
 	
 	@Override
-	public String getExtension() {
+	public String getOutputExtension() {
 	    return "html";
-	}
-	
-	@Override
-	public String getEOL() {
-	    return ";";
 	}
 	
 	@Override
@@ -59,7 +44,7 @@ public class JSBuildTarget extends LangBuildTarget {
 	}
 
 	@Override
-	public void append(ILangCommand cmd) {
+	public void append(Command cmd) {
 		builder.append(cmd.toTarget());
 	}
 	

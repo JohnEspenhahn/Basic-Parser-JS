@@ -1,7 +1,7 @@
 package com.hahn.basic.intermediate.statements;
 
-import com.hahn.basic.intermediate.FuncHead;
-import com.hahn.basic.intermediate.LangCompiler;
+import com.hahn.basic.intermediate.Compiler;
+import com.hahn.basic.intermediate.function.FuncHead;
 import com.hahn.basic.intermediate.objects.FuncPointer;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.ParameterizedType;
@@ -17,7 +17,7 @@ public class FuncDefStatement extends Statement {
         
         this.nameNode = nameNode;
         
-        this.fp = LangCompiler.factory.FuncPointer(nameNode, null, new ParameterizedType<ITypeable>(Type.FUNCTION, (ITypeable[]) func.getParams(), func.getReturnType()));
+        this.fp = Compiler.factory.FuncPointer(nameNode, null, new ParameterizedType<ITypeable>(Type.FUNCTION, (ITypeable[]) func.getParams(), func.getReturnType()));
         this.fp.setFunction(func);
     }
     

@@ -14,7 +14,7 @@ import com.hahn.basic.parser.Node;
 import com.hahn.basic.util.BitFlag;
 import com.hahn.basic.util.exceptions.CompileException;
 
-public class StructType extends Type implements IParamHolding {    
+public class StructType extends Type {    
     private final ArrayDeque<StructType> extended;
     private final Map<String, StructParam> params;
 

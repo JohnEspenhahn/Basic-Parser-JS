@@ -4,10 +4,10 @@ import java.util.Collection;
 import java.util.List;
 
 import com.hahn.basic.intermediate.Frame;
-import com.hahn.basic.intermediate.FuncBridge;
-import com.hahn.basic.intermediate.FuncGroup;
-import com.hahn.basic.intermediate.FuncHead;
-import com.hahn.basic.intermediate.LangCompiler;
+import com.hahn.basic.intermediate.Compiler;
+import com.hahn.basic.intermediate.function.FuncBridge;
+import com.hahn.basic.intermediate.function.FuncGroup;
+import com.hahn.basic.intermediate.function.FuncHead;
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.ClassObject;
 import com.hahn.basic.intermediate.objects.Param;
@@ -35,13 +35,13 @@ public class ClassType extends StructType {
         if (name == null) return;
         
         this.funcBridge = new FuncBridge(this);
-        this.initFrame = new Frame(LangCompiler.getGlobalFrame(), null);
-        this.staticFrame = new Frame(LangCompiler.getGlobalFrame(), null);
+        this.initFrame = new Frame(Compiler.getGlobalFrame(), null);
+        this.staticFrame = new Frame(Compiler.getGlobalFrame(), null);
         
-        this.classObj = LangCompiler.factory.ClassObject(this);
+        this.classObj = Compiler.factory.ClassObject(this);
         
-        this.varThis = LangCompiler.factory.VarThis(LangCompiler.getGlobalFrame(), this);
-        this.varImpliedThis = LangCompiler.factory.VarImpliedThis(LangCompiler.getGlobalFrame(), this);
+        this.varThis = Compiler.factory.VarThis(Compiler.getGlobalFrame(), this);
+        this.varImpliedThis = Compiler.factory.VarImpliedThis(Compiler.getGlobalFrame(), this);
         
         if (parent instanceof ClassType) {
             defineSuper((ClassType) parent);
@@ -49,7 +49,7 @@ public class ClassType extends StructType {
             this.varSuper = null;
         }
         
-        this.def = LangCompiler.factory.ClassDefinition(containingFrame, this);
+        this.def = Compiler.factory.ClassDefinition(containingFrame, this);
     }
     
     /**
@@ -57,7 +57,7 @@ public class ClassType extends StructType {
      * @param parent
      */
     private void defineSuper(ClassType parent) {
-        this.varSuper = LangCompiler.factory.VarSuper(LangCompiler.getGlobalFrame(), parent);
+        this.varSuper = Compiler.factory.VarSuper(Compiler.getGlobalFrame(), parent);
         
         for (FuncGroup funcs: parent.getDefinedFuncs()) {
             if (funcs.isConstructor()) {
@@ -168,7 +168,7 @@ public class ClassType extends StructType {
     }
     
     public FuncHead defineFunc(Node head, boolean override, String inName, String outName, Type rtnType, Param... params) {        
-        return funcBridge.defineFunc(LangCompiler.getGlobalFrame(), override, head, inName, outName, rtnType, params);
+        return funcBridge.defineFunc(Compiler.getGlobalFrame(), override, head, inName, outName, rtnType, params);
     }
     
     public Collection<FuncGroup> getDefinedFuncs() {

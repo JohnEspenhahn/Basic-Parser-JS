@@ -4,7 +4,7 @@ import lombok.NonNull;
 
 import com.hahn.basic.intermediate.Frame;
 import com.hahn.basic.intermediate.IIntermediate;
-import com.hahn.basic.intermediate.LangCompiler;
+import com.hahn.basic.intermediate.Compiler;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.opcode.OPCode;
@@ -79,7 +79,7 @@ public abstract class BasicObject implements IIntermediate, ITypeable {
      * @return A new, altered version of this
      */
     public BasicObject castTo(Type type, int row, int col) {
-        return LangCompiler.factory.CastedObject(this, getType().castTo(type, row, col), row, col);
+        return Compiler.factory.CastedObject(this, getType().castTo(type, row, col), row, col);
     }
     
     
@@ -308,7 +308,7 @@ public abstract class BasicObject implements IIntermediate, ITypeable {
      * @return ExpressionStatement
      */
     public final ExpressionStatement getAsExp(Statement container) {
-        return LangCompiler.factory.ExpressionStatement(container, this);
+        return Compiler.factory.ExpressionStatement(container, this);
     }
     
     @Override

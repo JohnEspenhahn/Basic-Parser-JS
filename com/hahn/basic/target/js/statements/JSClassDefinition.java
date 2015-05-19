@@ -2,8 +2,8 @@ package com.hahn.basic.target.js.statements;
 
 import com.hahn.basic.definition.EnumToken;
 import com.hahn.basic.intermediate.Frame;
-import com.hahn.basic.intermediate.FuncGroup;
-import com.hahn.basic.intermediate.FuncHead;
+import com.hahn.basic.intermediate.function.FuncGroup;
+import com.hahn.basic.intermediate.function.FuncHead;
 import com.hahn.basic.intermediate.objects.types.ClassType;
 import com.hahn.basic.intermediate.objects.types.StructType.StructParam;
 import com.hahn.basic.intermediate.statements.ClassDefinition;

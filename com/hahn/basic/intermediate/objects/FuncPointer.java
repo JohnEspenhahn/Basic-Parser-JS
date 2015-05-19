@@ -1,8 +1,8 @@
 package com.hahn.basic.intermediate.objects;
 
-import com.hahn.basic.intermediate.FuncHead;
 import com.hahn.basic.intermediate.IIntermediate;
-import com.hahn.basic.intermediate.LangCompiler;
+import com.hahn.basic.intermediate.Compiler;
+import com.hahn.basic.intermediate.function.FuncHead;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.ParameterizedType;
 import com.hahn.basic.intermediate.objects.types.Type;
@@ -106,7 +106,7 @@ public abstract class FuncPointer extends BasicObject {
      */
     protected void checkFunction() {
         if (func == null) {
-            FuncCallPair funcPair = LangCompiler.getFunc(objectIn, nameNode, getTypes());
+            FuncCallPair funcPair = Compiler.getFunc(objectIn, nameNode, getTypes());
             if (funcPair != null) {
                 // If returned a function pair, update variables
                 setFunction(funcPair.getFunc());

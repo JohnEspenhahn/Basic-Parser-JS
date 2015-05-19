@@ -3,7 +3,7 @@ package com.hahn.basic.intermediate.statements;
 import org.apache.commons.lang3.StringUtils;
 
 import com.hahn.basic.Main;
-import com.hahn.basic.intermediate.FuncHead;
+import com.hahn.basic.intermediate.function.FuncHead;
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.FuncCallPointer;
 

@@ -2,7 +2,7 @@ package com.hahn.basic.intermediate.objects;
 
 import com.hahn.basic.intermediate.Frame;
 import com.hahn.basic.intermediate.IIntermediate;
-import com.hahn.basic.intermediate.LangCompiler;
+import com.hahn.basic.intermediate.Compiler;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.opcode.OPCode;
 import com.hahn.basic.intermediate.statements.Statement;
@@ -127,7 +127,7 @@ public class OPObject extends BasicObject {
     }
     
     public String getTargetOPSymbol() {
-        return LangCompiler.factory.getTargetOPSymbol(getOP());
+        return Compiler.factory.getTargetOPSymbol(getOP());
     }
     
     @Override

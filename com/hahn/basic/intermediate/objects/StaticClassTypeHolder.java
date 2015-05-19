@@ -2,7 +2,7 @@ package com.hahn.basic.intermediate.objects;
 
 import lombok.experimental.Delegate;
 
-import com.hahn.basic.intermediate.FuncHead;
+import com.hahn.basic.intermediate.function.FuncHead;
 import com.hahn.basic.intermediate.objects.types.ClassType;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.StructType;

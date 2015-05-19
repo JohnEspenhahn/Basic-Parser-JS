@@ -9,8 +9,8 @@ import org.apache.commons.lang3.math.NumberUtils;
 
 import com.hahn.basic.Main;
 import com.hahn.basic.definition.EnumToken;
-import com.hahn.basic.intermediate.FuncHead;
 import com.hahn.basic.intermediate.IIntermediate;
+import com.hahn.basic.intermediate.function.FuncHead;
 import com.hahn.basic.intermediate.objects.AdvancedObject;
 import com.hahn.basic.intermediate.objects.LiteralNum;
 import com.hahn.basic.intermediate.objects.Param;

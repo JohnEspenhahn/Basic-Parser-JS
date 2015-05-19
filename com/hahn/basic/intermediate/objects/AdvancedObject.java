@@ -7,7 +7,7 @@ import java.util.List;
 
 import com.hahn.basic.intermediate.Frame;
 import com.hahn.basic.intermediate.IIntermediate;
-import com.hahn.basic.intermediate.LangCompiler;
+import com.hahn.basic.intermediate.Compiler;
 import com.hahn.basic.intermediate.objects.register.IRegister;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.opcode.OPCode;
@@ -48,7 +48,7 @@ public abstract class AdvancedObject extends BasicObject {
     @Override
     public BasicObject getForCreateVar() {
         if (isRegisterOnStack()) {
-            return LangCompiler.factory.PushObject();
+            return Compiler.factory.PushObject();
         } else {
             return super.getForCreateVar();
         }

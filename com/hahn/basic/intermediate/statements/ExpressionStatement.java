@@ -1,7 +1,7 @@
 package com.hahn.basic.intermediate.statements;
 
 import com.hahn.basic.Main;
-import com.hahn.basic.intermediate.LangCompiler;
+import com.hahn.basic.intermediate.Compiler;
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.ExpressionObject;
 import com.hahn.basic.intermediate.objects.types.Type;
@@ -94,7 +94,7 @@ public abstract class ExpressionStatement extends Statement {
     public ExpressionObject getAsExpObj() {
         this.gotAsObject = true;
         
-        return LangCompiler.factory.ExpressionObject(this);
+        return Compiler.factory.ExpressionObject(this);
     }
     
     /**

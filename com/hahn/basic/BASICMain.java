@@ -5,15 +5,15 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 
-import com.hahn.basic.intermediate.LangCompiler;
+import com.hahn.basic.intermediate.Compiler;
 import com.hahn.basic.lexer.ILexer;
 import com.hahn.basic.lexer.PackedToken;
 import com.hahn.basic.lexer.regex.IEnumRegexToken;
 import com.hahn.basic.parser.IEnumExpression;
 import com.hahn.basic.parser.Node;
 import com.hahn.basic.parser.Parser;
-import com.hahn.basic.target.ILangFactory;
-import com.hahn.basic.target.LangBuildTarget;
+import com.hahn.basic.target.CommandFactory;
+import com.hahn.basic.target.OutputBuilder;
 import com.hahn.basic.util.exceptions.CompileException;
 import com.hahn.basic.util.exceptions.LexException;
 import com.hahn.basic.viewer.ViewerBuilder;
@@ -23,12 +23,12 @@ public class BASICMain extends Main {
     
     private final ILexer lexer;
     private final Parser parser;
-    private final ILangFactory factory;
+    private final CommandFactory factory;
     
     /** The stream of lexed tokens */
     private List<PackedToken> stream;
 
-    public BASICMain(ILangFactory factory, ILexer lexer, Class<? extends IEnumRegexToken> tokens, Class<? extends IEnumExpression> expressions) {
+    public BASICMain(CommandFactory factory, ILexer lexer, Class<? extends IEnumRegexToken> tokens, Class<? extends IEnumExpression> expressions) {
         System.out.println("BASIC Parser v" + VERSION);
         
         this.factory = factory;
@@ -39,8 +39,8 @@ public class BASICMain extends Main {
     }
     
     @Override
-    public LangBuildTarget getLangBuildTarget() {
-        return this.factory.getLangBuildTarget();
+    public OutputBuilder getLangBuildTarget() {
+        return factory.getBuildTarget();
     }
     
     @Override
@@ -129,7 +129,7 @@ public class BASICMain extends Main {
     }
     
     private void compile(Node tree_head) {
-        LangBuildTarget code = LangCompiler.compile(tree_head, factory);
+        OutputBuilder code = Compiler.compile(tree_head, factory);
         
         if (inputFile != null) {
             writeToFile(code, getTargetFile()); 
@@ -138,7 +138,7 @@ public class BASICMain extends Main {
         }
     }
     
-    private void writeToFile(LangBuildTarget code, File targ) {
+    private void writeToFile(OutputBuilder code, File targ) {
         FileOutputStream os = null;
         try {
             targ.delete();

@@ -22,7 +22,7 @@ import com.hahn.basic.util.exceptions.CompileException;
  * @param <T> Some ITypeable object to allow this to store
  * either abstract types of actual typed objects
  */
-public class ParameterizedType<T extends ITypeable> extends Type implements IParamHolding {
+public class ParameterizedType<T extends ITypeable> extends Type {
     public static final ParameterizedType<Type> STRING_ARRAY = new ParameterizedType<Type>(Type.ARRAY, new Type[] { Type.STRING });
     
     private final StructType base;

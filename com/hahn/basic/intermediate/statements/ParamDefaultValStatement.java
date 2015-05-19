@@ -1,6 +1,6 @@
 package com.hahn.basic.intermediate.statements;
 
-import com.hahn.basic.intermediate.FuncHead;
+import com.hahn.basic.intermediate.function.FuncHead;
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.parser.Node;
 

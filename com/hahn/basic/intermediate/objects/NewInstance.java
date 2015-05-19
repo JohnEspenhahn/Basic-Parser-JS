@@ -3,8 +3,8 @@ package com.hahn.basic.intermediate.objects;
 import java.util.List;
 
 import com.hahn.basic.definition.EnumToken;
-import com.hahn.basic.intermediate.FuncHead;
 import com.hahn.basic.intermediate.IIntermediate;
+import com.hahn.basic.intermediate.function.FuncHead;
 import com.hahn.basic.intermediate.objects.types.ClassType;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.parser.Node;

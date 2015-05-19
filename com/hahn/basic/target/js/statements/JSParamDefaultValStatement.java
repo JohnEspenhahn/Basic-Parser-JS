@@ -2,7 +2,7 @@ package com.hahn.basic.target.js.statements;
 
 import java.util.Iterator;
 
-import com.hahn.basic.intermediate.FuncHead;
+import com.hahn.basic.intermediate.function.FuncHead;
 import com.hahn.basic.intermediate.statements.ParamDefaultValStatement;
 import com.hahn.basic.target.js.JSPretty;
 

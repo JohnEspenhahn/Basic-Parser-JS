@@ -3,7 +3,7 @@ package com.hahn.basic.intermediate.library.base;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.hahn.basic.intermediate.LangCompiler;
+import com.hahn.basic.intermediate.Compiler;
 import com.hahn.basic.intermediate.objects.types.ClassType;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.util.BitFlag;
@@ -49,11 +49,11 @@ public abstract class Library {
     
     public static void defineString(String str) {
         // If not already defined will define
-        LangCompiler.getString(str);
+        Compiler.getString(str);
     }
     
     public static void defineFunc(String inName, String outName, Type rtnType, Type... types) {        
-        LangCompiler.defineFunc(inName, outName, rtnType, Util.toParams(types));
+        Compiler.defineFunc(inName, outName, rtnType, Util.toParams(types));
     }
     
     public static void defineFunc(ClassType classIn, boolean override, String inName, String outName, int flags, Type rtnType, Type... types) {

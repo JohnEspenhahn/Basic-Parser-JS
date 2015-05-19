@@ -51,6 +51,7 @@ import java.util.List;
 import com.hahn.basic.Main;
 import com.hahn.basic.definition.EnumExpression;
 import com.hahn.basic.definition.EnumToken;
+import com.hahn.basic.intermediate.function.FuncHead;
 import com.hahn.basic.intermediate.objects.AdvancedObject;
 import com.hahn.basic.intermediate.objects.Array;
 import com.hahn.basic.intermediate.objects.BasicObject;
@@ -208,7 +209,7 @@ public class Frame extends Statement {
                 
                 boolean eol = !c.isBlock() && it.hasNext();
                 if (Main.getInstance().isPretty() || eol) {
-                    str.append(LangCompiler.factory.getLangBuildTarget().getEOL());
+                    str.append(Compiler.factory.getEOL());
                     
                     // Pretty print new line
                     if (Main.getInstance().isPretty() && eol) str.append('\n');
@@ -433,7 +434,7 @@ public class Frame extends Statement {
     }
     
     public String getLabel(String name) {
-        return LangCompiler.getLabel(name, this);
+        return Compiler.getLabel(name, this);
     }
     
     /*
@@ -503,7 +504,7 @@ public class Frame extends Statement {
         
         // Parse the name of the library from the quoted string form
         String str = name.getValue();
-        LangCompiler.addLibrary(str.substring(1, str.length() - 1));
+        Compiler.addLibrary(str.substring(1, str.length() - 1));
     }
     
     /**
@@ -554,7 +555,7 @@ public class Frame extends Statement {
      * @return The object the with retrieved value
      */
     private BasicObject inAccessVar(BasicObject obj, NestedListIterator<Node> it, boolean leaveLast) {        
-        ExpressionStatement exp = LangCompiler.factory.ExpressionStatement(this, obj);
+        ExpressionStatement exp = Compiler.factory.ExpressionStatement(this, obj);
         while (it.hasNext()) {
             Type type = exp.getObj().getType();
             
@@ -571,7 +572,7 @@ public class Frame extends Statement {
                 
                 @SuppressWarnings("unchecked")
                 ParameterizedType<ITypeable> arrType = (ParameterizedType<ITypeable>) type;
-                exp.setObj(LangCompiler.factory.VarAccess(exp, exp.getObj(), offset, arrType.getTypable(0).getType(), child.getRow(), child.getCol()), child);
+                exp.setObj(Compiler.factory.VarAccess(exp, exp.getObj(), offset, arrType.getTypable(0).getType(), child.getRow(), child.getCol()), child);
             } else if (accessMarker == DOT && type.doesExtend(Type.STRUCT)) {               
                 Node nameNode = it.next();
                 Node prthNode = (it.hasNext() ? it.next() : null);
@@ -600,7 +601,7 @@ public class Frame extends Statement {
                     
                     // Get FuncCall object
                     BasicObject[] aParams = params.toArray(new BasicObject[params.size()]);
-                    exp.setObj(LangCompiler.factory.FuncCallPointer(nameNode, exp.getObj(), aParams), child);
+                    exp.setObj(Compiler.factory.FuncCallPointer(nameNode, exp.getObj(), aParams), child);
                     
                 // Variable
                 } else {
@@ -609,7 +610,7 @@ public class Frame extends Statement {
                     nameNode.setColor(TextColor.LIGHT_BLUE);
                     
                     StructParam sp = exp.getObj().getType().getAsStruct().getParam(nameNode);               
-                    exp.setObj(LangCompiler.factory.VarAccess(exp, exp.getObj(), sp, sp.getType(), child.getRow(), child.getCol()), child);
+                    exp.setObj(Compiler.factory.VarAccess(exp, exp.getObj(), sp, sp.getType(), child.getRow(), child.getCol()), child);
                     
                     if (sp.hasFlag(BitFlag.PRIVATE)) {
                         throw new CompileException("The field `" + nameNode.getValue() + "` is private", nameNode);
@@ -680,7 +681,7 @@ public class Frame extends Statement {
      * @return ArithmeticSetObject to update the var
      */
     protected OPObject updateVar(BasicObject var, Node varNode, BasicObject obj, Node objNode, OPCode op) {
-        return LangCompiler.factory.ArithmeticSetObject(this, op, var, varNode, obj, objNode);
+        return Compiler.factory.ArithmeticSetObject(this, op, var, varNode, obj, objNode);
     }
     
     /**
@@ -691,7 +692,7 @@ public class Frame extends Statement {
      * @return OPObject to update the var
      */
     protected OPObject prefixUpdateVar(BasicObject var, Node varNode, OPCode op) {
-        return LangCompiler.factory.OPObject(this, op, var, varNode, null, null);
+        return Compiler.factory.OPObject(this, op, var, varNode, null, null);
     }
     
     /**
@@ -702,7 +703,7 @@ public class Frame extends Statement {
      * @return OPObject to update the var
      */
     protected OPObject postfixUpdateVar(BasicObject var, Node varNode, OPCode op) {
-        return LangCompiler.factory.PostfixOPObject(this, op, var, varNode);
+        return Compiler.factory.PostfixOPObject(this, op, var, varNode);
     }
     
     /**
@@ -724,7 +725,7 @@ public class Frame extends Statement {
         // Init var
         int flags = 0;
         Type type = Type.UNDEFINED;
-        DefineVarStatement define = LangCompiler.factory.DefineVarStatement(this, false);
+        DefineVarStatement define = Compiler.factory.DefineVarStatement(this, false);
         
         // For empty array creation
         EmptyArray emptyArray = null;
@@ -749,7 +750,7 @@ public class Frame extends Statement {
                     
                     obj = struct.putParam(new Param(name, type, flags), node);
                 } else { // Local var
-                    obj = LangCompiler.factory.VarLocal(this, name, type, flags);
+                    obj = Compiler.factory.VarLocal(this, name, type, flags);
                 }
                 
                 // Modify var
@@ -785,7 +786,7 @@ public class Frame extends Statement {
                     
                     val = LiteralNum.UNDEFINED;
                     if (type.doesExtend(Type.OBJECT)) val = LiteralNum.NULL;
-                    else if (type.doesExtend(Type.STRUCT)) val = LangCompiler.factory.DefaultStruct(type.getAsStruct());
+                    else if (type.doesExtend(Type.STRUCT)) val = Compiler.factory.DefaultStruct(type.getAsStruct());
                     
                     hasInit = true;
                 }
@@ -858,7 +859,7 @@ public class Frame extends Statement {
             throw new CompileException("Illegal array definition, must define size of first dimension", typeNode);
         }
         
-        return LangCompiler.factory.EmptyArray(head, IArray.toArrayType(type, dimensions), sizes);
+        return Compiler.factory.EmptyArray(head, IArray.toArrayType(type, dimensions), sizes);
     }
     
     /**
@@ -883,13 +884,13 @@ public class Frame extends Statement {
             }
         }
         
-        return LangCompiler.factory.Array(values);
+        return Compiler.factory.Array(values);
     }
     
     private void defineClassVar(ClassType classIn, BasicObject var, Node varNode, BasicObject val, Node valNode) {
-        VarAccess access = LangCompiler.factory.VarAccess(this, classIn.getThis(), var, var.getType(), varNode.getRow(), varNode.getCol());
-        OPObject op = LangCompiler.factory.OPObject(this, OPCode.SET, access, varNode, val, valNode);
-        classIn.addInitStatement(LangCompiler.factory.ExpressionStatement(this, op));
+        VarAccess access = Compiler.factory.VarAccess(this, classIn.getThis(), var, var.getType(), varNode.getRow(), varNode.getCol());
+        OPObject op = Compiler.factory.OPObject(this, OPCode.SET, access, varNode, val, valNode);
+        classIn.addInitStatement(Compiler.factory.ExpressionStatement(this, op));
     }
     
     /**
@@ -899,7 +900,7 @@ public class Frame extends Statement {
      */
     public Compilable doReturn(Node head) {
         Frame f = this;
-        while (f.parent != LangCompiler.getGlobalFrame()) {
+        while (f.parent != Compiler.getGlobalFrame()) {
             f = f.parent;
         }
         
@@ -925,7 +926,7 @@ public class Frame extends Statement {
         }
         
         // Return
-        return LangCompiler.factory.ReturnStatement(this, (FuncHead) f, result);
+        return Compiler.factory.ReturnStatement(this, (FuncHead) f, result);
     }
     
     /**
@@ -1124,7 +1125,7 @@ public class Frame extends Statement {
             Main.getInstance().setLine(nameNode.getRow(), nameNode.getCol());
             
             if (classIn == null) {
-                func = LangCompiler.defineFunc(LangCompiler.getGlobalFrame(), body, name, null, rtnType, aParams);
+                func = Compiler.defineFunc(Compiler.getGlobalFrame(), body, name, null, rtnType, aParams);
             } else {
                 func = classIn.defineFunc(body, name, null, rtnType, aParams);
             }
@@ -1133,7 +1134,7 @@ public class Frame extends Statement {
             String name = getLabel("afunc");
             nameNode.setValue(name);
             
-            func = LangCompiler.defineFunc(this, body, name, null, rtnType, aParams);
+            func = Compiler.defineFunc(this, body, name, null, rtnType, aParams);
         }
         
         // Put flags
@@ -1141,14 +1142,14 @@ public class Frame extends Statement {
         
         // Put default value
         if (!inits.isEmpty()) {
-            ParamDefaultValStatement defaultVal = LangCompiler.factory.ParamDefaultValStatement(func, false);
+            ParamDefaultValStatement defaultVal = Compiler.factory.ParamDefaultValStatement(func, false);
             for (DefinePair pair: inits) defaultVal.addVar(pair);
             
             func.addCode(defaultVal);
         }
         
         // Return
-        return LangCompiler.factory.FuncDefStatement(this, nameNode, func);
+        return Compiler.factory.FuncDefStatement(this, nameNode, func);
     }
     
     /**
@@ -1178,8 +1179,8 @@ public class Frame extends Statement {
         BasicObject[] aParams = params.toArray(new BasicObject[params.size()]);
         
         // Get FuncCall object
-        FuncCallPointer funcCallPointer = LangCompiler.factory.FuncCallPointer(nameNode, objectIn, aParams);
-        return LangCompiler.factory.DefaultCallFuncStatement(this, funcCallPointer);
+        FuncCallPointer funcCallPointer = Compiler.factory.FuncCallPointer(nameNode, objectIn, aParams);
+        return Compiler.factory.DefaultCallFuncStatement(this, funcCallPointer);
     }
     
     /**
@@ -1230,7 +1231,7 @@ public class Frame extends Statement {
             types = new ParameterizedType<ITypeable>(Type.FUNCTION);
         }
         
-        return LangCompiler.factory.FuncPointer(nameNode, objectIn, types);
+        return Compiler.factory.FuncPointer(nameNode, objectIn, types);
     }
     
     /**
@@ -1254,7 +1255,7 @@ public class Frame extends Statement {
             List<BasicObject> params = new ArrayList<BasicObject>();
             getFuncCallParams(children.get(3), params);
             
-            return LangCompiler.factory.NewInstance(type, typeNode, params);
+            return Compiler.factory.NewInstance(type, typeNode, params);
         } else if (type.doesExtend(Type.ARRAY)) {
             throw new CompileException("Illegal array definition, must define size of first dimension", typeNode);
         } else {
@@ -1282,7 +1283,7 @@ public class Frame extends Statement {
             }
         }
         
-        return LangCompiler.factory.IfStatement(this, conditionals);
+        return Compiler.factory.IfStatement(this, conditionals);
     }
     
     /**
@@ -1303,7 +1304,7 @@ public class Frame extends Statement {
         Node block = head.getAsChildren().get(1);
         List<Node> blockChildren = block.getAsChildren();
         
-        return LangCompiler.factory.WhileStatement(this, blockChildren.get(1), blockChildren.get(3));
+        return Compiler.factory.WhileStatement(this, blockChildren.get(1), blockChildren.get(3));
     }
     
     /**
@@ -1338,7 +1339,7 @@ public class Frame extends Statement {
             }
         }
         
-        return LangCompiler.factory.ForStatement(this, define, condition, modification, body);
+        return Compiler.factory.ForStatement(this, define, condition, modification, body);
     }
     
     /**
@@ -1347,7 +1348,7 @@ public class Frame extends Statement {
      * @return ContinueStatement
      */
     public Compilable doContinue(Node head) {        
-        return LangCompiler.factory.ContinueStatement(this);
+        return Compiler.factory.ContinueStatement(this);
     }
     
     /**
@@ -1361,7 +1362,7 @@ public class Frame extends Statement {
             throw new CompileException("No loop to break out of ", head);
         }
         
-        return LangCompiler.factory.BreakStatement(this);
+        return Compiler.factory.BreakStatement(this);
     }
     
     /**
@@ -1437,7 +1438,7 @@ public class Frame extends Statement {
             }
         }
         
-        return LangCompiler.getRegex(regex);
+        return Compiler.getRegex(regex);
     }
     
     /**
@@ -1475,7 +1476,7 @@ public class Frame extends Statement {
     }
     
     public ExpressionStatement doHandleExpression(Iterator<Node> it) {
-        ExpressionStatement exp = LangCompiler.factory.ExpressionStatement(this, null);
+        ExpressionStatement exp = Compiler.factory.ExpressionStatement(this, null);
         
         // Add tokens
         while (it.hasNext()) {            
@@ -1503,7 +1504,7 @@ public class Frame extends Statement {
             it.next(); // skip colon
             Node node_else = it.next();
             
-            exp.setObj(LangCompiler.factory.TernaryObject(exp, exp.getObj(), node_then, node_else, child.getRow(), child.getCol()), child);
+            exp.setObj(Compiler.factory.TernaryObject(exp, exp.getObj(), node_then, node_else, child.getRow(), child.getCol()), child);
             
         } else if (token == OPEN_PRNTH) {
             Node inPrnthNode = it.next();
@@ -1519,25 +1520,25 @@ public class Frame extends Statement {
                         /* Prefix */ || (exp.getObj() == null && token == SUB)) {
             OPCode op = OPCode.fromSymbol(val);
             
-            ExpressionStatement nextExp = LangCompiler.factory.ExpressionStatement(this, null);
+            ExpressionStatement nextExp = Compiler.factory.ExpressionStatement(this, null);
             handleNextExpressionChild(it, nextExp, temp);
             
-            exp.setObj(LangCompiler.factory.OPObject(exp, op, nextExp.getObj(), nextExp.getNode(), null, null), child);
+            exp.setObj(Compiler.factory.OPObject(exp, op, nextExp.getObj(), nextExp.getNode(), null, null), child);
         } else if (token == ADD || token == SUB || token == MULT || token == DIV || token == MOD || token == AND || token == BOR || token == XOR || token == LSHIFT || token == RSHIFT || token == BOOL_AND || token == BOOL_OR) {
             OPCode op = OPCode.fromSymbol(val);
             
-            ExpressionStatement nextExp = LangCompiler.factory.ExpressionStatement(this, null);
+            ExpressionStatement nextExp = Compiler.factory.ExpressionStatement(this, null);
             handleNextExpressionChild(it, nextExp, temp);
             
-            exp.setObj(LangCompiler.factory.ArithmeticObject(exp, op, exp.getObj(), exp.getNode(), nextExp.getObj(), nextExp.getNode()), child);
+            exp.setObj(Compiler.factory.ArithmeticObject(exp, op, exp.getObj(), exp.getNode(), nextExp.getObj(), nextExp.getNode()), child);
         } else if (token == NOTEQUAL || token == EQUALS || token == LESS_EQU || token == GTR_EQU || token == LESS || token == GTR) {
             OPCode op = OPCode.fromSymbol(val);
             
-            ExpressionStatement nextExp = LangCompiler.factory.ExpressionStatement(this, null);
+            ExpressionStatement nextExp = Compiler.factory.ExpressionStatement(this, null);
             handleNextExpressionChild(it, nextExp, temp);
             
             if (temp == null) temp = createTempVar(Type.BOOL);
-            exp.setObj(LangCompiler.factory.ConditionalObject(exp, op, exp.getObj(), exp.getNode(), nextExp.getObj(), nextExp.getNode(), temp), child);
+            exp.setObj(Compiler.factory.ConditionalObject(exp, op, exp.getObj(), exp.getNode(), nextExp.getObj(), nextExp.getNode(), temp), child);
             
         } else if (!child.isTerminal()) {
             exp.setObj(handleExpression(child), child);
@@ -1561,7 +1562,7 @@ public class Frame extends Statement {
             } else if (token == FALSE) {
                 return new LiteralBool(false);
             } else if (token == STRING) {
-                return LangCompiler.getString(val.substring(1, val.length() - 1));
+                return Compiler.getString(val.substring(1, val.length() - 1));
             } else if (token == NULL) {
                 return LiteralNum.NULL;
             }

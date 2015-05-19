@@ -6,7 +6,7 @@ import java.util.Iterator;
 
 import lombok.NonNull;
 
-import com.hahn.basic.target.LangBuildTarget;
+import com.hahn.basic.target.OutputBuilder;
 
 public abstract class Statement extends Compilable {
     private Deque<Compilable> targetCode;
@@ -86,7 +86,7 @@ public abstract class Statement extends Compilable {
         return targetCode;
     }
     
-    public String joinTargetCode(LangBuildTarget builder) {
+    public String joinTargetCode(OutputBuilder builder) {
     	StringBuilder str = new StringBuilder();    	
     	if (useAddTargetCode()) {
             for (Compilable c: targetCode) {
