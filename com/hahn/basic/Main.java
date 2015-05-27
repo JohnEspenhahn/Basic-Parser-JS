@@ -2,9 +2,7 @@ package com.hahn.basic;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Stack;
@@ -15,6 +13,7 @@ import javax.swing.JFileChooser;
 
 import com.hahn.basic.definition.EnumExpression;
 import com.hahn.basic.definition.EnumToken;
+import com.hahn.basic.intermediate.CodeLines;
 import com.hahn.basic.lexer.basic.BasicLexer;
 import com.hahn.basic.target.OutputBuilder;
 import com.hahn.basic.target.js.JSCommandFactory;
@@ -27,13 +26,9 @@ public abstract class Main {
     private static final String FILE_KEY = "file";
     private static final String DIR_KEY = "dir";
     
-    private int row, col;
-    private Stack<Integer> rows = new Stack<Integer>(), columns = new Stack<Integer>();
-    
-    private List<String> lines = new ArrayList<String>();
-    
     private boolean debug = false, pretty = false, library = false;
     
+    private Stack<CodeLines> linesStack;
     private Map<String, String> values;
     
     private EnumInputType inputType;
@@ -43,14 +38,24 @@ public abstract class Main {
         this.inputType = null;
         this.inputFile = null;
         
+        this.linesStack = new Stack<CodeLines>();
         this.values = new HashMap<String, String>();
+        
+        pushCodeLines();
     }
     
     public abstract OutputBuilder getLangBuildTarget();
     
     public abstract void printShellTitle();
     
+    /**
+     * Reset the compiler
+     */
     public abstract void reset();
+    
+    /**
+     * Compile the inputed code
+     */
     public abstract void handleInput();
     
     public void setInputType(EnumInputType type) {
@@ -149,9 +154,9 @@ public abstract class Main {
             } else {
                 try {               
                     // Reset
-                    lines.clear();
+                    getLines().reset();
                     clearLineErrors();
-                    lines.add(input.trim());
+                    getLines().add(input.trim());
                     
                     reset();                    
                     handleInput();
@@ -192,9 +197,9 @@ public abstract class Main {
             while(scanner.hasNextLine()) {
                 String line = scanner.nextLine();
                 
-                lines.add(line + (scanner.hasNextLine() ? "\n" : ""));
+                getLines().add(line + (scanner.hasNextLine() ? "\n" : ""));
             }
-            // lines.add("#eof"); // End of File
+            // getLines().add("#eof"); // End of File
             
             handleInput();
             
@@ -239,9 +244,9 @@ public abstract class Main {
                         while(scanner.hasNextLine()) {
                             String line = scanner.nextLine();
                             
-                            lines.add(line + (scanner.hasNextLine() ? "\n" : ""));
+                            getLines().add(line + (scanner.hasNextLine() ? "\n" : ""));
                         }
-                        // lines.add("#eof"); // End of File
+                        // getLines().add("#eof"); // End of File
                         
                         scanner.close();
                         scanner = null;
@@ -272,6 +277,10 @@ public abstract class Main {
         }
     }
     
+    /**
+     * Parse code lines from a string. Does not do any compiling
+     * @param str The string of code to parse into lines
+     */
     public void parseLinesFromString(String str) {
         resetFile();
         
@@ -280,18 +289,18 @@ public abstract class Main {
         
         int idx = 0;
         while (m.find()) {
-            lines.add(str.substring(idx, m.end()));
+            getLines().add(str.substring(idx, m.end()));
             idx = m.end();
         }
         
         // Add last without new line
         if (idx != str.length() - 1) {
-            lines.add(str.substring(idx));
+            getLines().add(str.substring(idx));
         }
     }
     
     private void resetFile() {
-        lines.clear();
+        getLines().reset();
         clearLineErrors();
         library = false;
     }
@@ -329,35 +338,6 @@ public abstract class Main {
         else System.out.println("ERROR: " + e.getMessage());
     }
     
-    protected List<String> getLines() {
-        return lines;
-    }
-    
-    public String getLineStr() {
-        return getLineStr(getRow());
-    }
-    
-    public String getLineStr(int line) {
-        return lines.get(line - 1);
-    }
-    
-    public int getRow() {
-        return row;
-    }
-    
-    public int getCol() {
-        return col;
-    }
-    
-    public void setLine(int row) {
-        setLine(row, -1);
-    }
-    
-    public void setLine(int row, int col) {
-        this.row = row;
-        this.col = col;
-    }
-    
     public void putLineError(CompileException e) {
         ViewerBuilder.putLineError(e.getRow(), e.getTooltipMessage());
     }
@@ -366,15 +346,44 @@ public abstract class Main {
         ViewerBuilder.clearLineErrors();
     }
     
+    public int getRow() {
+        return getLines().getRow();
+    }
+    
+    public int getCol() {
+        return getLines().getCol();
+    }
+    
+    public void setLine(int row, int col) {
+        getLines().setLine(row, col);
+    }
+    
     public void pushLine(int row, int col) {
-        rows.push(this.row);
-        columns.push(this.col);
-        
-        setLine(row, col);
+        getLines().pushLine(row, col);
     }
     
     public void popLine() {
-        setLine(rows.pop(), columns.pop());
+        getLines().popLine();
+    }
+    
+    public String getLineStr() {
+        return getLines().getLineStr();
+    }
+    
+    public String getLineStr(int row) {
+        return getLines().getLineStr(row);
+    }
+    
+    public CodeLines getLines() {
+        return linesStack.peek();
+    }
+    
+    public void pushCodeLines() {
+        linesStack.add(new CodeLines());
+    }
+    
+    public void popCodeLines() {
+        linesStack.pop();
     }
     
     public static Main getInstance() {
@@ -383,7 +392,7 @@ public abstract class Main {
     
     public static void main(String[] args) {
         try {
-            instance = new BASICMain(new JSCommandFactory(), new BasicLexer(), EnumToken.class, EnumExpression.class);
+            instance = new KavaMain(new JSCommandFactory(), new BasicLexer(), EnumToken.class, EnumExpression.class);
             
             String s;
             for (int i = 0; i < args.length; i++) {

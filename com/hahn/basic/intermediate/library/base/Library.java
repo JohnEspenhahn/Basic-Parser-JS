@@ -1,12 +1,16 @@
 package com.hahn.basic.intermediate.library.base;
 
+import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Map;
 
 import com.hahn.basic.intermediate.Compiler;
+import com.hahn.basic.intermediate.library.CodeLibrary;
 import com.hahn.basic.intermediate.objects.types.ClassType;
 import com.hahn.basic.intermediate.objects.types.Type;
+import com.hahn.basic.parser.Node;
 import com.hahn.basic.util.TypeUtils;
+import com.hahn.basic.util.exceptions.CompileException;
 import com.hahn.basic.util.structures.BitFlag;
 
 public abstract class Library {
@@ -14,6 +18,7 @@ public abstract class Library {
     
     private final String name;
     protected Library(String name) {
+        if (Library.libraries.containsKey(name)) System.out.println("WARNING: THe library '" + name + "' is being overriden!");
         Library.libraries.put(name, this);
         
         this.name = name;
@@ -37,13 +42,18 @@ public abstract class Library {
     
     public abstract String toTarget();
     
-    public static Library getLib(String name) {
+    public static Library getLib(Node node, String name) {
         Library lib = Library.libraries.get(name);
 
         if (lib != null) {
             return lib;
         } else {
-            throw new com.hahn.basic.util.exceptions.CompileException("Unknown library to import " + name);
+            try {
+                // Everything is done in constructor
+                return new CodeLibrary(name);
+            } catch (FileNotFoundException e) {
+                throw new CompileException("Couldn't load the file '" + name + "'", node);
+            }
         }
     }
     

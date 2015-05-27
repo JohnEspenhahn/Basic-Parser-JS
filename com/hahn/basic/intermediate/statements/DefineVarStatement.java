@@ -99,7 +99,7 @@ public abstract class DefineVarStatement extends Statement {
     
     @Override
     public boolean reverseOptimize() {
-        Main.getInstance().setLine(row);
+        Main.getInstance().setLine(row, -1);
         
         ListIterator<DefinePair> it = definepairs.listIterator(definepairs.size());
         while (it.hasPrevious()) {
@@ -121,7 +121,7 @@ public abstract class DefineVarStatement extends Statement {
     
     @Override
     public boolean forwardOptimize() {
-        Main.getInstance().setLine(row);
+        Main.getInstance().setLine(row, -1);
         
         Iterator<DefinePair> it = definepairs.iterator();
         while (it.hasNext()) {

@@ -140,9 +140,9 @@ public class Compiler {
         }
     }
     
-    public static void addLibrary(String name) {        
+    public static void addLibrary(Node node, String name) {        
         if (!libs.containsKey(name)) {
-            Library lib = Library.getLib(name); 
+            Library lib = Library.getLib(node, name); 
             libs.put(name, lib);
             
             lib.define();

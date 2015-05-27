@@ -11,7 +11,7 @@ import com.hahn.basic.util.structures.BitFlag;
 public class LibraryJS extends Library {
     
     public LibraryJS() {
-        super("JS");
+        super("kava.language.JS");
     }
     
     @Override

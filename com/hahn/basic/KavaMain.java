@@ -18,8 +18,8 @@ import com.hahn.basic.util.exceptions.CompileException;
 import com.hahn.basic.util.exceptions.LexException;
 import com.hahn.basic.viewer.ViewerBuilder;
 
-public class BASICMain extends Main {
-    public static final String VERSION = "2.0.0";
+public class KavaMain extends Main {
+    public static final String VERSION = "3.0.0";
     
     private final ILexer lexer;
     private final Parser parser;
@@ -28,8 +28,8 @@ public class BASICMain extends Main {
     /** The stream of lexed tokens */
     private List<PackedToken> stream;
 
-    public BASICMain(CommandFactory factory, ILexer lexer, Class<? extends IEnumRegexToken> tokens, Class<? extends IEnumExpression> expressions) {
-        System.out.println("BASIC Parser v" + VERSION);
+    public KavaMain(CommandFactory factory, ILexer lexer, Class<? extends IEnumRegexToken> tokens, Class<? extends IEnumExpression> expressions) {
+        System.out.println("Kava Parser v" + VERSION);
         
         this.factory = factory;
         

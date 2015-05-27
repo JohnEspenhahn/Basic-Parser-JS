@@ -6,21 +6,19 @@ import java.io.IOException;
 import com.hahn.basic.Main;
 import com.hahn.basic.intermediate.Compiler;
 import com.hahn.basic.intermediate.library.base.Library;
-import com.hahn.basic.target.OutputBuilder;
 import com.hahn.basic.target.Command;
-import com.hahn.basic.target.js.library.LibraryJQuery;
+import com.hahn.basic.target.OutputBuilder;
 import com.hahn.basic.target.js.library.LibraryJS;
 
 public class JSOutputBuilder implements OutputBuilder {
-    public static final Library JS = new LibraryJS(),
-                                JQuery = new LibraryJQuery();
+    public static final Library JS = new LibraryJS();
     
 	private StringBuilder builder;
 
 	public JSOutputBuilder() {
 		builder = new StringBuilder();
 		
-		Compiler.addLibrary("JS");
+		Compiler.addLibrary(null, "kava.language.JS");
 	}
 	
 	@Override

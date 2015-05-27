@@ -7,6 +7,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 import com.hahn.basic.definition.EnumToken;
+import com.hahn.basic.intermediate.CodeLines;
 import com.hahn.basic.lexer.ILexer;
 import com.hahn.basic.lexer.PackedToken;
 import com.hahn.basic.util.exceptions.LexException;
@@ -45,10 +46,10 @@ public class BasicLexer implements ILexer {
     }
     
     @Override
-    public List<PackedToken> lex(List<String> input) {
+    public List<PackedToken> lex(CodeLines input) {
         stream.clear();
         
-        line = StringUtils.join(input, "");
+        line = StringUtils.join(input.getLines(), "");
         
         row = 1;
         index = 0;

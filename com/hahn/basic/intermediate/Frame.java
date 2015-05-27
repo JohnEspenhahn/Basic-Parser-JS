@@ -84,8 +84,8 @@ import com.hahn.basic.intermediate.statements.IfStatement.Conditional;
 import com.hahn.basic.intermediate.statements.ParamDefaultValStatement;
 import com.hahn.basic.intermediate.statements.Statement;
 import com.hahn.basic.parser.Node;
-import com.hahn.basic.util.LiteralUtils;
 import com.hahn.basic.util.CompilerUtils;
+import com.hahn.basic.util.LiteralUtils;
 import com.hahn.basic.util.exceptions.CompileException;
 import com.hahn.basic.util.exceptions.DuplicateDefinitionException;
 import com.hahn.basic.util.exceptions.UnhandledNodeException;
@@ -494,18 +494,31 @@ public class Frame extends Statement {
 
     /**
      * `Import` handler
-     * @param head EnumToken.IMPORT
+     * @param head EnumExpression.IMPORT
      */
     public void doImport(Node head) {
-        List<Node> children = head.getAsChildren();
-        Node name = children.get(1);
+        StringBuilder path = new StringBuilder();
+        
+        Iterator<Node> it = CompilerUtils.getIterator(head);
+        while (it.hasNext()) {
+            Node n = it.next();
+            Enum<?> token = n.getToken();
+            
+            if (token == EnumToken.IMPORT) {
+                continue;
+            } else if (token == IDENTIFIER) {
+                path.append(n.getValue());
+            } else if (token == IDENTIFIER) {
+                path.append(".");
+            }
+        }
         
         // Update location
-        Main.getInstance().setLine(name.getRow(), name.getCol());
+        Main.getInstance().setLine(head.getRow(), head.getCol());
         
         // Parse the name of the library from the quoted string form
-        String str = name.getValue();
-        Compiler.addLibrary(str.substring(1, str.length() - 1));
+        String strPath = path.toString();
+        Compiler.addLibrary(head, strPath);
     }
     
     /**

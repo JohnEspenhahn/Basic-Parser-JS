@@ -8,6 +8,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import com.hahn.basic.intermediate.CodeLines;
 import com.hahn.basic.lexer.ILexer;
 import com.hahn.basic.lexer.PackedToken;
 import com.hahn.basic.util.exceptions.LexException;
@@ -75,11 +76,11 @@ public class RegexLexer implements ILexer {
     }
     
     @Override
-    public List<PackedToken> lex(List<String> input) {
+    public List<PackedToken> lex(CodeLines input) {
         List<PackedToken> stream = new ArrayList<PackedToken>();
         
         int idx = 0;
-        Iterator<String> it = input.iterator();
+        Iterator<String> it = input.getLines().iterator();
         for (int row = 1; it.hasNext(); row++) {
             String line = it.next();
             

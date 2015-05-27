@@ -77,7 +77,7 @@ public abstract class ExpressionStatement extends Statement {
     
     @Override
     public boolean forwardOptimize() {
-        Main.getInstance().pushLine(row, 0);
+        Main.getInstance().pushLine(row, -1);
         
         getObj().takeRegister(this);
         

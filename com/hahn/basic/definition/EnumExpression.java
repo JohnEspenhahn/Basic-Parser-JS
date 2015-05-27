@@ -70,7 +70,7 @@ public enum EnumExpression implements IEnumExpression {
     MODIFY      ("<ADD2_SUB2> <ACCESS>|<ACCESS> <ADD2_SUB2>|<ACCESS><ASSIGN_OP><EXPRESSION>", false),
     ASSIGN_OP   ("ASSIGN|PLUS_EQU|SUB_EQU|MULT_EQU|DIV_EQU|AND_EQU|BOR_EQU|XOR_EQU"),
     
-    COMMAND     ("CONTINUE|BREAK|IMPORT"),
+    COMMAND     ("CONTINUE|BREAK"),
     RETURN      ("RETURN ?<EXPRESSION>", false),
     
     BLOCK       ("OPEN_BRACE {<BLOCK_CNTNT>} CLOSE_BRACE|<BLOCK_CNTNT>", false),
@@ -79,7 +79,7 @@ public enum EnumExpression implements IEnumExpression {
     /** Stuff that can be done within class{} */
     CLASS_CNTNT ("COMMENT|<DEF_FUNC>|<CONSTRUCTOR>|<DEFINE>EOL|EOL", false),
     
-    IMPORT      ("IMPORT STRING EOL", false),
+    IMPORT      ("IMPORT IDENTIFIER {DOT IDENTIFIER} EOL", false),
     DIRECTIVE   ("AT IDENTIFIER", false),
     START       ("<DIRECTIVE>$|<IMPORT>$|<STRUCT>$|<CLASS>$|<BLOCK_CNTNT>$|<CLASS_CNTNT>$", false);
 
