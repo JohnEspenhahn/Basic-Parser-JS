@@ -2,6 +2,7 @@ package com.hahn.basic.intermediate.objects;
 
 import lombok.experimental.Delegate;
 
+import com.hahn.basic.intermediate.CodeFile;
 import com.hahn.basic.intermediate.IIntermediate;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.statements.ExpressionStatement;
@@ -23,6 +24,7 @@ public abstract class CastedObject extends BasicObject {
     @Delegate(types = BasicObject.class, excludes = IHolderExcludeList.class)
     private BasicObject heldObj;
     
+    private CodeFile file;
     private int row, col;
 
     /**
@@ -32,11 +34,12 @@ public abstract class CastedObject extends BasicObject {
      * @param row The row to throw an error at
      * @param col The column to throw an error at
      */
-    public CastedObject(BasicObject obj, Type type, int row, int col) {
+    public CastedObject(BasicObject obj, Type type, CodeFile file, int row, int col) {
         super(obj.getName(), type);
 
         this.heldObj = obj;
         
+        this.file = file;
         this.row = row;
         this.col = col;
     }
@@ -67,7 +70,7 @@ public abstract class CastedObject extends BasicObject {
         
         // If held type changed, verify cast
         if (getHeldObject().getType() != pretype) {
-            getHeldObject().getType().castTo(getType(), this.row, this.col);
+            getHeldObject().getType().castTo(getType(), this.file, this.row, this.col);
         }
         
         return result;
@@ -80,7 +83,7 @@ public abstract class CastedObject extends BasicObject {
         
         // If held type changed, verify cast
         if (getHeldObject().getType() != pretype) {
-            getHeldObject().getType().castTo(getType(), this.row, this.col);
+            getHeldObject().getType().castTo(getType(), this.file, this.row, this.col);
         }
     }
 }

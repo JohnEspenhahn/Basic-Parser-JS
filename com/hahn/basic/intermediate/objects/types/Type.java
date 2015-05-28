@@ -3,11 +3,14 @@ package com.hahn.basic.intermediate.objects.types;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 import lombok.NonNull;
 
 import com.hahn.basic.definition.EnumExpression;
 import com.hahn.basic.definition.EnumToken;
+import com.hahn.basic.intermediate.CodeFile;
+import com.hahn.basic.intermediate.Compiler;
 import com.hahn.basic.intermediate.objects.IArray;
 import com.hahn.basic.parser.Node;
 import com.hahn.basic.util.CompilerUtils;
@@ -19,46 +22,44 @@ public class Type implements ITypeable {
     public static final int NO_MATCH = -0xffff;
     private static final List<Type> TYPES = new ArrayList<Type>();
     
-    public static final Type VOID = new Type("void"),
-                             BOOL = new Type("bool"),
-                             REAL = new Type("real"),
-                             REALSTR = new RealOrStringType(),
-                             /** UNDEFINED -> anything */
-                             UNDEFINED = new Type("undefined", false, true),
-                             /** NULL -> extends OBJECT */
-                             NULL = new Type("null", false, true);
+    public static Type VOID, BOOL, REAL, REALSTR, UNDEFINED, NULL;
     
-    public static final StructType STRUCT = new StructType("struct", null, 0, true);
+    public static StructType STRUCT;
+    public static ClassType OBJECT,FUNCTION, ARRAY, STRING;
     
-    public static final ClassType  OBJECT   = new ClassType(null, "Object", STRUCT, BitFlag.ABSTRACT.b | BitFlag.SYSTEM.b, false),
-                                   FUNCTION = OBJECT.extendAs(null, "function", BitFlag.FINAL.b | BitFlag.SYSTEM.b).setTypeParams(-1),
-                                   ARRAY    = OBJECT.extendAs(null, "Array", BitFlag.FINAL.b | BitFlag.SYSTEM.b).setTypeParams(-1),
-                                   STRING   = OBJECT.extendAs(null, "String", BitFlag.FINAL.b | BitFlag.SYSTEM.b).setTypeParams(0);
-    
-    public static final int COUNT_PRIMATIVES = TYPES.size();
+    public static int COUNT_PRIMATIVES;
     
     public final boolean requiresInit;
     private final String name; 
     
-    public Type(String name, boolean requiresInit, boolean isAbstract) {
+    /**
+     * Create a new type
+     * @param file The file the type is defined in. Required unless isAbstract 
+     * @param name The name of the type
+     * @param requiresInit Required to be initialized before use
+     * @param isAbstract Should be saved in types list
+     */
+    public Type(CodeFile file, String name, boolean requiresInit, boolean isAbstract) {
         this.name = name;
         this.requiresInit = requiresInit;
         
         if (!isAbstract) {
             if (fromName(name) == null) {
                 Type.TYPES.add(this);
-            } else {
-                throw new CompileException("The type '" + name + "' is already defined");
+            } else if (file == null) {
+                throw new RuntimeException("No file provided when defining duplicate type '" + name + "'");
+            } else {                
+                throw new CompileException("The type '" + name + "' is already defined", file);
             }
         }
     }
     
-    public Type (String name, boolean requiresInit) {
-        this(name, requiresInit, false);
+    public Type (CodeFile file, String name, boolean requiresInit) {
+        this(file, name, requiresInit, false);
     }
     
-    public Type(String name) {
-        this(name, false, false);
+    public Type(CodeFile file, String name) {
+        this(file, name, false, false);
     }
     
     public String getName() {
@@ -119,27 +120,28 @@ public class Type implements ITypeable {
      * @return newType on success
      * @throws CastException If can not cast
      */
-    public Type castTo(Type newType, int row, int col) {
+    public Type castTo(Type newType, CodeFile file, int row, int col) {
         if (this == UNDEFINED) return newType;
         else if (this.doesExtend(newType)) return newType;
         else if (this.doesExtend(NULL) && newType.doesExtend(OBJECT)) return newType;
         
         // TODO upcasting and expression to check at runtime
         
-        throw new CastException("Can not cast `" + this + "` to `" + newType + "`", row, col);
+        throw new CastException("Can not cast `" + this + "` to `" + newType + "`", file, row, col);
     }
     
     /**
      * Auto-casting from original to newType. Standard to
      * be called from REGISTER_OPTIMIZE
      * @param newType The new/given type
+     * @param file The file to throw error at
      * @param row Row to throw error at
      * @param col Column to throw error at
      * @param unsafe If true will throw exception on fail
      * @return Common type, or null if failed and unsafe is false 
      * @throws CompileException failed and unsafe is true
      */
-    public Type autocast(Type newType, int row, int col, boolean unsafe) {
+    public Type autocast(Type newType, CodeFile file, int row, int col, boolean unsafe) {
         if (newType == null) return this;
         else if (this == UNDEFINED) return newType;
         else if (newType == UNDEFINED) return this;
@@ -148,25 +150,26 @@ public class Type implements ITypeable {
         else if (this == STRING && newType == REALSTR) return STRING;
         else if (this.doesExtend(NULL) && newType.doesExtend(OBJECT)) return newType;
         
-        if (unsafe) throw new CompileException("Incompatible types `" + this + "` and `" + newType + "`", row, col);
+        if (unsafe) throw new CompileException("Incompatible types `" + this + "` and `" + newType + "`", file, row, col);
         else return null;
     }
     
     public boolean canAutocast(Type newType) {
-        return autocast(newType, -1, -1, false) != null;
+        return autocast(newType, null, -1, -1, false) != null;
     }
     
     /**
      * Combine two types and return the common type. Used with arithmetic and ternary
      * @param t1 Type one
      * @param t2 Type two
+     * @param file The file to throw error at
      * @param row Row to throw error at
      * @param col Column to throw error at
      * @param unsafe If true will throw exception on fail
      * @return Common type, or null if failed and unsafe is false 
      * @throws CompileException failed and unsafe is true
      */
-    public static Type merge(Type t1, Type t2, int row, int col, boolean unsafe) {
+    public static Type merge(Type t1, Type t2, CodeFile file, int row, int col, boolean unsafe) {
         if (t1 == null && t2 == null) return null;
         else if (t1 == null || t1 == UNDEFINED) return t2;
         else if (t2 == null || t2 == UNDEFINED) return t1;
@@ -177,7 +180,7 @@ public class Type implements ITypeable {
         else if (t1.doesExtend(STRING) && t2.doesExtend(REAL)) return STRING;
         else if (t2.doesExtend(STRING) && t1.doesExtend(REAL)) return STRING;
         
-        if (unsafe) throw new CompileException("Incompatible types `" + t1 + "` and `" + t2 + "`", row, col);
+        if (unsafe) throw new CompileException("Incompatible types `" + t1 + "` and `" + t2 + "`", file, row, col);
         else return null;
     }
     
@@ -333,6 +336,39 @@ public class Type implements ITypeable {
             if (i >= COUNT_PRIMATIVES)
                 it.remove();
         }
+    }
+    
+    public static void setupSystemTypes(Compiler c) {
+        // Reset to just primitives
+        if (getPublicTypes().size() > 0) {
+            int idx = getPublicTypes().size();
+            ListIterator<Type> it = getPublicTypes().listIterator(idx);
+            while (it.hasPrevious() && idx > COUNT_PRIMATIVES) {
+                idx -= 1;
+                it.previous();
+                it.remove();
+            }
+            
+            return;
+        }
+        
+        VOID = new Type(c.getGlobalFile(), "void");
+        BOOL = new Type(c.getGlobalFile(), "bool");
+        REAL = new Type(c.getGlobalFile(), "real");
+        REALSTR = new RealOrStringType();
+        /** UNDEFINED -> anything */
+        UNDEFINED = new Type(c.getGlobalFile(), "undefined", false, true);
+        /** NULL -> extends OBJECT */
+        NULL = new Type(c.getGlobalFile(), "null", false, true);
+
+        STRUCT = new StructType(c.getGlobalFile(), "struct", null, 0, true);
+
+        OBJECT   = new ClassType(c.getGlobalFrame(), "Object", STRUCT, BitFlag.ABSTRACT.b | BitFlag.SYSTEM.b, false);
+        FUNCTION = OBJECT.extendAs(c.getGlobalFrame(), "function", BitFlag.FINAL.b | BitFlag.SYSTEM.b).setTypeParams(-1);
+        ARRAY    = OBJECT.extendAs(c.getGlobalFrame(), "Array", BitFlag.FINAL.b | BitFlag.SYSTEM.b).setTypeParams(-1);
+        STRING   = OBJECT.extendAs(c.getGlobalFrame(), "String", BitFlag.FINAL.b | BitFlag.SYSTEM.b).setTypeParams(0);
+
+        COUNT_PRIMATIVES = getPublicTypes().size();
     }
     
     /**

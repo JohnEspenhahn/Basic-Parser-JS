@@ -3,6 +3,7 @@ package com.hahn.basic.intermediate.objects;
 import java.util.Arrays;
 import java.util.ListIterator;
 
+import com.hahn.basic.intermediate.CodeFile;
 import com.hahn.basic.intermediate.IIntermediate;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.ParameterizedType;
@@ -46,8 +47,8 @@ public abstract class FuncCallPointer extends FuncPointer {
      * @return this
      */
     @Override
-    public BasicObject castTo(Type t, int row, int col) {
-        this.returnType = this.returnType.castTo(t, row, col);
+    public BasicObject castTo(Type t, CodeFile file, int row, int col) {
+        this.returnType = this.returnType.castTo(t, file, row, col);
 
         return this;
     }
@@ -64,7 +65,7 @@ public abstract class FuncCallPointer extends FuncPointer {
         if (objectIn != null) objectIn.setInUse(this);
         
         checkFunction();
-        returnType = returnType.autocast(func.getReturnType(), nameNode.getRow(), nameNode.getCol(), true);
+        returnType = returnType.autocast(func.getReturnType(), nameNode.getFile(), nameNode.getRow(), nameNode.getCol(), true);
         
         return super.setInUse(by);
     }

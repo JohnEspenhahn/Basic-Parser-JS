@@ -2,6 +2,7 @@ package com.hahn.basic.target.js;
 
 import java.util.List;
 
+import com.hahn.basic.intermediate.CodeFile;
 import com.hahn.basic.intermediate.Frame;
 import com.hahn.basic.intermediate.function.FuncHead;
 import com.hahn.basic.intermediate.objects.AdvancedObject;
@@ -47,7 +48,6 @@ import com.hahn.basic.intermediate.statements.ParamDefaultValStatement;
 import com.hahn.basic.intermediate.statements.Statement;
 import com.hahn.basic.intermediate.statements.WhileStatement;
 import com.hahn.basic.parser.Node;
-import com.hahn.basic.target.OutputBuilder;
 import com.hahn.basic.target.Command;
 import com.hahn.basic.target.CommandFactory;
 import com.hahn.basic.target.js.function.JSFuncHead;
@@ -82,7 +82,6 @@ import com.hahn.basic.target.js.statements.JSWhileStatement;
 import com.hahn.basic.util.exceptions.UnimplementedException;
 
 public class JSCommandFactory implements CommandFactory {
-    private JSOutputBuilder build;    
     private SimpleRegisterFactory registerFactory;
     
     public JSCommandFactory() {
@@ -90,14 +89,8 @@ public class JSCommandFactory implements CommandFactory {
     }
     
     @Override
-    public void reset() {
-        build = new JSOutputBuilder();
-        registerFactory.reset();
-    }
-    
-    @Override
-    public OutputBuilder getBuildTarget() {
-        return build;
+    public String getOutputExtension() {
+        return "js";
     }
     
     @Override
@@ -169,8 +162,8 @@ public class JSCommandFactory implements CommandFactory {
     }
     
     @Override
-    public CastedObject CastedObject(BasicObject obj, Type type, int row, int col) {
-        return new JSCastedObject(obj, type, row, col);
+    public CastedObject CastedObject(BasicObject obj, Type type, CodeFile file, int row, int col) {
+        return new JSCastedObject(obj, type, file, row, col);
     }
     
     @Override
@@ -189,8 +182,8 @@ public class JSCommandFactory implements CommandFactory {
     }
     
     @Override
-    public VarAccess VarAccess(Statement container, BasicObject var, BasicObject idx, Type type, int row, int col) {
-        return new JSVarAccess(container, var, idx, type, row, col);
+    public VarAccess VarAccess(Statement container, BasicObject var, BasicObject idx, Type type, CodeFile file, int row, int col) {
+        return new JSVarAccess(container, var, idx, type, file, row, col);
     }
     
     @Override
@@ -229,13 +222,13 @@ public class JSCommandFactory implements CommandFactory {
     }
     
     @Override
-    public TernaryObject TernaryObject(Statement container, BasicObject condition, Node node_then, Node node_else, int row, int col) {
-        return new JSTernaryObject(container, condition, node_then, node_else, row, col);
+    public TernaryObject TernaryObject(Statement container, BasicObject condition, Node node_then, Node node_else, CodeFile file, int row, int col) {
+        return new JSTernaryObject(container, condition, node_then, node_else, file, row, col);
     }
     
     @Override
-    public FuncHead FuncHead(Frame parent, ClassType classIn, String inName, String outName, Node head, Type rtnType, Param[] params) {
-        return new JSFuncHead(parent, classIn, inName, outName, head, rtnType, params);
+    public FuncHead FuncHead(CodeFile file, Frame parent, ClassType classIn, String inName, String outName, Node head, Type rtnType, Param[] params) {
+        return new JSFuncHead(file, parent, classIn, inName, outName, head, rtnType, params);
     }
     
     @Override

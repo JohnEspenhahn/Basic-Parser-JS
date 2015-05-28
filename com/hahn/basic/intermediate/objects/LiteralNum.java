@@ -21,6 +21,7 @@ import static com.hahn.basic.intermediate.opcode.OPCode.SUBE;
 import static com.hahn.basic.intermediate.opcode.OPCode.XOR;
 import static com.hahn.basic.intermediate.opcode.OPCode.XORE;
 
+import com.hahn.basic.intermediate.CodeFile;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.opcode.OPCode;
 import com.hahn.basic.util.exceptions.CompileException;
@@ -46,19 +47,19 @@ public class LiteralNum extends Literal {
     }
     
     @Override
-    public boolean updateLiteral(OPCode op, Literal lit) {    	
+    public boolean updateLiteral(OPCode op, Literal lit, CodeFile file) {    	
     	// Do operation
         if (op == SUB && lit == null)     { this.value = -this.value; }
-        else if (op == ADD || op == ADDE) { if(isreal(op,lit)) this.value += lit.getValue(); }
-        else if (op == SUB || op == SUBE) { if(isreal(op,lit)) this.value -= lit.getValue(); }
-        else if (op == MUL || op == MULE) { if(isreal(op,lit)) this.value *= lit.getValue(); }
-        else if (op == DIV || op == DIVE) { if(isreal(op,lit)) this.value /= lit.getValue(); }
-        else if (op == MOD || op == MODE) { if(isreal(op,lit)) this.value %= lit.getValue(); }
-        else if (op == BOR || op == BORE) { if(isreal(op,lit)) this.value = ((int) this.value) | ((int) lit.getValue()); }
-        else if (op == AND || op == ANDE) { if(isreal(op,lit)) this.value = ((int) this.value) & ((int) lit.getValue()); }
-        else if (op == XOR || op == XORE) { if(isreal(op,lit)) this.value = ((int) this.value) ^ ((int) lit.getValue()); }
-        else if (op == SHL )              { if(isreal(op,lit)) this.value = ((int) this.value) << ((int) lit.getValue()); }
-        else if (op == SHR )              { if(isreal(op,lit)) this.value = ((int) this.value) >> ((int) lit.getValue()); }
+        else if (op == ADD || op == ADDE) { if(isreal(op,lit,file)) this.value += lit.getValue(); }
+        else if (op == SUB || op == SUBE) { if(isreal(op,lit,file)) this.value -= lit.getValue(); }
+        else if (op == MUL || op == MULE) { if(isreal(op,lit,file)) this.value *= lit.getValue(); }
+        else if (op == DIV || op == DIVE) { if(isreal(op,lit,file)) this.value /= lit.getValue(); }
+        else if (op == MOD || op == MODE) { if(isreal(op,lit,file)) this.value %= lit.getValue(); }
+        else if (op == BOR || op == BORE) { if(isreal(op,lit,file)) this.value = ((int) this.value) | ((int) lit.getValue()); }
+        else if (op == AND || op == ANDE) { if(isreal(op,lit,file)) this.value = ((int) this.value) & ((int) lit.getValue()); }
+        else if (op == XOR || op == XORE) { if(isreal(op,lit,file)) this.value = ((int) this.value) ^ ((int) lit.getValue()); }
+        else if (op == SHL )              { if(isreal(op,lit,file)) this.value = ((int) this.value) << ((int) lit.getValue()); }
+        else if (op == SHR )              { if(isreal(op,lit,file)) this.value = ((int) this.value) >> ((int) lit.getValue()); }
         else if (op == BNOT)              { this.value = ~((int) this.value);  }
         else if (op == INT )              { this.value = (int) this.value;     }
         else return false; // Not a modifiable op code
@@ -66,11 +67,11 @@ public class LiteralNum extends Literal {
         return true; // Did modify
     }
     
-    private boolean isreal(OPCode op, Literal lit) {
+    private boolean isreal(OPCode op, Literal lit, CodeFile file) {
         if (lit == null) {
             return false;
         } else if (!lit.getType().doesExtend(Type.REAL)) {
-            throw new CompileException("Can not preform operation " + op + " on a `real` and a `" + lit.getType() + "` value");
+            throw new CompileException("Can not preform operation " + op + " on a `real` and a `" + lit.getType() + "` value", file);
         } else {
             return true;
         }

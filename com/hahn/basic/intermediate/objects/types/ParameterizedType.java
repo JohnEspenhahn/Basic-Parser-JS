@@ -10,8 +10,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.hahn.basic.definition.EnumExpression;
 import com.hahn.basic.parser.Node;
-import com.hahn.basic.util.TypeUtils;
 import com.hahn.basic.util.CompilerUtils;
+import com.hahn.basic.util.TypeUtils;
 import com.hahn.basic.util.exceptions.CompileException;
 
 /**
@@ -74,7 +74,7 @@ public class ParameterizedType<T extends ITypeable> extends Type {
      * @param returnType The return type of this
      */
     public ParameterizedType(StructType base, T[] types, Type returnType) {
-        super(createName(base, types, returnType), false, true);
+        super(null, createName(base, types, returnType), false, true);
         
         this.base = base;
         this.types = types;
@@ -208,7 +208,7 @@ public class ParameterizedType<T extends ITypeable> extends Type {
             
             if (t == EnumExpression.TYPE) {
                 if (allowReturn) returnType = Type.fromNode(node);
-                else throw new CompileException("Cannot provide return type for the parameterized type `" + base + "`");
+                else throw new CompileException("Cannot provide return type for the parameterized type `" + base + "`", node.getFile(), node.getRow(), node.getCol());
             } else if (t == EnumExpression.TYPE_LIST) {
                 params = getTypeList(node);
             }

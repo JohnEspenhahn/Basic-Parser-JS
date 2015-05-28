@@ -1,7 +1,7 @@
 package com.hahn.basic.intermediate;
 
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.ListIterator;
 import java.util.Map;
 
 import com.hahn.basic.intermediate.function.FuncBridge;
@@ -13,121 +13,81 @@ import com.hahn.basic.intermediate.objects.FuncCallPair;
 import com.hahn.basic.intermediate.objects.Param;
 import com.hahn.basic.intermediate.objects.StringConst;
 import com.hahn.basic.intermediate.objects.Var;
-import com.hahn.basic.intermediate.objects.VarTemp;
 import com.hahn.basic.intermediate.objects.types.ClassType;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.Type;
+import com.hahn.basic.lexer.ILexerFactory;
+import com.hahn.basic.lexer.regex.IEnumRegexToken;
+import com.hahn.basic.parser.IEnumExpression;
 import com.hahn.basic.parser.Node;
+import com.hahn.basic.parser.Parser;
 import com.hahn.basic.target.CommandFactory;
-import com.hahn.basic.target.OutputBuilder;
-import com.hahn.basic.target.js.JSPretty;
+import com.hahn.basic.target.OutputBuilderFactory;
 
 public class Compiler {    
-    private static Map<String, Library> libs = new HashMap<String, Library>();
-    private static Map<String, Integer> labels = new HashMap<String, Integer>();
-    private static Map<String, StringConst> strings = new HashMap<String, StringConst>();
+    private final CompilerStatus status;
     
-    public static CommandFactory factory;
-    private static Frame globalFrame, frame;
+    private final Map<String, Library> libs;
+    private final Map<String, Integer> labels;
+    private final Map<String, StringConst> strings;
     
-    private static FuncBridge funcBridge;
-
-    public static OutputBuilder compile(Node h, CommandFactory f) {
-        globalFrame = frame = new Frame(null, h);
-        factory = f;
+    private final ILexerFactory lexerFactory;
+    private final Parser parser;
+    
+    private final CommandFactory factory;
+    private final OutputBuilderFactory outputFactory;
+    
+    private final FuncBridge funcBridge;
+    
+    private final CodeFile globalFile;
+    private final Frame globalFrame;
+    private final Node globalNode;
+    
+    public Compiler(CommandFactory factory, ILexerFactory lexerFactory, Class<? extends IEnumRegexToken> tokens, Class<? extends IEnumExpression> expressions, OutputBuilderFactory outputFactory, CompilerStatus status) {
+        this.status = status;
         
-        // Reset
-        reset();
+        this.lexerFactory = lexerFactory;
+        this.parser = new Parser(tokens, expressions);
+        this.factory = factory;
         
-        // Init
-        factory.reset();
-        OutputBuilder builder = factory.getBuildTarget();
+        this.outputFactory = outputFactory;
         
-        frame.addTargetCode();
+        this.libs = new HashMap<String, Library>();
+        this.labels = new HashMap<String, Integer>();
+        this.strings = new HashMap<String, StringConst>();
         
-        ListIterator<Type> classIt = Type.getPublicTypes().listIterator(Type.getPublicTypes().size());
+        this.funcBridge = new FuncBridge(null);
         
-        ////////////////////////
-        // Reverse optimize
-        ////////////////////////
-        for (FuncGroup funcGroup: funcBridge.getFuncs()) {
-            for (FuncHead func: funcGroup) {
-                if (func.hasFrameHead()) {
-                    func.addTargetCode();
-                    func.reverseOptimize();
-                }
-            }
-        }
-
-        while (classIt.hasPrevious()) classIt.previous().reverseOptimize();
+        // Globals
+        this.globalFile = createCodeFile("");
+        this.globalNode = Node.newTopNode(globalFile);
+        this.globalFrame = new Frame(globalFile, null, null);
         
-        frame.reverseOptimize();
+        Type.setupSystemTypes(this);
         
-        ////////////////////////
-        // Forward optimize
-        ////////////////////////
-        frame.forwardOptimize();
-        
-        for (FuncGroup funcGroup: funcBridge.getFuncs()) {
-            for (FuncHead func: funcGroup) {
-                if (func.hasFrameHead()) {
-                    func.forwardOptimize();
-                }
-            }
-        }
-        
-        while (classIt.hasNext()) classIt.next().forwardOptimize();
-        
-        ////////////////////////
-        // Start builder text
-        ////////////////////////
-        builder.appendString(builder.getStart());
-        
-        // Put library import strings
-        for (Library lib: libs.values()) {
-            builder.appendString(lib.toTarget());
-        }
-        
-        // Compile class area
-        builder.appendString(builder.getContentStart());
-        for (Type t: Type.getPublicTypes()) {
-            builder.appendString(t.toTarget());
-        }
-        
-        // Convert code to target
-        builder.appendString(frame.toTarget());
-        builder.appendString(builder.getCodeEnd());
-        
-        // Convert functions to target
-        for (FuncGroup funcGroup: funcBridge.getFuncs()) {
-            for (FuncHead func: funcGroup) {
-                if (func.hasFrameHead()) {                    
-                    builder.appendString(func.toFuncAreaTarget());
-                    builder.appendString(JSPretty.format("^"));
-                }
-            }
-        }
-        
-        builder.appendString(builder.getContentEnd());        
-        builder.appendString(builder.getEnd());
-        
-        return builder;
+        // XXX Add global libraries
+        addLibrary(getGlobalNode(), "kava.language.JS");
     }
     
-    private static void reset() {
-        VarTemp.NEXT_TEMP_VAR = 0;
-        Type.reset();
-        
-        funcBridge = new FuncBridge(null);
-        
-        strings.clear();
-        labels.clear();
-        libs.clear();
+    public CodeFile createCodeFile(String input) {
+        return new CodeFile(this, input, outputFactory.newInstance(this), lexerFactory, parser);
     }
     
-    public static String getLabel(String name, Frame f) {
+    public CompilerStatus getStatus() {
+        return status;
+    }
+    
+    public CodeFile compile(String input) {
+        CodeFile file = createCodeFile(input);
+        file.startCompiling();
+        file.finishCompiling();
+        
+        return file;
+    }
+    
+    public synchronized String getLabel(String name, Frame f) {
         if (f instanceof FuncHead) {
-            name = ((FuncHead) f).getFuncId().toString() + name; 
+            name = ((FuncHead) f).getFuncId().toString() + name;
         }
         
         Integer idx = labels.get(name);
@@ -140,59 +100,59 @@ public class Compiler {
         }
     }
     
-    public static void addLibrary(Node node, String name) {        
+    public synchronized void addLibrary(Node node, String name) {
         if (!libs.containsKey(name)) {
-            Library lib = Library.getLib(node, name); 
+            Library lib = Library.getLib(node, name);
             libs.put(name, lib);
             
-            lib.define();
+            lib.define(node.getFile());
         }
     }
     
     /**
      * Convert a string to a string constant
+     * 
      * @param str The string to get (does not need inner parenthesis)
      * @return StringConst
      */
-    public static StringConst getString(String str) {
-    	StringConst var = strings.get(str);
-    	if (var != null) {
-    		return var;
-    	} else {
-    		StringConst strConst = Compiler.factory.StringConst(str);
-    		strings.put(str, strConst);
-    		
-    		return strConst;
-    	}
+    public synchronized StringConst getString(String str) {
+        StringConst var = strings.get(str);
+        if (var != null) {
+            return var;
+        } else {
+            StringConst strConst = factory.StringConst(str);
+            strings.put(str, strConst);
+            
+            return strConst;
+        }
     }
     
     /**
      * Convert a regex to a string constant
+     * 
      * @param str The string to get (does not need inner parenthesis)
      * @return StringConst
      */
-    public static StringConst getRegex(String str) {
-       return getString(str.replace("\\", "\\\\"));
+    public synchronized StringConst getRegex(String str) {
+        return getString(str.replace("\\", "\\\\"));
     }
     
-    public static FuncHead defineFunc(String inName, String outName, Type rtnType, Param... params) {
-        return Compiler.defineFunc(getGlobalFrame(), null, inName, outName, rtnType, params);
+    public synchronized FuncHead defineFunc(CodeFile file, String inName, String outName, Type rtnType, Param... params) {
+        return defineFunc(file, getGlobalFrame(), null, inName, outName, rtnType, params);
     }
     
-    public static FuncHead defineFunc(Frame parent, Node head, String inName, String outName, Type rtnType, Param... params) {
-        return funcBridge.defineFunc(parent, false, head, inName, outName, rtnType, params);
+    public synchronized FuncHead defineFunc(CodeFile file, Frame parent, Node head, String inName, String outName, Type rtnType, Param... params) {
+        return funcBridge.defineFunc(file, parent, false, head, inName, outName, rtnType, params);
     }
     
-    public static FuncCallPair getFunc(BasicObject objIn, Node nameNode, ITypeable[] types) {
-        if (objIn != null && objIn.getType() instanceof ClassType) {            
+    public synchronized FuncCallPair getFunc(BasicObject objIn, Node nameNode, ITypeable[] types) {
+        if (objIn != null && objIn.getType() instanceof ClassType) {
             // If object in is implied this, check for global function first
             if (objIn.getVarThisFlag() == Var.IS_IMPLIED_THIS) {
                 FuncCallPair funcPair = getGlobalFunc(nameNode, types);
                 
                 // If found in global frame, return that
-                if (funcPair != null) {
-                    return funcPair;
-                }
+                if (funcPair != null) { return funcPair; }
             }
             
             // If no global function by this name, check `this`
@@ -203,7 +163,7 @@ public class Compiler {
         }
     }
     
-    public static FuncCallPair getGlobalFunc(Node nameNode, ITypeable[] types) {
+    public synchronized FuncCallPair getGlobalFunc(Node nameNode, ITypeable[] types) {
         String name = nameNode.getValue();
         FuncHead func = funcBridge.getFunc(name, types);
         
@@ -211,7 +171,27 @@ public class Compiler {
         else return null;
     }
     
-    public static Frame getGlobalFrame() {
-    	return globalFrame;
+    public CommandFactory getFactory() {
+        return factory;
+    }
+    
+    public Frame getGlobalFrame() {
+        return globalFrame;
+    }
+    
+    public CodeFile getGlobalFile() {
+        return globalFile;
+    }
+    
+    public Node getGlobalNode() {
+        return globalNode;
+    }
+    
+    public Collection<FuncGroup> getFuncs() {
+        return funcBridge.getFuncs();
+    }
+    
+    public Collection<Library> getLibraries() {
+        return libs.values();
     }
 }

@@ -2,10 +2,8 @@ package com.hahn.basic.lexer;
 
 import java.util.List;
 
-import com.hahn.basic.intermediate.CodeLines;
+import com.hahn.basic.util.exceptions.LexException;
 
-public interface ILexer {
-    public void reset();
-    
-    public List<PackedToken> lex(CodeLines input);
+public interface ILexer {    
+    public List<PackedToken> lex() throws LexException;
 }

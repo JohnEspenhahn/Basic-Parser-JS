@@ -93,7 +93,9 @@ import com.hahn.basic.util.structures.BitFlag;
 import com.hahn.basic.util.structures.NestedListIterator;
 import com.hahn.basic.viewer.util.TextColor;
 
-public class Frame extends Statement {    
+public class Frame extends Statement {  
+    private final CodeFile file;
+    
     private final Frame parent;
     private final Node frameHead;
     
@@ -107,19 +109,27 @@ public class Frame extends Statement {
     protected EndLoopStatement endLoop;
     private boolean hasReturn;
     
-    public Frame(Frame parent, Node head) {
-    	this(parent, head, false);
+    /**
+     * Create a new frame
+     * @param file The containing code file (nonnull)
+     * @param parent The parent frame
+     * @param head The frame head
+     */
+    public Frame(CodeFile file, Frame parent, Node head) {
+    	this(file, parent, head, false);
     }
     
     /**
      * Create a new frame
+     * @param file The containing code file (nonnull)
      * @param parent The parent frame
      * @param head The frame head
      * @param loopable True if frame can be looped (ex: for loop, function).
      */
-    public Frame(Frame parent, Node head, boolean loopable) {
-        super(null);
+    public Frame(CodeFile file, Frame parent, Node head, boolean loopable) {
+        super(null, file.getCurrentRow());
         
+        this.file = file;
         this.parent = parent;
         this.frameHead = head;
         
@@ -131,6 +141,11 @@ public class Frame extends Statement {
         
         // Special loop handling. Functions are loopable because of recursion 
         if (loopable) { this.endLoop = new EndLoopStatement(this); }
+    }
+    
+    @Override
+    public CodeFile getFile() {
+        return file;
     }
     
     @Override
@@ -210,7 +225,7 @@ public class Frame extends Statement {
                 
                 boolean eol = !c.isBlock() && it.hasNext();
                 if (Main.getInstance().isPretty() || eol) {
-                    str.append(Compiler.factory.getEOL());
+                    str.append(getFile().getCompiler().getFactory().getEOL());
                     
                     // Pretty print new line
                     if (Main.getInstance().isPretty() && eol) str.append('\n');
@@ -325,7 +340,7 @@ public class Frame extends Statement {
             vars.put(name, var);
             return var;
         } else {
-            throw new DuplicateDefinitionException("The variable `" + var + "` is already defined in this scope");
+            throw new DuplicateDefinitionException("The variable `" + var + "` is already defined in this scope", getFile());
         }
     }
     
@@ -435,7 +450,7 @@ public class Frame extends Statement {
     }
     
     public String getLabel(String name) {
-        return Compiler.getLabel(name, this);
+        return getFile().getCompiler().getLabel(name, this);
     }
     
     /*
@@ -514,11 +529,11 @@ public class Frame extends Statement {
         }
         
         // Update location
-        Main.getInstance().setLine(head.getRow(), head.getCol());
+        getFile().pushCurrentPoint(head.getRow(), head.getCol());
         
         // Parse the name of the library from the quoted string form
         String strPath = path.toString();
-        Compiler.addLibrary(head, strPath);
+        getCompiler().addLibrary(head, strPath);
     }
     
     /**
@@ -569,7 +584,7 @@ public class Frame extends Statement {
      * @return The object the with retrieved value
      */
     private BasicObject inAccessVar(BasicObject obj, NestedListIterator<Node> it, boolean leaveLast) {        
-        ExpressionStatement exp = Compiler.factory.ExpressionStatement(this, obj);
+        ExpressionStatement exp = getFactory().ExpressionStatement(this, obj);
         while (it.hasNext()) {
             Type type = exp.getObj().getType();
             
@@ -586,7 +601,7 @@ public class Frame extends Statement {
                 
                 @SuppressWarnings("unchecked")
                 ParameterizedType<ITypeable> arrType = (ParameterizedType<ITypeable>) type;
-                exp.setObj(Compiler.factory.VarAccess(exp, exp.getObj(), offset, arrType.getTypable(0).getType(), child.getRow(), child.getCol()), child);
+                exp.setObj(getFactory().VarAccess(exp, exp.getObj(), offset, arrType.getTypable(0).getType(), child.getFile(), child.getRow(), child.getCol()), child);
             } else if (accessMarker == DOT && type.doesExtend(Type.STRUCT)) {               
                 Node nameNode = it.next();
                 Node prthNode = (it.hasNext() ? it.next() : null);
@@ -615,7 +630,7 @@ public class Frame extends Statement {
                     
                     // Get FuncCall object
                     BasicObject[] aParams = params.toArray(new BasicObject[params.size()]);
-                    exp.setObj(Compiler.factory.FuncCallPointer(nameNode, exp.getObj(), aParams), child);
+                    exp.setObj(getFactory().FuncCallPointer(nameNode, exp.getObj(), aParams), child);
                     
                 // Variable
                 } else {
@@ -624,7 +639,7 @@ public class Frame extends Statement {
                     nameNode.setColor(TextColor.LIGHT_BLUE);
                     
                     StructParam sp = exp.getObj().getType().getAsStruct().getParam(nameNode);               
-                    exp.setObj(Compiler.factory.VarAccess(exp, exp.getObj(), sp, sp.getType(), child.getRow(), child.getCol()), child);
+                    exp.setObj(getFactory().VarAccess(exp, exp.getObj(), sp, sp.getType(), child.getFile(), child.getRow(), child.getCol()), child);
                     
                     if (sp.hasFlag(BitFlag.PRIVATE)) {
                         throw new CompileException("The field `" + nameNode.getValue() + "` is private", nameNode);
@@ -695,7 +710,7 @@ public class Frame extends Statement {
      * @return ArithmeticSetObject to update the var
      */
     protected OPObject updateVar(BasicObject var, Node varNode, BasicObject obj, Node objNode, OPCode op) {
-        return Compiler.factory.ArithmeticSetObject(this, op, var, varNode, obj, objNode);
+        return getFactory().ArithmeticSetObject(this, op, var, varNode, obj, objNode);
     }
     
     /**
@@ -706,7 +721,7 @@ public class Frame extends Statement {
      * @return OPObject to update the var
      */
     protected OPObject prefixUpdateVar(BasicObject var, Node varNode, OPCode op) {
-        return Compiler.factory.OPObject(this, op, var, varNode, null, null);
+        return getFactory().OPObject(this, op, var, varNode, null, null);
     }
     
     /**
@@ -717,7 +732,7 @@ public class Frame extends Statement {
      * @return OPObject to update the var
      */
     protected OPObject postfixUpdateVar(BasicObject var, Node varNode, OPCode op) {
-        return Compiler.factory.PostfixOPObject(this, op, var, varNode);
+        return getFactory().PostfixOPObject(this, op, var, varNode);
     }
     
     /**
@@ -739,7 +754,7 @@ public class Frame extends Statement {
         // Init var
         int flags = 0;
         Type type = Type.UNDEFINED;
-        DefineVarStatement define = Compiler.factory.DefineVarStatement(this, false);
+        DefineVarStatement define = getFactory().DefineVarStatement(this, false);
         
         // For empty array creation
         EmptyArray emptyArray = null;
@@ -764,7 +779,7 @@ public class Frame extends Statement {
                     
                     obj = struct.putParam(new Param(name, type, flags), node);
                 } else { // Local var
-                    obj = Compiler.factory.VarLocal(this, name, type, flags);
+                    obj = getFactory().VarLocal(this, name, type, flags);
                 }
                 
                 // Modify var
@@ -800,7 +815,7 @@ public class Frame extends Statement {
                     
                     val = LiteralNum.UNDEFINED;
                     if (type.doesExtend(Type.OBJECT)) val = LiteralNum.NULL;
-                    else if (type.doesExtend(Type.STRUCT)) val = Compiler.factory.DefaultStruct(type.getAsStruct());
+                    else if (type.doesExtend(Type.STRUCT)) val = getFactory().DefaultStruct(type.getAsStruct());
                     
                     hasInit = true;
                 }
@@ -822,7 +837,7 @@ public class Frame extends Statement {
                 
                 // Make var available
                 if (struct == null) {
-                    Main.getInstance().setLine(node.getRow(), node.getCol());
+                    getFile().pushCurrentPoint(node.getRow(), node.getCol());
                     addVar((AdvancedObject) obj);
                 }
             }
@@ -873,7 +888,7 @@ public class Frame extends Statement {
             throw new CompileException("Illegal array definition, must define size of first dimension", typeNode);
         }
         
-        return Compiler.factory.EmptyArray(head, IArray.toArrayType(type, dimensions), sizes);
+        return getFactory().EmptyArray(head, IArray.toArrayType(type, dimensions), sizes);
     }
     
     /**
@@ -898,13 +913,13 @@ public class Frame extends Statement {
             }
         }
         
-        return Compiler.factory.Array(values);
+        return getFactory().Array(values);
     }
     
     private void defineClassVar(ClassType classIn, BasicObject var, Node varNode, BasicObject val, Node valNode) {
-        VarAccess access = Compiler.factory.VarAccess(this, classIn.getThis(), var, var.getType(), varNode.getRow(), varNode.getCol());
-        OPObject op = Compiler.factory.OPObject(this, OPCode.SET, access, varNode, val, valNode);
-        classIn.addInitStatement(Compiler.factory.ExpressionStatement(this, op));
+        VarAccess access = getFactory().VarAccess(this, classIn.getThis(), var, var.getType(), varNode.getFile(), varNode.getRow(), varNode.getCol());
+        OPObject op = getFactory().OPObject(this, OPCode.SET, access, varNode, val, valNode);
+        classIn.addInitStatement(getFactory().ExpressionStatement(this, op));
     }
     
     /**
@@ -914,7 +929,7 @@ public class Frame extends Statement {
      */
     public Compilable doReturn(Node head) {
         Frame f = this;
-        while (f.parent != Compiler.getGlobalFrame()) {
+        while (f.parent != getCompiler().getGlobalFrame()) {
             f = f.parent;
         }
         
@@ -934,13 +949,13 @@ public class Frame extends Statement {
             result = LiteralNum.VOID;
         }
         
-        Type newType = result.getType().autocast(func.getReturnType(), head.getRow(), head.getCol(), false);
+        Type newType = result.getType().autocast(func.getReturnType(), head.getFile(), head.getRow(), head.getCol(), false);
         if (newType == null) {
             throw new CompileException("Invalid return type. Expected `" + func.getReturnType() + "` but got `" + result.getType() + "`", head);
         }
         
         // Return
-        return Compiler.factory.ReturnStatement(this, (FuncHead) f, result);
+        return getFactory().ReturnStatement(this, (FuncHead) f, result);
     }
     
     /**
@@ -952,7 +967,7 @@ public class Frame extends Statement {
         it.next(); // skip 'struct'
         
         Node nameNode = it.next();
-        Main.getInstance().setLine(nameNode.getRow(), nameNode.getCol());
+        getFile().pushCurrentPoint(nameNode.getRow(), nameNode.getCol());
         StructType struct = Type.STRUCT.extendAs(this, nameNode.getValue(), 0);
         
         while (it.hasNext()) {
@@ -977,7 +992,7 @@ public class Frame extends Statement {
         int flags = 0;
         
         // Keep track of location
-        Main.getInstance().setLine(nameNode.getRow(), nameNode.getCol());
+        getFile().pushCurrentPoint(nameNode.getRow(), nameNode.getCol());
         
         // Don't add class code if library
         if (Main.getInstance().isLibrary()) {
@@ -1136,19 +1151,19 @@ public class Frame extends Statement {
         if (!anonymous) {
             // Named
             String name = nameNode.getValue();
-            Main.getInstance().setLine(nameNode.getRow(), nameNode.getCol());
+            getFile().pushCurrentPoint(nameNode.getRow(), nameNode.getCol());
             
             if (classIn == null) {
-                func = Compiler.defineFunc(Compiler.getGlobalFrame(), body, name, null, rtnType, aParams);
+                func = getCompiler().defineFunc(getFile(), getCompiler().getGlobalFrame(), body, name, null, rtnType, aParams);
             } else {
-                func = classIn.defineFunc(body, name, null, rtnType, aParams);
+                func = classIn.defineFunc(getFile(), body, name, null, rtnType, aParams);
             }
         } else {
             // Anonymous
             String name = getLabel("afunc");
             nameNode.setValue(name);
             
-            func = Compiler.defineFunc(this, body, name, null, rtnType, aParams);
+            func = getCompiler().defineFunc(getFile(), this, body, name, null, rtnType, aParams);
         }
         
         // Put flags
@@ -1156,14 +1171,14 @@ public class Frame extends Statement {
         
         // Put default value
         if (!inits.isEmpty()) {
-            ParamDefaultValStatement defaultVal = Compiler.factory.ParamDefaultValStatement(func, false);
+            ParamDefaultValStatement defaultVal = getFactory().ParamDefaultValStatement(func, false);
             for (DefinePair pair: inits) defaultVal.addVar(pair);
             
             func.addCode(defaultVal);
         }
         
         // Return
-        return Compiler.factory.FuncDefStatement(this, nameNode, func);
+        return getFactory().FuncDefStatement(this, nameNode, func);
     }
     
     /**
@@ -1193,8 +1208,8 @@ public class Frame extends Statement {
         BasicObject[] aParams = params.toArray(new BasicObject[params.size()]);
         
         // Get FuncCall object
-        FuncCallPointer funcCallPointer = Compiler.factory.FuncCallPointer(nameNode, objectIn, aParams);
-        return Compiler.factory.DefaultCallFuncStatement(this, funcCallPointer);
+        FuncCallPointer funcCallPointer = getFactory().FuncCallPointer(nameNode, objectIn, aParams);
+        return getFactory().DefaultCallFuncStatement(this, funcCallPointer);
     }
     
     /**
@@ -1245,7 +1260,7 @@ public class Frame extends Statement {
             types = new ParameterizedType<ITypeable>(Type.FUNCTION);
         }
         
-        return Compiler.factory.FuncPointer(nameNode, objectIn, types);
+        return getFactory().FuncPointer(nameNode, objectIn, types);
     }
     
     /**
@@ -1269,7 +1284,7 @@ public class Frame extends Statement {
             List<BasicObject> params = new ArrayList<BasicObject>();
             getFuncCallParams(children.get(3), params);
             
-            return Compiler.factory.NewInstance(type, typeNode, params);
+            return getFactory().NewInstance(type, typeNode, params);
         } else if (type.doesExtend(Type.ARRAY)) {
             throw new CompileException("Illegal array definition, must define size of first dimension", typeNode);
         } else {
@@ -1297,7 +1312,7 @@ public class Frame extends Statement {
             }
         }
         
-        return Compiler.factory.IfStatement(this, conditionals);
+        return getFactory().IfStatement(this, conditionals);
     }
     
     /**
@@ -1318,7 +1333,7 @@ public class Frame extends Statement {
         Node block = head.getAsChildren().get(1);
         List<Node> blockChildren = block.getAsChildren();
         
-        return Compiler.factory.WhileStatement(this, blockChildren.get(1), blockChildren.get(3));
+        return getFactory().WhileStatement(this, blockChildren.get(1), blockChildren.get(3));
     }
     
     /**
@@ -1353,7 +1368,7 @@ public class Frame extends Statement {
             }
         }
         
-        return Compiler.factory.ForStatement(this, define, condition, modification, body);
+        return getFactory().ForStatement(this, define, condition, modification, body);
     }
     
     /**
@@ -1362,7 +1377,7 @@ public class Frame extends Statement {
      * @return ContinueStatement
      */
     public Compilable doContinue(Node head) {        
-        return Compiler.factory.ContinueStatement(this);
+        return getFactory().ContinueStatement(this);
     }
     
     /**
@@ -1376,7 +1391,7 @@ public class Frame extends Statement {
             throw new CompileException("No loop to break out of ", head);
         }
         
-        return Compiler.factory.BreakStatement(this);
+        return getFactory().BreakStatement(this);
     }
     
     /**
@@ -1399,7 +1414,7 @@ public class Frame extends Statement {
                 continue;
             } else if (token == EnumExpression.EXPRESSION) {                
                 ExpressionStatement nextExp = handleExpression(it.next());                
-                return nextExp.getAsExpObj().castTo(Type.fromNode(node), typeNode.getRow(), typeNode.getCol());
+                return nextExp.getAsExpObj().castTo(Type.fromNode(node), typeNode.getFile(), typeNode.getRow(), typeNode.getCol());
             } else {
                 throw new UnhandledNodeException(node);
             }
@@ -1452,7 +1467,7 @@ public class Frame extends Statement {
             }
         }
         
-        return Compiler.getRegex(regex);
+        return getCompiler().getRegex(regex);
     }
     
     /**
@@ -1490,7 +1505,7 @@ public class Frame extends Statement {
     }
     
     public ExpressionStatement doHandleExpression(Iterator<Node> it) {
-        ExpressionStatement exp = Compiler.factory.ExpressionStatement(this, null);
+        ExpressionStatement exp = getFactory().ExpressionStatement(this, null);
         
         // Add tokens
         while (it.hasNext()) {            
@@ -1498,7 +1513,7 @@ public class Frame extends Statement {
         }
  
         if (exp.getObj() == null) {
-            throw new CompileException("Incomplete command"); 
+            throw new CompileException("Incomplete command", getFile()); 
         } else {
             return exp;
         }
@@ -1518,7 +1533,7 @@ public class Frame extends Statement {
             it.next(); // skip colon
             Node node_else = it.next();
             
-            exp.setObj(Compiler.factory.TernaryObject(exp, exp.getObj(), node_then, node_else, child.getRow(), child.getCol()), child);
+            exp.setObj(getFactory().TernaryObject(exp, exp.getObj(), node_then, node_else, child.getFile(), child.getRow(), child.getCol()), child);
             
         } else if (token == OPEN_PRNTH) {
             Node inPrnthNode = it.next();
@@ -1534,25 +1549,25 @@ public class Frame extends Statement {
                         /* Prefix */ || (exp.getObj() == null && token == SUB)) {
             OPCode op = OPCode.fromSymbol(val);
             
-            ExpressionStatement nextExp = Compiler.factory.ExpressionStatement(this, null);
+            ExpressionStatement nextExp = getFactory().ExpressionStatement(this, null);
             handleNextExpressionChild(it, nextExp, temp);
             
-            exp.setObj(Compiler.factory.OPObject(exp, op, nextExp.getObj(), nextExp.getNode(), null, null), child);
+            exp.setObj(getFactory().OPObject(exp, op, nextExp.getObj(), nextExp.getNode(), null, null), child);
         } else if (token == ADD || token == SUB || token == MULT || token == DIV || token == MOD || token == AND || token == BOR || token == XOR || token == LSHIFT || token == RSHIFT || token == BOOL_AND || token == BOOL_OR) {
             OPCode op = OPCode.fromSymbol(val);
             
-            ExpressionStatement nextExp = Compiler.factory.ExpressionStatement(this, null);
+            ExpressionStatement nextExp = getFactory().ExpressionStatement(this, null);
             handleNextExpressionChild(it, nextExp, temp);
             
-            exp.setObj(Compiler.factory.ArithmeticObject(exp, op, exp.getObj(), exp.getNode(), nextExp.getObj(), nextExp.getNode()), child);
+            exp.setObj(getFactory().ArithmeticObject(exp, op, exp.getObj(), exp.getNode(), nextExp.getObj(), nextExp.getNode()), child);
         } else if (token == NOTEQUAL || token == EQUALS || token == LESS_EQU || token == GTR_EQU || token == LESS || token == GTR) {
             OPCode op = OPCode.fromSymbol(val);
             
-            ExpressionStatement nextExp = Compiler.factory.ExpressionStatement(this, null);
+            ExpressionStatement nextExp = getFactory().ExpressionStatement(this, null);
             handleNextExpressionChild(it, nextExp, temp);
             
             if (temp == null) temp = createTempVar(Type.BOOL);
-            exp.setObj(Compiler.factory.ConditionalObject(exp, op, exp.getObj(), exp.getNode(), nextExp.getObj(), nextExp.getNode(), temp), child);
+            exp.setObj(getFactory().ConditionalObject(exp, op, exp.getObj(), exp.getNode(), nextExp.getObj(), nextExp.getNode(), temp), child);
             
         } else if (!child.isTerminal()) {
             exp.setObj(handleExpression(child), child);
@@ -1576,7 +1591,7 @@ public class Frame extends Statement {
             } else if (token == FALSE) {
                 return new LiteralBool(false);
             } else if (token == STRING) {
-                return Compiler.getString(val.substring(1, val.length() - 1));
+                return getCompiler().getString(val.substring(1, val.length() - 1));
             } else if (token == NULL) {
                 return LiteralNum.NULL;
             }

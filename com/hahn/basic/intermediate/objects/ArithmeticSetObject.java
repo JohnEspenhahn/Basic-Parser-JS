@@ -20,7 +20,7 @@ public abstract class ArithmeticSetObject extends ArithmeticObject {
         
         // Check flags
         if (getP1().hasFlag(BitFlag.CONST)) {
-            throw new CompileException("Can not modify the constant variable `" + getP1() + "`");
+            throw new CompileException("Can not modify the constant variable `" + getP1() + "`", getFile());
         }
         
         // The type of the variable being set
@@ -29,10 +29,10 @@ public abstract class ArithmeticSetObject extends ArithmeticObject {
         Type givenType = getP2().getType();
         
         // The type that the target and given want to merge to
-        Type mergedType = Type.merge(targetType, givenType, getP2Node().getRow(), getP2Node().getCol(), true);
+        Type mergedType = Type.merge(targetType, givenType, getP2Node().getFile(), getP2Node().getRow(), getP2Node().getCol(), true);
         
         // Ensure the type being merged to can be assigned to the target
-        setType(mergedType.autocast(targetType, getP2Node().getRow(), getP2Node().getCol(), true));
+        setType(mergedType.autocast(targetType, getP2Node().getFile(), getP2Node().getRow(), getP2Node().getCol(), true));
         
         return false;
     }

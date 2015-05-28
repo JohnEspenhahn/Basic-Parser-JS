@@ -7,7 +7,7 @@ import javax.swing.text.StyledDocument;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.hahn.basic.definition.EnumExpression;
+import com.hahn.basic.intermediate.CodeFile;
 import com.hahn.basic.lexer.PackedToken;
 import com.hahn.basic.viewer.util.TextColor;
 
@@ -33,7 +33,7 @@ public class Node {
         this(parent, token, null, idx, row, col);
     }
     
-    public Node(Node parent, Enum<?> token, String value, int idx, int row, int col) {
+    public Node(Node parent, Enum<?> token, String value, int idx, int row, int col) {        
         this.idx = idx;
         this.row = row;
         this.col = col;
@@ -54,12 +54,13 @@ public class Node {
         this.children = new ArrayList<Node>();
     }
 
-    private Node() {
-        this(null, EnumExpression.START, 0, 0, 0);
+    public static Node newTopNode(CodeFile file) {        
+        return new NodeHead(file);
     }
-
-    public static Node newTopNode() {
-        return new Node();
+    
+    public CodeFile getFile() {
+        if (parent != null) return parent.getFile();
+        else return null;
     }
     
     public int getIdx() {

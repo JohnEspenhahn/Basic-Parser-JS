@@ -1,12 +1,13 @@
 package com.hahn.basic.intermediate.objects;
 
+import com.hahn.basic.intermediate.CodeFile;
 import com.hahn.basic.intermediate.Frame;
 import com.hahn.basic.intermediate.IIntermediate;
-import com.hahn.basic.intermediate.Compiler;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.opcode.OPCode;
 import com.hahn.basic.intermediate.statements.Statement;
 import com.hahn.basic.parser.Node;
+import com.hahn.basic.target.CommandFactory;
 import com.hahn.basic.target.js.JSPretty;
 import com.hahn.basic.util.exceptions.CompileException;
 import com.sun.istack.internal.Nullable;
@@ -16,7 +17,7 @@ import com.sun.istack.internal.Nullable;
  * @author John Espenhahn
  *
  */
-public class OPObject extends BasicObject {
+public class OPObject extends BasicObject implements IFileObject {
     private Frame frame;
     private OPCode opcode;
     
@@ -72,8 +73,8 @@ public class OPObject extends BasicObject {
     }
     
     @Override
-    public boolean updateLiteral(OPCode op, Literal lit) {
-        return getP1().updateLiteral(op, lit);
+    public boolean updateLiteral(OPCode op, Literal lit, CodeFile file) {
+        return getP1().updateLiteral(op, lit, file);
     }
     
     @Override
@@ -92,6 +93,16 @@ public class OPObject extends BasicObject {
     
     public Frame getFrame() {
         return frame;
+    }
+    
+    @Override
+    public CodeFile getFile() {
+        return getFrame().getFile();
+    }
+    
+    @Override
+    public CommandFactory getFactory() {
+        return getFile().getFactory();
     }
     
     public BasicObject getP1() {
@@ -127,7 +138,7 @@ public class OPObject extends BasicObject {
     }
     
     public String getTargetOPSymbol() {
-        return Compiler.factory.getTargetOPSymbol(getOP());
+        return getFactory().getTargetOPSymbol(getOP());
     }
     
     @Override
@@ -138,15 +149,15 @@ public class OPObject extends BasicObject {
         
         // Special case to prevent "++1"
         if ((opcode == OPCode.PADD || opcode == OPCode.PSUB) && !p1.isVar()) {
-            throw new CompileException("Illegal left-side argument `" + p1 + "` with operator `" + opcode.symbol + "`");
+            throw new CompileException("Illegal left-side argument `" + p1 + "` with operator `" + opcode.symbol + "`", getFile());
         }
         
         // Type check
-        Type mergedType = p1.getType().autocast(opcode.type1, p1Node.getRow(), p1Node.getCol(), true);
+        Type mergedType = p1.getType().autocast(opcode.type1, p1Node.getFile(), p1Node.getRow(), p1Node.getCol(), true);
         setType(mergedType);
         
         if (p2 != null) { 
-            p2.getType().autocast(opcode.type2, p2Node.getRow(), p2Node.getCol(), true);
+            p2.getType().autocast(opcode.type2, p2Node.getFile(), p2Node.getRow(), p2Node.getCol(), true);
         }
         
         return false;
@@ -161,7 +172,7 @@ public class OPObject extends BasicObject {
         // Check literals
         if (p1.hasLiteral() && OPCode.canChangeLiteral(getOP())) {
             Literal p2Literal = (p2 == null ? null : p2.getLiteral());
-            if (p1.canUpdateLiteral(getFrame(), getOP()) && p1.updateLiteral(opcode, p2Literal)) {
+            if (p1.canUpdateLiteral(getFrame(), getOP()) && p1.updateLiteral(opcode, p2Literal, getFile())) {
                 this.isLiteral = true;
             } else {
                 p1.setLiteral(null);

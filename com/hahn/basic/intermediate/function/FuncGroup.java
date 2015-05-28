@@ -68,7 +68,7 @@ public class FuncGroup implements Iterable<FuncHead> {
             if (depth >= 0 && depth < bestMatch) {
                 FuncHead tempFunc = funcs.get(i);
                 if (bestMatch == depth) {
-                    throw new CompileException("Ambiguous definition of `" + tempFunc.toString() + "`", tempFunc.row, -1);
+                    throw new CompileException("Ambiguous definition of `" + tempFunc.toString() + "`", tempFunc.getFile(), tempFunc.row, -1);
                 } else {
                     bestMatch = depth;
                     func = tempFunc;

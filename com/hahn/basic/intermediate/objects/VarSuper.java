@@ -1,5 +1,6 @@
 package com.hahn.basic.intermediate.objects;
 
+import com.hahn.basic.intermediate.CodeFile;
 import com.hahn.basic.intermediate.Frame;
 import com.hahn.basic.intermediate.objects.types.ClassType;
 import com.hahn.basic.intermediate.objects.types.Type;
@@ -24,7 +25,7 @@ public class VarSuper extends Var {
     }
     
     @Override
-    public BasicObject castTo(Type type, int row, int col) {
-        throw new CompileException("Cannot cast `super`", row, col);
+    public BasicObject castTo(Type type, CodeFile file, int row, int col) {
+        throw new CompileException("Cannot cast `super`", file, row, col);
     }
 }

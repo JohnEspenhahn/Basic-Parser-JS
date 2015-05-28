@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.hahn.basic.intermediate.CodeFile;
 import com.hahn.basic.intermediate.Frame;
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.Param;
@@ -23,12 +24,13 @@ public class StructType extends Type {
     
     /**
      * Create a new struct
+     * @param file The file defined in
      * @param name The name of the struct
      * @param parent The parent struct or null
      * @param isAbstract If true won't check for other types with the same name
      */
-    protected StructType(String name, StructType parent, int flags, boolean isAbstract) {
-        super(name, true, isAbstract);
+    protected StructType(CodeFile file, String name, StructType parent, int flags, boolean isAbstract) {
+        super(file, name, true, isAbstract);
         
         this.flags = flags;
         
@@ -116,7 +118,7 @@ public class StructType extends Type {
      * @return A new struct object
      */
     public StructType extendAs(Frame containingFrame, String name, List<BasicObject> ps, int flags) {
-        StructType struct = new StructType(name, this, flags, false);
+        StructType struct = new StructType(containingFrame.getFile(), name, this, flags, false);
         struct.loadParams(ps);
         
         return struct;

@@ -3,7 +3,7 @@ package com.hahn.basic.intermediate.objects.types;
 public class RealOrStringType extends Type {
     
     public RealOrStringType() {
-        super("real_string", false, true);
+        super(null, "real_string", false, true);
     }
     
     @Override

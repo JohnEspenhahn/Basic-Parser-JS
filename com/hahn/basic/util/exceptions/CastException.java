@@ -1,5 +1,6 @@
 package com.hahn.basic.util.exceptions;
 
+import com.hahn.basic.intermediate.CodeFile;
 import com.hahn.basic.parser.Node;
 
 public class CastException extends CompileException {
@@ -13,8 +14,8 @@ public class CastException extends CompileException {
         super(mss + e.message, node);
     }
 
-    public CastException(String mss, int row, int col) {
-        super(mss, row, col);
+    public CastException(String mss, CodeFile file, int row, int col) {
+        super(mss, file, row, col);
     }
     
 }

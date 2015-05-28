@@ -3,6 +3,7 @@ package com.hahn.basic.intermediate.objects.types;
 import java.util.Collection;
 import java.util.List;
 
+import com.hahn.basic.intermediate.CodeFile;
 import com.hahn.basic.intermediate.Compiler;
 import com.hahn.basic.intermediate.Frame;
 import com.hahn.basic.intermediate.function.FuncBridge;
@@ -15,12 +16,15 @@ import com.hahn.basic.intermediate.objects.Var;
 import com.hahn.basic.intermediate.statements.ClassDefinition;
 import com.hahn.basic.intermediate.statements.Statement;
 import com.hahn.basic.parser.Node;
+import com.hahn.basic.target.CommandFactory;
 import com.hahn.basic.util.ConstructorUtils;
 import com.hahn.basic.util.TypeUtils;
 import com.hahn.basic.util.exceptions.CompileException;
 import com.hahn.basic.util.structures.BitFlag;
 
-public class ClassType extends StructType {    
+public class ClassType extends StructType {
+    private Frame containingFrame;
+    
     private FuncBridge funcBridge;
     private Frame initFrame;
     private Frame staticFrame;
@@ -31,18 +35,21 @@ public class ClassType extends StructType {
     private ClassDefinition def;
     
     public ClassType(Frame containingFrame, String name, StructType parent, int flags, boolean isAbstract) {
-        super(name, parent, flags, isAbstract);
+        super(containingFrame.getFile(), name, parent, flags, isAbstract);
         
         if (name == null) return;
         
+        this.containingFrame = containingFrame;
+        
+        final Frame globalFrame = getCompiler().getGlobalFrame();
         this.funcBridge = new FuncBridge(this);
-        this.initFrame = new Frame(Compiler.getGlobalFrame(), null);
-        this.staticFrame = new Frame(Compiler.getGlobalFrame(), null);
+        this.initFrame = new Frame(getFile(), globalFrame, null);
+        this.staticFrame = new Frame(getFile(), globalFrame, null);
         
-        this.classObj = Compiler.factory.ClassObject(this);
+        this.classObj = getFactory().ClassObject(this);
         
-        this.varThis = Compiler.factory.VarThis(Compiler.getGlobalFrame(), this);
-        this.varImpliedThis = Compiler.factory.VarImpliedThis(Compiler.getGlobalFrame(), this);
+        this.varThis = getFactory().VarThis(globalFrame, this);
+        this.varImpliedThis = getFactory().VarImpliedThis(globalFrame, this);
         
         if (parent instanceof ClassType) {
             defineSuper((ClassType) parent);
@@ -50,7 +57,7 @@ public class ClassType extends StructType {
             this.varSuper = null;
         }
         
-        this.def = Compiler.factory.ClassDefinition(containingFrame, this);
+        this.def = getFactory().ClassDefinition(containingFrame, this);
     }
     
     /**
@@ -58,12 +65,12 @@ public class ClassType extends StructType {
      * @param parent
      */
     private void defineSuper(ClassType parent) {
-        this.varSuper = Compiler.factory.VarSuper(Compiler.getGlobalFrame(), parent);
+        this.varSuper = getFactory().VarSuper(getCompiler().getGlobalFrame(), parent);
         
         for (FuncGroup funcs: parent.getDefinedFuncs()) {
             if (funcs.isConstructor()) {
                 for (FuncHead func: funcs.getFuncs()) {
-                    FuncHead superFunc = defineFunc(null, "super", null, func.getReturnType(), TypeUtils.toParams(func.getParams()));
+                    FuncHead superFunc = defineFunc(getFile(), null, "super", null, func.getReturnType(), TypeUtils.toParams(func.getParams()));
                     superFunc.setFlags(BitFlag.PRIVATE.b);
                 }
                 
@@ -74,6 +81,31 @@ public class ClassType extends StructType {
     
     public ClassObject getClassObj() {
         return classObj;
+    }
+    
+    public Frame getContainingFrame() {
+        return containingFrame;
+    }
+    
+    /**
+     * @return File associated with this class
+     */
+    public CodeFile getFile() {
+        return getContainingFrame().getFile();
+    }
+    
+    /**
+     * @return Factory associated with this class
+     */
+    public CommandFactory getFactory() {
+        return getFile().getFactory();
+    }
+    
+    /**
+     * @return Compiler associated with this class
+     */
+    public Compiler getCompiler() {
+        return getFile().getCompiler();
     }
     
     /**
@@ -164,12 +196,12 @@ public class ClassType extends StructType {
         return initFrame;
     }
     
-    public FuncHead defineFunc(Node head, String inName, String outName, Type rtnType, Param... params) {
-        return defineFunc(head, false, inName, outName, rtnType, params);
+    public FuncHead defineFunc(CodeFile file, Node head, String inName, String outName, Type rtnType, Param... params) {
+        return defineFunc(file, head, false, inName, outName, rtnType, params);
     }
     
-    public FuncHead defineFunc(Node head, boolean override, String inName, String outName, Type rtnType, Param... params) {        
-        return funcBridge.defineFunc(Compiler.getGlobalFrame(), override, head, inName, outName, rtnType, params);
+    public FuncHead defineFunc(CodeFile file, Node head, boolean override, String inName, String outName, Type rtnType, Param... params) {        
+        return funcBridge.defineFunc(file, getCompiler().getGlobalFrame(), override, head, inName, outName, rtnType, params);
     }
     
     public Collection<FuncGroup> getDefinedFuncs() {
@@ -212,7 +244,7 @@ public class ClassType extends StructType {
             if (func != null) {
                 if (func.hasFlag(BitFlag.PRIVATE)) {
                     if (!safe) {
-                        throw new CompileException("The function `" + func + "` is private");
+                        throw new CompileException("The function `" + func + "` is private", nameNode.getFile(), nameNode.getRow(), nameNode.getCol());
                     } else {
                         return null;
                     }
@@ -242,7 +274,7 @@ public class ClassType extends StructType {
      */
     private FuncHead getValidFuncAccess(BasicObject objIn, Node nameNode, FuncHead func, boolean safe) {
         if (func.hasFlag(BitFlag.STATIC) && !objIn.isClassObject()) {
-            if (!safe) throw new CompileException("Must access function `" + func + "` directly through its defining class");
+            if (!safe) throw new CompileException("Must access function `" + func + "` directly through its defining class", getFile());
             else return null;
         } else {
             return func;
@@ -265,7 +297,7 @@ public class ClassType extends StructType {
         
         // If no constructor, define default
         if (funcBridge.getFuncGroup(ConstructorUtils.getConstructorName()) == null) {
-            defineFunc(null, ConstructorUtils.getConstructorName(), null, Type.VOID, new Param[0]);
+            defineFunc(getFile(), null, ConstructorUtils.getConstructorName(), null, Type.VOID, new Param[0]);
         }
     }
     

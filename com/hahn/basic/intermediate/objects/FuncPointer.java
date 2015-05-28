@@ -1,15 +1,17 @@
 package com.hahn.basic.intermediate.objects;
 
-import com.hahn.basic.intermediate.IIntermediate;
+import com.hahn.basic.intermediate.CodeFile;
 import com.hahn.basic.intermediate.Compiler;
+import com.hahn.basic.intermediate.IIntermediate;
 import com.hahn.basic.intermediate.function.FuncHead;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.ParameterizedType;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.parser.Node;
+import com.hahn.basic.target.CommandFactory;
 import com.hahn.basic.util.exceptions.CompileException;
 
-public abstract class FuncPointer extends BasicObject {
+public abstract class FuncPointer extends BasicObject implements IFileObject {
     protected Node nameNode;
     protected BasicObject objectIn;
     
@@ -26,6 +28,20 @@ public abstract class FuncPointer extends BasicObject {
         
         this.nameNode = nameNode;
         this.objectIn = objectIn;
+    }
+    
+    @Override
+    public CodeFile getFile() {
+        return nameNode.getFile();
+    }
+    
+    @Override
+    public CommandFactory getFactory() {
+        return getFile().getFactory();
+    }
+    
+    public Compiler getCompiler() {
+        return getFile().getCompiler();
     }
     
     @Override
@@ -106,7 +122,7 @@ public abstract class FuncPointer extends BasicObject {
      */
     protected void checkFunction() {
         if (func == null) {
-            FuncCallPair funcPair = Compiler.getFunc(objectIn, nameNode, getTypes());
+            FuncCallPair funcPair = getCompiler().getFunc(objectIn, nameNode, getTypes());
             if (funcPair != null) {
                 // If returned a function pair, update variables
                 setFunction(funcPair.getFunc());
@@ -118,7 +134,7 @@ public abstract class FuncPointer extends BasicObject {
             
             // Still null then not found
             if (func == null) {
-                throw new CompileException("Function `" + FuncHead.toHumanReadable(this) + "` was not found");
+                throw new CompileException("Function `" + FuncHead.toHumanReadable(this) + "` was not found", getFile());
             }
         }
     }

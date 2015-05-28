@@ -1,7 +1,6 @@
 package com.hahn.basic.intermediate.statements;
 
-import com.hahn.basic.Main;
-import com.hahn.basic.intermediate.Compiler;
+import com.hahn.basic.intermediate.CodeFile;
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.ExpressionObject;
 import com.hahn.basic.intermediate.objects.types.Type;
@@ -58,30 +57,30 @@ public abstract class ExpressionStatement extends Statement {
         return node;
     }
     
-    public void castTo(Type type, int row, int col) {
+    public void castTo(Type type, CodeFile file, int row, int col) {
         enforce();
         
-        this.obj = this.obj.castTo(type, row, col);
+        this.obj = this.obj.castTo(type, file, row, col);
     }
     
     @Override
     public boolean reverseOptimize() {
-        if (node != null) Main.getInstance().pushLine(node.getRow(), node.getCol());   
+        if (node != null) getFile().pushCurrentPoint(node.getRow(), node.getCol());   
         
         getObj().setInUse(this);
         
-        if (node != null) Main.getInstance().popLine();
+        if (node != null) getFile().popCurrentPoint();
         
         return false;
     }
     
     @Override
     public boolean forwardOptimize() {
-        Main.getInstance().pushLine(row, -1);
+        getFile().pushCurrentLine(row);
         
         getObj().takeRegister(this);
         
-        Main.getInstance().popLine();
+        getFile().popCurrentPoint();
         
         return false;
     }
@@ -94,7 +93,7 @@ public abstract class ExpressionStatement extends Statement {
     public ExpressionObject getAsExpObj() {
         this.gotAsObject = true;
         
-        return Compiler.factory.ExpressionObject(this);
+        return getFactory().ExpressionObject(this);
     }
     
     /**

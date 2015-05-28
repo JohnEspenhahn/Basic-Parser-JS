@@ -21,10 +21,10 @@ public abstract class ForStatement extends Statement {
     public ForStatement(Statement continer, Node define, Node condition, List<Node> modification, Node body) {
         super(continer);
         
-        this.outerFrame  = new Frame(getFrame(), null);
-        this.modifyFrame = new Frame(outerFrame, null);
+        this.outerFrame  = new Frame(getFile(), getFrame(), null);
+        this.modifyFrame = new Frame(getFile(), outerFrame, null);
         
-        this.innerFrame  = new Frame(outerFrame, body, true);
+        this.innerFrame  = new Frame(getFile(), outerFrame, body, true);
         
         this.define = outerFrame.defineVar(define);
         this.condition = outerFrame.handleExpression(condition);

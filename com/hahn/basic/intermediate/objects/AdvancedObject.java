@@ -5,14 +5,15 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import com.hahn.basic.intermediate.CodeFile;
 import com.hahn.basic.intermediate.Frame;
 import com.hahn.basic.intermediate.IIntermediate;
-import com.hahn.basic.intermediate.Compiler;
 import com.hahn.basic.intermediate.objects.register.IRegister;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.opcode.OPCode;
+import com.hahn.basic.target.CommandFactory;
 
-public abstract class AdvancedObject extends BasicObject {
+public abstract class AdvancedObject extends BasicObject implements IFileObject {
     private Frame frame;
 
     private IRegister reg;
@@ -36,6 +37,16 @@ public abstract class AdvancedObject extends BasicObject {
     public Frame getFrame() {
         return frame;
     }
+    
+    @Override
+    public CodeFile getFile() {
+        return getFrame().getFile();
+    }
+    
+    @Override
+    public CommandFactory getFactory() {
+        return getFile().getFactory();
+    }
 
     /**
      * Get the address of this object
@@ -48,7 +59,7 @@ public abstract class AdvancedObject extends BasicObject {
     @Override
     public BasicObject getForCreateVar() {
         if (isRegisterOnStack()) {
-            return Compiler.factory.PushObject();
+            return getFactory().PushObject();
         } else {
             return super.getForCreateVar();
         }
@@ -209,7 +220,7 @@ public abstract class AdvancedObject extends BasicObject {
     }
 
     @Override
-    public boolean updateLiteral(OPCode op, Literal lit) {
-        return literal.updateLiteral(op, lit);
+    public boolean updateLiteral(OPCode op, Literal lit, CodeFile file) {
+        return literal.updateLiteral(op, lit, file);
     }
 }

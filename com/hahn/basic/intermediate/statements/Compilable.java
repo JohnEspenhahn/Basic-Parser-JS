@@ -1,20 +1,50 @@
 package com.hahn.basic.intermediate.statements;
 
-import com.hahn.basic.Main;
+import lombok.NonNull;
+
+import com.hahn.basic.intermediate.CodeFile;
+import com.hahn.basic.intermediate.Compiler;
 import com.hahn.basic.intermediate.Frame;
 import com.hahn.basic.intermediate.IIntermediate;
+import com.hahn.basic.intermediate.objects.IFileObject;
 import com.hahn.basic.target.Command;
+import com.hahn.basic.target.CommandFactory;
 
-public abstract class Compilable implements IIntermediate, Command {
+public abstract class Compilable implements IIntermediate, IFileObject, Command {
     public final int row;
     private final Frame frame;
 
-    public Compilable(Frame f) {
-        this.row = Main.getInstance().getRow();
-
+    public Compilable(Frame f, int row) {
         this.frame = f;
+        this.row = row;
+    }
+    
+    /**
+     * @return Get the command factory associated with this object
+     */
+    @Override
+    public CommandFactory getFactory() {
+        return getCompiler().getFactory();
+    }
+    
+    /**
+     * @return The compiler associated with this object
+     */
+    public Compiler getCompiler() {
+        return getFile().getCompiler();
     }
 
+    /**
+     * @return The file associated with this object
+     */
+    @Override
+    public CodeFile getFile() {
+        return getFrame().getFile();
+    }
+    
+    /**
+     * @return The frame associated with this object
+     */
     public Frame getFrame() {
         return frame;
     }

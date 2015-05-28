@@ -10,9 +10,9 @@ public abstract class WhileStatement extends Statement {
     public WhileStatement(Statement container, Node condition, Node body) {
         super(container);
         
-        this.outerFrame = new Frame(getFrame(), null);
+        this.outerFrame = new Frame(getFile(), getFrame(), null);
         
-        this.innerFrame = new Frame(outerFrame, body, true);
+        this.innerFrame = new Frame(getFile(), outerFrame, body, true);
         this.innerFrame.addTargetCode();
         
         this.condition = outerFrame.handleExpression(condition);

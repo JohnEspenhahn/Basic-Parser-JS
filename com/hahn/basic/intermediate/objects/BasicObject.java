@@ -2,9 +2,9 @@ package com.hahn.basic.intermediate.objects;
 
 import lombok.NonNull;
 
+import com.hahn.basic.intermediate.CodeFile;
 import com.hahn.basic.intermediate.Frame;
 import com.hahn.basic.intermediate.IIntermediate;
-import com.hahn.basic.intermediate.Compiler;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.opcode.OPCode;
@@ -78,8 +78,8 @@ public abstract class BasicObject implements IIntermediate, ITypeable {
      * @col Column to throw error at
      * @return A new, altered version of this
      */
-    public BasicObject castTo(Type type, int row, int col) {
-        return Compiler.factory.CastedObject(this, getType().castTo(type, row, col), row, col);
+    public BasicObject castTo(Type type, CodeFile file, int row, int col) {
+        return file.getFactory().CastedObject(this, getType().castTo(type, file, row, col), file, row, col);
     }
     
     
@@ -137,9 +137,10 @@ public abstract class BasicObject implements IIntermediate, ITypeable {
      * If is a literal, modify it
      * @param op The operation to preform on the literal
      * @param lit The value to use in update. Can be null
+     * @param file The file updating in
      * @return True if should remove the containing op command
      */
-    public boolean updateLiteral(OPCode op, Literal lit) {
+    public boolean updateLiteral(OPCode op, Literal lit, CodeFile file) {
         return false;
     }
     
@@ -308,7 +309,7 @@ public abstract class BasicObject implements IIntermediate, ITypeable {
      * @return ExpressionStatement
      */
     public final ExpressionStatement getAsExp(Statement container) {
-        return Compiler.factory.ExpressionStatement(container, this);
+        return container.getFactory().ExpressionStatement(container, this);
     }
     
     @Override

@@ -1,6 +1,5 @@
 package com.hahn.basic.target.js.statements;
 
-import com.hahn.basic.Main;
 import com.hahn.basic.intermediate.function.FuncHead;
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.statements.ReturnStatement;
@@ -20,7 +19,7 @@ public class JSReturnStatement extends ReturnStatement {
     
     @Override
     public boolean doReverseOptimize() {
-        Main.getInstance().setLine(row, -1);
+        getFile().pushCurrentLine(row);
         
         if (getResult() != null) {
             getResult().setInUse(this);
@@ -31,7 +30,7 @@ public class JSReturnStatement extends ReturnStatement {
     
     @Override
     public boolean doForwardOptimize() {
-        Main.getInstance().setLine(row, -1);
+        getFile().pushCurrentLine(row);
         
         if (getResult() != null) {
             getResult().takeRegister(this);

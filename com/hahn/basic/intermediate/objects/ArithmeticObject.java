@@ -21,13 +21,13 @@ public abstract class ArithmeticObject extends OPObject {
         
         Type p1Type = getP1().getType();
         Type p2Type = getP2().getType();
-        if (p1Type.autocast(getOP().type1, getP1Node().getRow(), getP1Node().getCol(), false) == null) {
+        if (p1Type.autocast(getOP().type1, getP1Node().getFile(), getP1Node().getRow(), getP1Node().getCol(), false) == null) {
             throw new CompileException("Expected type `" + getOP().type1 + "` but got `" + p1Type + "` with operator `" + getOP().symbol + "`", getP1Node());
-        } else if (p2Type.autocast(getOP().type2, getP1Node().getRow(), getP1Node().getCol(), false) == null) {
+        } else if (p2Type.autocast(getOP().type2, getP1Node().getFile(), getP1Node().getRow(), getP1Node().getCol(), false) == null) {
             throw new CompileException("Expected type `" + getOP().type2 + "` but got `" + p2Type + "` with operator `" + getOP().symbol + "`", getP2Node());
         }
         
-        setType(Type.merge(p1Type, p2Type, getP2Node().getRow(), getP2Node().getCol(), true));
+        setType(Type.merge(p1Type, p2Type, getP2Node().getFile(), getP2Node().getRow(), getP2Node().getCol(), true));
         
         return false;
     }

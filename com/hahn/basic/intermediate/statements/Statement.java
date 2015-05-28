@@ -6,13 +6,18 @@ import java.util.Iterator;
 
 import lombok.NonNull;
 
+import com.hahn.basic.intermediate.Frame;
 import com.hahn.basic.target.OutputBuilder;
 
 public abstract class Statement extends Compilable {
     private Deque<Compilable> targetCode;
     
     public Statement(Statement container) {
-        super(container == null ? null : container.getFrame());
+        this(container.getFrame(), container.getFile().getCurrentRow());
+    }
+    
+    public Statement(Frame frame, int row) {
+        super(frame, row);
         
         if (useAddTargetCode()) {
             this.targetCode = new ArrayDeque<Compilable>();

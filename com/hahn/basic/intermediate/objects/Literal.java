@@ -1,5 +1,6 @@
 package com.hahn.basic.intermediate.objects;
 
+import com.hahn.basic.intermediate.CodeFile;
 import com.hahn.basic.intermediate.Frame;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.opcode.OPCode;
@@ -18,7 +19,7 @@ public abstract class Literal extends BasicObject {
 	}
 	
 	@Override
-    public abstract boolean updateLiteral(OPCode op, Literal lit);
+    public abstract boolean updateLiteral(OPCode op, Literal lit, CodeFile file);
 
 	@Override
     public boolean hasLiteral() {

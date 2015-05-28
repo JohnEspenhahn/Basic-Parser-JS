@@ -4,7 +4,7 @@ import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.hahn.basic.intermediate.Compiler;
+import com.hahn.basic.intermediate.CodeFile;
 import com.hahn.basic.intermediate.library.CodeLibrary;
 import com.hahn.basic.intermediate.objects.types.ClassType;
 import com.hahn.basic.intermediate.objects.types.Type;
@@ -38,7 +38,11 @@ public abstract class Library {
         return this.name.hashCode();
     }
     
-    public abstract void define();
+    /**
+     * Define the library from the calling file
+     * @param callingFile The calling (aka importing) file
+     */
+    public abstract void define(CodeFile callingFile);
     
     public abstract String toTarget();
     
@@ -57,24 +61,19 @@ public abstract class Library {
         }
     }
     
-    public static void defineString(String str) {
-        // If not already defined will define
-        Compiler.getString(str);
+    public static void defineFunc(CodeFile file, String inName, String outName, Type rtnType, Type... types) {        
+        file.getCompiler().defineFunc(file, inName, outName, rtnType, TypeUtils.toParams(types));
     }
     
-    public static void defineFunc(String inName, String outName, Type rtnType, Type... types) {        
-        Compiler.defineFunc(inName, outName, rtnType, TypeUtils.toParams(types));
-    }
-    
-    public static void defineFunc(ClassType classIn, boolean override, String inName, String outName, int flags, Type rtnType, Type... types) {
-        classIn.defineFunc(null, override, inName, outName, rtnType, TypeUtils.toParams(types)).setFlags(flags);
+    public static void defineFunc(CodeFile file, ClassType classIn, boolean override, String inName, String outName, int flags, Type rtnType, Type... types) {
+        classIn.defineFunc(file, null, override, inName, outName, rtnType, TypeUtils.toParams(types)).setFlags(flags);
     }
     
     public static void defineParam(ClassType classIn, String inName, String outName, Type type) {
         classIn.systemParam(inName, type, outName, true);
     }
     
-    public static ClassType defineClass(String name, boolean isFinal) {
-        return Type.OBJECT.extendAs(null, name, BitFlag.SYSTEM.b | (isFinal ? BitFlag.FINAL.b : 0));
+    public static ClassType defineClass(CodeFile file, String name, boolean isFinal) {
+        return Type.OBJECT.extendAs(file.getCompiler().getGlobalFrame(), name, BitFlag.SYSTEM.b | (isFinal ? BitFlag.FINAL.b : 0));
     }
 }

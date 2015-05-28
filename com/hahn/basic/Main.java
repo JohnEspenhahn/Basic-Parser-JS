@@ -1,62 +1,49 @@
 package com.hahn.basic;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.Stack;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.swing.JFileChooser;
 
+import sun.misc.IOUtils;
+
 import com.hahn.basic.definition.EnumExpression;
 import com.hahn.basic.definition.EnumToken;
-import com.hahn.basic.intermediate.CodeLines;
-import com.hahn.basic.lexer.basic.BasicLexer;
-import com.hahn.basic.target.OutputBuilder;
+import com.hahn.basic.intermediate.CompilerStatus;
+import com.hahn.basic.lexer.basic.BasicLexerFactory;
+import com.hahn.basic.target.CommandFactory;
 import com.hahn.basic.target.js.JSCommandFactory;
+import com.hahn.basic.target.js.JSOutputBuilderFactory;
 import com.hahn.basic.util.exceptions.CompileException;
-import com.hahn.basic.viewer.ViewerBuilder;
 
 public abstract class Main {
     private static Main instance;
-    
     private static final String FILE_KEY = "file";
-    private static final String DIR_KEY = "dir";
-    
-    private boolean debug = false, pretty = false, library = false;
-    
-    private Stack<CodeLines> linesStack;
-    private Map<String, String> values;
-    
+        
+    private Map<String, String> parameters;    
     private EnumInputType inputType;
     protected File inputFile;
     
     public Main() {
         this.inputType = null;
-        this.inputFile = null;
-        
-        this.linesStack = new Stack<CodeLines>();
-        this.values = new HashMap<String, String>();
-        
-        pushCodeLines();
+        this.inputFile = null;        
+        this.parameters = new HashMap<String, String>();
     }
     
-    public abstract OutputBuilder getLangBuildTarget();
+    public abstract CommandFactory getCommandFactory();
+    
+    public abstract CompilerStatus getCompilerStatus();
     
     public abstract void printShellTitle();
     
     /**
-     * Reset the compiler
-     */
-    public abstract void reset();
-    
-    /**
      * Compile the inputed code
      */
-    public abstract void handleInput();
+    public abstract void handleInput(String input);
     
     public void setInputType(EnumInputType type) {
         if (this.inputType == null) this.inputType = type;
@@ -64,16 +51,16 @@ public abstract class Main {
     }
     
     public void setValue(String name, String value) {
-        if (!values.containsKey(name)) values.put(name, value);
+        if (!parameters.containsKey(name)) parameters.put(name, value);
         else throw new IllegalArgumentException("Duplicate parameter `" + name + "`");
     }
     
     public String getValue(String name) {
-        return values.get(name);
+        return parameters.get(name);
     }
     
     public File getTargetFile() {
-        return new File(inputFile.getAbsolutePath() + "." + getLangBuildTarget().getOutputExtension());
+        return new File(inputFile.getAbsolutePath() + "." + getCommandFactory().getOutputExtension());
     }
     
     public File getInputFile() {
@@ -91,23 +78,19 @@ public abstract class Main {
             guiFileInput();
         } else if (inputType == EnumInputType.FILE) {
             fileInput(new File(getValue(FILE_KEY)));
-        } else if (inputType == EnumInputType.DIR) {
-            dirInput(getValue(DIR_KEY));
         } else {
             printHelp();
         }
     }
     
     public void printHelp() {
-        System.out.println("Usage: cmp [-options] input");
+        System.out.println("Usage: [options] [input mode]");
         System.out.println();
         System.out.println("Options:");
         System.out.println(" --debug                       Run in debug mode");
         System.out.println(" --pretty                      Run in pretty print mode");
         System.out.println();
         System.out.println("Input Modes:");
-        System.out.println(" -d [<path>], --dir [<path>]   Attempt to compile a project");
-        System.out.println("                               in the given directory <path>");
         System.out.println(" -f <path>, --file <path>      Compile file at the given");
         System.out.println("                               file <path>");
         System.out.println(" -g, --gui                     Select file to be compiled");
@@ -153,13 +136,7 @@ public abstract class Main {
                 break;
             } else {
                 try {               
-                    // Reset
-                    getLines().reset();
-                    clearLineErrors();
-                    getLines().add(input.trim());
-                    
-                    reset();                    
-                    handleInput();
+                    handleInput(input);
                 } catch (CompileException e) {
                     printCompileException(e);
                 } catch (Exception e) {
@@ -186,204 +163,43 @@ public abstract class Main {
     public void fileInput(File file) {
         this.inputFile = file;
         
-        // Reset
-        resetFile();
-        
-        Scanner scanner = null;
         try {
-            long start = System.currentTimeMillis();
-            
-            scanner = new Scanner(this.inputFile);
-            while(scanner.hasNextLine()) {
-                String line = scanner.nextLine();
-                
-                getLines().add(line + (scanner.hasNextLine() ? "\n" : ""));
-            }
-            // getLines().add("#eof"); // End of File
-            
-            handleInput();
-            
-            if (debug) {
-                System.out.println();
-                System.out.println("Done in " + (System.currentTimeMillis() - start) + "ms");
-            }
+            handleInput(new String(IOUtils.readFully(new FileInputStream(file), -1, true)));
         } catch (CompileException e) {
             printCompileException(e);
         } catch (FileNotFoundException e) {
             System.err.println("Could not find the file `" + getValue(FILE_KEY) + "`");
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            if (scanner != null) {
-                scanner.close();
-            }
         }
-    }
-    
-    public void dirInput(String dir) {
-        if (dir == null) dir = System.getProperty("user.dir");
-        File dirFile = new File(dir);
-        
-        System.out.println("Compiling files in directory `" + dir + "` with extension `." + getLangBuildTarget().getInputExtension() + "`");
-        
-        if (dirFile.isDirectory()) {            
-            Scanner scanner = null;
-            try {
-                resetFile();
-                
-                int found = 0;
-                long start = System.currentTimeMillis();                
-                this.inputFile = new File(dirFile, "main");
-                
-                for (File f: dirFile.listFiles()) {
-                    String extension = f.getName().replaceFirst("^.+\\.", "");
-                    if (f.isFile() && extension.equals(getLangBuildTarget().getInputExtension())) {
-                        found += 1;
-                        
-                        scanner = new Scanner(f);
-                        while(scanner.hasNextLine()) {
-                            String line = scanner.nextLine();
-                            
-                            getLines().add(line + (scanner.hasNextLine() ? "\n" : ""));
-                        }
-                        // getLines().add("#eof"); // End of File
-                        
-                        scanner.close();
-                        scanner = null;
-                    }
-                }
-                
-                handleInput();
-                
-                System.out.println();
-                if (found == 0) {
-                    System.err.println("No files found in the directory `" + dir + "` with the file extension `." + getLangBuildTarget().getInputExtension() + "`");
-                }
-                
-                System.out.println("Done in " + (System.currentTimeMillis() - start) + "ms");
-            } catch (CompileException e) {
-                printCompileException(e);
-            } catch (FileNotFoundException e) {
-                System.err.println("Could not find the directory `" + dir + "`");
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                if (scanner != null) {
-                    scanner.close();
-                }
-            }
-        } else {
-            throw new IllegalArgumentException("The given directory path is not a directory");
-        }
-    }
-    
-    /**
-     * Parse code lines from a string. Does not do any compiling
-     * @param str The string of code to parse into lines
-     */
-    public void parseLinesFromString(String str) {
-        resetFile();
-        
-        Pattern p = Pattern.compile("\n");
-        Matcher m = p.matcher(str);
-        
-        int idx = 0;
-        while (m.find()) {
-            getLines().add(str.substring(idx, m.end()));
-            idx = m.end();
-        }
-        
-        // Add last without new line
-        if (idx != str.length() - 1) {
-            getLines().add(str.substring(idx));
-        }
-    }
-    
-    private void resetFile() {
-        getLines().reset();
-        clearLineErrors();
-        library = false;
     }
     
     public void toggleDebug() {
-        debug = !debug;
-        System.out.println("Debug = " + debug);
-        System.out.println();
+        getCompilerStatus().toggleDebug();
     }
     
     public boolean isDebugging() {
-        return debug;
+        return getCompilerStatus().isDebugging();
     }
     
     public void togglePretty() {
-        pretty = !pretty;
-        System.out.println("Pretty = " + pretty);
-        System.out.println();
+        getCompilerStatus().togglePretty();
     }
     
     public boolean isPretty() {
-        return pretty;
+        return getCompilerStatus().isPretty();
     }
     
     public void setIsLibrary(boolean l) {
-        this.library = l;
+        getCompilerStatus().setIsLibrary(l);
     }
     
     public boolean isLibrary() {
-        return library;
+        return getCompilerStatus().isLibrary();
     }
     
     public void printCompileException(CompileException e) {
-        if (debug) e.printStackTrace();
-        else System.out.println("ERROR: " + e.getMessage());
-    }
-    
-    public void putLineError(CompileException e) {
-        ViewerBuilder.putLineError(e.getRow(), e.getTooltipMessage());
-    }
-    
-    public void clearLineErrors() {
-        ViewerBuilder.clearLineErrors();
-    }
-    
-    public int getRow() {
-        return getLines().getRow();
-    }
-    
-    public int getCol() {
-        return getLines().getCol();
-    }
-    
-    public void setLine(int row, int col) {
-        getLines().setLine(row, col);
-    }
-    
-    public void pushLine(int row, int col) {
-        getLines().pushLine(row, col);
-    }
-    
-    public void popLine() {
-        getLines().popLine();
-    }
-    
-    public String getLineStr() {
-        return getLines().getLineStr();
-    }
-    
-    public String getLineStr(int row) {
-        return getLines().getLineStr(row);
-    }
-    
-    public CodeLines getLines() {
-        return linesStack.peek();
-    }
-    
-    public void pushCodeLines() {
-        linesStack.add(new CodeLines());
-    }
-    
-    public void popCodeLines() {
-        linesStack.pop();
+        getCompilerStatus().printCompileException(e);
     }
     
     public static Main getInstance() {
@@ -392,7 +208,7 @@ public abstract class Main {
     
     public static void main(String[] args) {
         try {
-            instance = new KavaMain(new JSCommandFactory(), new BasicLexer(), EnumToken.class, EnumExpression.class);
+            instance = new KavaMain(new JSCommandFactory(), new BasicLexerFactory(), EnumToken.class, EnumExpression.class, new JSOutputBuilderFactory());
             
             String s;
             for (int i = 0; i < args.length; i++) {
@@ -412,11 +228,6 @@ public abstract class Main {
                     } else {
                         throw new IllegalArgumentException("No file name provided after `" + s + "`");
                     }
-                } else if (s.equals("--dir") || s.equals("-d")) {
-                    instance.setInputType(EnumInputType.DIR);
-                    if (i+1 < args.length && !args[i+1].startsWith("-")) {
-                        instance.setValue(DIR_KEY, args[++i]);
-                    }
                 } else {
                     throw new IllegalArgumentException("Illegal command line parameter `" + s + "`");
                 }
@@ -432,6 +243,6 @@ public abstract class Main {
     }
     
     public enum EnumInputType {
-        SHELL, GUI_FILE, FILE, DIR
+        SHELL, GUI_FILE, FILE
     }
 }

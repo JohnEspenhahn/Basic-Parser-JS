@@ -6,7 +6,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 import com.hahn.basic.definition.EnumToken;
-import com.hahn.basic.intermediate.Compiler;
+import com.hahn.basic.intermediate.CodeFile;
 import com.hahn.basic.intermediate.Frame;
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.FuncPointer;
@@ -37,6 +37,7 @@ public abstract class FuncHead extends Frame {
     /**
      * A function head defines a function header
      * 
+     * @param file The defining file
      * @param parent Containing frame
      * @param classIn Containing class
      * @param inName The name for this language
@@ -45,8 +46,8 @@ public abstract class FuncHead extends Frame {
      * @param rtn The return type of the function
      * @param params The parameters for the function
      */
-    public FuncHead(Frame parent, ClassType classIn, String inName, String outName, Node funcHeadNode, Type rtn, Param... params) {
-        super(parent, funcHeadNode, true); // TODO nest anon func
+    public FuncHead(CodeFile file, Frame parent, ClassType classIn, String inName, String outName, Node funcHeadNode, Type rtn, Param... params) {
+        super(file, parent, funcHeadNode, true); // TODO nest anon func
         
         if (outName != null) {
             this.funcId = outName;
@@ -67,7 +68,7 @@ public abstract class FuncHead extends Frame {
         for (int i = 0; i < params.length; i++) {
             Param p = params[i];
             
-            Var var = Compiler.factory.VarParameter(this, p.getName(), p.getType(), p.getFlags());
+            Var var = getFactory().VarParameter(this, p.getName(), p.getType(), p.getFlags());
             this.params[i] = var;
             this.isOptional[i] = false;
             
@@ -148,7 +149,7 @@ public abstract class FuncHead extends Frame {
         if (getClassIn() != null) {
             StructParam param = classIn.getParamSafe(name);
             if (param != null) { 
-                return Compiler.factory.VarAccess(this, getClassIn().getThis(), param, param.getType(), -1, -1);
+                return getFactory().VarAccess(this, getClassIn().getThis(), param, param.getType(), null, -1, -1);
             }
         }
         
@@ -243,7 +244,7 @@ public abstract class FuncHead extends Frame {
         
         int pIdx, tIdx;
         for (pIdx = 0, tIdx = 0; pIdx < params.length && tIdx < types.length; pIdx++) {
-            boolean match = (params[pIdx].getType().autocast(types[tIdx].getType(), -1, -1, false) != null);
+            boolean match = (params[pIdx].getType().autocast(types[tIdx].getType(), null, -1, -1, false) != null);
             if (match) {
                 tIdx += 1;
             } else if (isOptional[pIdx]) {

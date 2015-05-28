@@ -1,5 +1,6 @@
 package com.hahn.basic.intermediate.objects;
 
+import com.hahn.basic.intermediate.CodeFile;
 import com.hahn.basic.intermediate.Frame;
 import com.hahn.basic.intermediate.IIntermediate;
 import com.hahn.basic.intermediate.objects.types.StructType.StructParam;
@@ -19,10 +20,11 @@ public abstract class VarAccess extends BasicObject {
      * @param var The var to access
      * @param index The index of a property to access. Can be either a literal, another variable, or a struct param
      * @param type The type of the property at the given index
+     * @param file Containing file
      * @param row Row to throw error at
      * @param col Column to throw error at
      */
-    public VarAccess(Statement container, BasicObject var, BasicObject index, Type type, int row, int col) {
+    public VarAccess(Statement container, BasicObject var, BasicObject index, Type type, CodeFile file, int row, int col) {
         super(var.getName() + "[" + index.getName() + "]", type);
         
         this.var = var;
@@ -33,7 +35,7 @@ public abstract class VarAccess extends BasicObject {
         }
         
         if (getAccessedWithinVar().isVarSuper()) {
-            throw new CompileException("Only functions are accessable via the 'super' keyword", row, col);
+            throw new CompileException("Only functions are accessable via the 'super' keyword", file, row, col);
         }
     }
     
@@ -106,8 +108,8 @@ public abstract class VarAccess extends BasicObject {
         else return false;
     }
     
-    public boolean updateLiteral(OPCode op, Literal lit) {
-        if (accessed != null) return accessed.updateLiteral(op, lit);
+    public boolean updateLiteral(OPCode op, Literal lit, CodeFile file) {
+        if (accessed != null) return accessed.updateLiteral(op, lit, file);
         else return false;
     }
     

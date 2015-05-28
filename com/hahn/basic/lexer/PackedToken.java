@@ -1,6 +1,5 @@
 package com.hahn.basic.lexer;
 
-
 public class PackedToken {
     public final Enum<?> token;
     public final String value;

@@ -7,7 +7,6 @@ import java.util.ListIterator;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.hahn.basic.Main;
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.parser.Node;
 
@@ -99,7 +98,7 @@ public abstract class DefineVarStatement extends Statement {
     
     @Override
     public boolean reverseOptimize() {
-        Main.getInstance().setLine(row, -1);
+        getFile().pushCurrentLine(row);
         
         ListIterator<DefinePair> it = definepairs.listIterator(definepairs.size());
         while (it.hasPrevious()) {
@@ -110,7 +109,7 @@ public abstract class DefineVarStatement extends Statement {
             
             // Type check
             if (!ignoreTypeCheck) {
-                pair.val.getType().autocast(pair.var.getType(), pair.node.getRow(), pair.node.getCol(), true);
+                pair.val.getType().autocast(pair.var.getType(), getFile(), pair.node.getRow(), pair.node.getCol(), true);
             }
             
             pair.var.removeInUse();
@@ -121,7 +120,7 @@ public abstract class DefineVarStatement extends Statement {
     
     @Override
     public boolean forwardOptimize() {
-        Main.getInstance().setLine(row, -1);
+        getFile().pushCurrentLine(row);
         
         Iterator<DefinePair> it = definepairs.iterator();
         while (it.hasNext()) {

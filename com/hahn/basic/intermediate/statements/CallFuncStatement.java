@@ -2,7 +2,6 @@ package com.hahn.basic.intermediate.statements;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.hahn.basic.Main;
 import com.hahn.basic.intermediate.function.FuncHead;
 import com.hahn.basic.intermediate.objects.BasicObject;
 import com.hahn.basic.intermediate.objects.FuncCallPointer;
@@ -26,7 +25,7 @@ public abstract class CallFuncStatement extends Statement {
     
     @Override
     public final boolean reverseOptimize() {
-        Main.getInstance().setLine(row, -1);
+        getFile().pushCurrentLine(row);
         
     	if (shouldCallFunction()) {    	    
 		    funcCallPointer.setInUse(this);
@@ -40,7 +39,7 @@ public abstract class CallFuncStatement extends Statement {
     
     @Override
     public final boolean forwardOptimize() {
-        Main.getInstance().setLine(row, -1);
+        getFile().pushCurrentLine(row);
         funcCallPointer.takeRegister(this);
         
         return doForwardOptimize();

@@ -3,6 +3,7 @@ package com.hahn.basic.intermediate.library;
 import java.io.File;
 import java.io.FileNotFoundException;
 
+import com.hahn.basic.intermediate.CodeFile;
 import com.hahn.basic.intermediate.library.base.Library;
 
 public class CodeLibrary extends Library {
@@ -19,7 +20,7 @@ public class CodeLibrary extends Library {
     }
 
     @Override
-    public void define() {
+    public void define(CodeFile file) {
         // TODO Auto-generated method stub
         
     }

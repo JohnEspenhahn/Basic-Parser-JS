@@ -3,7 +3,7 @@ package com.hahn.basic.target;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-public interface OutputBuilder {
+public interface OutputBuilder {   
     String getStart();
     String getEnd();
     

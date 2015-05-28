@@ -69,9 +69,9 @@ public abstract class IfStatement extends Statement {
          * @param body EnumExpression.BLOCK
          */
         public Conditional(Frame parent, Node condition, Node body) {
-            this.outerFrame = new Frame(parent, null);
+            this.outerFrame = new Frame(parent.getFile(), parent, null);
             
-            this.innerFrame = new Frame(outerFrame, body);
+            this.innerFrame = new Frame(parent.getFile(), outerFrame, body);
             this.innerFrame.addTargetCode();
             
             if (condition != null) {

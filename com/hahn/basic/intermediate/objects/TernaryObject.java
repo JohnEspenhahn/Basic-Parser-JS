@@ -1,5 +1,6 @@
 package com.hahn.basic.intermediate.objects;
 
+import com.hahn.basic.intermediate.CodeFile;
 import com.hahn.basic.intermediate.IIntermediate;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.statements.Statement;
@@ -7,9 +8,11 @@ import com.hahn.basic.parser.Node;
 
 public abstract class TernaryObject extends BasicObject {
     private BasicObject conditional, then_obj, else_obj;
+    
+    private CodeFile file;
     private int row, col;
     
-    public TernaryObject(Statement container, BasicObject condition, Node node_then, Node node_else, int row, int col) {
+    public TernaryObject(Statement container, BasicObject condition, Node node_then, Node node_else, CodeFile file, int row, int col) {
         super("?:", Type.UNDEFINED);
         
         this.conditional = condition;
@@ -17,6 +20,7 @@ public abstract class TernaryObject extends BasicObject {
         this.then_obj = container.getFrame().handleNextExpressionChildObject(node_then, null);
         this.else_obj = container.getFrame().handleNextExpressionChildObject(node_else, null);
         
+        this.file = file;
         this.row = row;
         this.col = col;
     }
@@ -50,7 +54,7 @@ public abstract class TernaryObject extends BasicObject {
         getConditional().setInUse(this);
         
         // Type pair for then and else
-        setType(Type.merge(getThen().getType(), getElse().getType(), row, col, true));
+        setType(Type.merge(getThen().getType(), getElse().getType(), file, row, col, true));
         
         return super.setInUse(by);
     }

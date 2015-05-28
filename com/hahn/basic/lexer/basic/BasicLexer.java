@@ -4,10 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
-
 import com.hahn.basic.definition.EnumToken;
-import com.hahn.basic.intermediate.CodeLines;
+import com.hahn.basic.intermediate.CodeFile;
 import com.hahn.basic.lexer.ILexer;
 import com.hahn.basic.lexer.PackedToken;
 import com.hahn.basic.util.exceptions.LexException;
@@ -24,32 +22,25 @@ import com.hahn.basic.util.exceptions.LexException;
  * 
  */
 public class BasicLexer implements ILexer {    
-    private int row, index, matchStart, rowStart;
     private final List<PackedToken> stream;
+    private final CodeFile file;
     
+    private int row, index, matchStart, rowStart;    
     private String line;
     
     /**
      * Create a new lexer with static definition for the BASIC language
      */
-    public BasicLexer() {
-        stream = new ArrayList<PackedToken>();
+    public BasicLexer(CodeFile file) {
+        this.file = file;
+        this.stream = new ArrayList<PackedToken>();
     }
     
     @Override
-    public void reset() {
-        this.row = 0;
-        this.index = 0;
-        this.rowStart = 0;
-        this.matchStart = 0;
-        this.stream.clear();
-    }
-    
-    @Override
-    public List<PackedToken> lex(CodeLines input) {
+    public List<PackedToken> lex() throws LexException {
         stream.clear();
         
-        line = StringUtils.join(input.getLines(), "");
+        line = file.getFullText();
         
         row = 1;
         index = 0;
@@ -124,7 +115,7 @@ public class BasicLexer implements ILexer {
         
         index += 1;        
         char c = getChar();
-        if (c != '/') throw new LexException(getRow(), getColumn());
+        if (c != '/') throw new LexException(file, getRow(), getColumn());
         
         while (c != '\n') {
             index += 1;
@@ -175,7 +166,7 @@ public class BasicLexer implements ILexer {
         
         if (c == '.') {
             if (!hex) matchDouble(startIdx);
-            else throw new LexException(getRow(), getColumn());
+            else throw new LexException(file, getRow(), getColumn());
         } else if (!hex && (c == 'x' || c == 'X')) {
             matchNumber(startIdx, true);
         } else {
@@ -193,7 +184,7 @@ public class BasicLexer implements ILexer {
         } while (index < line.length() && isNumeric(c = getChar()));
         
         if (c == '.') {
-            throw new LexException(getRow(), getColumn());
+            throw new LexException(file, getRow(), getColumn());
         } else {
             String match = getMatch();
             stream.add(new PackedToken(EnumToken.REAL, match, startIdx, getRow(), getColumn(startIdx)));
@@ -210,7 +201,7 @@ public class BasicLexer implements ILexer {
         
         index += 1;
         if (index >= line.length() || getChar() != '\'') {
-            throw new LexException(getRow(), getColumn());
+            throw new LexException(file, getRow(), getColumn());
         } else {
             String match = getMatch();
             stream.add(new PackedToken(EnumToken.CHAR, match, startIdx, getRow(), getColumn(startIdx)));
@@ -227,7 +218,7 @@ public class BasicLexer implements ILexer {
         } while (index < line.length() && (c = getChar()) != '"');
         
         if (c != '"') {
-            throw new LexException(getRow(), getColumn());
+            throw new LexException(file, getRow(), getColumn());
         } else {
             index += 1;
             
@@ -258,7 +249,7 @@ public class BasicLexer implements ILexer {
         } while (index > startIdx);
         
         // No match
-        throw new LexException(getRow(), getColumn(startIdx));
+        throw new LexException(file, getRow(), getColumn(startIdx));
     }
     
     private void matchSeparator() {
@@ -274,7 +265,7 @@ public class BasicLexer implements ILexer {
         }
         
         // No match
-        throw new LexException(getRow(), getColumn(startIdx));
+        throw new LexException(file, getRow(), getColumn(startIdx));
     }
     
     private void matchOther() {

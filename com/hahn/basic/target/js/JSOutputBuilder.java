@@ -15,10 +15,8 @@ public class JSOutputBuilder implements OutputBuilder {
     
 	private StringBuilder builder;
 
-	public JSOutputBuilder() {
+	public JSOutputBuilder(Compiler compiler) {
 		builder = new StringBuilder();
-		
-		Compiler.addLibrary(null, "kava.language.JS");
 	}
 	
 	@Override

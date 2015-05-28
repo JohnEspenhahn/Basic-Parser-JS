@@ -4,8 +4,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.hahn.basic.intermediate.CodeFile;
 import com.hahn.basic.intermediate.Frame;
-import com.hahn.basic.intermediate.Compiler;
 import com.hahn.basic.intermediate.objects.Param;
 import com.hahn.basic.intermediate.objects.types.ClassType;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
@@ -26,8 +26,8 @@ public class FuncBridge {
         return funcs.values();
     }
     
-    public FuncHead defineFunc(Frame parent, boolean override, Node head, String inName, String outName, Type rtnType, Param... params) {
-        FuncHead func = Compiler.factory.FuncHead(parent, classType, inName, outName, head, rtnType, params);
+    public FuncHead defineFunc(CodeFile file, Frame parent, boolean override, Node head, String inName, String outName, Type rtnType, Param... params) {
+        FuncHead func = file.getFactory().FuncHead(file, parent, classType, inName, outName, head, rtnType, params);
         
         FuncGroup group = funcs.get(inName);
         if (group == null) {
@@ -36,7 +36,7 @@ public class FuncBridge {
             
             return func;
         } else if (!override && group.isDefined(func)) {
-            throw new CompileException("The function `" + func.getName() + "` with those parameters is already defined");
+            throw new CompileException("The function `" + func.getName() + "` with those parameters is already defined", file);
         } else {
             if (override) group.removeAllMatch(func);
             

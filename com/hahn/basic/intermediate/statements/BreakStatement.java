@@ -6,8 +6,8 @@ import com.hahn.basic.util.exceptions.CompileException;
 public abstract class BreakStatement extends Statement {
     private Frame loop;
     
-    public BreakStatement(Statement s) {
-        super(s);
+    public BreakStatement(Statement container) {
+        super(container);
         
         loop = getFrame().getLoop();
         if (loop == null) {
