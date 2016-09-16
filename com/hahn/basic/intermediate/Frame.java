@@ -599,9 +599,14 @@ public class Frame extends Statement {
                     break;
                 }
                 
-                @SuppressWarnings("unchecked")
-                ParameterizedType<ITypeable> arrType = (ParameterizedType<ITypeable>) type;
-                exp.setObj(getFactory().VarAccess(exp, exp.getObj(), offset, arrType.getTypable(0).getType(), child.getFile(), child.getRow(), child.getCol()), child);
+                Type innerType = Type.OBJECT;
+                if (type instanceof ParameterizedType) {
+                	@SuppressWarnings("unchecked")
+                    ParameterizedType<ITypeable> arrType = (ParameterizedType<ITypeable>) type;
+                	innerType = arrType.getTypable(0).getType();
+                }                
+                
+                exp.setObj(getFactory().VarAccess(exp, exp.getObj(), offset, innerType, child.getFile(), child.getRow(), child.getCol()), child);
             } else if (accessMarker == DOT && type.doesExtend(Type.STRUCT)) {               
                 Node nameNode = it.next();
                 Node prthNode = (it.hasNext() ? it.next() : null);

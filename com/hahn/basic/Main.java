@@ -15,6 +15,7 @@ import com.hahn.basic.definition.EnumToken;
 import com.hahn.basic.intermediate.CompilerStatus;
 import com.hahn.basic.lexer.basic.BasicLexerFactory;
 import com.hahn.basic.target.CommandFactory;
+import com.hahn.basic.target.OutputBuilderFactory;
 import com.hahn.basic.target.js.JSCommandFactory;
 import com.hahn.basic.target.js.JSOutputBuilderFactory;
 import com.hahn.basic.util.exceptions.CompileException;
@@ -44,7 +45,7 @@ public abstract class Main {
     /**
      * Compile the inputed code
      */
-    public abstract void handleInput(String input);
+    public abstract String handleInput(String input);
     
     public void setInputType(EnumInputType type) {
         if (this.inputType == null) this.inputType = type;
@@ -137,7 +138,8 @@ public abstract class Main {
                 break;
             } else {
                 try {               
-                    handleInput(input);
+                    String output = handleInput(input);
+                    System.out.println(output);
                 } catch (CompileException e) {
                     printCompileException(e);
                 } catch (Exception e) {
@@ -203,13 +205,22 @@ public abstract class Main {
         getCompilerStatus().printCompileException(e);
     }
     
+    public static void forceNewInstance(OutputBuilderFactory out) {
+    	System.out.println("WARNING: Forcing new instance (hopefully for testing)");
+    	Main.instance = new KavaMain(new JSCommandFactory(), new BasicLexerFactory(), EnumToken.class, EnumExpression.class, out);
+    }
+    
     public static Main getInstance() {
-        return instance;
+    	if (Main.instance == null) {
+    		Main.instance = new KavaMain(new JSCommandFactory(), new BasicLexerFactory(), EnumToken.class, EnumExpression.class, new JSOutputBuilderFactory());
+    	}
+    	
+        return Main.instance;
     }
     
     public static void main(String[] args) {
         try {
-            instance = new KavaMain(new JSCommandFactory(), new BasicLexerFactory(), EnumToken.class, EnumExpression.class, new JSOutputBuilderFactory());
+            Main instance = Main.getInstance();
             
             String s;
             for (int i = 0; i < args.length; i++) {

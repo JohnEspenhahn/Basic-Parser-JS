@@ -53,7 +53,7 @@ public abstract class Array extends BasicObject implements IArray {
     
     @Override
     public boolean setInUse(IIntermediate by) {
-        Type baseType = null;
+		Type baseType = null;
         
         ListIterator<IBasicObject> it = getValues().listIterator(getValues().size());
         while (it.hasPrevious()) {
@@ -63,6 +63,9 @@ public abstract class Array extends BasicObject implements IArray {
             if (baseType == null) baseType = obj.getType();
             else baseType = baseType.getCommonType(obj.getType());
         }
+        
+        // Empty array initializer
+        if (baseType == null) baseType = Type.UNDEFINED;
         
         int dimensions = 1;
         if (baseType.doesExtend(Type.ARRAY) && baseType instanceof ParameterizedType) {

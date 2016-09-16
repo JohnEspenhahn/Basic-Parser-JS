@@ -100,6 +100,8 @@ public class Type implements ITypeable {
     public int getExtendDepth(Type t) {
         if (this == Type.UNDEFINED || t == Type.UNDEFINED || this.equals(t)) {
             return 0;
+        } else if (t == Type.OBJECT) {
+        	return 1;
         } else {
             return -1;
         }

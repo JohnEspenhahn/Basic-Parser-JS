@@ -22,6 +22,8 @@ import com.hahn.basic.util.TypeUtils;
 import com.hahn.basic.util.exceptions.CompileException;
 import com.hahn.basic.util.structures.BitFlag;
 
+import lombok.NonNull;
+
 public class ClassType extends StructType implements IClassType {
     private final Frame containingFrame;
     
@@ -34,7 +36,7 @@ public class ClassType extends StructType implements IClassType {
     private final ClassObject classObj;    
     private Var varThis, varImpliedThis, varSuper;
     
-    public ClassType(Frame containingFrame, String name, StructType parent, int flags, boolean isAbstract) {
+    protected ClassType(Frame containingFrame, String name, @NonNull StructType parent, int flags, boolean isAbstract) {
         super(containingFrame.getFile(), name, parent, flags, isAbstract);
         
         if (name == null) throw new IllegalArgumentException();

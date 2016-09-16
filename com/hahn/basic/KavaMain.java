@@ -55,12 +55,12 @@ public class KavaMain extends Main {
     }
     
     @Override
-    public void handleInput(String input) {
+    public String handleInput(String input) {
         compiler = new Compiler(factory, lexerFactory, tokens, expressions, outputFactory, status);
         CodeFile file = compiler.compile(input);
-        
-        System.out.println(file);
+
         if (getInputFile() != null) writeToFile(file.getOutputBuilder());
+        return file.toString();
     }
     
     private void writeToFile(OutputBuilder code) {

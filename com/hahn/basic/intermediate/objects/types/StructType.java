@@ -95,9 +95,7 @@ public class StructType extends Type {
     @Override
     public Type getCommonType(Type other) {
         if (!(other instanceof StructType)) {
-            if (this.doesExtend(other)) return other;
-            else if (other.doesExtend(this)) return this;
-            else return Type.OBJECT;
+            return super.getCommonType(other);
         }
         
         Iterator<StructType> thisExtended  = this.getExtended().iterator();        
