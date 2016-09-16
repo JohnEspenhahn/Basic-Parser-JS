@@ -25,7 +25,7 @@ public class VarSuper extends Var {
     }
     
     @Override
-    public BasicObject castTo(Type type, CodeFile file, int row, int col) {
+    public IBasicObject castTo(Type type, CodeFile file, int row, int col) {
         throw new CompileException("Cannot cast `super`", file, row, col);
     }
 }

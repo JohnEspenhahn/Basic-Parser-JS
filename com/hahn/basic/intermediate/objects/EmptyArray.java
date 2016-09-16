@@ -13,7 +13,7 @@ import com.hahn.basic.util.exceptions.CompileException;
 
 public abstract class EmptyArray extends BasicObject implements IArray {
     private Node node;
-    private List<BasicObject> dimensionSizes;
+    private List<IBasicObject> dimensionSizes;
     
     /**
      * Create an empty array defined at node `node` of type `type` (where `type` extends Array)
@@ -22,7 +22,7 @@ public abstract class EmptyArray extends BasicObject implements IArray {
      * @param dimensionSizes Contain information about the size of the dimensions
      * @throws IllegalArgumentException If type does not extend Array
      */
-    public EmptyArray(Node node, ParameterizedType<Type> type, List<BasicObject> dimensionSizes) {
+    public EmptyArray(Node node, ParameterizedType<Type> type, List<IBasicObject> dimensionSizes) {
         super(type.toString(), type);
         
         if (!type.doesExtend(Type.ARRAY)) throw new IllegalArgumentException();
@@ -35,7 +35,7 @@ public abstract class EmptyArray extends BasicObject implements IArray {
         return node;
     }
     
-    public List<BasicObject> getDimensionSizes() {
+    public List<IBasicObject> getDimensionSizes() {
         return dimensionSizes;
     }
     
@@ -63,9 +63,9 @@ public abstract class EmptyArray extends BasicObject implements IArray {
     @Override
     public boolean setInUse(IIntermediate by) {
         int dimension = getDimensionSizes().size();
-        ListIterator<BasicObject> it = getDimensionSizes().listIterator(dimension);
+        ListIterator<IBasicObject> it = getDimensionSizes().listIterator(dimension);
         while (it.hasPrevious()) {
-            BasicObject obj = it.previous();
+            IBasicObject obj = it.previous();
             obj.setInUse(this);
             
             if (!obj.getType().doesExtend(Type.REAL)) {
@@ -80,7 +80,7 @@ public abstract class EmptyArray extends BasicObject implements IArray {
     
     @Override
     public void takeRegister(IIntermediate by) {
-        Iterator<BasicObject> it = getDimensionSizes().iterator();
+        Iterator<IBasicObject> it = getDimensionSizes().iterator();
         while (it.hasNext()) {
             it.next().takeRegister(this);
         }

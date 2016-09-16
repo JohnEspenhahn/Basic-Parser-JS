@@ -1,20 +1,20 @@
 package com.hahn.basic.intermediate.statements;
 
 import com.hahn.basic.intermediate.CodeFile;
-import com.hahn.basic.intermediate.objects.BasicObject;
+import com.hahn.basic.intermediate.objects.IBasicObject;
 import com.hahn.basic.intermediate.objects.ExpressionObject;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.parser.Node;
 
 public abstract class ExpressionStatement extends Statement {
-    private BasicObject obj;
+    private IBasicObject obj;
     private Node node;
     
     private boolean forcedGroup;
     
     private boolean gotAsObject;
     
-    public ExpressionStatement(Statement continer, BasicObject obj) {
+    public ExpressionStatement(Statement continer, IBasicObject obj) {
         super(continer);
         
         this.obj = obj;        
@@ -38,7 +38,7 @@ public abstract class ExpressionStatement extends Statement {
         return forcedGroup || getObj().isGrouped();
     }
     
-    public BasicObject getObj() {
+    public IBasicObject getObj() {
         return obj;
     }
     
@@ -46,7 +46,7 @@ public abstract class ExpressionStatement extends Statement {
         setObj(otherExp.getAsExpObj(), node);
     }
     
-    public void setObj(BasicObject obj, Node node) {
+    public void setObj(IBasicObject obj, Node node) {
         enforce();
         
         this.obj = obj;

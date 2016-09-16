@@ -1,14 +1,14 @@
 package com.hahn.basic.target.js.statements;
 
 import com.hahn.basic.intermediate.function.FuncHead;
-import com.hahn.basic.intermediate.objects.BasicObject;
+import com.hahn.basic.intermediate.objects.IBasicObject;
 import com.hahn.basic.intermediate.statements.ReturnStatement;
 import com.hahn.basic.intermediate.statements.Statement;
 import com.hahn.basic.target.js.JSPretty;
 
 public class JSReturnStatement extends ReturnStatement {
     
-    public JSReturnStatement(Statement container, FuncHead returnFrom, BasicObject result) {
+    public JSReturnStatement(Statement container, FuncHead returnFrom, IBasicObject result) {
         super(container, returnFrom, result);
     }
     

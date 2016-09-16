@@ -4,9 +4,9 @@ import com.hahn.basic.intermediate.function.FuncHead;
 
 public class FuncCallPair {
     private final FuncHead func;
-    private final BasicObject objectIn;
+    private final IBasicObject objectIn;
     
-    public FuncCallPair(FuncHead func, BasicObject objIn) {
+    public FuncCallPair(FuncHead func, IBasicObject objIn) {
         this.func = func;
         this.objectIn = objIn;
     }
@@ -15,7 +15,7 @@ public class FuncCallPair {
         return func;
     }
     
-    public BasicObject getObjectIn() {
+    public IBasicObject getObjectIn() {
         return objectIn;
     }
 }

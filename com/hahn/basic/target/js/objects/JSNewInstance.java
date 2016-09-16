@@ -3,7 +3,7 @@ package com.hahn.basic.target.js.objects;
 import java.util.List;
 
 import com.hahn.basic.definition.EnumToken;
-import com.hahn.basic.intermediate.objects.BasicObject;
+import com.hahn.basic.intermediate.objects.IBasicObject;
 import com.hahn.basic.intermediate.objects.NewInstance;
 import com.hahn.basic.intermediate.objects.types.ClassType;
 import com.hahn.basic.intermediate.objects.types.Type;
@@ -12,7 +12,7 @@ import com.hahn.basic.util.CompilerUtils;
 
 public class JSNewInstance extends NewInstance {
     
-    public JSNewInstance(Type type, Node typeNode, List<BasicObject> params) {
+    public JSNewInstance(Type type, Node typeNode, List<IBasicObject> params) {
         super(type, typeNode, params);
     }
     

@@ -11,8 +11,8 @@ import com.hahn.basic.util.exceptions.CompileException;
 import com.hahn.basic.util.structures.BitFlag;
 
 public abstract class VarAccess extends BasicObject {
-    private final BasicObject var, index;
-    private BasicObject accessed;
+    private final IBasicObject var, index;
+    private IBasicObject accessed;
     
     /**
      * Access a property of a var at a given index
@@ -24,7 +24,7 @@ public abstract class VarAccess extends BasicObject {
      * @param row Row to throw error at
      * @param col Column to throw error at
      */
-    public VarAccess(Statement container, BasicObject var, BasicObject index, Type type, CodeFile file, int row, int col) {
+    public VarAccess(Statement container, IBasicObject var, IBasicObject index, Type type, CodeFile file, int row, int col) {
         super(var.getName() + "[" + index.getName() + "]", type);
         
         this.var = var;
@@ -40,12 +40,12 @@ public abstract class VarAccess extends BasicObject {
     }
     
     @Override
-    public BasicObject getAccessedWithinVar() {
+    public IBasicObject getAccessedWithinVar() {
         return var;
     }
     
     @Override
-    public BasicObject getAccessedAtIdx() {
+    public IBasicObject getAccessedAtIdx() {
         return index;
     }
     
@@ -54,7 +54,7 @@ public abstract class VarAccess extends BasicObject {
      * @return The actual object being accessed, or null if it cannot be determined
      */
     @Override
-    public final BasicObject getAccessedObject() {
+    public final IBasicObject getAccessedObject() {
         return accessed;
     }
     

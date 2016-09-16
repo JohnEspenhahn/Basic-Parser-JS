@@ -1,13 +1,13 @@
 package com.hahn.basic.intermediate.statements;
 
 import com.hahn.basic.intermediate.function.FuncHead;
-import com.hahn.basic.intermediate.objects.BasicObject;
+import com.hahn.basic.intermediate.objects.IBasicObject;
 
 public abstract class ReturnStatement extends Statement {
 	private FuncHead func;
-	private BasicObject result;
+	private IBasicObject result;
     
-    public ReturnStatement(Statement container, FuncHead returnFrom, BasicObject result) {
+    public ReturnStatement(Statement container, FuncHead returnFrom, IBasicObject result) {
         super(container);
         
         this.func = returnFrom;
@@ -18,7 +18,7 @@ public abstract class ReturnStatement extends Statement {
     	return func;
     }
     
-    public BasicObject getResult() {
+    public IBasicObject getResult() {
     	return result;
     }
     

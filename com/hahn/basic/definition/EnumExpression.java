@@ -3,6 +3,7 @@ package com.hahn.basic.definition;
 import com.hahn.basic.parser.IEnumExpression;
 import com.hahn.basic.viewer.util.TextColor;
 
+// This syntax is explained more in the com.hahn.basic.definition Expression-Parser README.txt
 public enum EnumExpression implements IEnumExpression {   
     STMT_EXPRS  ("<CREATE_ARR>|<CREATE_EARR>|<CREATE>|<CALL_FUNC>|<MODIFY>|<ACCESS>", false),
     FACTOR      ("<STMT_EXPRS>|<CAST>|<ANON_FUNC>|<FUNC_POINTER>|NULL|CHAR|HEX_INT|REAL|TRUE|FALSE|OPEN_PRNTH<EXPRESSION>CLOSE_PRNTH"),

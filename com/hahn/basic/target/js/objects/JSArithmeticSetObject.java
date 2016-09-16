@@ -1,7 +1,7 @@
 package com.hahn.basic.target.js.objects;
 
 import com.hahn.basic.intermediate.objects.ArithmeticSetObject;
-import com.hahn.basic.intermediate.objects.BasicObject;
+import com.hahn.basic.intermediate.objects.IBasicObject;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.opcode.OPCode;
 import com.hahn.basic.intermediate.statements.Statement;
@@ -10,7 +10,7 @@ import com.hahn.basic.target.js.JSPretty;
 
 public class JSArithmeticSetObject extends ArithmeticSetObject {
     
-    public JSArithmeticSetObject(Statement container, OPCode op, BasicObject p1, Node p1Node, BasicObject p2, Node p2Node) {
+    public JSArithmeticSetObject(Statement container, OPCode op, IBasicObject p1, Node p1Node, IBasicObject p2, Node p2Node) {
         super(container, op, p1, p1Node, p2, p2Node);
     }
     
@@ -19,8 +19,8 @@ public class JSArithmeticSetObject extends ArithmeticSetObject {
         // XXX Special condition for updating indexed value of an array
         if (getP1().getAccessedWithinVar() != null && getP1().getAccessedAtIdx() != null 
                 && getP1().getAccessedWithinVar().getType().doesExtend(Type.ARRAY)) {
-            BasicObject arr = getP1().getAccessedWithinVar();
-            BasicObject idx = getP1().getAccessedAtIdx();
+            IBasicObject arr = getP1().getAccessedWithinVar();
+            IBasicObject idx = getP1().getAccessedAtIdx();
             String action = null;
             switch (getOP()) {
             case SET:

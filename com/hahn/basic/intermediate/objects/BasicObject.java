@@ -1,18 +1,15 @@
 package com.hahn.basic.intermediate.objects;
 
-import lombok.NonNull;
-
 import com.hahn.basic.intermediate.CodeFile;
 import com.hahn.basic.intermediate.Frame;
 import com.hahn.basic.intermediate.IIntermediate;
-import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.opcode.OPCode;
-import com.hahn.basic.intermediate.statements.ExpressionStatement;
-import com.hahn.basic.intermediate.statements.Statement;
 import com.hahn.basic.util.structures.BitFlag;
 
-public abstract class BasicObject implements IIntermediate, ITypeable {
+import lombok.NonNull;
+
+public abstract class BasicObject extends RawObject {
     private String name;
     private Type type;
     
@@ -70,16 +67,6 @@ public abstract class BasicObject implements IIntermediate, ITypeable {
      */
     public int getFlags() {
         return 0;
-    }
-
-    /**
-     * @param type The type to cast to
-     * @row Row to throw error at
-     * @col Column to throw error at
-     * @return A new, altered version of this
-     */
-    public BasicObject castTo(Type type, CodeFile file, int row, int col) {
-        return file.getFactory().CastedObject(this, getType().castTo(type, file, row, col), file, row, col);
     }
     
     
@@ -276,14 +263,14 @@ public abstract class BasicObject implements IIntermediate, ITypeable {
     /**
      * @return The creatable version of this
      */
-    public BasicObject getForCreateVar() {
+    public IBasicObject getForCreateVar() {
         return this;
     }
     
     /**
      * @return The reference to the variable actually being accessed
      */
-    public BasicObject getAccessedObject() {
+    public IBasicObject getAccessedObject() {
         return this;
     }
     
@@ -291,7 +278,7 @@ public abstract class BasicObject implements IIntermediate, ITypeable {
      * Used by VarAccess
      * @return The var being accessed within
      */
-    public BasicObject getAccessedWithinVar() {
+    public IBasicObject getAccessedWithinVar() {
         return null;
     }
     
@@ -299,17 +286,8 @@ public abstract class BasicObject implements IIntermediate, ITypeable {
      * Used by VarAccess
      * @return The index of the variable being accessed within getVar()
      */
-    public BasicObject getAccessedAtIdx() {
+    public IBasicObject getAccessedAtIdx() {
         return null;
-    }
-    
-    /**
-     * Get as an expression
-     * @param container The container of the expression
-     * @return ExpressionStatement
-     */
-    public final ExpressionStatement getAsExp(Statement container) {
-        return container.getFactory().ExpressionStatement(container, this);
     }
     
     @Override

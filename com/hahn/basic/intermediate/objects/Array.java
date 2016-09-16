@@ -11,20 +11,20 @@ import com.hahn.basic.intermediate.objects.types.Type;
 
 public abstract class Array extends BasicObject implements IArray {
     
-    private List<BasicObject> values;
+    private List<IBasicObject> values;
     
     /**
      * Create an array with default values `values`
      * @param values The values for the dimensions
      * @throws IllegalArgumentException If type does not extend Array
      */
-    public Array(List<BasicObject> values) {
+    public Array(List<IBasicObject> values) {
         super("[...]", IArray.toArrayType(Type.OBJECT, 1));
         
         this.values = values;
     }
     
-    public List<BasicObject> getValues() {
+    public List<IBasicObject> getValues() {
         return values;
     }
     
@@ -55,9 +55,9 @@ public abstract class Array extends BasicObject implements IArray {
     public boolean setInUse(IIntermediate by) {
         Type baseType = null;
         
-        ListIterator<BasicObject> it = getValues().listIterator(getValues().size());
+        ListIterator<IBasicObject> it = getValues().listIterator(getValues().size());
         while (it.hasPrevious()) {
-            BasicObject obj = it.previous();
+            IBasicObject obj = it.previous();
             obj.setInUse(this);
             
             if (baseType == null) baseType = obj.getType();
@@ -79,7 +79,7 @@ public abstract class Array extends BasicObject implements IArray {
     
     @Override
     public void takeRegister(IIntermediate by) {
-        Iterator<BasicObject> it = getValues().iterator();
+        Iterator<IBasicObject> it = getValues().iterator();
         while (it.hasNext()) {
             it.next().takeRegister(this);
         }

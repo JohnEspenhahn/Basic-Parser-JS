@@ -73,7 +73,7 @@ public class KavaMain extends Main {
             
             os = new FileOutputStream(targ);
             
-            code.writeRunnableTo(os);
+            code.writeRunnableTo(os, ENCODING);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

@@ -7,7 +7,7 @@ import com.hahn.basic.parser.Node;
 
 public class PostfixOPObject extends OPObject {
     
-    public PostfixOPObject(Statement container, OPCode op, BasicObject p, Node pNode) {
+    public PostfixOPObject(Statement container, OPCode op, IBasicObject p, Node pNode) {
         super(container, op, p, pNode, null, null);
     }
     
@@ -20,7 +20,7 @@ public class PostfixOPObject extends OPObject {
         return false;
     }
     
-    public BasicObject getParam() {
+    public IBasicObject getParam() {
         return getP1();
     }
     

@@ -10,7 +10,8 @@ import com.hahn.basic.parser.Node;
 import com.hahn.basic.target.CommandFactory;
 import com.hahn.basic.target.js.JSPretty;
 import com.hahn.basic.util.exceptions.CompileException;
-import com.sun.istack.internal.Nullable;
+
+import lombok.NonNull;
 
 /**
  * An object that performs an operation on one or two parameters
@@ -22,11 +23,11 @@ public class OPObject extends BasicObject implements IFileObject {
     private OPCode opcode;
     
     private Node p1Node;
-    private BasicObject p1;
+    private IBasicObject p1;
     private boolean isLiteral;
     
     private Node p2Node;
-    private BasicObject p2;
+    private IBasicObject p2;
     
     /**
      * Create a new operation object
@@ -37,7 +38,7 @@ public class OPObject extends BasicObject implements IFileObject {
      * @param p2 The nullable second parameter
      * @param p2Node Used when throwing errors related to p2
      */
-    public OPObject(Statement container, OPCode op, BasicObject p1, Node p1Node, @Nullable BasicObject p2, @Nullable Node p2Node) {
+    public OPObject(Statement container, OPCode op, @NonNull IBasicObject p1, Node p1Node, IBasicObject p2, Node p2Node) {
         super("@" + op + "@", p1.getType());
         
         this.isLiteral = false;
@@ -105,7 +106,7 @@ public class OPObject extends BasicObject implements IFileObject {
         return getFile().getFactory();
     }
     
-    public BasicObject getP1() {
+    public IBasicObject getP1() {
         return p1;
     }
     
@@ -113,7 +114,7 @@ public class OPObject extends BasicObject implements IFileObject {
         return p1Node;
     }
     
-    public BasicObject getP2() {
+    public IBasicObject getP2() {
         return p2;
     }
     

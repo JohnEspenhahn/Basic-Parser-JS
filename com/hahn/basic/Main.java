@@ -1,15 +1,14 @@
 package com.hahn.basic;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
 import javax.swing.JFileChooser;
-
-import sun.misc.IOUtils;
 
 import com.hahn.basic.definition.EnumExpression;
 import com.hahn.basic.definition.EnumToken;
@@ -21,6 +20,8 @@ import com.hahn.basic.target.js.JSOutputBuilderFactory;
 import com.hahn.basic.util.exceptions.CompileException;
 
 public abstract class Main {
+	public static final String ENCODING = "UTF-8";
+	
     private static Main instance;
     private static final String FILE_KEY = "file";
         
@@ -164,7 +165,7 @@ public abstract class Main {
         this.inputFile = file;
         
         try {
-            handleInput(new String(IOUtils.readFully(new FileInputStream(file), -1, true)));
+            handleInput(new String(Files.readAllBytes(Paths.get(file.toURI())), ENCODING));
         } catch (CompileException e) {
             printCompileException(e);
         } catch (FileNotFoundException e) {

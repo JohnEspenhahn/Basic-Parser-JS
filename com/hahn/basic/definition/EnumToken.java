@@ -6,6 +6,7 @@ import java.util.List;
 import com.hahn.basic.lexer.regex.IEnumRegexToken;
 import com.hahn.basic.viewer.util.TextColor;
 
+// This syntax is explained more in the com.hahn.basic.definition Token-Lexer README.txt
 public enum EnumToken implements IEnumRegexToken {
     STRING      ("\".*?[^\\\\]\""           , Group.LIT),
     HEX_INT     ("0x[0-9A-Fa-f]+"           , Group.LIT),

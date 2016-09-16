@@ -7,12 +7,12 @@ import com.hahn.basic.intermediate.statements.Statement;
 import com.hahn.basic.parser.Node;
 
 public abstract class TernaryObject extends BasicObject {
-    private BasicObject conditional, then_obj, else_obj;
+    private IBasicObject conditional, then_obj, else_obj;
     
     private CodeFile file;
     private int row, col;
     
-    public TernaryObject(Statement container, BasicObject condition, Node node_then, Node node_else, CodeFile file, int row, int col) {
+    public TernaryObject(Statement container, IBasicObject condition, Node node_then, Node node_else, CodeFile file, int row, int col) {
         super("?:", Type.UNDEFINED);
         
         this.conditional = condition;
@@ -25,19 +25,19 @@ public abstract class TernaryObject extends BasicObject {
         this.col = col;
     }
     
-    public BasicObject getConditional() {
+    public IBasicObject getConditional() {
         return conditional;
     }
     
-    public BasicObject getThen() {
+    public IBasicObject getThen() {
         return then_obj;
     }
     
-    public BasicObject getElse() {
+    public IBasicObject getElse() {
         return else_obj;
     }
     
-    protected boolean doGroup(BasicObject obj) {
+    protected boolean doGroup(IBasicObject obj) {
         return obj.isGrouped() || obj.isTernary();
     }
     

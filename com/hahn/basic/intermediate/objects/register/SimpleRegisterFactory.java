@@ -5,7 +5,7 @@ import java.util.Deque;
 
 import com.hahn.basic.intermediate.Frame;
 import com.hahn.basic.intermediate.objects.AdvancedObject;
-import com.hahn.basic.intermediate.objects.BasicObject;
+import com.hahn.basic.intermediate.objects.IBasicObject;
 
 public class SimpleRegisterFactory {  
     private final Deque<SimpleRegister> free;
@@ -37,7 +37,7 @@ public class SimpleRegisterFactory {
     }
     
     protected SimpleRegister getNextFree(Frame frame) {
-        BasicObject testVar = null;
+        IBasicObject testVar = null;
         
         SimpleRegister first = null, reg;
         if (free.size() > 0) reg = first = free.removeLast();

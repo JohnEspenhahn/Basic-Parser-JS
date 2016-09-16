@@ -25,7 +25,7 @@ public class Type implements ITypeable {
     public static Type VOID, BOOL, REAL, REALSTR, UNDEFINED, NULL;
     
     public static StructType STRUCT;
-    public static ClassType OBJECT,FUNCTION, ARRAY, STRING;
+    public static ClassType OBJECT, FUNCTION, ARRAY, STRING;
     
     public static int COUNT_PRIMATIVES;
     

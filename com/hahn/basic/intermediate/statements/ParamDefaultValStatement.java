@@ -1,7 +1,7 @@
 package com.hahn.basic.intermediate.statements;
 
 import com.hahn.basic.intermediate.function.FuncHead;
-import com.hahn.basic.intermediate.objects.BasicObject;
+import com.hahn.basic.intermediate.objects.IBasicObject;
 import com.hahn.basic.parser.Node;
 
 public abstract class ParamDefaultValStatement extends DefineVarStatement {
@@ -16,7 +16,7 @@ public abstract class ParamDefaultValStatement extends DefineVarStatement {
      * be converted to the actual function parameter variable
      */
     public void addVar(DefinePair pair) {
-        BasicObject actualVar = getFrame().safeGetVar(pair.var.getName());
+        IBasicObject actualVar = getFrame().safeGetVar(pair.var.getName());
         if (actualVar.getType() != pair.var.getType()) {
             throw new RuntimeException("Unexpected type `" + actualVar.getType() + "` of actual var. Expected `" + pair.var.getType() + "`");
         }
@@ -27,7 +27,7 @@ public abstract class ParamDefaultValStatement extends DefineVarStatement {
     }
     
     @Deprecated
-    public void addVar(BasicObject var, BasicObject val, Node node) {
+    public void addVar(IBasicObject var, IBasicObject val, Node node) {
         throw new RuntimeException("Please use addVar(DefinePair) with ParamDefaultVarStatement");
     }
     

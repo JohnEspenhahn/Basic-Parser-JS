@@ -17,7 +17,7 @@ public class IOUtil {
         try {
             return String.format("<script>%s\n</script>", IOUtil.readFile(f));
         } catch (FileNotFoundException e) {
-            return String.format("<script>alert('Could not find file %s!'</script>", f.getName());
+            return String.format("<script>alert('Could not find file %s!')</script>", f.getName());
         }
     }
 }

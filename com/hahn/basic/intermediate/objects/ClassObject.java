@@ -5,7 +5,7 @@ import com.hahn.basic.intermediate.objects.types.ClassType;
 public abstract class ClassObject extends BasicObject {
     
     public ClassObject(ClassType type) {
-        super(type.getName(), new StaticClassTypeHolder(type));
+        super(type.getName(), type.cloneAsStatic());
     }    
     
     @Override

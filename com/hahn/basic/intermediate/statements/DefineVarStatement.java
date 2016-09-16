@@ -7,7 +7,7 @@ import java.util.ListIterator;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.hahn.basic.intermediate.objects.BasicObject;
+import com.hahn.basic.intermediate.objects.IBasicObject;
 import com.hahn.basic.parser.Node;
 
 public abstract class DefineVarStatement extends Statement {
@@ -17,7 +17,7 @@ public abstract class DefineVarStatement extends Statement {
     private boolean ignoreTypeCheck;
     
     private int lastMatchIdx;
-    private BasicObject lastMatchObj;
+    private IBasicObject lastMatchObj;
     
     public DefineVarStatement(Statement container, boolean ignoreTypeCheck) {
         super(container);
@@ -45,7 +45,7 @@ public abstract class DefineVarStatement extends Statement {
      * @param val The value to give it
      * @param node The node to throw an error at if needed
      */
-    public void addVar(BasicObject var, BasicObject val, Node node) {
+    public void addVar(IBasicObject var, IBasicObject val, Node node) {
         definepairs.add(new DefinePair(node, var.getForCreateVar(), val));
     }
     
@@ -60,7 +60,7 @@ public abstract class DefineVarStatement extends Statement {
      * @param var The var to check for
      * @return True if this statement defines that var
      */
-    public boolean hasVar(BasicObject var) {
+    public boolean hasVar(IBasicObject var) {
         for (int i = 0; i < definepairs.size(); i++) {
             DefinePair pair = definepairs.get(i);
             if (pair.var == var) {
@@ -77,7 +77,7 @@ public abstract class DefineVarStatement extends Statement {
         return false;
     }
     
-    public BasicObject getValFor(BasicObject var) {
+    public IBasicObject getValFor(IBasicObject var) {
         if (lastMatchObj != null && lastMatchObj == var) {
             return definepairs.get(lastMatchIdx).val;
         } else {
@@ -125,8 +125,8 @@ public abstract class DefineVarStatement extends Statement {
         Iterator<DefinePair> it = definepairs.iterator();
         while (it.hasNext()) {
             DefinePair pair = it.next();
-            BasicObject var = pair.var;
-            BasicObject val = pair.val;
+            IBasicObject var = pair.var;
+            IBasicObject val = pair.val;
             
             // TODO handling of literals not used
             if (var.hasLiteral() && var.getUses() == 1) {
@@ -160,9 +160,9 @@ public abstract class DefineVarStatement extends Statement {
     
     public static class DefinePair {
         public final Node node;
-        public final BasicObject var, val;
+        public final IBasicObject var, val;
         
-        public DefinePair(Node node, BasicObject var, BasicObject val) {
+        public DefinePair(Node node, IBasicObject var, IBasicObject val) {
             this.node = node;
             
             this.var = var;

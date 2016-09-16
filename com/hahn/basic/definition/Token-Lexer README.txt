@@ -11,6 +11,7 @@ cutomize the existing com.hahn.basic.definition.EnumToken
 
 ==================
 == Regex Lexer
+== @deprecated
 ==================
 Provide an enum with all of the tokens to parse input into. 
 

@@ -20,7 +20,7 @@ public abstract class FuncCallPointer extends FuncPointer {
      * @param objectIn The object that the function is in or null
      * @param params The provided parameters for the call
      */
-    public FuncCallPointer(Node nameNode, BasicObject objectIn, BasicObject[] params) {
+    public FuncCallPointer(Node nameNode, IBasicObject objectIn, IBasicObject[] params) {
         super(nameNode, objectIn, new ParameterizedType<ITypeable>(Type.FUNCTION, (ITypeable[]) params));
 
         nameNode.setColor(TextColor.GREY);
@@ -47,7 +47,7 @@ public abstract class FuncCallPointer extends FuncPointer {
      * @return this
      */
     @Override
-    public BasicObject castTo(Type t, CodeFile file, int row, int col) {
+    public IBasicObject castTo(Type t, CodeFile file, int row, int col) {
         this.returnType = this.returnType.castTo(t, file, row, col);
 
         return this;
@@ -55,9 +55,9 @@ public abstract class FuncCallPointer extends FuncPointer {
 
     @Override
     public boolean setInUse(IIntermediate by) {        
-        ListIterator<BasicObject> it = Arrays.asList(getParams()).listIterator(countParams());
+        ListIterator<IBasicObject> it = Arrays.asList(getParams()).listIterator(countParams());
         while (it.hasPrevious()) {
-            BasicObject param = it.previous();
+            IBasicObject param = it.previous();
             
             param.setInUse(this);
         }
@@ -73,7 +73,7 @@ public abstract class FuncCallPointer extends FuncPointer {
     @Override
     public void takeRegister(IIntermediate by) {
         if (objectIn != null) objectIn.takeRegister(this);
-        for (BasicObject param: getParams()) {
+        for (IBasicObject param: getParams()) {
             param.takeRegister(this);
         }
         
@@ -85,15 +85,15 @@ public abstract class FuncCallPointer extends FuncPointer {
      * @return The parameterized type
      */
     @SuppressWarnings("unchecked")
-    private ParameterizedType<BasicObject> getParameterized() {
-        return (ParameterizedType<BasicObject>) super.getType();
+    private ParameterizedType<IBasicObject> getParameterized() {
+        return (ParameterizedType<IBasicObject>) super.getType();
     }
 
     /**
      * Get the actual parameter objects from the parameterized type
      * @return The parameter objects
      */
-    public BasicObject[] getParams() {
+    public IBasicObject[] getParams() {
         return getParameterized().getTypes();
     }
     

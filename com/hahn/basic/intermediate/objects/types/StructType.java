@@ -9,7 +9,7 @@ import java.util.Map;
 
 import com.hahn.basic.intermediate.CodeFile;
 import com.hahn.basic.intermediate.Frame;
-import com.hahn.basic.intermediate.objects.BasicObject;
+import com.hahn.basic.intermediate.objects.IBasicObject;
 import com.hahn.basic.intermediate.objects.Param;
 import com.hahn.basic.parser.Node;
 import com.hahn.basic.util.exceptions.CompileException;
@@ -21,6 +21,7 @@ public class StructType extends Type {
 
     private int typeParams;
     private int flags;
+    protected final boolean staticMode;
     
     /**
      * Create a new struct
@@ -29,10 +30,11 @@ public class StructType extends Type {
      * @param parent The parent struct or null
      * @param isAbstract If true won't check for other types with the same name
      */
-    protected StructType(CodeFile file, String name, StructType parent, int flags, boolean isAbstract) {
+    private StructType(CodeFile file, String name, StructType parent, int flags, boolean isAbstract, boolean staticMode) {
         super(file, name, true, isAbstract);
         
         this.flags = flags;
+        this.staticMode = staticMode;
         
         if (parent == null) {
             this.extended = new ArrayDeque<StructType>();
@@ -44,12 +46,30 @@ public class StructType extends Type {
         this.params = new HashMap<String, StructParam>();
     }
     
+    protected StructType(CodeFile file, String name, StructType parent, int flags, boolean isAbstract) {
+    	this(file, name, parent, flags, isAbstract, false);
+    }
+    
+    /**
+     * Cloner
+     * @param self
+     * @param isStatic
+     */
+    protected StructType(StructType self, boolean staticMode) {
+    	// Create new "abstract" struct that is a copy of this one (abstract so not addd to type list)
+    	this(null, self.getName(), self.getParent(), self.getFlags(), true, staticMode);
+    }
+    
     private ArrayDeque<StructType> getExtended() {
         return extended;
     }
     
     public StructType getParent() {
         return (getExtended().size() == 0 ? null : getExtended().getLast());
+    }
+    
+    protected int getFlags() {
+    	return flags;
     }
     
     public boolean hasFlag(BitFlag flag) {
@@ -117,17 +137,17 @@ public class StructType extends Type {
      * @param flags Flags for this struct
      * @return A new struct object
      */
-    public StructType extendAs(Frame containingFrame, String name, List<BasicObject> ps, int flags) {
+    public StructType extendAs(Frame containingFrame, String name, List<IBasicObject> ps, int flags) {
         StructType struct = new StructType(containingFrame.getFile(), name, this, flags, false);
         struct.loadParams(ps);
         
         return struct;
     }
     
-    public void loadParams(List<BasicObject> ps) {
+    public void loadParams(List<IBasicObject> ps) {
         if (ps != null) {
             for (int i = 0; i < ps.size(); i++) {
-                BasicObject p = ps.get(i);
+                IBasicObject p = ps.get(i);
                 addParam(p, null, null, false);
             }
         }
@@ -169,7 +189,7 @@ public class StructType extends Type {
      * @return This
      * @throws CompileException If the variable is already defined
      */
-    private StructType addParam(BasicObject p, Node node, String outName, boolean override) {        
+    private StructType addParam(IBasicObject p, Node node, String outName, boolean override) {        
         putParam(p, node, outName, override);
         
         return this;
@@ -182,7 +202,7 @@ public class StructType extends Type {
      * @return The added struct param
      * @throws CompileException If the variable is already defined
      */
-    public StructParam putParam(BasicObject p, Node node) {
+    public StructParam putParam(IBasicObject p, Node node) {
         return putParam(p, node, null, false);
     }
     
@@ -195,7 +215,7 @@ public class StructType extends Type {
      * @return The added struct param
      * @throws CompileException If the variable is already defined
      */
-    private StructParam putParam(BasicObject p, Node node, String outName, boolean override) {
+    private StructParam putParam(IBasicObject p, Node node, String outName, boolean override) {
         if ((override && checkSuperParamUnique(p.getName(), node)) || checkParamUnique(p.getName(), node)) {
             StructParam param = new StructParam(params.size(), p, outName);
             
@@ -260,7 +280,25 @@ public class StructType extends Type {
      * @throws CompileException If safe is false and an error occurs
      */
     public StructParam getParam(String name, boolean requireThisUnique, boolean requireSuperUnique, boolean safe, Node throwNode) {        
-        boolean fromParent = false;
+    	StructParam p = doGetParam(name, requireThisUnique, requireSuperUnique, safe, throwNode);
+        
+    	if (!staticMode) {
+    		return p;
+    	} else {
+	        if (!p.hasFlag(BitFlag.STATIC)) {
+	            if (safe) return null;
+	            else throw new CompileException("Can not make a static reference to an instance variable", throwNode);
+	        } else if (!getDefinedParams().contains(p)) {
+	            if (safe) return null;
+	            else throw new CompileException("Must access static variable `" + p + "` directly through its defining class", throwNode);
+	        } else {
+	            return p;
+	        }
+    	}
+    }
+    
+    private StructParam doGetParam(String name, boolean requireThisUnique, boolean requireSuperUnique, boolean safe, Node throwNode) {
+    	boolean fromParent = false;
         StructParam sVar = params.get(name);
         if (sVar != null && requireThisUnique) {
             throw new CompileException("The instance variable `" + name + "` is already defined", throwNode);
@@ -299,10 +337,10 @@ public class StructType extends Type {
         /**
          * A structure param
          * @param i The index in the structure
-         * @param p The defining BasicObject
+         * @param p The defining IBasicObject
          * @param givenOutName The predefined output name or null for default name (see {@link getOutName()})
          */
-        private StructParam(int i, BasicObject p, String givenOutName) {
+        private StructParam(int i, IBasicObject p, String givenOutName) {
             super(p.getName(), p.getType(), p.getFlags());
             
             this.idx = i;

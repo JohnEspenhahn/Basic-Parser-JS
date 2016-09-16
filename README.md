@@ -1,6 +1,7 @@
 Basic-Parser JS
 ===============
 
-After more than a year of development, what started as an idea for the "Stackey" language in early 2013 is a working compiler. 
+An exercise in language parsing I started my senior year of high school and I have been working working on
+occasionally since.
 
-This is a continuation of my Basic-Parser, but targeted toward compilation to Javascript and eventually other languages such as Java or C++.
+This is a continuation of my Basic-Parser, which was going to be not only a language parser but also a runtime environment. I changed the goal to be syntactic sugar to compile to Javascript and eventually other languages such as Java or Python.

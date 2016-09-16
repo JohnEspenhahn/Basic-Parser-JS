@@ -9,7 +9,7 @@ import com.hahn.basic.intermediate.Frame;
 import com.hahn.basic.intermediate.function.FuncBridge;
 import com.hahn.basic.intermediate.function.FuncGroup;
 import com.hahn.basic.intermediate.function.FuncHead;
-import com.hahn.basic.intermediate.objects.BasicObject;
+import com.hahn.basic.intermediate.objects.IBasicObject;
 import com.hahn.basic.intermediate.objects.ClassObject;
 import com.hahn.basic.intermediate.objects.Param;
 import com.hahn.basic.intermediate.objects.Var;
@@ -22,22 +22,22 @@ import com.hahn.basic.util.TypeUtils;
 import com.hahn.basic.util.exceptions.CompileException;
 import com.hahn.basic.util.structures.BitFlag;
 
-public class ClassType extends StructType {
-    private Frame containingFrame;
+public class ClassType extends StructType implements IClassType {
+    private final Frame containingFrame;
     
-    private FuncBridge funcBridge;
-    private Frame initFrame;
-    private Frame staticFrame;
+    private final FuncBridge funcBridge;
+    private final Frame initFrame;
+    private final Frame staticFrame;
     
-    private ClassObject classObj;    
+    private final ClassDefinition def;
+    
+    private final ClassObject classObj;    
     private Var varThis, varImpliedThis, varSuper;
-    
-    private ClassDefinition def;
     
     public ClassType(Frame containingFrame, String name, StructType parent, int flags, boolean isAbstract) {
         super(containingFrame.getFile(), name, parent, flags, isAbstract);
         
-        if (name == null) return;
+        if (name == null) throw new IllegalArgumentException();
         
         this.containingFrame = containingFrame;
         
@@ -58,6 +58,29 @@ public class ClassType extends StructType {
         }
         
         this.def = getFactory().ClassDefinition(containingFrame, this);
+    }
+    
+    protected ClassType(ClassType self, boolean staticMode) {
+    	super(self, staticMode);
+    	
+    	this.containingFrame = self.containingFrame;
+        
+        this.funcBridge = self.funcBridge;
+        this.initFrame = self.initFrame;
+        this.staticFrame = self.staticFrame;
+        
+        this.classObj = self.classObj;
+        
+        this.varThis = self.varThis;
+        this.varImpliedThis = self.varImpliedThis;
+        
+        this.varSuper = self.varSuper;
+        
+        this.def = getFactory().ClassDefinition(containingFrame, this);
+    }
+    
+    public ClassType cloneAsStatic() {
+    	return new ClassType(this, staticMode);
     }
     
     /**
@@ -148,7 +171,7 @@ public class ClassType extends StructType {
     }
     
     @Override
-    public ClassType extendAs(Frame containingFrame, String name, List<BasicObject> ps, int flags) {
+    public ClassType extendAs(Frame containingFrame, String name, List<IBasicObject> ps, int flags) {
         ClassType newClass = new ClassType(containingFrame, name, this, flags, false);
         newClass.loadParams(ps);
         
@@ -219,7 +242,7 @@ public class ClassType extends StructType {
      * @return The function
      * @throw CompileException If the requested function is not defined
      */
-    public FuncHead getFunc(BasicObject objIn, Node nameNode, ITypeable[] types) {
+    public FuncHead getFunc(IBasicObject objIn, Node nameNode, ITypeable[] types) {
         return getFunc(objIn, nameNode, types, false, false);
     }
     
@@ -232,7 +255,25 @@ public class ClassType extends StructType {
      * @return The function; or, if `safe` is true and there is an error, null
      * @throw CompileException If `safe` is false and the function is not defined
      */
-    public FuncHead getFunc(BasicObject objIn, Node nameNode, ITypeable[] types, boolean safe, boolean shallow) {
+    public FuncHead getFunc(IBasicObject objIn, Node nameNode, ITypeable[] types, boolean safe, boolean shallow) {
+    	FuncHead func = doGetFunc(objIn, nameNode, types, safe, false);
+        
+    	if (!staticMode) {
+    		return func;
+    	} else {
+    		if (!func.hasFlag(BitFlag.STATIC)) {
+                if (safe) return null;
+                else throw new CompileException("Can not make a static reference to a non-static function", nameNode);
+            } else if (getFunc(objIn, nameNode, types, true, true) != func) {
+                if (safe) return null;
+                else throw new CompileException("Must access static function `" + func + "` directly through its defining class", nameNode);                
+            } else {
+                return func;
+            }	
+    	}
+    }
+    
+    private FuncHead doGetFunc(IBasicObject objIn, Node nameNode, ITypeable[] types, boolean safe, boolean shallow) {
         final boolean isFindingConstructor = ConstructorUtils.isConstructorName(nameNode.getValue());
         
         String name = nameNode.getValue();
@@ -272,7 +313,7 @@ public class ClassType extends StructType {
      * @return The function; or, if `safe` is true and there is an error, null
      * @throw CompileException If `safe` is false and the function is not defined
      */
-    private FuncHead getValidFuncAccess(BasicObject objIn, Node nameNode, FuncHead func, boolean safe) {
+    private FuncHead getValidFuncAccess(IBasicObject objIn, Node nameNode, FuncHead func, boolean safe) {
         if (func.hasFlag(BitFlag.STATIC) && !objIn.isClassObject()) {
             if (!safe) throw new CompileException("Must access function `" + func + "` directly through its defining class", getFile());
             else return null;

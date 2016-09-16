@@ -13,7 +13,7 @@ import com.hahn.basic.util.exceptions.CompileException;
 
 public abstract class FuncPointer extends BasicObject implements IFileObject {
     protected Node nameNode;
-    protected BasicObject objectIn;
+    protected IBasicObject objectIn;
     
     protected FuncHead func;
     
@@ -23,7 +23,7 @@ public abstract class FuncPointer extends BasicObject implements IFileObject {
      * @param objectIn The object that contains the function or null
      * @param funcType The function parameterized type
      */
-    public FuncPointer(Node nameNode, BasicObject objectIn, ParameterizedType<ITypeable> funcType) {
+    public FuncPointer(Node nameNode, IBasicObject objectIn, ParameterizedType<ITypeable> funcType) {
         super(nameNode.getValue(), funcType);
         
         this.nameNode = nameNode;
@@ -64,7 +64,7 @@ public abstract class FuncPointer extends BasicObject implements IFileObject {
      * Get the object in which the function this is pointing to lives
      * @return The object that contains the function that is being pointed to
      */
-    public BasicObject getObjectIn() {
+    public IBasicObject getObjectIn() {
         return objectIn;
     }
     

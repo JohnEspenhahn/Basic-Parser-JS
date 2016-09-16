@@ -1,13 +1,13 @@
 package com.hahn.basic.target.js.statements;
 
-import com.hahn.basic.intermediate.objects.BasicObject;
+import com.hahn.basic.intermediate.objects.IBasicObject;
 import com.hahn.basic.intermediate.statements.ExpressionStatement;
 import com.hahn.basic.intermediate.statements.Statement;
 import com.hahn.basic.target.js.JSPretty;
 
 public class JSExpressionStatement extends ExpressionStatement {
     
-    public JSExpressionStatement(Statement continer, BasicObject obj) {
+    public JSExpressionStatement(Statement continer, IBasicObject obj) {
         super(continer, obj);
     }
     

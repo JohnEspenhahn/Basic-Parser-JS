@@ -8,7 +8,7 @@ import com.hahn.basic.intermediate.function.FuncBridge;
 import com.hahn.basic.intermediate.function.FuncGroup;
 import com.hahn.basic.intermediate.function.FuncHead;
 import com.hahn.basic.intermediate.library.base.Library;
-import com.hahn.basic.intermediate.objects.BasicObject;
+import com.hahn.basic.intermediate.objects.IBasicObject;
 import com.hahn.basic.intermediate.objects.FuncCallPair;
 import com.hahn.basic.intermediate.objects.Param;
 import com.hahn.basic.intermediate.objects.StringConst;
@@ -145,7 +145,7 @@ public class Compiler {
         return funcBridge.defineFunc(file, parent, false, head, inName, outName, rtnType, params);
     }
     
-    public synchronized FuncCallPair getFunc(BasicObject objIn, Node nameNode, ITypeable[] types) {
+    public synchronized FuncCallPair getFunc(IBasicObject objIn, Node nameNode, ITypeable[] types) {
         if (objIn != null && objIn.getType() instanceof ClassType) {
             // If object in is implied this, check for global function first
             if (objIn.getVarThisFlag() == Var.IS_IMPLIED_THIS) {

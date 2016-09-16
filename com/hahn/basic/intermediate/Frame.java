@@ -54,7 +54,7 @@ import com.hahn.basic.definition.EnumToken;
 import com.hahn.basic.intermediate.function.FuncHead;
 import com.hahn.basic.intermediate.objects.AdvancedObject;
 import com.hahn.basic.intermediate.objects.Array;
-import com.hahn.basic.intermediate.objects.BasicObject;
+import com.hahn.basic.intermediate.objects.IBasicObject;
 import com.hahn.basic.intermediate.objects.EmptyArray;
 import com.hahn.basic.intermediate.objects.FuncCallPointer;
 import com.hahn.basic.intermediate.objects.FuncPointer;
@@ -361,9 +361,9 @@ public class Frame extends Statement {
      * @param name The name of the variable
      * @return The variable found or null
      */
-    public BasicObject safeGetVar(String name) {
+    public IBasicObject safeGetVar(String name) {
         // Local var
-        BasicObject obj = safeGetLocalVar(name);
+        IBasicObject obj = safeGetLocalVar(name);
         if (obj != null) return obj;
         
         // Instance var
@@ -382,7 +382,7 @@ public class Frame extends Statement {
      * @param name The name of the class
      * @return The class object found or null
      */
-    public BasicObject safeGetClassObj(String name) {
+    public IBasicObject safeGetClassObj(String name) {
         Type t = Type.fromName(name);
         if (t != null && t.doesExtend(Type.OBJECT)) {
             return ((ClassType) t).getClassObj();
@@ -397,9 +397,9 @@ public class Frame extends Statement {
      * @param name The name of the variable
      * @return The variable found or null
      */
-    public BasicObject safeGetLocalVar(String name) {
+    public IBasicObject safeGetLocalVar(String name) {
         // Local var
-        BasicObject obj = vars.get(name);
+        IBasicObject obj = vars.get(name);
         if (obj != null) {
             return obj;
         }
@@ -419,16 +419,16 @@ public class Frame extends Statement {
         return null;
     }
     
-    public BasicObject safeGetInstanceVar(String name) {
+    public IBasicObject safeGetInstanceVar(String name) {
         return null;
     }
     
-    public BasicObject getVar(Node nameNode) {
+    public IBasicObject getVar(Node nameNode) {
         String name = nameNode.getValue();
         Enum<?> token = nameNode.getToken();
         
         if (token == IDENTIFIER || token == THIS || token == SUPER) {    
-            BasicObject obj = safeGetVar(name);
+            IBasicObject obj = safeGetVar(name);
             
             // Found
             if (obj != null) {
@@ -542,7 +542,7 @@ public class Frame extends Statement {
      * @return The object with the retrieved value
      * @throws CompileException If illegal indexing of a variable
      */
-    private BasicObject accessVar(Node head) {
+    private IBasicObject accessVar(Node head) {
         return accessVar(new NestedListIterator<Node>(head.getAsChildren()), false);
     }
     
@@ -553,7 +553,7 @@ public class Frame extends Statement {
      * @return The object with the retrieved value
      * @throws CompileException If illegal indexing of a variable
      */
-    private BasicObject accessVar(NestedListIterator<Node> it, boolean leaveLast) {
+    private IBasicObject accessVar(NestedListIterator<Node> it, boolean leaveLast) {
         Node nameNode = it.next();
         if (leaveLast && !it.hasNext()) {
             it.previous();
@@ -565,7 +565,7 @@ public class Frame extends Statement {
             }
         }
         
-        BasicObject obj = getVar(nameNode);
+        IBasicObject obj = getVar(nameNode);
         if (it.hasNext()) {
             if (obj.getType().doesExtend(Type.STRUCT)) {
                 return inAccessVar(obj, it.enter(it.next().getAsChildren()), leaveLast);
@@ -583,7 +583,7 @@ public class Frame extends Statement {
      * @param head EnumExpression.IN_ACCESS
      * @return The object the with retrieved value
      */
-    private BasicObject inAccessVar(BasicObject obj, NestedListIterator<Node> it, boolean leaveLast) {        
+    private IBasicObject inAccessVar(IBasicObject obj, NestedListIterator<Node> it, boolean leaveLast) {        
         ExpressionStatement exp = getFactory().ExpressionStatement(this, obj);
         while (it.hasNext()) {
             Type type = exp.getObj().getType();
@@ -591,7 +591,7 @@ public class Frame extends Statement {
             Node child = it.next();
             Enum<?> accessMarker = child.getToken();
             if (accessMarker == OPEN_SQR && type.doesExtend(Type.ARRAY)) {
-                BasicObject offset = handleExpression(it.next()).getAsExpObj();
+                IBasicObject offset = handleExpression(it.next()).getAsExpObj();
                 it.next(); // Skip CLOSE_SQR
                 
                 if (leaveLast && !it.hasNext()) {
@@ -623,13 +623,13 @@ public class Frame extends Statement {
                 // Function
                 if (prthNode != null && prthNode.getToken() == EnumExpression.PRNTH_PARAMS) {
                     Node node = prthNode.getAsChildren().get(1);
-                    List<BasicObject> params = new ArrayList<BasicObject>();
+                    List<IBasicObject> params = new ArrayList<IBasicObject>();
                     if (node.getToken() == EnumExpression.CALL_PARAMS) {
                         getFuncCallParams(node, params);
                     }
                     
                     // Get FuncCall object
-                    BasicObject[] aParams = params.toArray(new BasicObject[params.size()]);
+                    IBasicObject[] aParams = params.toArray(new IBasicObject[params.size()]);
                     exp.setObj(getFactory().FuncCallPointer(nameNode, exp.getObj(), aParams), child);
                     
                 // Variable
@@ -663,12 +663,12 @@ public class Frame extends Statement {
         boolean isPrefix = (children.size() == 2 && children.get(0).getToken() != EnumExpression.ACCESS);
         
         Node varNode = (isPrefix ? children.get(1) : children.get(0));
-        BasicObject var = accessVar(varNode);
+        IBasicObject var = accessVar(varNode);
         
         Node opNode = (isPrefix ? children.get(0) : children.get(1));
         
         Node objNode = (children.size() > 2 ? children.get(2) : null);
-        BasicObject obj = (children.size() > 2 ? handleExpression(objNode).getAsExpObj() : null);
+        IBasicObject obj = (children.size() > 2 ? handleExpression(objNode).getAsExpObj() : null);
         
         switch (opNode.joinToString()) {
             case "=": 
@@ -709,7 +709,7 @@ public class Frame extends Statement {
      * @param op The operation to perform on the variable
      * @return ArithmeticSetObject to update the var
      */
-    protected OPObject updateVar(BasicObject var, Node varNode, BasicObject obj, Node objNode, OPCode op) {
+    protected OPObject updateVar(IBasicObject var, Node varNode, IBasicObject obj, Node objNode, OPCode op) {
         return getFactory().ArithmeticSetObject(this, op, var, varNode, obj, objNode);
     }
     
@@ -720,7 +720,7 @@ public class Frame extends Statement {
      * @param op The operation to perform on the variable
      * @return OPObject to update the var
      */
-    protected OPObject prefixUpdateVar(BasicObject var, Node varNode, OPCode op) {
+    protected OPObject prefixUpdateVar(IBasicObject var, Node varNode, OPCode op) {
         return getFactory().OPObject(this, op, var, varNode, null, null);
     }
     
@@ -731,7 +731,7 @@ public class Frame extends Statement {
      * @param op The operation to perform on the variable
      * @return OPObject to update the var
      */
-    protected OPObject postfixUpdateVar(BasicObject var, Node varNode, OPCode op) {
+    protected OPObject postfixUpdateVar(IBasicObject var, Node varNode, OPCode op) {
         return getFactory().PostfixOPObject(this, op, var, varNode);
     }
     
@@ -773,7 +773,7 @@ public class Frame extends Statement {
                 String name = node.getValue();
                 
                 // Create var
-                final BasicObject obj;
+                final IBasicObject obj;
                 if (struct != null) { // Instance var
                     node.setColor(TextColor.LIGHT_BLUE);
                     
@@ -783,7 +783,7 @@ public class Frame extends Statement {
                 }
                 
                 // Modify var
-                BasicObject val = null;
+                IBasicObject val = null;
                 Node mainNode = null, valNode = null;
                 
                 boolean hasInit = false;
@@ -865,7 +865,7 @@ public class Frame extends Statement {
             throw new CompileException("Illegal array definition, must define size of first dimension", typeNode);
         }
         
-        List<BasicObject> sizes = new ArrayList<BasicObject>();
+        List<IBasicObject> sizes = new ArrayList<IBasicObject>();
         
         Node open_brace = null;
         while (it.hasNext()) {
@@ -897,7 +897,7 @@ public class Frame extends Statement {
      * @return An Array definition
      */
     private Array createArray(Node head) {
-        List<BasicObject> values = new ArrayList<BasicObject>();
+        List<IBasicObject> values = new ArrayList<IBasicObject>();
         
         Iterator<Node> it = CompilerUtils.getIterator(head);
         while (it.hasNext()) {
@@ -916,7 +916,7 @@ public class Frame extends Statement {
         return getFactory().Array(values);
     }
     
-    private void defineClassVar(ClassType classIn, BasicObject var, Node varNode, BasicObject val, Node valNode) {
+    private void defineClassVar(ClassType classIn, IBasicObject var, Node varNode, IBasicObject val, Node valNode) {
         VarAccess access = getFactory().VarAccess(this, classIn.getThis(), var, var.getType(), varNode.getFile(), varNode.getRow(), varNode.getCol());
         OPObject op = getFactory().OPObject(this, OPCode.SET, access, varNode, val, valNode);
         classIn.addInitStatement(getFactory().ExpressionStatement(this, op));
@@ -940,7 +940,7 @@ public class Frame extends Statement {
         FuncHead func = (FuncHead) f;
         
         // Set result
-        BasicObject result = null;
+        IBasicObject result = null;
         List<Node> children = head.getAsChildren();
         if (children.size() > 1) {
             Node resultNode = children.get(1);
@@ -1128,7 +1128,7 @@ public class Frame extends Statement {
                     if (pToken == EnumToken.COMMA) {
                         continue;
                     } else if (pToken == EnumToken.ASSIGN) {
-                        BasicObject pVal = handleExpression(pIt.next()).getAsExpObj();
+                        IBasicObject pVal = handleExpression(pIt.next()).getAsExpObj();
                         inits.add(new DefinePair(pNode, params.get(params.size() - 1), pVal));
                     } else {
                         Type pType = Type.fromNode(pNode);
@@ -1192,10 +1192,10 @@ public class Frame extends Statement {
         
         // Determine function
         NestedListIterator<Node> accessIt = new NestedListIterator<Node>(it.next().getAsChildren());
-        BasicObject objectIn = accessVar(accessIt, true);
+        IBasicObject objectIn = accessVar(accessIt, true);
         Node nameNode = accessIt.next();
         
-        List<BasicObject> params = new ArrayList<BasicObject>();
+        List<IBasicObject> params = new ArrayList<IBasicObject>();
         while (it.hasNext()) {
             Node node = it.next();
             Enum<?> token = node.getToken();
@@ -1205,7 +1205,7 @@ public class Frame extends Statement {
             }
         }
         
-        BasicObject[] aParams = params.toArray(new BasicObject[params.size()]);
+        IBasicObject[] aParams = params.toArray(new IBasicObject[params.size()]);
         
         // Get FuncCall object
         FuncCallPointer funcCallPointer = getFactory().FuncCallPointer(nameNode, objectIn, aParams);
@@ -1217,7 +1217,7 @@ public class Frame extends Statement {
      * @param head EnumExpression.CALL_PARAMS
      * @param params The list to add the params to
      */
-    private void getFuncCallParams(Node head, List<BasicObject> params) {
+    private void getFuncCallParams(Node head, List<IBasicObject> params) {
         if (head.getToken() != EnumExpression.CALL_PARAMS) return;
         
         Iterator<Node> it = CompilerUtils.getIterator(head);
@@ -1226,7 +1226,7 @@ public class Frame extends Statement {
             if (pNode.getToken() == EnumToken.COMMA) {
                 continue;
             } else {
-                BasicObject v = handleExpression(pNode).getAsExpObj();
+                IBasicObject v = handleExpression(pNode).getAsExpObj();
                 params.add(v);
             }
         }
@@ -1268,7 +1268,7 @@ public class Frame extends Statement {
      * @param head EnumExpression.CREATE
      * @return Object instance
      */
-    public BasicObject createInstance(Node head) {
+    public IBasicObject createInstance(Node head) {
     	List<Node> children = head.getAsChildren();
     	
     	Node typeNode = children.get(1);
@@ -1281,7 +1281,7 @@ public class Frame extends Statement {
         
         // Standard definition
         if (children.size() > 3) {
-            List<BasicObject> params = new ArrayList<BasicObject>();
+            List<IBasicObject> params = new ArrayList<IBasicObject>();
             getFuncCallParams(children.get(3), params);
             
             return getFactory().NewInstance(type, typeNode, params);
@@ -1400,7 +1400,7 @@ public class Frame extends Statement {
      * @param temp
      * @return ObjectHolder
      */
-    private BasicObject doCast(Node head, BasicObject temp) {
+    private IBasicObject doCast(Node head, IBasicObject temp) {
         Iterator<Node> it = CompilerUtils.getIterator(head);
         
         Node typeNode = null;
@@ -1451,7 +1451,7 @@ public class Frame extends Statement {
      * @param head EnumExpression.REGEX
      * @return
      */
-    private BasicObject parseRegex(Node head) {
+    private IBasicObject parseRegex(Node head) {
         Iterator<Node> it = CompilerUtils.getIterator(head);
         it.next(); // Skip open '/'
         
@@ -1519,12 +1519,12 @@ public class Frame extends Statement {
         }
     }
     
-    public void handleNextExpressionChild(Iterator<Node> it, ExpressionStatement exp, BasicObject temp) {
+    public void handleNextExpressionChild(Iterator<Node> it, ExpressionStatement exp, IBasicObject temp) {
         Node child = it.next();
         String val = child.getValue();
         Enum<?> token = child.getToken();
         
-        BasicObject obj = handleNextExpressionChildObject(child, temp);
+        IBasicObject obj = handleNextExpressionChildObject(child, temp);
         if (obj != null) {
             exp.setObj(obj, child);
             
@@ -1577,7 +1577,7 @@ public class Frame extends Statement {
         }
     }
     
-    public BasicObject handleNextExpressionChildObject(Node child, BasicObject temp) {
+    public IBasicObject handleNextExpressionChildObject(Node child, IBasicObject temp) {
         Enum<?> token = child.getToken();
         
         if (child.isTerminal()) {

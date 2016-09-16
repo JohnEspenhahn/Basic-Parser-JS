@@ -1,7 +1,5 @@
 package com.hahn.basic.intermediate.objects;
 
-import lombok.NonNull;
-
 import com.hahn.basic.intermediate.IIntermediate;
 import com.hahn.basic.intermediate.objects.types.Type;
 import com.hahn.basic.intermediate.opcode.OPCode;
@@ -9,9 +7,11 @@ import com.hahn.basic.intermediate.statements.Statement;
 import com.hahn.basic.parser.Node;
 import com.hahn.basic.util.exceptions.CompileException;
 
+import lombok.NonNull;
+
 public abstract class ArithmeticObject extends OPObject {
     
-    public ArithmeticObject(Statement container, OPCode op, BasicObject p1, Node p1Node, @NonNull BasicObject p2, Node p2Node) {
+    public ArithmeticObject(Statement container, OPCode op, IBasicObject p1, Node p1Node, @NonNull IBasicObject p2, Node p2Node) {
         super(container, op, p1, p1Node, p2, p2Node);
     }
     

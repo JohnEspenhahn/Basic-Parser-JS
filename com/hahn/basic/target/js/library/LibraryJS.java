@@ -1,12 +1,9 @@
 package com.hahn.basic.target.js.library;
 
-import java.io.File;
-
 import com.hahn.basic.intermediate.CodeFile;
 import com.hahn.basic.intermediate.library.base.Library;
 import com.hahn.basic.intermediate.objects.types.ParameterizedType;
 import com.hahn.basic.intermediate.objects.types.Type;
-import com.hahn.basic.util.IOUtil;
 import com.hahn.basic.util.structures.BitFlag;
 
 public class LibraryJS extends Library {
@@ -17,6 +14,7 @@ public class LibraryJS extends Library {
     
     @Override
     public void define(CodeFile callingFile) {
+    	// Define built in Java functions
         Library.defineFunc(callingFile, Type.OBJECT, true, "toString", "toString", 0, Type.STRING);
         
         Library.defineParam(Type.ARRAY, "length", "length", Type.REAL);
@@ -49,6 +47,6 @@ public class LibraryJS extends Library {
     
     @Override
     public String toTarget() {
-        return IOUtil.loadScript(new File("lib/js/js.js.min"));
+        return ""; // IOUtil.loadScript(new File("lib/js/js.js.min"));
     }
 }

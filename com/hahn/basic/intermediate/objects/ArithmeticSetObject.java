@@ -10,7 +10,7 @@ import com.hahn.basic.util.structures.BitFlag;
 
 public abstract class ArithmeticSetObject extends ArithmeticObject {
     
-    public ArithmeticSetObject(Statement container, OPCode op, BasicObject p1, Node p1Node, BasicObject p2, Node p2Node) {
+    public ArithmeticSetObject(Statement container, OPCode op, IBasicObject p1, Node p1Node, IBasicObject p2, Node p2Node) {
         super(container, op, p1, p1Node, p2, p2Node);
     }
     

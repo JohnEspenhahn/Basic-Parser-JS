@@ -3,7 +3,7 @@ package com.hahn.basic.target.js.statements;
 import java.util.List;
 
 import com.hahn.basic.Main;
-import com.hahn.basic.intermediate.objects.BasicObject;
+import com.hahn.basic.intermediate.objects.IBasicObject;
 import com.hahn.basic.intermediate.objects.LiteralNum;
 import com.hahn.basic.intermediate.statements.DefineVarStatement;
 import com.hahn.basic.intermediate.statements.Statement;
@@ -24,7 +24,7 @@ public class JSDefineVarStatement extends DefineVarStatement {
     }
     
     @Override
-    public void addVar(BasicObject var, BasicObject val, Node node) {
+    public void addVar(IBasicObject var, IBasicObject val, Node node) {
         if (var.hasFlag(BitFlag.CONST) && val == LiteralNum.UNDEFINED) {
             throw new CompileException("The constant variable `" + var.getName() + "` must be initialized", node);
         }

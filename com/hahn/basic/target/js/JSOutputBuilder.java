@@ -71,8 +71,8 @@ public class JSOutputBuilder implements OutputBuilder {
 	}
 
 	@Override
-	public void writeRunnableTo(FileOutputStream os) throws IOException {
-		os.write(builder.toString().getBytes());
+	public void writeRunnableTo(FileOutputStream os, String encoding) throws IOException {
+		os.write(builder.toString().getBytes(encoding));
 		os.write('\n');
 	}
 

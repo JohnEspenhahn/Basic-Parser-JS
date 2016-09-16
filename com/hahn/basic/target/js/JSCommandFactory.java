@@ -8,7 +8,7 @@ import com.hahn.basic.intermediate.function.FuncHead;
 import com.hahn.basic.intermediate.objects.AdvancedObject;
 import com.hahn.basic.intermediate.objects.ArithmeticObject;
 import com.hahn.basic.intermediate.objects.Array;
-import com.hahn.basic.intermediate.objects.BasicObject;
+import com.hahn.basic.intermediate.objects.IBasicObject;
 import com.hahn.basic.intermediate.objects.CastedObject;
 import com.hahn.basic.intermediate.objects.ClassObject;
 import com.hahn.basic.intermediate.objects.ConditionalObject;
@@ -122,12 +122,12 @@ public class JSCommandFactory implements CommandFactory {
     }
     
     @Override
-    public BasicObject PushObject() {
+    public IBasicObject PushObject() {
         throw new UnimplementedException();
     }
     
     @Override
-    public BasicObject DefaultStruct(StructType struct) {
+    public IBasicObject DefaultStruct(StructType struct) {
         return new JSDefaultStruct(struct);
     }
     
@@ -142,27 +142,27 @@ public class JSCommandFactory implements CommandFactory {
     }
     
     @Override
-    public OPObject OPObject(Statement container, OPCode op, BasicObject p1, Node p1Node, BasicObject p2, Node p2Node) {
+    public OPObject OPObject(Statement container, OPCode op, IBasicObject p1, Node p1Node, IBasicObject p2, Node p2Node) {
         return new OPObject(container, op, p1, p1Node, p2, p2Node);
     }
     
     @Override
-    public OPObject PostfixOPObject(Statement container, OPCode op, BasicObject p, Node pNode) {
+    public OPObject PostfixOPObject(Statement container, OPCode op, IBasicObject p, Node pNode) {
         return new PostfixOPObject(container, op, p, pNode);
     }
     
     @Override
-    public ArithmeticObject ArithmeticObject(Statement container, OPCode op, BasicObject p1, Node p1Node, BasicObject p2, Node p2Node) {
+    public ArithmeticObject ArithmeticObject(Statement container, OPCode op, IBasicObject p1, Node p1Node, IBasicObject p2, Node p2Node) {
         return new JSArithmeticObject(container, op, p1, p1Node, p2, p2Node);
     }
     
     @Override
-    public JSArithmeticSetObject ArithmeticSetObject(Statement container, OPCode op, BasicObject p1, Node p1Node, BasicObject p2, Node p2Node) {
+    public JSArithmeticSetObject ArithmeticSetObject(Statement container, OPCode op, IBasicObject p1, Node p1Node, IBasicObject p2, Node p2Node) {
         return new JSArithmeticSetObject(container, op, p1, p1Node, p2, p2Node);
     }
     
     @Override
-    public CastedObject CastedObject(BasicObject obj, Type type, CodeFile file, int row, int col) {
+    public CastedObject CastedObject(IBasicObject obj, Type type, CodeFile file, int row, int col) {
         return new JSCastedObject(obj, type, file, row, col);
     }
     
@@ -182,7 +182,7 @@ public class JSCommandFactory implements CommandFactory {
     }
     
     @Override
-    public VarAccess VarAccess(Statement container, BasicObject var, BasicObject idx, Type type, CodeFile file, int row, int col) {
+    public VarAccess VarAccess(Statement container, IBasicObject var, IBasicObject idx, Type type, CodeFile file, int row, int col) {
         return new JSVarAccess(container, var, idx, type, file, row, col);
     }
     
@@ -202,27 +202,27 @@ public class JSCommandFactory implements CommandFactory {
     }
     
     @Override
-    public EmptyArray EmptyArray(Node node, ParameterizedType<Type> type, List<BasicObject> dimensionSizes) {
+    public EmptyArray EmptyArray(Node node, ParameterizedType<Type> type, List<IBasicObject> dimensionSizes) {
         return new JSEmptyArray(node, type, dimensionSizes);
     }
     
     @Override
-    public Array Array(List<BasicObject> values) {
+    public Array Array(List<IBasicObject> values) {
         return new JSArray(values);
     }
     
     @Override
-    public BasicObject NewInstance(Type type, Node typeNode, List<BasicObject> params) {
+    public IBasicObject NewInstance(Type type, Node typeNode, List<IBasicObject> params) {
         return new JSNewInstance(type, typeNode, params);
     }
     
     @Override
-    public ConditionalObject ConditionalObject(Statement container, OPCode op, BasicObject p1, Node p1Node, BasicObject p2, Node p2Node, BasicObject temp) {
+    public ConditionalObject ConditionalObject(Statement container, OPCode op, IBasicObject p1, Node p1Node, IBasicObject p2, Node p2Node, IBasicObject temp) {
         return new JSConditionalObject(container, op, p1, p1Node, p2, p2Node, temp);
     }
     
     @Override
-    public TernaryObject TernaryObject(Statement container, BasicObject condition, Node node_then, Node node_else, CodeFile file, int row, int col) {
+    public TernaryObject TernaryObject(Statement container, IBasicObject condition, Node node_then, Node node_else, CodeFile file, int row, int col) {
         return new JSTernaryObject(container, condition, node_then, node_else, file, row, col);
     }
     
@@ -232,12 +232,12 @@ public class JSCommandFactory implements CommandFactory {
     }
     
     @Override
-    public FuncPointer FuncPointer(Node nameNode, BasicObject objectIn, ParameterizedType<ITypeable> funcType) {
+    public FuncPointer FuncPointer(Node nameNode, IBasicObject objectIn, ParameterizedType<ITypeable> funcType) {
         return new JSFuncPointer(nameNode, objectIn, funcType);
     }
     
     @Override
-    public FuncCallPointer FuncCallPointer(Node nameNode, BasicObject objectIn, BasicObject[] params) {
+    public FuncCallPointer FuncCallPointer(Node nameNode, IBasicObject objectIn, IBasicObject[] params) {
         return new JSFuncCallPointer(nameNode, objectIn, params);
     }
     
@@ -247,7 +247,7 @@ public class JSCommandFactory implements CommandFactory {
     }
     
     @Override
-    public ExpressionStatement ExpressionStatement(Statement container, BasicObject obj) {
+    public ExpressionStatement ExpressionStatement(Statement container, IBasicObject obj) {
         return new JSExpressionStatement(container, obj);
     }
     
@@ -262,7 +262,7 @@ public class JSCommandFactory implements CommandFactory {
     }
     
     @Override
-    public Compilable ReturnStatement(Statement container, FuncHead returnFrom, BasicObject result) {
+    public Compilable ReturnStatement(Statement container, FuncHead returnFrom, IBasicObject result) {
         return new JSReturnStatement(container, returnFrom, result);
     }
     

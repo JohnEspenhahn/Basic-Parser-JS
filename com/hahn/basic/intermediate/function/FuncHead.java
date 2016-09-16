@@ -8,7 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import com.hahn.basic.definition.EnumToken;
 import com.hahn.basic.intermediate.CodeFile;
 import com.hahn.basic.intermediate.Frame;
-import com.hahn.basic.intermediate.objects.BasicObject;
+import com.hahn.basic.intermediate.objects.IBasicObject;
 import com.hahn.basic.intermediate.objects.FuncPointer;
 import com.hahn.basic.intermediate.objects.Param;
 import com.hahn.basic.intermediate.objects.Var;
@@ -140,12 +140,12 @@ public abstract class FuncHead extends Frame {
      * were defined externally
      * @return List of variables
      */
-    public List<BasicObject> getVarsDefExternal() {
+    public List<IBasicObject> getVarsDefExternal() {
         return endLoop.getVars();
     }
     
     @Override
-    public BasicObject safeGetInstanceVar(String name) {
+    public IBasicObject safeGetInstanceVar(String name) {
         if (getClassIn() != null) {
             StructParam param = classIn.getParamSafe(name);
             if (param != null) { 
@@ -156,7 +156,7 @@ public abstract class FuncHead extends Frame {
         return null;
     }
     
-    public void makeOptional(BasicObject p) {
+    public void makeOptional(IBasicObject p) {
         for (int i = 0; i < params.length; i++) {
             Var funcParam = params[i];
             if (funcParam == p) {
@@ -304,7 +304,7 @@ public abstract class FuncHead extends Frame {
         return toHumanReadable(p.getObjectIn(), p.getName(), p.getTypes(), p.getReturn());
     }
     
-    public static String toHumanReadable(BasicObject objectIn, String name, ITypeable[] types, Type returnType) {
+    public static String toHumanReadable(IBasicObject objectIn, String name, ITypeable[] types, Type returnType) {
         String funcName = (objectIn != null ? objectIn.getName() + "." : "");
         
         funcName += name + "(";

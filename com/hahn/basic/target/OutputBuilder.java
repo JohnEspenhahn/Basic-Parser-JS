@@ -23,7 +23,7 @@ public interface OutputBuilder {
     
     void append(Command cmd);
     void appendString(String str);
-    void writeRunnableTo(FileOutputStream os) throws IOException;
+    void writeRunnableTo(FileOutputStream os, String encoding) throws IOException;
     
     @Override
     String toString();

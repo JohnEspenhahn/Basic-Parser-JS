@@ -3,7 +3,7 @@ package com.hahn.basic.target.js.objects;
 import java.util.List;
 
 import com.hahn.basic.definition.EnumToken;
-import com.hahn.basic.intermediate.objects.BasicObject;
+import com.hahn.basic.intermediate.objects.IBasicObject;
 import com.hahn.basic.intermediate.objects.EmptyArray;
 import com.hahn.basic.intermediate.objects.types.ParameterizedType;
 import com.hahn.basic.intermediate.objects.types.Type;
@@ -12,7 +12,7 @@ import com.hahn.basic.util.CompilerUtils;
 
 public class JSEmptyArray extends EmptyArray {
 
-    public JSEmptyArray(Node node, ParameterizedType<Type> type, List<BasicObject> dimensionSizes) {
+    public JSEmptyArray(Node node, ParameterizedType<Type> type, List<IBasicObject> dimensionSizes) {
         super(node, type, dimensionSizes);
     }
 

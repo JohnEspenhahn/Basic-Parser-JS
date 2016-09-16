@@ -13,12 +13,12 @@ public abstract class NewInstance extends BasicObject {
     private Node constructorNode;
     private FuncHead constructor;
     
-	private BasicObject[] params;
+	private IBasicObject[] params;
 	
-	public NewInstance(Type type, Node typeNode, List<BasicObject> params) {
+	public NewInstance(Type type, Node typeNode, List<IBasicObject> params) {
 		super("new " + type.getName(), type);
 		
-		this.params = params.toArray(new BasicObject[params.size()]);
+		this.params = params.toArray(new IBasicObject[params.size()]);
 		
 		// Get constructor
 		if (type.doesExtend(Type.OBJECT)) {
@@ -33,7 +33,7 @@ public abstract class NewInstance extends BasicObject {
 	    return super.setInUse(by);
 	}
 	
-	public BasicObject[] getParams() {
+	public IBasicObject[] getParams() {
 		return params;
 	}
 	

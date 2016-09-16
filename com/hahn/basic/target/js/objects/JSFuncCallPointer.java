@@ -1,13 +1,13 @@
 package com.hahn.basic.target.js.objects;
 
-import com.hahn.basic.intermediate.objects.BasicObject;
+import com.hahn.basic.intermediate.objects.IBasicObject;
 import com.hahn.basic.intermediate.objects.FuncCallPointer;
 import com.hahn.basic.parser.Node;
 import com.hahn.basic.util.CompilerUtils;
 
 public class JSFuncCallPointer extends FuncCallPointer {
     
-    public JSFuncCallPointer(Node nameNode, BasicObject objectIn, BasicObject[] params) {
+    public JSFuncCallPointer(Node nameNode, IBasicObject objectIn, IBasicObject[] params) {
         super(nameNode, objectIn, params);
     }
     

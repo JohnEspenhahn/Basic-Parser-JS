@@ -52,12 +52,12 @@ public abstract class AdvancedObject extends BasicObject implements IFileObject 
      * Get the address of this object
      * @return The address of this object
      */
-    public BasicObject getAddress() {
+    public IBasicObject getAddress() {
         return this;
     }
 
     @Override
-    public BasicObject getForCreateVar() {
+    public IBasicObject getForCreateVar() {
         if (isRegisterOnStack()) {
             return getFactory().PushObject();
         } else {

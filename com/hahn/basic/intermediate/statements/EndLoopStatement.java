@@ -4,19 +4,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
-import com.hahn.basic.intermediate.objects.BasicObject;
+import com.hahn.basic.intermediate.objects.IBasicObject;
 
 public class EndLoopStatement extends Statement {
     /**
      * List of all vars using in this block, but not created within it.
      * Used so last use not tracked as within that block
      */
-    private List<BasicObject> vars;
+    private List<IBasicObject> vars;
     
     public EndLoopStatement(Statement s) {
         super(s);
         
-        vars = new ArrayList<BasicObject>();
+        vars = new ArrayList<IBasicObject>();
     }
     
     /**
@@ -24,13 +24,13 @@ public class EndLoopStatement extends Statement {
      * used in a loop but not created within it
      * @param o The object to add
      */
-    public void addVar(BasicObject o) {
+    public void addVar(IBasicObject o) {
         if (!vars.contains(o)) {
             vars.add(o);
         }
     }
     
-    public List<BasicObject> getVars() {
+    public List<IBasicObject> getVars() {
         return vars;
     }
     
@@ -41,9 +41,9 @@ public class EndLoopStatement extends Statement {
     
     @Override
     public boolean reverseOptimize() {
-        ListIterator<BasicObject> it = vars.listIterator(vars.size());
+        ListIterator<IBasicObject> it = vars.listIterator(vars.size());
         while (it.hasPrevious()) {
-            BasicObject obj = it.previous();
+            IBasicObject obj = it.previous();
             obj.setInUse(this);
         }
         
@@ -52,7 +52,7 @@ public class EndLoopStatement extends Statement {
     
     @Override
     public boolean forwardOptimize() {
-        for (BasicObject obj: vars) {
+        for (IBasicObject obj: vars) {
             obj.takeRegister(this);
         }
         

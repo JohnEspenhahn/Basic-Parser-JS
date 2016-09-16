@@ -8,7 +8,7 @@ import com.hahn.basic.intermediate.function.FuncHead;
 import com.hahn.basic.intermediate.objects.AdvancedObject;
 import com.hahn.basic.intermediate.objects.ArithmeticObject;
 import com.hahn.basic.intermediate.objects.Array;
-import com.hahn.basic.intermediate.objects.BasicObject;
+import com.hahn.basic.intermediate.objects.IBasicObject;
 import com.hahn.basic.intermediate.objects.CastedObject;
 import com.hahn.basic.intermediate.objects.ClassObject;
 import com.hahn.basic.intermediate.objects.ConditionalObject;
@@ -59,17 +59,17 @@ public interface CommandFactory {
 	ClassDefinition ClassDefinition(Frame containingFrame, ClassType type);
 	
 	// Objects	
-	BasicObject PushObject();
-	BasicObject DefaultStruct(StructType struct);
+	IBasicObject PushObject();
+	IBasicObject DefaultStruct(StructType struct);
 	StringConst StringConst(String str);
 	ClassObject ClassObject(ClassType classType);
 	
-	OPObject OPObject(Statement container, OPCode op, BasicObject p1, Node p1Node, BasicObject p2, Node p2Node);
-	OPObject PostfixOPObject(Statement container, OPCode op, BasicObject p, Node pNode);
-	ArithmeticObject ArithmeticObject(Statement container, OPCode op, BasicObject p1, Node p1Node, BasicObject p2, Node p2Node);
-	JSArithmeticSetObject ArithmeticSetObject(Statement container, OPCode op, BasicObject p1, Node p1Node, BasicObject p2, Node p2Node);
+	OPObject OPObject(Statement container, OPCode op, IBasicObject p1, Node p1Node, IBasicObject p2, Node p2Node);
+	OPObject PostfixOPObject(Statement container, OPCode op, IBasicObject p, Node pNode);
+	ArithmeticObject ArithmeticObject(Statement container, OPCode op, IBasicObject p1, Node p1Node, IBasicObject p2, Node p2Node);
+	JSArithmeticSetObject ArithmeticSetObject(Statement container, OPCode op, IBasicObject p1, Node p1Node, IBasicObject p2, Node p2Node);
 	
-	CastedObject CastedObject(BasicObject obj, Type type, CodeFile file, int row, int col);
+	CastedObject CastedObject(IBasicObject obj, Type type, CodeFile file, int row, int col);
 	ExpressionObject ExpressionObject(ExpressionStatement exp);
 	
 	Var VarParameter(Frame frame, String name, Type type, int flags);
@@ -80,28 +80,28 @@ public interface CommandFactory {
 	
 	Var VarSuper(Frame frame, ClassType type);
 	
-	VarAccess VarAccess(Statement container, BasicObject var, BasicObject idx, Type type, CodeFile file, int row, int col);
+	VarAccess VarAccess(Statement container, IBasicObject var, IBasicObject idx, Type type, CodeFile file, int row, int col);
 	
-	EmptyArray EmptyArray(Node node, ParameterizedType<Type> type, List<BasicObject> dimensionSizes);
-	Array Array(List<BasicObject> values);
+	EmptyArray EmptyArray(Node node, ParameterizedType<Type> type, List<IBasicObject> dimensionSizes);
+	Array Array(List<IBasicObject> values);
 	
-	BasicObject NewInstance(Type type, Node typeNode, List<BasicObject> params);
+	IBasicObject NewInstance(Type type, Node typeNode, List<IBasicObject> params);
 	
-	ConditionalObject ConditionalObject(Statement container, OPCode op, BasicObject p1, Node p1Node, BasicObject p2, Node p2Node, BasicObject temp);
-	TernaryObject TernaryObject(Statement container, BasicObject condition, Node node_then, Node node_else, CodeFile file, int row, int col);
+	ConditionalObject ConditionalObject(Statement container, OPCode op, IBasicObject p1, Node p1Node, IBasicObject p2, Node p2Node, IBasicObject temp);
+	TernaryObject TernaryObject(Statement container, IBasicObject condition, Node node_then, Node node_else, CodeFile file, int row, int col);
 	
 	FuncHead FuncHead(CodeFile file, Frame parent, ClassType classIn, String inName, String outName, Node head, Type rtnType, Param[] params);
-    FuncPointer FuncPointer(Node nameNode, BasicObject objectIn, ParameterizedType<ITypeable> funcType);
-    FuncCallPointer FuncCallPointer(Node nameNode, BasicObject objectIn, BasicObject[] params);
+    FuncPointer FuncPointer(Node nameNode, IBasicObject objectIn, ParameterizedType<ITypeable> funcType);
+    FuncCallPointer FuncCallPointer(Node nameNode, IBasicObject objectIn, IBasicObject[] params);
     
     // Commands    
     Command Import(String name);
     
     Compilable BreakStatement(Frame frame);
     Compilable ContinueStatement(Frame frame);
-    Compilable ReturnStatement(Statement container, FuncHead returnFrom, BasicObject result);
+    Compilable ReturnStatement(Statement container, FuncHead returnFrom, IBasicObject result);
     
-    ExpressionStatement ExpressionStatement(Statement continer, BasicObject obj);
+    ExpressionStatement ExpressionStatement(Statement continer, IBasicObject obj);
     
     IfStatement IfStatement(Statement container, List<Conditional> conditionals);
     WhileStatement WhileStatement(Statement container, Node conditional, Node body);
