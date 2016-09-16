@@ -34,7 +34,7 @@ implements, extends, this, super
 ==================
 == Types 
 ==================
-bool, real, string, array, object
+bool, real, String, Array, Object
 
 ==================
 == Comments 
@@ -45,7 +45,15 @@ bool, real, string, array, object
 == Defining a variable
 ==================
 real i = 10;
-real j = 12;
+real j = 12, k = 21;
 String hi = "Hello world";
 
+// Two ways to define arrays
+Array<real> arr1 = [ 1, 2, 3];
+real[] arr2 = [ 1, 2, 3 ];
+
+// Legal but not recommended, essentually Array<Object> arr = [ 1, 2, 3 ];
+Array arr = [ 1, 2, 3 ];
+
 Note: semicolon at end of line is required. Multiple semicolon terminated expressions can be on one line
+
