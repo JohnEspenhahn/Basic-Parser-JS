@@ -27,7 +27,7 @@ public class JSContinueStatement extends ContinueStatement {
     
     @Override
     public String toTarget() {
-        return JSPretty.format(0, "continue");
+        return JSPretty.format(getFile().isPretty(), 0, "continue");
     }
     
 }

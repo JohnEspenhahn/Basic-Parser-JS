@@ -1,6 +1,5 @@
 package com.hahn.basic.target.js;
 
-import com.hahn.basic.Main;
 import com.hahn.basic.intermediate.Compiler;
 
 public class JSNodeOutputBuilder extends JSOutputBuilder {
@@ -26,7 +25,7 @@ public class JSNodeOutputBuilder extends JSOutputBuilder {
 	
 	@Override
 	public String getCodeEnd() {
-	    return (Main.getInstance().isPretty() ? "\n" : ";");
+	    return (compiler.isPretty() ? "\n" : ";");
 	}
 	
 	@Override

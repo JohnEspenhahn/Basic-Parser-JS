@@ -55,7 +55,7 @@ public class JSForStatement extends ForStatement {
     
     @Override
     public String toTarget() {
-        return JSPretty.format(0, "for(%S;_%S;_%L)%b",
+        return JSPretty.format(getFile().isPretty(), 0, "for(%S;_%S;_%L)%b",
                 getDefineStatement(),
                 getConditionStatement(),
                 getModifyFrame().getTargetCode().toArray(new IIntermediate[getModifyFrame().getTargetCode().size()]),

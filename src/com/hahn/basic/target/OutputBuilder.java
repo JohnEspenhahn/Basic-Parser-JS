@@ -1,7 +1,7 @@
 package com.hahn.basic.target;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
 public interface OutputBuilder {   
     String getStart();
@@ -23,7 +23,7 @@ public interface OutputBuilder {
     
     void append(Command cmd);
     void appendString(String str);
-    void writeRunnableTo(FileOutputStream os, String encoding) throws IOException;
+    void writeRunnableTo(OutputStream os, String encoding) throws IOException;
     
     @Override
     String toString();

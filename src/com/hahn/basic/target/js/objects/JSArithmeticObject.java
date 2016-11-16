@@ -15,7 +15,7 @@ public class JSArithmeticObject extends ArithmeticObject {
     
     @Override
     public String doToTarget() {        
-        return JSPretty.format("%s_%s_%s",
+        return JSPretty.format(getFile().isPretty(), "%s_%s_%s",
                 getP1().isGrouped() ? "("+getP1().toTarget()+")" : getP1().toTarget(),
                 getTargetOPSymbol(), 
                 getP2().isGrouped() ? "("+getP2().toTarget()+")" : getP2().toTarget()

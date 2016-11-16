@@ -4,6 +4,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
+import com.hahn.basic.intermediate.CodeFile;
+import com.hahn.basic.intermediate.Frame;
 import com.hahn.basic.intermediate.IIntermediate;
 import com.hahn.basic.intermediate.objects.types.ITypeable;
 import com.hahn.basic.intermediate.objects.types.ParameterizedType;
@@ -11,6 +13,7 @@ import com.hahn.basic.intermediate.objects.types.Type;
 
 public abstract class Array extends BasicObject implements IArray {
     
+	private Frame frame;
     private List<IBasicObject> values;
     
     /**
@@ -18,10 +21,15 @@ public abstract class Array extends BasicObject implements IArray {
      * @param values The values for the dimensions
      * @throws IllegalArgumentException If type does not extend Array
      */
-    public Array(List<IBasicObject> values) {
+    public Array(Frame frame, List<IBasicObject> values) {
         super("[...]", IArray.toArrayType(Type.OBJECT, 1));
         
+        this.frame = frame;
         this.values = values;
+    }
+    
+    public CodeFile getFile() {
+    	return this.frame.getFile();
     }
     
     public List<IBasicObject> getValues() {

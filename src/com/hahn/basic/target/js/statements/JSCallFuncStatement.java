@@ -35,9 +35,9 @@ public class JSCallFuncStatement extends CallFuncStatement {
     public String toTarget() {
         FuncCallPointer funccall = getFuncCallPointer();
         if (funccall.getObjectIn() == null) {
-            return JSPretty.format(0, "%s(%l)", funccall.getFuncId(), funccall.getParams());
+            return JSPretty.format(getFile().isPretty(), 0, "%s(%l)", funccall.getFuncId(), funccall.getParams());
         } else {
-            return JSPretty.format(0, "%s.%s(%l)", funccall.getObjectIn().toTarget(), funccall.getFuncId(), funccall.getParams());
+            return JSPretty.format(getFile().isPretty(), 0, "%s.%s(%l)", funccall.getObjectIn().toTarget(), funccall.getFuncId(), funccall.getParams());
         }
     }
     

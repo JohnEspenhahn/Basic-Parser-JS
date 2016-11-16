@@ -77,6 +77,10 @@ public class Compiler {
         return status;
     }
     
+    public boolean isPretty() {
+    	return getStatus().isPretty();
+    }
+    
     public CodeFile compile(String input) {
         CodeFile file = createCodeFile(input);
         file.startCompiling();

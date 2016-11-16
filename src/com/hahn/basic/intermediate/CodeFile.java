@@ -33,6 +33,8 @@ public class CodeFile {
     private Node node;
     private Frame frame;
     
+    private boolean isLibrary;
+    
     protected CodeFile(Compiler compiler, String input, OutputBuilder output, ILexerFactory lexerFactory, Parser parser) {
         this.compiler = compiler;
         this.fullText = input;
@@ -40,6 +42,7 @@ public class CodeFile {
         this.lines = new ArrayList<String>();
         this.rows = new Stack<Integer>();
         this.columns = new Stack<Integer>();
+        this.isLibrary = false;
         
         parse(lexerFactory.newInstance(this), parser);
     }
@@ -143,7 +146,7 @@ public class CodeFile {
             for (FuncHead func : funcGroup) {
                 if (func.hasFrameHead()) {
                     output.appendString(func.toFuncAreaTarget());
-                    output.appendString(JSPretty.format("^"));
+                    output.appendString(JSPretty.format(isPretty(), "^"));
                 }
             }
         }
@@ -152,8 +155,20 @@ public class CodeFile {
         output.appendString(output.getEnd());
     }
     
+    public boolean isLibrary() {
+    	return isLibrary;
+    }
+    
+    public void setIsLibrary() {
+    	this.isLibrary = true;
+    }
+    
     public Compiler getCompiler() {
         return compiler;
+    }
+    
+    public boolean isPretty() {
+    	return getCompiler().getStatus().isPretty();
     }
     
     public CommandFactory getFactory() {

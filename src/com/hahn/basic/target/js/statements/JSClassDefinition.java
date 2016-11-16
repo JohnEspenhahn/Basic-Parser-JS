@@ -24,7 +24,7 @@ public class JSClassDefinition extends ClassDefinition {
         boolean isChild = (clazz.getParent() instanceof ClassType);
         
         StringBuilder builder = new StringBuilder();
-        builder.append(JSPretty.format(0, "var %s_=_(function(%s)_{^", clazz.getName(), (isChild ? EnumToken.___s : "")));
+        builder.append(JSPretty.format(getFile().isPretty(), 0, "var %s_=_(function(%s)_{^", clazz.getName(), (isChild ? EnumToken.___s : "")));
         
         JSPretty.addTab();
         
@@ -40,34 +40,34 @@ public class JSClassDefinition extends ClassDefinition {
         String parentName = clazz.getParent().getName();
         
         // Extend super
-        if (isChild) builder.append(JSPretty.format(0, "%s(%s,%s);^", EnumToken.___e, localName, parentName));
+        if (isChild) builder.append(JSPretty.format(getFile().isPretty(), 0, "%s(%s,%s);^", EnumToken.___e, localName, parentName));
         
         // Main constructor
-        builder.append(JSPretty.format(0, "function %s()_{^", localName));
+        builder.append(JSPretty.format(getFile().isPretty(), 0, "function %s()_{^", localName));
         
         // Call super constructor and, if needed, add init frame
         if (!clazz.getInitFrame().isEmpty()) {
             JSPretty.addTab();
-            builder.append(JSPretty.format(0, "%s.call(this);^", EnumToken.___s));
-            builder.append(JSPretty.format(-1, "%s", clazz.getInitFrame()));
+            builder.append(JSPretty.format(getFile().isPretty(), 0, "%s.call(this);^", EnumToken.___s));
+            builder.append(JSPretty.format(getFile().isPretty(), -1, "%s", clazz.getInitFrame()));
             JSPretty.removeTab();
         } else {
-            builder.append(JSPretty.format(1, "%s.call(this)<;>", EnumToken.___s));
+            builder.append(JSPretty.format(getFile().isPretty(), 1, "%s.call(this)<;>", EnumToken.___s));
         }
         
-        builder.append(JSPretty.format(0, "^"));
-        builder.append(JSPretty.format(0, "}^"));
+        builder.append(JSPretty.format(getFile().isPretty(), 0, "^"));
+        builder.append(JSPretty.format(getFile().isPretty(), 0, "}^"));
         
         // Define class's static parameters
         for (StructParam param: clazz.getDefinedParams()) {
             if (param.hasFlag(BitFlag.STATIC)) {
-                builder.append(JSPretty.format(0, "%s.%s_=_undefined;^", localName, param.getName()));
+                builder.append(JSPretty.format(getFile().isPretty(), 0, "%s.%s_=_undefined;^", localName, param.getName()));
             }
         }
         
         // TODO class static frame
         if (!clazz.getStaticFrame().isEmpty()) {
-            builder.append(JSPretty.format(0, "%b^", clazz.getStaticFrame()));
+            builder.append(JSPretty.format(getFile().isPretty(), 0, "%b^", clazz.getStaticFrame()));
         }
         
         // Add functions
@@ -75,19 +75,19 @@ public class JSClassDefinition extends ClassDefinition {
             for (FuncHead func: funcGroup) {
                 if (func.hasFrameHead()) {                    
                     if (func.hasFlag(BitFlag.STATIC)) {
-                        builder.append(JSPretty.format(0, "%s.%s_=_%s;^", localName, func.getFuncId(), func.toFuncAreaTarget()));
+                        builder.append(JSPretty.format(getFile().isPretty(), 0, "%s.%s_=_%s;^", localName, func.getFuncId(), func.toFuncAreaTarget()));
                     } else {
-                        builder.append(JSPretty.format(0, "%s.prototype.%s_=_%s;^", localName, func.getFuncId(), func.toFuncAreaTarget()));
+                        builder.append(JSPretty.format(getFile().isPretty(), 0, "%s.prototype.%s_=_%s;^", localName, func.getFuncId(), func.toFuncAreaTarget()));
                     }
                 }
             }
         }
         
-        builder.append(JSPretty.format(0, "return %s<;^>", localName));        
+        builder.append(JSPretty.format(getFile().isPretty(), 0, "return %s<;^>", localName));        
         
         JSPretty.removeTab();
         
-        builder.append(JSPretty.format(0, "})(%s);^", (isChild ? parentName : "")));
+        builder.append(JSPretty.format(getFile().isPretty(), 0, "})(%s);^", (isChild ? parentName : "")));
         return builder.toString();
     }
     

@@ -58,12 +58,12 @@ public class JSIfStatement extends IfStatement {
             else first = false;
             
             if (cnd.hasCondition()) {
-                str.append(JSPretty.format("if(%s)%b",  cnd.getConditionObject(), cnd.getInnerFrame()));
+                str.append(JSPretty.format(getFile().isPretty(), "if(%s)%b",  cnd.getConditionObject(), cnd.getInnerFrame()));
             } else {
-                str.append(JSPretty.format("%b", cnd.getInnerFrame()));
+                str.append(JSPretty.format(getFile().isPretty(), "%b", cnd.getInnerFrame()));
             }            
         }
         
-        return JSPretty.format(0, "%s", str.toString());
+        return JSPretty.format(getFile().isPretty(), 0, "%s", str.toString());
     }   
 }

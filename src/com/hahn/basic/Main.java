@@ -12,10 +12,10 @@ import javax.swing.JFileChooser;
 
 import com.hahn.basic.definition.EnumExpression;
 import com.hahn.basic.definition.EnumToken;
+import com.hahn.basic.intermediate.CodeFile;
 import com.hahn.basic.intermediate.CompilerStatus;
 import com.hahn.basic.lexer.basic.BasicLexerFactory;
 import com.hahn.basic.target.CommandFactory;
-import com.hahn.basic.target.OutputBuilderFactory;
 import com.hahn.basic.target.js.JSCommandFactory;
 import com.hahn.basic.target.js.JSOutputBuilderFactory;
 import com.hahn.basic.util.exceptions.CompileException;
@@ -23,7 +23,6 @@ import com.hahn.basic.util.exceptions.CompileException;
 public abstract class Main {
 	public static final String ENCODING = "UTF-8";
 	
-    private static Main instance;
     private static final String FILE_KEY = "file";
         
     private Map<String, String> parameters;    
@@ -45,7 +44,7 @@ public abstract class Main {
     /**
      * Compile the inputed code
      */
-    public abstract String handleInput(String input);
+    public abstract CodeFile handleInput(String input);
     
     public void setInputType(EnumInputType type) {
         if (this.inputType == null) this.inputType = type;
@@ -137,8 +136,8 @@ public abstract class Main {
             } else if (input.equalsIgnoreCase("exit")) {
                 break;
             } else {
-                try {               
-                    String output = handleInput(input);
+                try {
+                    String output = handleInput(input).toString();
                     System.out.println(output);
                 } catch (CompileException e) {
                     printCompileException(e);
@@ -193,34 +192,13 @@ public abstract class Main {
         return getCompilerStatus().isPretty();
     }
     
-    public void setIsLibrary(boolean l) {
-        getCompilerStatus().setIsLibrary(l);
-    }
-    
-    public boolean isLibrary() {
-        return getCompilerStatus().isLibrary();
-    }
-    
     public void printCompileException(CompileException e) {
         getCompilerStatus().printCompileException(e);
     }
     
-    public static void forceNewInstance(OutputBuilderFactory out) {
-    	System.out.println("WARNING: Forcing new instance (hopefully for testing)");
-    	Main.instance = new KavaMain(new JSCommandFactory(), new BasicLexerFactory(), EnumToken.class, EnumExpression.class, out);
-    }
-    
-    public static Main getInstance() {
-    	if (Main.instance == null) {
-    		Main.instance = new KavaMain(new JSCommandFactory(), new BasicLexerFactory(), EnumToken.class, EnumExpression.class, new JSOutputBuilderFactory());
-    	}
-    	
-        return Main.instance;
-    }
-    
     public static void main(String[] args) {
         try {
-            Main instance = Main.getInstance();
+            Main instance = new KavaMain(new JSCommandFactory(), new BasicLexerFactory(), EnumToken.class, EnumExpression.class, new JSOutputBuilderFactory());
             
             String s;
             for (int i = 0; i < args.length; i++) {

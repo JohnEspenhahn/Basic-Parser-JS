@@ -207,8 +207,8 @@ public class JSCommandFactory implements CommandFactory {
     }
     
     @Override
-    public Array Array(List<IBasicObject> values) {
-        return new JSArray(values);
+    public Array Array(Statement container, List<IBasicObject> values) {
+        return new JSArray(container, values);
     }
     
     @Override

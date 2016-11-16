@@ -3,7 +3,7 @@ package com.hahn.basic.intermediate;
 import com.hahn.basic.util.exceptions.CompileException;
 
 public class CompilerStatus {
-    private boolean debug = false, pretty = false, library = false;
+    private boolean debug = false, pretty = false;
     
     public void toggleDebug() {
         debug = !debug;
@@ -23,14 +23,6 @@ public class CompilerStatus {
     
     public boolean isPretty() {
         return pretty;
-    }
-    
-    public void setIsLibrary(boolean l) {
-        this.library = l;
-    }
-    
-    public boolean isLibrary() {
-        return library;
     }
     
     public void printCompileException(CompileException e) {

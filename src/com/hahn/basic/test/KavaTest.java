@@ -4,15 +4,22 @@ import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
-import com.hahn.basic.Main;
+import com.hahn.basic.KavaMain;
+import com.hahn.basic.definition.EnumExpression;
+import com.hahn.basic.definition.EnumToken;
+import com.hahn.basic.lexer.basic.BasicLexerFactory;
+import com.hahn.basic.target.js.JSCommandFactory;
 import com.hahn.basic.target.js.JSNodeOutputBuilderFactory;
-import com.hahn.basic.util.exceptions.*;
+import com.hahn.basic.util.exceptions.CompileException;
+import com.hahn.basic.util.exceptions.DuplicateDefinitionException;
 
 public class KavaTest {
 	
+	private KavaMain kava;
+	
 	@Test
 	public void testIdentifiers() {
-		Main.forceNewInstance(new JSNodeOutputBuilderFactory());
+		kava = new KavaMain(new JSCommandFactory(), new BasicLexerFactory(), EnumToken.class, EnumExpression.class, new JSNodeOutputBuilderFactory());
 		
 		assertOK("real r = 1, j = 2; puts(r + j);");
 		assertCompileException("real j = 1;\nreal j = 2;", DuplicateDefinitionException.class, 2);
@@ -27,15 +34,18 @@ public class KavaTest {
 	}
 	
 	private void assertOK(String code) {
+		System.out.println("In:" + code);
+		
 		String res = "";
 		try {
-			res = Main.getInstance().handleInput(code);
+			res = kava.handleInput(code).toString();
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail("Wasn't OK");
 		}
 		
 		System.out.println("OK:" + res);
+		System.out.println();
 		
 		return;
 	}
@@ -50,7 +60,7 @@ public class KavaTest {
 
 	private void assertCompileException(String code, Class<? extends CompileException> type, int row) {
 		try {
-			Main.getInstance().handleInput(code);
+			kava.handleInput(code);
 		} catch (CompileException e) {
 			if (e.getClass() != type) {
 				fail("Wrong exception thrown " + e);

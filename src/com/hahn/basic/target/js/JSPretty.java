@@ -5,7 +5,6 @@ import java.util.UnknownFormatConversionException;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.hahn.basic.Main;
 import com.hahn.basic.intermediate.Frame;
 import com.hahn.basic.intermediate.IIntermediate;
 import com.hahn.basic.util.CompilerUtils;
@@ -19,8 +18,8 @@ public class JSPretty {
      * @param args If empty will ignore format
      * @return Formatted string
      */
-    public static String format(String format, Object... args) {
-        return JSPretty.format(-1, format, args);
+    public static String format(final boolean pretty, String format, Object... args) {
+        return JSPretty.format(pretty, -1, format, args);
     }
     
     /**
@@ -30,8 +29,8 @@ public class JSPretty {
      * @param args If empty will ignore format
      * @return Formatted string with indent and `tabs` extra tabs
      */
-    public static String format(final int tabs, String format, Object... args) {
-        if (Main.getInstance().isPretty() && tabs >= 0) JSPretty.setTabs(getTabs() + tabs);
+    public static String format(final boolean pretty, final int tabs, String format, Object... args) {
+        if (pretty && tabs >= 0) JSPretty.setTabs(getTabs() + tabs);
         
         StringBuilder builder = new StringBuilder(format.length());
         
@@ -41,13 +40,13 @@ public class JSPretty {
             char c = format.charAt(i);
             if (isFlag) {
                 isFlag = false;
-                handleFlag(builder, c, args[argIdx++]);
+                handleFlag(pretty, builder, c, args[argIdx++]);
                 
             } else if (c == '%') {
                 isFlag = true;
                 
             } else if (c == '<') {
-                if (!Main.getInstance().isPretty()) {
+                if (!pretty) {
                     do {
                         i += 1;
                     } while (i < format.length() && format.charAt(i) != '>');
@@ -56,14 +55,14 @@ public class JSPretty {
                 continue;
                 
             } else {
-                handleToken(builder, c);
+                handleToken(pretty, builder, c);
             }
         }
         
         if (isFlag) throw new MissingFormatArgumentException(format);
         
         String str;        
-        if (Main.getInstance().isPretty() && tabs >= 0) {
+        if (pretty && tabs >= 0) {
             str = getIndent() + builder.toString();
             JSPretty.indent -= tabs;
         } else {
@@ -73,7 +72,7 @@ public class JSPretty {
         return str;
     }
     
-    private static void handleFlag(StringBuilder str, char flag, Object arg) {
+    private static void handleFlag(final boolean pretty, StringBuilder str, char flag, Object arg) {
         boolean require_brace = true;
         final int oldIndent = JSPretty.getTabs();
         
@@ -103,25 +102,25 @@ public class JSPretty {
             
             Frame frame = (Frame) arg;
             if (frame.isEmpty()) {
-                if (require_brace) str.append(Main.getInstance().isPretty() ? " {}" : "{}");
-                else str.append(Main.getInstance().isPretty() ? " ;" : ";");
+                if (require_brace) str.append(pretty ? " {}" : "{}");
+                else str.append(pretty ? " ;" : ";");
             } else {
                 // If more than one object in frame requires brace
                 require_brace = require_brace || frame.getSize() > 1;
                 
                 if (require_brace) {
                     JSPretty.setTabs(getTabs() + 1);
-                    str.append(Main.getInstance().isPretty() ? " {\n" : "{");
+                    str.append(pretty ? " {\n" : "{");
                 } else {
                     JSPretty.setTabs(0);
-                    str.append(Main.getInstance().isPretty() ? " " : "");
+                    str.append(pretty ? " " : "");
                 }
                 
                 str.append(arg instanceof IIntermediate ? ((IIntermediate) arg).toTarget() : arg);
                 
                 if (require_brace) {
                     JSPretty.setTabs(getTabs() - 1);
-                    str.append(Main.getInstance().isPretty() ? getIndent() + "}" : "}");
+                    str.append(pretty ? getIndent() + "}" : "}");
                 } else {
                     JSPretty.setTabs(oldIndent);
                 }
@@ -158,8 +157,8 @@ public class JSPretty {
         }
     }
     
-    private static void handleToken(StringBuilder str, char token) {
-        if (Main.getInstance().isPretty()) {
+    private static void handleToken(final boolean pretty, StringBuilder str, char token) {
+        if (pretty) {
             switch (token) {
             case ',':
                 str.append(", ");

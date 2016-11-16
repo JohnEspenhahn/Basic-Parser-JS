@@ -15,7 +15,7 @@ import com.hahn.basic.target.OutputBuilder;
 import com.hahn.basic.target.OutputBuilderFactory;
 
 public class KavaMain extends Main {
-    public static final String VERSION = "3.0.0";
+    public static final String VERSION = "3.1.0";
     
     private final CompilerStatus status;
     
@@ -55,12 +55,12 @@ public class KavaMain extends Main {
     }
     
     @Override
-    public String handleInput(String input) {
+    public CodeFile handleInput(String input) {
         compiler = new Compiler(factory, lexerFactory, tokens, expressions, outputFactory, status);
         CodeFile file = compiler.compile(input);
 
         if (getInputFile() != null) writeToFile(file.getOutputBuilder());
-        return file.toString();
+        return file;
     }
     
     private void writeToFile(OutputBuilder code) {

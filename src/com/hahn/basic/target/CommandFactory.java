@@ -83,7 +83,7 @@ public interface CommandFactory {
 	VarAccess VarAccess(Statement container, IBasicObject var, IBasicObject idx, Type type, CodeFile file, int row, int col);
 	
 	EmptyArray EmptyArray(Node node, ParameterizedType<Type> type, List<IBasicObject> dimensionSizes);
-	Array Array(List<IBasicObject> values);
+	Array Array(Statement container, List<IBasicObject> values);
 	
 	IBasicObject NewInstance(Type type, Node typeNode, List<IBasicObject> params);
 	

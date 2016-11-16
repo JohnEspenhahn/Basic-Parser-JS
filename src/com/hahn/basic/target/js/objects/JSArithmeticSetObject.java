@@ -54,14 +54,14 @@ public class JSArithmeticSetObject extends ArithmeticSetObject {
                 throw new RuntimeException("Unhandled arithmetic set condition");
             }
             
-            return JSPretty.format("%s.%s(%s,%s)",
+            return JSPretty.format(getFile().isPretty(), "%s.%s(%s,%s)",
                     arr.toTarget(),
                     action,
                     idx.toTarget(),
                     getP2().toTarget()
                    );
         } else {
-            return JSPretty.format("%s_%s_%s",
+            return JSPretty.format(getFile().isPretty(), "%s_%s_%s",
                     getP1().isGrouped() ? "("+getP1().toTarget()+")" : getP1().toTarget(),
                     getTargetOPSymbol(), 
                     getP2().isGrouped() ? "("+getP2().toTarget()+")" : getP2().toTarget()

@@ -8,11 +8,13 @@ import com.hahn.basic.intermediate.objects.IFileObject;
 import com.hahn.basic.target.Command;
 import com.hahn.basic.target.CommandFactory;
 
+import lombok.NonNull;
+
 public abstract class Compilable implements IIntermediate, IFileObject, Command {
     public final int row;
     private final Frame frame;
 
-    public Compilable(Frame f, int row) {
+    public Compilable(@NonNull Frame f, int row) {
         this.frame = f;
         this.row = row;
     }

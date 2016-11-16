@@ -1,22 +1,25 @@
 package com.hahn.basic.target.js;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
-import com.hahn.basic.Main;
 import com.hahn.basic.intermediate.Compiler;
 import com.hahn.basic.intermediate.library.base.Library;
 import com.hahn.basic.target.Command;
 import com.hahn.basic.target.OutputBuilder;
 import com.hahn.basic.target.js.library.LibraryJS;
 
+import lombok.NonNull;
+
 public class JSOutputBuilder implements OutputBuilder {
     public static final Library JS = new LibraryJS();
     
+    protected final Compiler compiler;
 	private StringBuilder builder;
 
-	public JSOutputBuilder(Compiler compiler) {
-		builder = new StringBuilder();
+	public JSOutputBuilder(@NonNull Compiler compiler) {
+		this.builder = new StringBuilder();
+		this.compiler = compiler;
 	}
 	
 	@Override
@@ -46,18 +49,18 @@ public class JSOutputBuilder implements OutputBuilder {
 	
 	@Override
 	public String getCodeEnd() {
-	    return (Main.getInstance().isPretty() ? "\n" : ";");
+	    return (compiler.isPretty() ? "\n" : ";");
 	}
 	
 	@Override
 	public String getContentStart() {
 	    JSPretty.addTab();
-	    return (Main.getInstance().isPretty() ? "\n<script>\nfunction main() {\n" : "<script>function main(){");
+	    return (compiler.isPretty() ? "\n<script>\nfunction main() {\n" : "<script>function main(){");
 	}
 	
 	@Override
     public String getEnd() {
-        return (Main.getInstance().isPretty() ? "\n" : "") + "</script>\n</head>\n</html>";
+        return (compiler.isPretty() ? "\n" : "") + "</script>\n</head>\n</html>";
     }
 	
 	@Override
@@ -65,13 +68,13 @@ public class JSOutputBuilder implements OutputBuilder {
 	    StringBuilder endBuilder = new StringBuilder();
 	    
 	    JSPretty.removeTab();
-	    endBuilder.append(Main.getInstance().isPretty() ? "}\n" : "}");
+	    endBuilder.append(compiler.isPretty() ? "}\n" : "}");
         
         return endBuilder.toString();
 	}
 
 	@Override
-	public void writeRunnableTo(FileOutputStream os, String encoding) throws IOException {
+	public void writeRunnableTo(OutputStream os, String encoding) throws IOException {
 		os.write(builder.toString().getBytes(encoding));
 		os.write('\n');
 	}

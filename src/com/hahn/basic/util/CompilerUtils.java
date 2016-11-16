@@ -3,14 +3,13 @@ package com.hahn.basic.util;
 import java.util.Arrays;
 import java.util.Iterator;
 
-import com.hahn.basic.Main;
 import com.hahn.basic.intermediate.IIntermediate;
 import com.hahn.basic.parser.Node;
 
 public class CompilerUtils {
     
     public static String getListSeperator() {
-        return (Main.getInstance().isPretty() ? ", " : ",");
+        return ",";
     }
     
     public static String toTarget(IIntermediate[] arr) {

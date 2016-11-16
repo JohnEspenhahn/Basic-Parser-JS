@@ -192,13 +192,13 @@ public class OPObject extends BasicObject implements IFileObject {
      */
     public String doToTarget() {
         if (getP2() != null) {
-            return JSPretty.format("%s_%s_%s",
+            return JSPretty.format(getFile().isPretty(), "%s_%s_%s",
                     getP1().isGrouped() ? "("+getP1().toTarget()+")" : getP1().toTarget(),
                     getTargetOPSymbol(), 
                     getP2().isGrouped() ? "("+getP2().toTarget()+")" : getP2().toTarget()
                    );
         } else {
-            return JSPretty.format("%s%s",
+            return JSPretty.format(getFile().isPretty(), "%s%s",
                     getTargetOPSymbol(),
                     getP1().isExpression() ? "("+getP1().toTarget()+")" : getP1().toTarget()
                    );

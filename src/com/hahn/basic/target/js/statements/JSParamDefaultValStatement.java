@@ -20,7 +20,7 @@ public class JSParamDefaultValStatement extends ParamDefaultValStatement {
         while (it.hasNext()) {
             DefinePair pair = it.next();
             str.append(
-                    JSPretty.format(0, "%s_=_typeof %s_!==_'undefined'_?_%s" + (it.hasNext() ? ";^" : ""), 
+                    JSPretty.format(getFile().isPretty(), 0, "%s_=_typeof %s_!==_'undefined'_?_%s" + (it.hasNext() ? ";^" : ""), 
                       pair.var.toTarget(),
                       pair.var.toTarget(),
                       pair.val.isGrouped() ? "("+pair.val.toTarget()+")" : pair.val.toTarget()

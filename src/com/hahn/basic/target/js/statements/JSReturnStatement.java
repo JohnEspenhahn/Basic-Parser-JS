@@ -42,7 +42,7 @@ public class JSReturnStatement extends ReturnStatement {
     @Override
     public String toTarget() {
         if (getResult() != null) {
-            return JSPretty.format(0, "return %s", getResult());
+            return JSPretty.format(getFile().isPretty(), 0, "return %s", getResult());
         } else {
             return "return";
         }

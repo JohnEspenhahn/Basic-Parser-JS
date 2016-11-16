@@ -48,17 +48,16 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import com.hahn.basic.Main;
 import com.hahn.basic.definition.EnumExpression;
 import com.hahn.basic.definition.EnumToken;
 import com.hahn.basic.intermediate.function.FuncHead;
 import com.hahn.basic.intermediate.objects.AdvancedObject;
 import com.hahn.basic.intermediate.objects.Array;
-import com.hahn.basic.intermediate.objects.IBasicObject;
 import com.hahn.basic.intermediate.objects.EmptyArray;
 import com.hahn.basic.intermediate.objects.FuncCallPointer;
 import com.hahn.basic.intermediate.objects.FuncPointer;
 import com.hahn.basic.intermediate.objects.IArray;
+import com.hahn.basic.intermediate.objects.IBasicObject;
 import com.hahn.basic.intermediate.objects.LiteralBool;
 import com.hahn.basic.intermediate.objects.LiteralNum;
 import com.hahn.basic.intermediate.objects.OPObject;
@@ -93,8 +92,10 @@ import com.hahn.basic.util.structures.BitFlag;
 import com.hahn.basic.util.structures.NestedListIterator;
 import com.hahn.basic.viewer.util.TextColor;
 
+import lombok.NonNull;
+
 public class Frame extends Statement {  
-    private final CodeFile file;
+    protected final CodeFile file;
     
     private final Frame parent;
     private final Node frameHead;
@@ -115,7 +116,7 @@ public class Frame extends Statement {
      * @param parent The parent frame
      * @param head The frame head
      */
-    public Frame(CodeFile file, Frame parent, Node head) {
+    public Frame(@NonNull CodeFile file, Frame parent, Node head) {
     	this(file, parent, head, false);
     }
     
@@ -126,7 +127,7 @@ public class Frame extends Statement {
      * @param head The frame head
      * @param loopable True if frame can be looped (ex: for loop, function).
      */
-    public Frame(CodeFile file, Frame parent, Node head, boolean loopable) {
+    public Frame(@NonNull CodeFile file, Frame parent, Node head, boolean loopable) {
         super(null, file.getCurrentRow());
         
         this.file = file;
@@ -224,11 +225,11 @@ public class Frame extends Statement {
                 str.append(cs);
                 
                 boolean eol = !c.isBlock() && it.hasNext();
-                if (Main.getInstance().isPretty() || eol) {
+                if (file.isPretty() || eol) {
                     str.append(getFile().getCompiler().getFactory().getEOL());
                     
                     // Pretty print new line
-                    if (Main.getInstance().isPretty() && eol) str.append('\n');
+                    if (file.isPretty() && eol) str.append('\n');
                 }
             }
         }
@@ -918,7 +919,7 @@ public class Frame extends Statement {
             }
         }
         
-        return getFactory().Array(values);
+        return getFactory().Array(this, values);
     }
     
     private void defineClassVar(ClassType classIn, IBasicObject var, Node varNode, IBasicObject val, Node valNode) {
@@ -1000,9 +1001,7 @@ public class Frame extends Statement {
         getFile().pushCurrentPoint(nameNode.getRow(), nameNode.getCol());
         
         // Don't add class code if library
-        if (Main.getInstance().isLibrary()) {
-            flags |= BitFlag.SYSTEM.b;
-        }
+        if (file.isLibrary()) flags |= BitFlag.SYSTEM.b;
         
         // Get parent classes
         Node node;
@@ -1143,7 +1142,7 @@ public class Frame extends Statement {
                     }
                 }
             } else if (token == EnumExpression.BLOCK) {
-                if (!Main.getInstance().isLibrary()) body = child;
+                if (!file.isLibrary()) body = child;
                 else body = null;
             }
         }
@@ -1438,13 +1437,7 @@ public class Frame extends Statement {
         
         switch (directive) {
         case "library":
-            Main.getInstance().setIsLibrary(true);
-            break;
-        case "end_library":
-            Main.getInstance().setIsLibrary(false);
-            break;
-        case "eof":
-            Main.getInstance().setIsLibrary(false);
+            file.setIsLibrary();
             break;
         default:
             throw new CompileException("Unknown preprocessor directive `" + directive + "`", head);
